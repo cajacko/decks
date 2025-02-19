@@ -1,45 +1,98 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { useAppSelector } from "@/store/hooks";
-import { selectVisibleCardInstances } from "@/store/slices/stacks";
+import { View, StyleSheet, StyleProp, ViewStyle, Text } from "react-native";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  selectVisibleCardInstances,
+  shuffleStack,
+} from "@/store/slices/stacks";
 import CardInstance from "./CardInstance";
+import StackTopCard from "./StackTopCard";
+import EmptyStack from "./EmptyStack";
+import CardAction from "./CardAction";
 
 export interface StackProps {
   stackId: string;
+  cardWidth?: number;
+  style?: StyleProp<ViewStyle>;
 }
 
-export default function Stack({ stackId }: StackProps): React.ReactNode {
+export default function Stack({
+  stackId,
+  style,
+  cardWidth,
+}: StackProps): React.ReactNode {
+  const dispatch = useAppDispatch();
+
   const cardInstances = useAppSelector((state) =>
     selectVisibleCardInstances(state, { stackId })
   );
 
+  const handleShuffle = React.useCallback(() => {
+    dispatch(shuffleStack({ stackId, allCardInstancesState: "noChange" }));
+  }, [dispatch, stackId]);
+
   return (
-    <View style={styles.container}>
-      {cardInstances?.map(({ cardId, cardInstanceId, state }, i) => (
-        <CardInstance
-          key={cardInstanceId}
-          cardId={cardId}
-          state={state}
-          // TODO: would be good to maintain the rotation angles when moving cards around
-          // Prob store this in local component state?
-          // Also handle any number of rendered items, not just 3
-          style={[
-            styles.card,
-            i === 0
-              ? styles.topCard
-              : i === 1
-              ? styles.secondCard
-              : styles.thirdCard,
-          ]}
-        />
-      ))}
+    <View style={StyleSheet.flatten([styles.container, style])}>
+      <View style={styles.inner}>
+        {cardInstances?.map(({ cardId, cardInstanceId, state }, i) =>
+          i === 0 ? (
+            <StackTopCard
+              key={cardInstanceId}
+              cardId={cardId}
+              state={state}
+              style={styles.topCard}
+              width={cardWidth}
+            />
+          ) : (
+            <CardInstance
+              key={cardInstanceId}
+              cardId={cardId}
+              state={state}
+              width={cardWidth}
+              // TODO: would be good to maintain the rotation angles when moving cards around
+              // Prob store this in local component state?
+              // Also handle any number of rendered items, not just 3
+              style={
+                i === 0
+                  ? styles.topCard
+                  : i === 1
+                  ? styles.secondCard
+                  : styles.thirdCard
+              }
+            />
+          )
+        ) ?? <EmptyStack cardWidth={cardWidth} />}
+        {cardInstances && (
+          <CardAction
+            icon="Sh"
+            style={styles.shuffleButton}
+            onPress={handleShuffle}
+          />
+        )}
+      </View>
     </View>
   );
 }
 
+const marginLeft = 50;
+const marginBottom = marginLeft;
+
 const styles = StyleSheet.create({
-  container: {},
-  card: {},
+  container: {
+    position: "relative",
+  },
+  inner: {
+    marginTop: 10,
+    marginHorizontal: 20,
+    marginLeft,
+    marginBottom,
+  },
+  shuffleButton: {
+    position: "absolute",
+    bottom: -marginBottom,
+    left: -marginLeft,
+    zIndex: 5,
+  },
   topCard: {
     position: "relative",
     zIndex: 3,

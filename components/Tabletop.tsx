@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import Stack from "./Stack";
 import { useAppSelector } from "@/store/hooks";
 import { selectStackIds } from "@/store/slices/tabletop";
@@ -20,10 +20,24 @@ export default function Tabletop({
   }
 
   return (
-    <View>
+    <ScrollView style={styles.container} horizontal>
       {stackIds.map((stackId) => (
-        <Stack key={stackId} stackId={stackId} />
+        <Stack
+          key={stackId}
+          stackId={stackId}
+          style={styles.stack}
+          cardWidth={300}
+        />
       ))}
-    </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+  },
+  stack: {
+    marginHorizontal: 20,
+  },
+});

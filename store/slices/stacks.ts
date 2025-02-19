@@ -54,22 +54,22 @@ const initialState: StackState = {
         {
           cardInstanceId: "cardInstance2",
           cardId: "card2",
-          state: CardInstanceState.faceDown,
+          state: CardInstanceState.faceUp,
         },
         {
           cardInstanceId: "cardInstance3",
           cardId: "card3",
-          state: CardInstanceState.faceDown,
+          state: CardInstanceState.faceUp,
         },
         {
           cardInstanceId: "cardInstance4",
           cardId: "card4",
-          state: CardInstanceState.faceDown,
+          state: CardInstanceState.faceUp,
         },
         {
           cardInstanceId: "cardInstance5",
           cardId: "card5",
-          state: CardInstanceState.faceDown,
+          state: CardInstanceState.faceUp,
         },
       ],
     },
@@ -113,11 +113,30 @@ export const stacksSlice = createSlice({
         stackId: string;
         allCardInstancesState: CardInstanceState | "noChange";
       }>
-    ) => {},
+    ) => {
+      const stack = state.stacksById[action.payload.stackId];
+
+      if (!stack) return;
+
+      const shuffledCardInstances = [...stack.cardInstances].sort(
+        () => Math.random() - 0.5
+      );
+
+      state.stacksById[action.payload.stackId] = {
+        ...stack,
+        cardInstances: shuffledCardInstances.map((cardInstance) => ({
+          ...cardInstance,
+          state:
+            action.payload.allCardInstancesState === "noChange"
+              ? cardInstance.state
+              : action.payload.allCardInstancesState,
+        })),
+      };
+    },
   },
 });
 
-// export const { setCard, setCards } = stacksSlice.actions;
+export const { shuffleStack } = stacksSlice.actions;
 
 export const selectStack = (
   state: RootState,
@@ -133,7 +152,15 @@ export const selectCardInstances = (
 // there were none, or whatever we have if there's less than 3
 export const selectVisibleCardInstances = createCachedSelector(
   selectCardInstances,
-  (cardInstances) => cardInstances?.slice(0, 3) ?? null
+  (cardInstances) => {
+    const sliced = cardInstances?.slice(0, 3) ?? [];
+
+    if (sliced.length === 0) {
+      return null;
+    }
+
+    return sliced;
+  }
 )((state, props) => props.stackId);
 
 export default stacksSlice;
