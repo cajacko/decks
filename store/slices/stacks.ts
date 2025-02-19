@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createCachedSelector } from "re-reselect";
 // You can safely import the RootState type from the store file here. It's a circular import, but
 // the TypeScript compiler can correctly handle that for types. This may be needed for use cases
 // like writing selector functions.
@@ -122,5 +123,17 @@ export const selectStack = (
   state: RootState,
   props: { stackId: string }
 ): Stack | null => state[stacksSlice.name].stacksById[props.stackId] ?? null;
+
+export const selectCardInstances = (
+  state: RootState,
+  props: { stackId: string }
+): CardInstance[] | null => selectStack(state, props)?.cardInstances ?? null;
+
+// Uses createCachedSelector to select the first 3 cards only from selectCardInstances or null if
+// there were none, or whatever we have if there's less than 3
+export const selectVisibleCardInstances = createCachedSelector(
+  selectCardInstances,
+  (cardInstances) => cardInstances?.slice(0, 3) ?? null
+)((state, props) => props.stackId);
 
 export default stacksSlice;

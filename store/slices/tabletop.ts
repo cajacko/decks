@@ -61,4 +61,9 @@ export const selectTabletop = (
 ): Tabletop | null =>
   state[tabletopsSlice.name].tabletopsById[props.tabletopId] ?? null;
 
+export const selectStackIds = (
+  state: RootState,
+  props: { tabletopId: string }
+): string[] | null => selectTabletop(state, props)?.stacksIds ?? null;
+
 export default tabletopsSlice;

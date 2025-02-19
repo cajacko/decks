@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import Stack from "@/components/Stack";
+import Tabletop from "@/components/Tabletop";
 
 export default function TabTwoScreen() {
   return (
@@ -16,7 +16,7 @@ export default function TabTwoScreen() {
         />
       }
     >
-      <Stack />
+      <Tabletop tabletopId="tabletop1" />
     </ParallaxScrollView>
   );
 }

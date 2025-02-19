@@ -7,7 +7,7 @@ import type { RootState } from "../store";
 
 // TODO: Where are styles defined, deck, card, both? What happens when a card is in multiple decks?
 export interface Card {
-  id: string;
+  cardId: string;
 }
 
 export interface CardsState {
@@ -18,19 +18,19 @@ export interface CardsState {
 const initialState: CardsState = {
   cardsById: {
     card1: {
-      id: "card1",
+      cardId: "card1",
     },
     card2: {
-      id: "card2",
+      cardId: "card2",
     },
     card3: {
-      id: "card3",
+      cardId: "card3",
     },
     card4: {
-      id: "card4",
+      cardId: "card4",
     },
     card5: {
-      id: "card5",
+      cardId: "card5",
     },
   },
 };
@@ -40,11 +40,11 @@ export const cardsSlice = createSlice({
   initialState,
   reducers: {
     setCard: (state, actions: PayloadAction<Card>) => {
-      state.cardsById[actions.payload.id] = actions.payload;
+      state.cardsById[actions.payload.cardId] = actions.payload;
     },
     setCards: (state, actions: PayloadAction<Card[]>) => {
       actions.payload.forEach((card) => {
-        state.cardsById[card.id] = card;
+        state.cardsById[card.cardId] = card;
       });
     },
     removeCard: (state, actions: PayloadAction<{ cardId: string }>) => {

@@ -4,11 +4,13 @@ import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 export interface CardProps {
   width?: number;
   style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
 }
 
 export default function Card({
   style,
   width = 200,
+  children,
   ...rest
 }: CardProps): React.ReactNode {
   return (
@@ -23,7 +25,9 @@ export default function Card({
         style,
       ])}
       {...rest}
-    />
+    >
+      {children}
+    </View>
   );
 }
 
