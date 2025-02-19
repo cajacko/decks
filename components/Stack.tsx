@@ -75,7 +75,7 @@ export default function Stack({
             />
           );
         }) ?? <EmptyStack cardWidth={cardWidth} />}
-        {cardInstances && (
+        {cardInstances && cardInstances.length > 1 && (
           <CardAction
             icon="Sh"
             style={styles.shuffleButton}

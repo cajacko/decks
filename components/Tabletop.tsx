@@ -1,15 +1,17 @@
 import React from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleProp, StyleSheet, ViewStyle } from "react-native";
 import Stack from "./Stack";
 import { useAppSelector } from "@/store/hooks";
 import { selectStackIds } from "@/store/slices/tabletop";
 
 export interface TabletopProps {
   tabletopId: string;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function Tabletop({
   tabletopId,
+  style,
 }: TabletopProps): React.ReactNode {
   const stackIds = useAppSelector((state) =>
     selectStackIds(state, { tabletopId })
@@ -20,7 +22,11 @@ export default function Tabletop({
   }
 
   return (
-    <ScrollView style={styles.container} horizontal>
+    <ScrollView
+      style={StyleSheet.flatten([styles.scrollView, style])}
+      contentContainerStyle={styles.container}
+      horizontal
+    >
       {stackIds.map((stackId) => (
         <Stack
           key={stackId}
@@ -36,8 +42,11 @@ export default function Tabletop({
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flexDirection: "row",
+  },
+  container: {
+    alignItems: "center",
   },
   stack: {
     marginHorizontal: 20,
