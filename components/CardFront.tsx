@@ -4,13 +4,14 @@ import { selectCard } from "@/store/slices/cards";
 import { useAppSelector } from "@/store/hooks";
 import { Text, StyleSheet } from "react-native";
 
-export interface CardFrontProps extends Pick<CardProps, "style"> {
+export interface CardFrontProps extends Pick<CardProps, "style" | "children"> {
   cardId: string;
 }
 
 export default function CardFront({
   cardId,
   style,
+  children,
   ...rest
 }: CardFrontProps): React.ReactNode {
   const card = useAppSelector((state) => selectCard(state, { cardId }));
@@ -21,7 +22,8 @@ export default function CardFront({
 
   return (
     <Card {...rest} style={StyleSheet.flatten([style, styles.container])}>
-      <Text style={styles.text}>{card.cardId}</Text>
+      <Text style={styles.text}>{card.cardId} (front)</Text>
+      {children}
     </Card>
   );
 }

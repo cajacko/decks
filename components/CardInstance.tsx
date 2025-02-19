@@ -4,7 +4,8 @@ import { CardInstanceState } from "@/store/slices/stacks";
 import CardFront from "./CardFront";
 import CardBack from "./CardBack";
 
-export interface CardInstanceProps extends Pick<CardProps, "style" | "width"> {
+export interface CardInstanceProps
+  extends Pick<CardProps, "style" | "width" | "children"> {
   cardId: string;
   state: CardInstanceState;
 }

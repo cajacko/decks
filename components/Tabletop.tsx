@@ -27,6 +27,8 @@ export default function Tabletop({
           stackId={stackId}
           style={styles.stack}
           cardWidth={300}
+          leftStackId={stackIds[stackIds.indexOf(stackId) - 1]}
+          rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
         />
       ))}
     </ScrollView>

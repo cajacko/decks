@@ -7,9 +7,14 @@ export interface CardProps {
   children?: React.ReactNode;
 }
 
+const defaultWidth = 200;
+
+export const getCardHeight = (width: number | null): number =>
+  Math.round((width ?? defaultWidth) * 1.4);
+
 export default function Card({
   style,
-  width = 200,
+  width = defaultWidth,
   children,
   ...rest
 }: CardProps): React.ReactNode {
@@ -19,7 +24,7 @@ export default function Card({
         styles.container,
         {
           width: width,
-          height: Math.round(width * 1.4),
+          height: getCardHeight(width),
           borderRadius: Math.round(width / 20),
         },
         style,

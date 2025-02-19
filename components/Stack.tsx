@@ -14,12 +14,16 @@ export interface StackProps {
   stackId: string;
   cardWidth?: number;
   style?: StyleProp<ViewStyle>;
+  leftStackId?: string;
+  rightStackId?: string;
 }
 
 export default function Stack({
   stackId,
   style,
   cardWidth,
+  leftStackId,
+  rightStackId,
 }: StackProps): React.ReactNode {
   const dispatch = useAppDispatch();
 
@@ -34,16 +38,25 @@ export default function Stack({
   return (
     <View style={StyleSheet.flatten([styles.container, style])}>
       <View style={styles.inner}>
-        {cardInstances?.map(({ cardId, cardInstanceId, state }, i) =>
-          i === 0 ? (
-            <StackTopCard
-              key={cardInstanceId}
-              cardId={cardId}
-              state={state}
-              style={styles.topCard}
-              width={cardWidth}
-            />
-          ) : (
+        {cardInstances?.map(({ cardId, cardInstanceId, state }, i) => {
+          if (i === 0) {
+            return (
+              <StackTopCard
+                key={cardInstanceId}
+                cardId={cardId}
+                state={state}
+                style={styles.topCard}
+                width={cardWidth}
+                cardInstanceId={cardInstanceId}
+                stackId={stackId}
+                leftStackId={leftStackId}
+                rightStackId={rightStackId}
+                canMoveToBottom={cardInstances.length > 1}
+              />
+            );
+          }
+
+          return (
             <CardInstance
               key={cardInstanceId}
               cardId={cardId}
@@ -60,8 +73,8 @@ export default function Stack({
                   : styles.thirdCard
               }
             />
-          )
-        ) ?? <EmptyStack cardWidth={cardWidth} />}
+          );
+        }) ?? <EmptyStack cardWidth={cardWidth} />}
         {cardInstances && (
           <CardAction
             icon="Sh"
@@ -76,13 +89,14 @@ export default function Stack({
 
 const marginLeft = 50;
 const marginBottom = marginLeft;
+const marginTop = marginBottom;
 
 const styles = StyleSheet.create({
   container: {
     position: "relative",
   },
   inner: {
-    marginTop: 10,
+    marginTop,
     marginHorizontal: 20,
     marginLeft,
     marginBottom,
@@ -91,11 +105,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: -marginBottom,
     left: -marginLeft,
-    zIndex: 5,
+    zIndex: 3,
   },
   topCard: {
     position: "relative",
-    zIndex: 3,
+    zIndex: 4,
   },
   // TODO: Darken cards behind the front? Potential render a black translucent card over the top of
   // each?

@@ -96,9 +96,68 @@ export const stacksSlice = createSlice({
         toStackId: string;
         // Do we specify the method, or let the stack define it? Or both? If specified here it's
         // more specific, otherwise do what the stack it's going to says
-        // method: MoveCardInstanceMethod
+        method: MoveCardInstanceMethod;
       }>
-    ) => {},
+    ) => {
+      const fromStack = state.stacksById[action.payload.fromStackId];
+      const toStack = state.stacksById[action.payload.toStackId];
+
+      if (!fromStack || !toStack) return;
+
+      const cardInstance = fromStack.cardInstances.find(
+        (cardInstance) =>
+          cardInstance.cardInstanceId === action.payload.cardInstanceId
+      );
+
+      if (!cardInstance) return;
+
+      // Update the card instance state based on the method
+      switch (action.payload.method) {
+        case MoveCardInstanceMethod.topFaceUp:
+        case MoveCardInstanceMethod.bottomFaceUp:
+          cardInstance.state = CardInstanceState.faceUp;
+          break;
+        case MoveCardInstanceMethod.topFaceDown:
+        case MoveCardInstanceMethod.bottomFaceDown:
+          cardInstance.state = CardInstanceState.faceDown;
+          break;
+        case MoveCardInstanceMethod.topNoChange:
+        case MoveCardInstanceMethod.bottomNoChange:
+        default:
+          // Nothing needed here, this is just to remind us that this is on purpose
+          break;
+      }
+
+      if (fromStack.id === toStack.id) {
+        // Moving within the same stack so sort it
+        fromStack.cardInstances = fromStack.cardInstances.sort((a, b) => {
+          if (a.cardInstanceId === action.payload.cardInstanceId) return 1;
+          if (b.cardInstanceId === action.payload.cardInstanceId) return -1;
+
+          return 0;
+        });
+      } else {
+        // Moving stacks so remove it from the old stack
+        fromStack.cardInstances = fromStack.cardInstances.filter(
+          (cardInstance) =>
+            cardInstance.cardInstanceId !== action.payload.cardInstanceId
+        );
+
+        // Add to the new stack
+        switch (action.payload.method) {
+          case MoveCardInstanceMethod.topFaceUp:
+          case MoveCardInstanceMethod.topFaceDown:
+          case MoveCardInstanceMethod.topNoChange:
+            toStack.cardInstances = [cardInstance, ...toStack.cardInstances];
+            break;
+          case MoveCardInstanceMethod.bottomFaceUp:
+          case MoveCardInstanceMethod.bottomFaceDown:
+          case MoveCardInstanceMethod.bottomNoChange:
+            toStack.cardInstances = [...toStack.cardInstances, cardInstance];
+            break;
+        }
+      }
+    },
     changeCardState: (
       state,
       action: PayloadAction<{
@@ -106,7 +165,22 @@ export const stacksSlice = createSlice({
         stackId: string;
         state: CardInstanceState;
       }>
-    ) => {},
+    ) => {
+      const stack = state.stacksById[action.payload.stackId];
+
+      if (!stack) return;
+
+      const cardInstance = stack.cardInstances.find(
+        (cardInstance) =>
+          cardInstance.cardInstanceId === action.payload.cardInstanceId
+      );
+
+      if (!cardInstance) return;
+
+      cardInstance.state = action.payload.state;
+    },
+    // TODO: reducers shouldn't inject randomness, maybe we can pass in a string/ key to shuffle by?
+    // or the action can shuffle it
     shuffleStack: (
       state,
       action: PayloadAction<{
@@ -136,7 +210,7 @@ export const stacksSlice = createSlice({
   },
 });
 
-export const { shuffleStack } = stacksSlice.actions;
+export const { shuffleStack, changeCardState, moveCard } = stacksSlice.actions;
 
 export const selectStack = (
   state: RootState,
