@@ -2,22 +2,27 @@ import React from "react";
 import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 
 export interface CardProps {
-  width: number;
+  width?: number;
   style?: StyleProp<ViewStyle>;
 }
 
-export default function Card(props: CardProps): React.ReactNode {
+export default function Card({
+  style,
+  width = 200,
+  ...rest
+}: CardProps): React.ReactNode {
   return (
     <View
       style={StyleSheet.flatten([
         styles.container,
         {
-          width: props.width,
-          height: Math.round(props.width * 1.4),
-          borderRadius: Math.round(props.width / 20),
+          width: width,
+          height: Math.round(width * 1.4),
+          borderRadius: Math.round(width / 20),
         },
-        props.style,
+        style,
       ])}
+      {...rest}
     />
   );
 }
@@ -25,5 +30,12 @@ export default function Card(props: CardProps): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    shadowColor: "#000", // iOS & Android
+    shadowOffset: { width: 0, height: 4 }, // iOS only
+    shadowOpacity: 0.2, // iOS only
+    shadowRadius: 6, // iOS only
+    elevation: 6, // Android only
   },
 });

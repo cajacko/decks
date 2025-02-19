@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import Card from "@/components/Card";
+import Stack from "@/components/Stack";
 
 export default function TabTwoScreen() {
   return (
@@ -16,7 +16,7 @@ export default function TabTwoScreen() {
         />
       }
     >
-      <Card width={200} />
+      <Stack />
     </ParallaxScrollView>
   );
 }
