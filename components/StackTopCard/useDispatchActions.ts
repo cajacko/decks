@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks";
 import {
   moveCard,
   changeCardState,
@@ -8,7 +8,7 @@ import {
 } from "@/store/slices/stacks";
 import { CardRef } from "@/components/Card";
 import { StackTopCardProps } from "./types";
-import { selectUserSettings } from "@/store/slices/userSettings";
+import { useAnimateCardMovement } from "@/hooks/useFlag";
 
 export default function useDispatchActions({
   cardInstanceId,
@@ -18,7 +18,7 @@ export default function useDispatchActions({
   rightStackId,
   state,
 }: StackTopCardProps) {
-  const { animateCardMovement } = useAppSelector(selectUserSettings);
+  const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
   const cardRef = React.useRef<CardRef>(null);
   const [isAnimating, setIsAnimating] = React.useState(false);
