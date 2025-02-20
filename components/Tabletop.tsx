@@ -49,12 +49,12 @@ export default function Tabletop({
   }
 
   return (
-    <View>
+    <View style={style}>
       <TabletopToolbar tabletopId={tabletopId} />
       <ScrollView
         onLayout={handleLayout}
-        style={StyleSheet.flatten([styles.scrollView, style])}
-        contentContainerStyle={styles.container}
+        style={StyleSheet.flatten([styles.scrollView])}
+        contentContainerStyle={styles.contentContainer}
         horizontal
         snapToAlignment="center"
         // FIXME: Shouldn't need to add this buffer the calcs should work
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flexDirection: "row",
   },
-  container: {
+  contentContainer: {
     alignItems: "center",
   },
 });

@@ -7,6 +7,6 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   tabletop: {
-    height: "100%",
+    flex: 1,
   },
 });
