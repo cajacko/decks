@@ -7,11 +7,13 @@ import type { RootState } from "../store";
 
 export interface UserSettingsState {
   animateCardMovement: boolean;
+  holdMenuBehaviour: "hold" | "tap";
 }
 
 // Define the initial state using that type
 const initialState: UserSettingsState = {
-  animateCardMovement: false,
+  animateCardMovement: true,
+  holdMenuBehaviour: "hold",
 };
 
 export const userSettingsSlice = createSlice({

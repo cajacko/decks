@@ -13,23 +13,30 @@ export interface CardActionProps {
   icon: string;
   style?: StyleProp<ViewStyle>;
   onPress?: TouchableHighlightProps["onPress"];
+  active?: boolean;
 }
 
 export default function CardAction({
   icon,
   style,
   onPress,
+  active,
 }: CardActionProps): React.ReactNode {
   return (
     <TouchableHighlight
       onPress={onPress}
-      style={StyleSheet.flatten([styles.container, style])}
+      style={StyleSheet.flatten([
+        styles.container,
+        style,
+        { backgroundColor: active ? "lightgray" : "white" },
+      ])}
     >
       <Text style={styles.text}>{icon}</Text>
     </TouchableHighlight>
   );
 }
 
+// TODO: Remove this and use the context
 export const size = 80;
 
 const styles = StyleSheet.create({

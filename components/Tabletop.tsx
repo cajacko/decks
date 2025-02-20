@@ -53,7 +53,8 @@ export default function Tabletop({
       contentContainerStyle={styles.container}
       horizontal
       snapToAlignment="center"
-      snapToInterval={stackWidth}
+      // FIXME: Shouldn't need to add this buffer the calcs should work
+      snapToInterval={stackWidth + 10}
       decelerationRate="fast"
     >
       {stackIds.map((stackId) => (

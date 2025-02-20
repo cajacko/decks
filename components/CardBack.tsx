@@ -5,10 +5,7 @@ import { useAppSelector } from "@/store/hooks";
 import { StyleSheet, Text } from "react-native";
 
 export interface CardBackProps
-  extends Pick<
-    CardProps,
-    "style" | "children" | "onPress" | "width" | "height"
-  > {
+  extends Pick<CardProps, "style" | "children" | "width" | "height"> {
   cardId: string;
 }
 

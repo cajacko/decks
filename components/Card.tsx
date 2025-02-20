@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-  Animated,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { StyleSheet, StyleProp, ViewStyle, Animated } from "react-native";
 
 export interface CardProps {
   width: number;
@@ -14,7 +7,6 @@ export interface CardProps {
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onAnimationChange?: (isAnimating: boolean) => void;
-  onPress?: () => void;
   // TODO: Should we handle angles/ offsets here? It may be a common card property to be jiggled about?
   // offset?: 0 | 1 | 2 | 3 | 4;
 }
@@ -34,10 +26,7 @@ export const cardSizeRatios = {
 };
 
 const Card = React.forwardRef<CardRef, CardProps>(
-  (
-    { style, width, height, children, onAnimationChange, onPress, ...rest },
-    ref
-  ) => {
+  ({ style, width, height, children, onAnimationChange, ...rest }, ref) => {
     const translateX = React.useRef(new Animated.Value(0)).current;
     const translateY = React.useRef(new Animated.Value(0)).current;
     const opacity = React.useRef(new Animated.Value(1)).current;
@@ -46,7 +35,7 @@ const Card = React.forwardRef<CardRef, CardProps>(
       animateOut: async ({
         direction,
         animateOpacity = true,
-        duration = 500,
+        duration = 300,
       }) => {
         onAnimationChange?.(true);
 
@@ -126,11 +115,6 @@ const Card = React.forwardRef<CardRef, CardProps>(
         ])}
         {...rest}
       >
-        {onPress && (
-          <TouchableWithoutFeedback onPress={onPress}>
-            <View style={styles.pressableBackground} />
-          </TouchableWithoutFeedback>
-        )}
         {children}
       </Animated.View>
     );
@@ -140,16 +124,6 @@ const Card = React.forwardRef<CardRef, CardProps>(
 export default Card;
 
 const styles = StyleSheet.create({
-  pressableBackground: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    // zIndex: 10000,
-    opacity: 0,
-    backgroundColor: "red",
-  },
   container: {
     backgroundColor: "#fff",
     borderWidth: 1,

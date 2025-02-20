@@ -1,125 +1,126 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
 import CardInstance from "@/components/CardInstance";
 import CardAction, { size } from "@/components/CardAction";
 import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
+import HoldMenu, { MenuItem } from "../HoldMenu";
 
 export * from "./types";
-
-const sideActionGap = size / 4;
 
 export default function StackTopCard(
   props: StackTopCardProps
 ): React.ReactNode {
   const state = useDispatchActions(props);
 
+  const menuItems = React.useMemo(() => {
+    const centerLeft = props.width / 2 - size / 2;
+    const top = -size / 2;
+    const bottom = props.height - size / 2;
+    const left = -size / 2;
+    const right = props.width - size / 2;
+    const sideTop = props.height / 2 - size * 1.25;
+    const sideBottom = sideTop + size * 1.5;
+
+    const items: MenuItem<{ icon: string; onPress: () => unknown }>[] = [
+      {
+        key: "flip",
+        top: bottom,
+        left: centerLeft,
+        height: size,
+        width: size,
+        icon: "Fl",
+        onPress: state.handleFlipCard,
+      },
+    ];
+
+    if (state.handleMoveToBottom) {
+      items.push({
+        key: "bottom",
+        top: top,
+        left: centerLeft,
+        height: size,
+        width: size,
+        icon: "B",
+        onPress: state.handleMoveToBottom,
+      });
+    }
+
+    if (state.moveRight) {
+      items.push(
+        {
+          key: "Rt",
+          top: sideTop,
+          left: right,
+          height: size,
+          width: size,
+          icon: "Rt",
+          onPress: state.moveRight.top,
+        },
+        {
+          key: "Rb",
+          top: sideBottom,
+          left: right,
+          height: size,
+          width: size,
+          icon: "Rb",
+          onPress: state.moveRight.bottom,
+        }
+      );
+    }
+
+    if (state.moveLeft) {
+      items.push(
+        {
+          key: "Lt",
+          top: sideTop,
+          left: left,
+          height: size,
+          width: size,
+          icon: "Lt",
+          onPress: state.moveLeft.top,
+        },
+        {
+          key: "Lb",
+          top: sideBottom,
+          left: left,
+          height: size,
+          width: size,
+          icon: "Lb",
+          onPress: state.moveLeft.bottom,
+        }
+      );
+    }
+
+    return items;
+  }, [
+    props.height,
+    props.width,
+    state.handleFlipCard,
+    state.handleMoveToBottom,
+    state.moveRight,
+    state.moveLeft,
+  ]);
+
   return (
     <CardInstance
       {...props}
       ref={state.cardRef}
       onAnimationChange={state.setIsAnimating}
-      onPress={state.handleCardPress}
     >
-      {state.showActions && (
-        <>
+      <HoldMenu
+        menuItems={menuItems}
+        handleAction={({ onPress }) => onPress()}
+        renderItem={(menuItem) => (
           <CardAction
-            icon="Fl"
-            onPress={state.handleFlipCard}
-            style={StyleSheet.flatten([
-              styles.action,
-              styles.bottom,
-              styles.center,
-              {
-                marginBottom: -size / 2,
-                marginLeft: -size / 2,
-              },
-            ])}
+            icon={menuItem.icon}
+            active={menuItem.highlight}
+            style={{
+              height: menuItem.height,
+              width: menuItem.width,
+            }}
           />
-          {state.handleMoveToBottom && (
-            <CardAction
-              icon="B"
-              onPress={state.handleMoveToBottom}
-              style={StyleSheet.flatten([
-                styles.action,
-                styles.top,
-                styles.center,
-                {
-                  marginTop: -size / 2,
-                  marginLeft: -size / 2,
-                },
-              ])}
-            />
-          )}
-          {state.moveRight && (
-            <View
-              style={StyleSheet.flatten([
-                styles.action,
-                styles.right,
-                styles.middle,
-                {
-                  marginRight: -size / 2,
-                  marginTop: -(size * 2 + sideActionGap) / 2,
-                },
-              ])}
-            >
-              <CardAction
-                icon="Rt"
-                onPress={state.moveRight.top}
-                style={styles.topSideAction}
-              />
-              <CardAction icon="Rb" onPress={state.moveRight.bottom} />
-            </View>
-          )}
-          {state.moveLeft && (
-            <View
-              style={StyleSheet.flatten([
-                styles.action,
-                styles.left,
-                styles.middle,
-                {
-                  marginLeft: -size / 2,
-                  marginTop: -(size * 2 + sideActionGap) / 2,
-                },
-              ])}
-            >
-              <CardAction
-                icon="Lt"
-                onPress={state.moveLeft.top}
-                style={styles.topSideAction}
-              />
-              <CardAction icon="Lb" onPress={state.moveLeft.bottom} />
-            </View>
-          )}
-        </>
-      )}
+        )}
+      />
     </CardInstance>
   );
 }
-
-const styles = StyleSheet.create({
-  action: {
-    position: "absolute",
-  },
-  bottom: {
-    bottom: 0,
-  },
-  top: {
-    top: 0,
-  },
-  middle: {
-    top: "50%",
-  },
-  center: {
-    left: "50%",
-  },
-  left: {
-    left: 0,
-  },
-  right: {
-    right: 0,
-  },
-  topSideAction: {
-    marginBottom: sideActionGap,
-  },
-});
