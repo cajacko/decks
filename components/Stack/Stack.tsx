@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Animated } from "react-native";
 import CardInstance from "../CardInstance";
 import StackTopCard from "../StackTopCard";
 import EmptyStack from "../EmptyStack";
@@ -15,11 +15,27 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export default function Stack(props: StackProps): React.ReactNode {
   const dimensions = useTabletopContext();
-  const { cardInstancesIds, ...state } = useStack(props, dimensions);
+  const { cardInstancesIds, rotateAnim, showActions, ...state } = useStack(
+    props,
+    dimensions
+  );
+
+  const rotateStyle = {
+    transform: [
+      {
+        rotate: rotateAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: ["0deg", "-360deg"],
+        }),
+      },
+    ],
+  };
 
   return (
     <View style={StyleSheet.flatten([styles.container, props.style])}>
-      <View style={{ margin: dimensions.stackPadding }}>
+      <Animated.View
+        style={{ margin: dimensions.stackPadding, ...rotateStyle }}
+      >
         <CardSpacer />
 
         {cardInstancesIds && cardInstancesIds.length > 0 && (
@@ -66,7 +82,7 @@ export default function Stack(props: StackProps): React.ReactNode {
               );
             })}
 
-            {cardInstancesIds && cardInstancesIds.length > 1 && (
+            {cardInstancesIds && cardInstancesIds.length > 1 && showActions && (
               <CardAction
                 icon="Sh"
                 style={StyleSheet.flatten([
@@ -84,7 +100,7 @@ export default function Stack(props: StackProps): React.ReactNode {
         )}
 
         <EmptyStack style={StyleSheet.flatten([styles.card, { zIndex: 0 }])} />
-      </View>
+      </Animated.View>
     </View>
   );
 }

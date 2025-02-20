@@ -36,7 +36,13 @@ export default function useDispatchActions({
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [showActions, setShowActions] = React.useState(false);
 
-  const handleFlipCard = React.useCallback(() => {
+  const handleFlipCard = React.useCallback(async () => {
+    if (cardRef.current && animateCardMovement) {
+      try {
+        await cardRef.current.animateFlip();
+      } catch {}
+    }
+
     dispatch(
       changeCardState({
         tabletopId,

@@ -16,6 +16,7 @@ export interface AnimateOutProps {
 }
 
 export interface CardRef {
+  animateFlip: () => Promise<unknown>;
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
 }
 
@@ -27,8 +28,31 @@ const Card = React.forwardRef<CardRef, CardProps>(
     const translateY = React.useRef(new Animated.Value(0)).current;
     const opacity = React.useRef(new Animated.Value(1)).current;
     const [isAnimating, setIsAnimating] = React.useState(false);
+    const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
     React.useImperativeHandle(ref, () => ({
+      animateFlip: async () => {
+        setIsAnimating(true);
+        onAnimationChange?.(true);
+
+        return new Promise<unknown>((resolve) => {
+          Animated.sequence([
+            Animated.timing(scaleAnim, {
+              toValue: 0, // Shrink to zero width
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(scaleAnim, {
+              toValue: 1, // Expand back to full width
+              duration: 200,
+              useNativeDriver: true,
+            }),
+          ]).start(resolve);
+        }).finally(() => {
+          onAnimationChange?.(false);
+          setIsAnimating(false);
+        });
+      },
       animateOut: async ({
         direction,
         animateOpacity = true,
@@ -98,7 +122,12 @@ const Card = React.forwardRef<CardRef, CardProps>(
 
     // TODO: type properly
     const animationStyle = {
-      transform: [...styleTransform, { translateX }, { translateY }],
+      transform: [
+        ...styleTransform,
+        { translateX },
+        { translateY },
+        { scaleX: scaleAnim },
+      ],
       opacity,
     } as ViewStyle;
 

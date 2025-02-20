@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleProp, ViewStyle } from "react-native";
+import { StyleProp, ViewStyle, Animated } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectFirstXCardInstances,
@@ -16,6 +16,9 @@ export default function useStack(
   const dispatch = useAppDispatch();
   const { tabletopId } = useTabletopContext();
 
+  const rotateAnim = React.useRef(new Animated.Value(0)).current;
+  const [showActions, setShowActions] = React.useState(true);
+
   const { animateCardMovement } = useAppSelector(selectUserSettings);
   const limit = animateCardMovement
     ? positionStyles.length * 2
@@ -29,7 +32,22 @@ export default function useStack(
     })
   );
 
-  const handleShuffle = React.useCallback(() => {
+  const handleShuffle = React.useCallback(async () => {
+    rotateAnim.setValue(0);
+    setShowActions(false);
+
+    const promise = new Promise((resolve) => {
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(resolve);
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 250));
+
+    setShowActions(true);
+
     const randomOrder = cardInstancesIds?.sort(() => Math.random() - 0.5);
 
     dispatch(
@@ -40,7 +58,9 @@ export default function useStack(
         cardInstanceIds: randomOrder ?? [],
       })
     );
-  }, [dispatch, stackId, tabletopId, cardInstancesIds]);
+
+    await promise;
+  }, [dispatch, stackId, tabletopId, cardInstancesIds, rotateAnim]);
 
   const cardPositions = React.useRef<Array<string | null>>([]);
 
@@ -82,5 +102,7 @@ export default function useStack(
     cardInstancesIds,
     getCardPositionStyle,
     handleShuffle,
+    rotateAnim,
+    showActions,
   };
 }
