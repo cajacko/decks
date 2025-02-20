@@ -27,8 +27,11 @@ export function configureHistory<
   selectHistory: (
     state: WritableDraft<SliceState> | SliceState,
     props: P
-  ) => WritableDraft<History<HistoryState>> | undefined | null
+  ) => WritableDraft<History<HistoryState>> | undefined | null,
+  options?: { maxHistory?: number }
 ) {
+  const maxHistory = options?.maxHistory || 100;
+
   return {
     withSelectors: <RootState>(
       selectSlice: (state: RootState) => SliceState
@@ -63,6 +66,10 @@ export function configureHistory<
         );
 
         history.past.push({ inversePatches, patches });
+
+        if (history.past.length > maxHistory) {
+          history.past.shift();
+        }
 
         history.present = nextState;
         history.future = [];
