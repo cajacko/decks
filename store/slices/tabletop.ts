@@ -5,6 +5,7 @@ import { createCachedSelector } from "re-reselect";
 // like writing selector functions.
 // From: https://redux.js.org/tutorials/typescript-quick-start
 import type { RootState } from "../store";
+import { History, configureHistory } from "../history";
 
 export enum MoveCardInstanceMethod {
   topFaceUp = "topFaceUp",
@@ -13,7 +14,6 @@ export enum MoveCardInstanceMethod {
   bottomFaceUp = "bottomFaceUp",
   bottomFaceDown = "bottomFaceDown",
   bottomNoChange = "bottomNoChange",
-  // Do we want more complex ones like bury/ shuffle in?
 }
 
 export enum CardInstanceState {
@@ -30,10 +30,6 @@ export interface CardInstance {
 export interface Stack {
   id: string;
   cardInstances: CardInstance[];
-  // defaultCardInstanceState: CardInstanceState | "faceDownTopUp";
-  // Do we want these?
-  // moveRightTopState: CardInstanceState | null;
-  // moveRightBottomState: CardInstanceState | null;
 }
 
 interface TabletopHistoryState {
@@ -41,28 +37,12 @@ interface TabletopHistoryState {
   stacksById: Record<string, Stack | undefined>;
 }
 
-interface TabletopHistory {
-  past: TabletopHistoryState[];
-  present: TabletopHistoryState;
-  future: TabletopHistoryState[];
-}
+type TabletopHistory = History<TabletopHistoryState>;
 
 export interface Tabletop {
   id: string;
   stacksIds: string[];
   history: TabletopHistory;
-  // availableDecks: string[];
-  /**
-   * Cards that are not part of the availableDecks but should still be available to the tabletop
-   */
-  // additionalAvailableCards: string[];
-  /**
-   * A hand has a stack structure but is not part of the tabletop stacks
-   */
-  // handStackId: string | null;
-  // defines how the tabletop is set up on load or reset, it may just follow the deck setup, or be
-  // custom?
-  // initSetup: {}
 }
 
 export interface TabletopState {
@@ -75,9 +55,6 @@ const initialState: TabletopState = {
     tabletop1: {
       id: "tabletop1",
       stacksIds: ["stack1", "stack2", "stack3"],
-      // availableDecks: ["deck1"],
-      // additionalAvailableCards: [],
-      // handStackId: "hand1",
       history: {
         past: [],
         present: {
@@ -129,147 +106,151 @@ const initialState: TabletopState = {
   },
 };
 
+const history = configureHistory<
+  TabletopState,
+  TabletopHistoryState,
+  { tabletopId: string }
+>((state, props) => state.tabletopsById[props.tabletopId]?.history);
+
 export const tabletopsSlice = createSlice({
   name: "tabletops",
   initialState,
   reducers: {
-    moveCard: (
-      state,
-      action: PayloadAction<{
-        tabletopId: string;
-        cardInstanceId: string;
-        fromStackId: string;
-        toStackId: string;
-        // Do we specify the method, or let the stack define it? Or both? If specified here it's
-        // more specific, otherwise do what the stack it's going to says
-        method: MoveCardInstanceMethod;
-      }>
-    ) => {
-      const { tabletopId, fromStackId, cardInstanceId, method, toStackId } =
-        action.payload;
+    undo: history.undo,
+    redo: history.redo,
+    moveCard: history.withHistory(
+      (
+        state,
+        action: PayloadAction<{
+          tabletopId: string;
+          cardInstanceId: string;
+          fromStackId: string;
+          toStackId: string;
+          // Do we specify the method, or let the stack define it? Or both? If specified here it's
+          // more specific, otherwise do what the stack it's going to says
+          method: MoveCardInstanceMethod;
+        }>
+      ) => {
+        const { fromStackId, cardInstanceId, method, toStackId } =
+          action.payload;
 
-      const present = state.tabletopsById[tabletopId]?.history.present;
+        const fromStack = state?.stacksById[fromStackId];
+        const toStack = state.stacksById[toStackId];
 
-      if (!present) return;
+        if (!fromStack || !toStack) return;
 
-      const fromStack = present?.stacksById[action.payload.fromStackId];
-      const toStack = present.stacksById[action.payload.toStackId];
-
-      if (!fromStack || !toStack) return;
-
-      const cardInstance = fromStack.cardInstances.find(
-        (cardInstance) =>
-          cardInstance.cardInstanceId === action.payload.cardInstanceId
-      );
-
-      if (!cardInstance) return;
-
-      // Update the card instance state based on the method
-      switch (action.payload.method) {
-        case MoveCardInstanceMethod.topFaceUp:
-        case MoveCardInstanceMethod.bottomFaceUp:
-          cardInstance.state = CardInstanceState.faceUp;
-          break;
-        case MoveCardInstanceMethod.topFaceDown:
-        case MoveCardInstanceMethod.bottomFaceDown:
-          cardInstance.state = CardInstanceState.faceDown;
-          break;
-        case MoveCardInstanceMethod.topNoChange:
-        case MoveCardInstanceMethod.bottomNoChange:
-        default:
-          // Nothing needed here, this is just to remind us that this is on purpose
-          break;
-      }
-
-      if (fromStack.id === toStack.id) {
-        // Moving within the same stack so sort it
-        fromStack.cardInstances = fromStack.cardInstances.sort((a, b) => {
-          if (a.cardInstanceId === action.payload.cardInstanceId) return 1;
-          if (b.cardInstanceId === action.payload.cardInstanceId) return -1;
-
-          return 0;
-        });
-      } else {
-        // Moving stacks so remove it from the old stack
-        fromStack.cardInstances = fromStack.cardInstances.filter(
-          (cardInstance) =>
-            cardInstance.cardInstanceId !== action.payload.cardInstanceId
+        const cardInstance = fromStack.cardInstances.find(
+          (cardInstance) => cardInstance.cardInstanceId === cardInstanceId
         );
 
-        // Add to the new stack
-        switch (action.payload.method) {
+        if (!cardInstance) return;
+
+        // Update the card instance state based on the method
+        switch (method) {
           case MoveCardInstanceMethod.topFaceUp:
-          case MoveCardInstanceMethod.topFaceDown:
-          case MoveCardInstanceMethod.topNoChange:
-            toStack.cardInstances = [cardInstance, ...toStack.cardInstances];
-            break;
           case MoveCardInstanceMethod.bottomFaceUp:
+            cardInstance.state = CardInstanceState.faceUp;
+            break;
+          case MoveCardInstanceMethod.topFaceDown:
           case MoveCardInstanceMethod.bottomFaceDown:
+            cardInstance.state = CardInstanceState.faceDown;
+            break;
+          case MoveCardInstanceMethod.topNoChange:
           case MoveCardInstanceMethod.bottomNoChange:
-            toStack.cardInstances = [...toStack.cardInstances, cardInstance];
+          default:
+            // Nothing needed here, this is just to remind us that this is on purpose
             break;
         }
+
+        if (fromStack.id === toStack.id) {
+          // Moving within the same stack so sort it
+          fromStack.cardInstances = fromStack.cardInstances.sort((a, b) => {
+            if (a.cardInstanceId === cardInstanceId) return 1;
+            if (b.cardInstanceId === cardInstanceId) return -1;
+
+            return 0;
+          });
+        } else {
+          // Moving stacks so remove it from the old stack
+          fromStack.cardInstances = fromStack.cardInstances.filter(
+            (cardInstance) => cardInstance.cardInstanceId !== cardInstanceId
+          );
+
+          // Add to the new stack
+          switch (method) {
+            case MoveCardInstanceMethod.topFaceUp:
+            case MoveCardInstanceMethod.topFaceDown:
+            case MoveCardInstanceMethod.topNoChange:
+              toStack.cardInstances = [cardInstance, ...toStack.cardInstances];
+              break;
+            case MoveCardInstanceMethod.bottomFaceUp:
+            case MoveCardInstanceMethod.bottomFaceDown:
+            case MoveCardInstanceMethod.bottomNoChange:
+              toStack.cardInstances = [...toStack.cardInstances, cardInstance];
+              break;
+          }
+        }
       }
-    },
-    changeCardState: (
-      state,
-      action: PayloadAction<{
-        tabletopId: string;
-        cardInstanceId: string;
-        stackId: string;
-        state: CardInstanceState;
-      }>
-    ) => {
-      const present =
-        state.tabletopsById[action.payload.tabletopId]?.history.present;
-      const stack = present?.stacksById[action.payload.stackId];
+    ),
+    changeCardState: history.withHistory(
+      (
+        state,
+        action: PayloadAction<{
+          tabletopId: string;
+          cardInstanceId: string;
+          stackId: string;
+          state: CardInstanceState;
+        }>
+      ) => {
+        const stack = state?.stacksById[action.payload.stackId];
 
-      if (!stack) return;
+        if (!stack) return;
 
-      const cardInstance = stack.cardInstances.find(
-        (cardInstance) =>
-          cardInstance.cardInstanceId === action.payload.cardInstanceId
-      );
+        const cardInstance = stack.cardInstances.find(
+          (cardInstance) =>
+            cardInstance.cardInstanceId === action.payload.cardInstanceId
+        );
 
-      if (!cardInstance) return;
+        if (!cardInstance) return;
 
-      cardInstance.state = action.payload.state;
-    },
+        cardInstance.state = action.payload.state;
+      }
+    ),
     // TODO: reducers shouldn't inject randomness, maybe we can pass in a string/ key to shuffle by?
     // or the action can shuffle it
-    shuffleStack: (
-      state,
-      action: PayloadAction<{
-        tabletopId: string;
-        stackId: string;
-        allCardInstancesState: CardInstanceState | "noChange";
-      }>
-    ) => {
-      const present =
-        state.tabletopsById[action.payload.tabletopId]?.history.present;
-      const stack = present?.stacksById[action.payload.stackId];
+    shuffleStack: history.withHistory(
+      (
+        state,
+        action: PayloadAction<{
+          tabletopId: string;
+          stackId: string;
+          allCardInstancesState: CardInstanceState | "noChange";
+        }>
+      ) => {
+        const stack = state?.stacksById[action.payload.stackId];
 
-      if (!stack) return;
+        if (!stack) return;
 
-      const shuffledCardInstances = [...stack.cardInstances].sort(
-        () => Math.random() - 0.5
-      );
+        const shuffledCardInstances = [...stack.cardInstances].sort(
+          () => Math.random() - 0.5
+        );
 
-      present.stacksById[action.payload.stackId] = {
-        ...stack,
-        cardInstances: shuffledCardInstances.map((cardInstance) => ({
-          ...cardInstance,
-          state:
-            action.payload.allCardInstancesState === "noChange"
-              ? cardInstance.state
-              : action.payload.allCardInstancesState,
-        })),
-      };
-    },
+        state.stacksById[action.payload.stackId] = {
+          ...stack,
+          cardInstances: shuffledCardInstances.map((cardInstance) => ({
+            ...cardInstance,
+            state:
+              action.payload.allCardInstancesState === "noChange"
+                ? cardInstance.state
+                : action.payload.allCardInstancesState,
+          })),
+        };
+      }
+    ),
   },
 });
 
-export const { changeCardState, moveCard, shuffleStack } =
+export const { changeCardState, moveCard, shuffleStack, undo, redo } =
   tabletopsSlice.actions;
 
 export const selectTabletop = (
@@ -299,6 +280,13 @@ export const selectCardInstances = (
   state: RootState,
   props: { stackId: string; tabletopId: string }
 ): CardInstance[] | null => selectStack(state, props)?.cardInstances ?? null;
+
+const historySelectors = history.withSelectors<RootState>(
+  (state) => state.tabletops
+);
+
+export const selectTabletopHasPast = historySelectors.selectHasPast;
+export const selectTabletopHasFuture = historySelectors.selectHasFuture;
 
 // Uses createCachedSelector to select the first 3 cards only from selectCardInstances or null if
 // there were none, or whatever we have if there's less than 3

@@ -14,6 +14,8 @@ export default function HoldMenu<I extends MenuItem>(
       {...state.panResponder?.panHandlers}
       onTouchStart={state.onTouchStart}
       ref={state.menuRef}
+      onPointerEnter={state.onPointerEnter}
+      onPointerLeave={state.onPointerLeave}
     >
       {DEV_INDICATOR && (
         <Animated.View

@@ -114,6 +114,7 @@ export default function StackTopCard(
           <CardAction
             icon={menuItem.icon}
             active={menuItem.highlight}
+            onPress={menuItem.onPress}
             style={{
               height: menuItem.height,
               width: menuItem.width,

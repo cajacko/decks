@@ -330,6 +330,12 @@ export default function useHoldMenu<I extends MenuItem>({
   }, [opacity, renderMenu]);
 
   return {
+    onPointerEnter: () => {
+      setRenderMenu(true);
+    },
+    onPointerLeave: () => {
+      setRenderMenu(false);
+    },
     panResponder: holdMenuBehaviour === "hold" ? panResponder : undefined,
     menuRef,
     renderMenu,

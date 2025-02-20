@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { enablePatches } from "immer";
 import cardsSlice from "./slices/cards";
 import tabletopsSlice from "./slices/tabletop";
 import decksSlice from "./slices/decks";
@@ -11,7 +12,10 @@ export const store = configureStore({
     [decksSlice.name]: decksSlice.reducer,
     [userSettingsSlice.name]: userSettingsSlice.reducer,
   },
+  devTools: true,
 });
+
+enablePatches();
 
 // Infer the `RootState`,  `AppDispatch`, and `AppStore` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

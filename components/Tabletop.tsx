@@ -6,10 +6,12 @@ import {
   ViewStyle,
   ScrollViewProps,
   Dimensions,
+  View,
 } from "react-native";
 import Stack, { getStackDimensions } from "./Stack";
 import { useAppSelector } from "@/store/hooks";
 import { selectStackIds } from "@/store/slices/tabletop";
+import TabletopToolbar from "./TabletopToolbar";
 
 export interface TabletopProps {
   tabletopId: string;
@@ -47,29 +49,32 @@ export default function Tabletop({
   }
 
   return (
-    <ScrollView
-      onLayout={handleLayout}
-      style={StyleSheet.flatten([styles.scrollView, style])}
-      contentContainerStyle={styles.container}
-      horizontal
-      snapToAlignment="center"
-      // FIXME: Shouldn't need to add this buffer the calcs should work
-      snapToInterval={stackWidth + 10}
-      decelerationRate="fast"
-    >
-      {stackIds.map((stackId) => (
-        <Stack
-          key={stackId}
-          stackId={stackId}
-          style={{ paddingHorizontal: spaceBetweenStacks / 2 }}
-          leftStackId={stackIds[stackIds.indexOf(stackId) - 1]}
-          rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
-          availableHeight={size.height}
-          availableWidth={size.width}
-          tabletopId={tabletopId}
-        />
-      ))}
-    </ScrollView>
+    <View>
+      <TabletopToolbar tabletopId={tabletopId} />
+      <ScrollView
+        onLayout={handleLayout}
+        style={StyleSheet.flatten([styles.scrollView, style])}
+        contentContainerStyle={styles.container}
+        horizontal
+        snapToAlignment="center"
+        // FIXME: Shouldn't need to add this buffer the calcs should work
+        snapToInterval={stackWidth + 10}
+        decelerationRate="fast"
+      >
+        {stackIds.map((stackId) => (
+          <Stack
+            key={stackId}
+            stackId={stackId}
+            style={{ paddingHorizontal: spaceBetweenStacks / 2 }}
+            leftStackId={stackIds[stackIds.indexOf(stackId) - 1]}
+            rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
+            availableHeight={size.height}
+            availableWidth={size.width}
+            tabletopId={tabletopId}
+          />
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
