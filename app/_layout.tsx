@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { store } from "@/store/store";
 import { Provider } from "react-redux";
+import { Provider as HoldMenuProvider } from "@/components/HoldMenu/HoldMenu.context";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -36,11 +37,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Provider store={store}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
+        <HoldMenuProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </HoldMenuProvider>
       </Provider>
     </ThemeProvider>
   );

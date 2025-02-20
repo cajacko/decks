@@ -8,6 +8,7 @@ import {
 import { useAppSelector } from "@/store/hooks";
 import { selectUserSettings } from "@/store/slices/userSettings";
 import { MenuItem, HoldMenuProps } from "./types";
+import { useRegisterHoldMenuState } from "./HoldMenu.context";
 
 export const DEV_INDICATOR = false;
 
@@ -175,6 +176,8 @@ export default function useHoldMenu<I extends MenuItem>({
       }).start();
     }
   }, [opacity, renderMenu]);
+
+  useRegisterHoldMenuState(holdMenuBehaviour === "hold" && renderMenu);
 
   return {
     panResponder: holdMenuBehaviour === "hold" ? panResponder : undefined,
