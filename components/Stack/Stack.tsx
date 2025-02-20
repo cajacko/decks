@@ -34,8 +34,8 @@ export default function Stack(props: StackProps): React.ReactNode {
                 styles.card,
                 positionStyle,
                 // Decrements zIndex for each card, so the top card has the highest zIndex,
-                // finishing at 0
-                { zIndex: (cardInstances.length - i - 1) * 2 },
+                // finishing at 1
+                { zIndex: cardInstances.length - i },
               ]);
 
               // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
@@ -78,7 +78,7 @@ export default function Stack(props: StackProps): React.ReactNode {
                 style={StyleSheet.flatten([
                   styles.shuffleButton,
                   {
-                    zIndex: (cardInstances.length - 1) * 2 - 1,
+                    zIndex: 0,
                     bottom: -dimensions.stackPadding,
                     left: -dimensions.stackPadding,
                   },
