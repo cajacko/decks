@@ -6,10 +6,60 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import { MenuItem, HoldMenuProps } from "./types";
-import { useRegisterHoldMenuState } from "./HoldMenu.context";
 import { useHoldMenuBehaviour } from "@/hooks/useFlag";
 
 export const DEV_INDICATOR = false;
+
+// NOTE: 50ms is the max we ever want to wait before showing the menu
+const swipeHoldThresholds: Array<{
+  distance:
+    | {
+        greaterThan: number;
+        lessThan?: number;
+      }
+    | {
+        greaterThan?: number;
+        lessThan: number;
+      };
+  timeout:
+    | {
+        greaterThan: number;
+        lessThan?: number;
+      }
+    | {
+        greaterThan?: number;
+        lessThan: number;
+      };
+  showMenu: boolean;
+}> = [
+  {
+    distance: {
+      lessThan: 1,
+    },
+    timeout: {
+      greaterThan: 20,
+    },
+    showMenu: true,
+  },
+  {
+    distance: {
+      lessThan: 10,
+    },
+    timeout: {
+      greaterThan: 50,
+    },
+    showMenu: true,
+  },
+];
+
+const maxThresholdTimeout = swipeHoldThresholds.reduce(
+  (max, threshold) =>
+    Math.max(
+      max,
+      threshold.timeout.lessThan ?? threshold.timeout.greaterThan ?? 0
+    ),
+  0
+);
 
 export default function useHoldMenu<I extends MenuItem>({
   touchBuffer = 20,
@@ -87,31 +137,157 @@ export default function useHoldMenu<I extends MenuItem>({
     return hoveredItem ?? null;
   };
 
+  const horizontalDistance = React.useRef<null | {
+    distance: number;
+    since: Date;
+    timeout?: NodeJS.Timeout;
+  }>(null);
+
+  const renderMenuRef = React.useRef(renderMenu);
+
+  renderMenuRef.current = renderMenu;
+
+  function showHoldMenu() {
+    if (renderMenuRef.current) return;
+
+    renderMenuRef.current = true;
+
+    // This accounts for scroll views and stuff.
+    updateMenuPosition();
+    setHighlightedItem(null);
+    opacity.setValue(0);
+    setRenderMenu(true);
+
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+
+    if (DEV_INDICATOR) {
+      // Show hover indicator
+      Animated.timing(hoverIndicatorOpacity, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }).start();
+    }
+  }
+
+  function hideHoldMenu(gestureState?: PanResponderGestureState) {
+    if (!renderMenuRef.current) return;
+
+    if (gestureState) {
+      const hoveredItem = getHoveredItem(gestureState);
+
+      if (hoveredItem) {
+        props.handleAction(hoveredItem);
+      }
+    }
+
+    setHighlightedItem(null);
+
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      renderMenuRef.current = false;
+      setRenderMenu(false);
+    });
+
+    if (DEV_INDICATOR) {
+      // Hide hover indicator
+      Animated.timing(hoverIndicatorOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  }
+
   const panResponder = React.useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => {
+        // If it's already visible grant access
+        if (renderMenuRef.current) return true;
+
+        return false;
+      },
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        const now = new Date();
+
+        // If we don't have any recent data, reset the state
+        if (
+          !horizontalDistance.current ||
+          now.getTime() - horizontalDistance.current.since.getTime() >
+            maxThresholdTimeout
+        ) {
+          horizontalDistance.current = {
+            distance: gestureState.dx,
+            since: now,
+          };
+        } else {
+          horizontalDistance.current.distance += gestureState.dx;
+        }
+
+        const timeSince =
+          now.getTime() - horizontalDistance.current.since.getTime();
+
+        // This gets the distance travelled horizontally within our timeout
+        const distance = Math.abs(horizontalDistance.current.distance);
+
+        // Find a threshold that matches our current distance and time
+        const threshold = swipeHoldThresholds.find((threshold) => {
+          if (
+            threshold.timeout.greaterThan &&
+            timeSince < threshold.timeout.greaterThan
+          ) {
+            return false;
+          }
+
+          if (
+            threshold.timeout.lessThan &&
+            timeSince > threshold.timeout.lessThan
+          ) {
+            return false;
+          }
+
+          if (
+            threshold.distance.greaterThan &&
+            distance < threshold.distance.greaterThan
+          ) {
+            return false;
+          }
+
+          if (
+            threshold.distance.lessThan &&
+            distance > threshold.distance.lessThan
+          ) {
+            return false;
+          }
+
+          return true;
+        });
+
+        // Yay, we know what to do, do it
+        if (threshold) {
+          clearTimeout(horizontalDistance.current.timeout);
+
+          horizontalDistance.current = {
+            distance: 0,
+            since: now,
+          };
+
+          // Keep waiting/ allow scrolling
+          return threshold.showMenu;
+        }
+
+        return false;
+      },
 
       onPanResponderGrant: () => {
-        // This accounts for scroll views and stuff.
-        updateMenuPosition();
-        setHighlightedItem(null);
-        opacity.setValue(0);
-        setRenderMenu(true);
-
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }).start();
-
-        if (DEV_INDICATOR) {
-          // Show hover indicator
-          Animated.timing(hoverIndicatorOpacity, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: true,
-          }).start();
-        }
+        showHoldMenu();
       },
 
       onPanResponderMove: (_, gestureState) => {
@@ -125,30 +301,7 @@ export default function useHoldMenu<I extends MenuItem>({
       },
 
       onPanResponderRelease: (event, gestureState) => {
-        const hoveredItem = getHoveredItem(gestureState);
-
-        if (hoveredItem) {
-          props.handleAction(hoveredItem);
-        }
-
-        setHighlightedItem(null);
-
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }).start(() => {
-          setRenderMenu(false);
-        });
-
-        if (DEV_INDICATOR) {
-          // Hide hover indicator
-          Animated.timing(hoverIndicatorOpacity, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }
+        hideHoldMenu(gestureState);
       },
     })
   ).current;
@@ -175,8 +328,6 @@ export default function useHoldMenu<I extends MenuItem>({
       }).start();
     }
   }, [opacity, renderMenu]);
-
-  useRegisterHoldMenuState(holdMenuBehaviour === "hold" && renderMenu);
 
   return {
     panResponder: holdMenuBehaviour === "hold" ? panResponder : undefined,

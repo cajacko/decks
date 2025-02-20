@@ -10,7 +10,6 @@ import {
 import Stack, { getStackDimensions } from "./Stack";
 import { useAppSelector } from "@/store/hooks";
 import { selectStackIds } from "@/store/slices/tabletop";
-import { useIsHoldMenuActive } from "@/components/HoldMenu/HoldMenu.context";
 
 export interface TabletopProps {
   tabletopId: string;
@@ -21,8 +20,6 @@ export default function Tabletop({
   tabletopId,
   style,
 }: TabletopProps): React.ReactNode {
-  const isHoldMenuActive = useIsHoldMenuActive();
-
   const stackIds = useAppSelector((state) =>
     selectStackIds(state, { tabletopId })
   );
@@ -59,7 +56,6 @@ export default function Tabletop({
       // FIXME: Shouldn't need to add this buffer the calcs should work
       snapToInterval={stackWidth + 10}
       decelerationRate="fast"
-      scrollEnabled={!isHoldMenuActive}
     >
       {stackIds.map((stackId) => (
         <Stack
