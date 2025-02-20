@@ -1,10 +1,11 @@
 import React from "react";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   moveCard,
   changeCardState,
   CardInstanceState,
   MoveCardInstanceMethod,
+  selectCardInstance,
 } from "@/store/slices/tabletop";
 import { CardRef } from "@/components/Card";
 import { StackTopCardProps } from "./types";
@@ -16,9 +17,17 @@ export default function useDispatchActions({
   canMoveToBottom,
   leftStackId,
   rightStackId,
-  state,
   tabletopId,
 }: StackTopCardProps) {
+  const cardInstance = useAppSelector((state) =>
+    selectCardInstance(state, { tabletopId, cardInstanceId })
+  );
+
+  if (!cardInstance) {
+    throw new Error(`Card with id ${cardInstanceId} not found`);
+  }
+
+  const state = cardInstance.state;
   const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
   const cardRef = React.useRef<CardRef>(null);
@@ -30,14 +39,13 @@ export default function useDispatchActions({
       changeCardState({
         tabletopId,
         cardInstanceId,
-        stackId,
         state:
           state === CardInstanceState.faceDown
             ? CardInstanceState.faceUp
             : CardInstanceState.faceDown,
       })
     );
-  }, [dispatch, cardInstanceId, stackId, state, tabletopId]);
+  }, [dispatch, cardInstanceId, state, tabletopId]);
 
   const moveRight = React.useMemo(() => {
     if (!rightStackId) return undefined;

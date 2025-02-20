@@ -1,6 +1,7 @@
 import React from "react";
 import { CardProps } from "./Card";
-import { CardInstanceState } from "@/store/slices/tabletop";
+import { CardInstanceState, selectCardInstance } from "@/store/slices/tabletop";
+import { useAppSelector } from "@/store/hooks";
 import { CardRef } from "./Card";
 import CardFront from "./CardFront";
 import CardBack from "./CardBack";
@@ -10,12 +11,22 @@ export interface CardInstanceProps
     CardProps,
     "style" | "width" | "height" | "children" | "onAnimationChange"
   > {
-  cardId: string;
-  state: CardInstanceState;
+  cardInstanceId: string;
+  tabletopId: string;
 }
 
 const CardInstance = React.forwardRef<CardRef, CardInstanceProps>(
-  ({ cardId, state, ...rest }, ref) => {
+  ({ cardInstanceId, tabletopId, ...rest }, ref) => {
+    const cardInstance = useAppSelector((state) =>
+      selectCardInstance(state, { cardInstanceId, tabletopId })
+    );
+
+    if (!cardInstance) {
+      throw new Error(`Card instance with id ${cardInstanceId} not found`);
+    }
+
+    const { cardId, state } = cardInstance;
+
     if (state === CardInstanceState.faceUp) {
       return <CardFront cardId={cardId} {...rest} ref={ref} />;
     }

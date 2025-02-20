@@ -19,7 +19,7 @@ export default function useStack(
     ? positionStyles.length * 2
     : positionStyles.length;
 
-  const cardInstances = useAppSelector((state) =>
+  const cardInstancesIds = useAppSelector((state) =>
     selectFirstXCardInstances(state, {
       stackId,
       tabletopId,
@@ -33,11 +33,6 @@ export default function useStack(
     );
   }, [dispatch, stackId, tabletopId]);
 
-  const cardInstancesIds = React.useMemo(
-    () => cardInstances?.map(({ cardInstanceId }) => cardInstanceId) ?? [],
-    [cardInstances]
-  );
-
   const cardPositions = React.useRef<Array<string | null>>([]);
 
   // We need to reset the mapping so when cards come back in to the stack they don't adopt their old
@@ -45,7 +40,8 @@ export default function useStack(
   React.useEffect(() => {
     cardPositions.current.forEach((cardInstanceId, i) => {
       if (cardInstanceId === null) return;
-      if (cardInstancesIds.includes(cardInstanceId)) return null;
+      if (cardInstancesIds && cardInstancesIds.includes(cardInstanceId))
+        return null;
 
       cardPositions.current[i] = null;
     });
@@ -61,7 +57,7 @@ export default function useStack(
       for (let i = 0; i < limit; i++) {
         const cardInstanceId = cardPositions.current[i];
 
-        if (!cardInstanceId || !cardInstancesIds.includes(cardInstanceId)) {
+        if (!cardInstanceId || !cardInstancesIds?.includes(cardInstanceId)) {
           cardPositions.current[i] = props.cardInstanceId;
 
           return positionStyles[i];
@@ -74,7 +70,7 @@ export default function useStack(
   };
 
   return {
-    cardInstances,
+    cardInstancesIds,
     getCardPositionStyle,
     handleShuffle,
   };

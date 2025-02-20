@@ -9,24 +9,27 @@ import { StackProps } from "./stack.types";
 import styles, { getStackDimensions } from "./stack.style";
 import useStack from "./useStack";
 
+// TODO: all the same component in map? Maybe the animation should be higher up, not in the
+// component? As it's layout from here, not from the component itself
+
 export default function Stack(props: StackProps): React.ReactNode {
   const dimensions = getStackDimensions(props);
-  const { cardInstances, ...state } = useStack(props, dimensions);
+  const { cardInstancesIds, ...state } = useStack(props, dimensions);
 
   return (
     <View style={StyleSheet.flatten([styles.container, props.style])}>
       <View style={{ margin: dimensions.stackPadding }}>
-        {cardInstances && cardInstances.length > 0 ? (
+        {cardInstancesIds && cardInstancesIds.length > 0 ? (
           <>
             <CardSpacer
               width={dimensions.cardWidth}
               height={dimensions.cardHeight}
             />
 
-            {cardInstances.map((cardInstance, i) => {
+            {cardInstancesIds.map((cardInstanceId, i) => {
               const isTopCard = i === 0;
               const positionStyle = state.getCardPositionStyle({
-                cardInstanceId: cardInstance.cardInstanceId,
+                cardInstanceId,
                 isTopCard,
               });
 
@@ -35,7 +38,7 @@ export default function Stack(props: StackProps): React.ReactNode {
                 positionStyle,
                 // Decrements zIndex for each card, so the top card has the highest zIndex,
                 // finishing at 1
-                { zIndex: cardInstances.length - i },
+                { zIndex: cardInstancesIds.length - i },
               ]);
 
               // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
@@ -46,26 +49,24 @@ export default function Stack(props: StackProps): React.ReactNode {
                 return (
                   <StackTopCard
                     tabletopId={props.tabletopId}
-                    key={cardInstance.cardInstanceId}
-                    cardId={cardInstance.cardId}
-                    state={cardInstance.state}
+                    key={cardInstanceId}
                     style={style}
                     width={dimensions.cardWidth}
                     height={dimensions.cardHeight}
-                    cardInstanceId={cardInstance.cardInstanceId}
+                    cardInstanceId={cardInstanceId}
                     stackId={props.stackId}
                     leftStackId={props.leftStackId}
                     rightStackId={props.rightStackId}
-                    canMoveToBottom={cardInstances.length > 1}
+                    canMoveToBottom={cardInstancesIds.length > 1}
                   />
                 );
               }
 
               return (
                 <CardInstance
-                  key={cardInstance.cardInstanceId}
-                  cardId={cardInstance.cardId}
-                  state={cardInstance.state}
+                  key={cardInstanceId}
+                  cardInstanceId={cardInstanceId}
+                  tabletopId={props.tabletopId}
                   width={dimensions.cardWidth}
                   height={dimensions.cardHeight}
                   style={style}
@@ -73,7 +74,7 @@ export default function Stack(props: StackProps): React.ReactNode {
               );
             })}
 
-            {cardInstances && cardInstances.length > 1 && (
+            {cardInstancesIds && cardInstancesIds.length > 1 && (
               <CardAction
                 icon="Sh"
                 style={StyleSheet.flatten([

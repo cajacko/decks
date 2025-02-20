@@ -7,8 +7,7 @@ export interface CardProps {
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onAnimationChange?: (isAnimating: boolean) => void;
-  // TODO: Should we handle angles/ offsets here? It may be a common card property to be jiggled about?
-  // offset?: 0 | 1 | 2 | 3 | 4;
+  hidden?: boolean;
 }
 
 export interface AnimateOutProps {
@@ -30,6 +29,7 @@ const Card = React.forwardRef<CardRef, CardProps>(
     const translateX = React.useRef(new Animated.Value(0)).current;
     const translateY = React.useRef(new Animated.Value(0)).current;
     const opacity = React.useRef(new Animated.Value(1)).current;
+    const [isAnimating, setIsAnimating] = React.useState(false);
 
     React.useImperativeHandle(ref, () => ({
       animateOut: async ({
@@ -37,6 +37,7 @@ const Card = React.forwardRef<CardRef, CardProps>(
         animateOpacity = true,
         duration = 300,
       }) => {
+        setIsAnimating(true);
         onAnimationChange?.(true);
 
         return new Promise<unknown>((resolve) => {
@@ -89,6 +90,7 @@ const Card = React.forwardRef<CardRef, CardProps>(
           }
         }).finally(() => {
           onAnimationChange?.(false);
+          setIsAnimating(false);
         });
       },
     }));
@@ -111,7 +113,7 @@ const Card = React.forwardRef<CardRef, CardProps>(
             borderRadius: Math.round(width / 20),
           },
           style,
-          animationStyle,
+          isAnimating ? animationStyle : undefined,
         ])}
         {...rest}
       >

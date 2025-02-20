@@ -29,12 +29,13 @@ export interface CardInstance {
 
 export interface Stack {
   id: string;
-  cardInstances: CardInstance[];
+  cardInstances: string[];
 }
 
 interface TabletopHistoryState {
   stacksIds: string[];
   stacksById: Record<string, Stack | undefined>;
+  cardInstancesById: Record<string, CardInstance | undefined>;
 }
 
 type TabletopHistory = History<TabletopHistoryState>;
@@ -58,35 +59,42 @@ const initialState: TabletopState = {
       history: {
         past: [],
         present: {
+          cardInstancesById: {
+            cardInstance1: {
+              cardInstanceId: "cardInstance1",
+              cardId: "card1",
+              state: CardInstanceState.faceUp,
+            },
+            cardInstance2: {
+              cardInstanceId: "cardInstance2",
+              cardId: "card2",
+              state: CardInstanceState.faceUp,
+            },
+            cardInstance3: {
+              cardInstanceId: "cardInstance3",
+              cardId: "card3",
+              state: CardInstanceState.faceUp,
+            },
+            cardInstance4: {
+              cardInstanceId: "cardInstance4",
+              cardId: "card4",
+              state: CardInstanceState.faceUp,
+            },
+            cardInstance5: {
+              cardInstanceId: "cardInstance5",
+              cardId: "card5",
+              state: CardInstanceState.faceUp,
+            },
+          },
           stacksById: {
             stack1: {
               id: "stack1",
               cardInstances: [
-                {
-                  cardInstanceId: "cardInstance1",
-                  cardId: "card1",
-                  state: CardInstanceState.faceUp,
-                },
-                {
-                  cardInstanceId: "cardInstance2",
-                  cardId: "card2",
-                  state: CardInstanceState.faceUp,
-                },
-                {
-                  cardInstanceId: "cardInstance3",
-                  cardId: "card3",
-                  state: CardInstanceState.faceUp,
-                },
-                {
-                  cardInstanceId: "cardInstance4",
-                  cardId: "card4",
-                  state: CardInstanceState.faceUp,
-                },
-                {
-                  cardInstanceId: "cardInstance5",
-                  cardId: "card5",
-                  state: CardInstanceState.faceUp,
-                },
+                "cardInstance1",
+                "cardInstance2",
+                "cardInstance3",
+                "cardInstance4",
+                "cardInstance5",
               ],
             },
             stack2: {
@@ -139,9 +147,7 @@ export const tabletopsSlice = createSlice({
 
         if (!fromStack || !toStack) return;
 
-        const cardInstance = fromStack.cardInstances.find(
-          (cardInstance) => cardInstance.cardInstanceId === cardInstanceId
-        );
+        const cardInstance = state.cardInstancesById[cardInstanceId];
 
         if (!cardInstance) return;
 
@@ -165,15 +171,15 @@ export const tabletopsSlice = createSlice({
         if (fromStack.id === toStack.id) {
           // Moving within the same stack so sort it
           fromStack.cardInstances = fromStack.cardInstances.sort((a, b) => {
-            if (a.cardInstanceId === cardInstanceId) return 1;
-            if (b.cardInstanceId === cardInstanceId) return -1;
+            if (a === cardInstanceId) return 1;
+            if (b === cardInstanceId) return -1;
 
             return 0;
           });
         } else {
           // Moving stacks so remove it from the old stack
           fromStack.cardInstances = fromStack.cardInstances.filter(
-            (cardInstance) => cardInstance.cardInstanceId !== cardInstanceId
+            (cardInstance) => cardInstance !== cardInstanceId
           );
 
           // Add to the new stack
@@ -181,12 +187,18 @@ export const tabletopsSlice = createSlice({
             case MoveCardInstanceMethod.topFaceUp:
             case MoveCardInstanceMethod.topFaceDown:
             case MoveCardInstanceMethod.topNoChange:
-              toStack.cardInstances = [cardInstance, ...toStack.cardInstances];
+              toStack.cardInstances = [
+                cardInstanceId,
+                ...toStack.cardInstances,
+              ];
               break;
             case MoveCardInstanceMethod.bottomFaceUp:
             case MoveCardInstanceMethod.bottomFaceDown:
             case MoveCardInstanceMethod.bottomNoChange:
-              toStack.cardInstances = [...toStack.cardInstances, cardInstance];
+              toStack.cardInstances = [
+                ...toStack.cardInstances,
+                cardInstanceId,
+              ];
               break;
           }
         }
@@ -198,18 +210,11 @@ export const tabletopsSlice = createSlice({
         action: PayloadAction<{
           tabletopId: string;
           cardInstanceId: string;
-          stackId: string;
           state: CardInstanceState;
         }>
       ) => {
-        const stack = state?.stacksById[action.payload.stackId];
-
-        if (!stack) return;
-
-        const cardInstance = stack.cardInstances.find(
-          (cardInstance) =>
-            cardInstance.cardInstanceId === action.payload.cardInstanceId
-        );
+        const cardInstance =
+          state.cardInstancesById[action.payload.cardInstanceId];
 
         if (!cardInstance) return;
 
@@ -235,16 +240,17 @@ export const tabletopsSlice = createSlice({
           () => Math.random() - 0.5
         );
 
-        state.stacksById[action.payload.stackId] = {
-          ...stack,
-          cardInstances: shuffledCardInstances.map((cardInstance) => ({
-            ...cardInstance,
-            state:
-              action.payload.allCardInstancesState === "noChange"
-                ? cardInstance.state
-                : action.payload.allCardInstancesState,
-          })),
-        };
+        const allCardInstancesState = action.payload.allCardInstancesState;
+
+        if (allCardInstancesState !== "noChange") {
+          shuffledCardInstances.forEach((cardInstanceId) => {
+            const cardInstance = state.cardInstancesById[cardInstanceId];
+
+            if (!cardInstance) return;
+
+            cardInstance.state = allCardInstancesState;
+          });
+        }
       }
     ),
   },
@@ -276,10 +282,17 @@ export const selectStack = (
 ): Stack | null =>
   selectPresentState(state, props)?.stacksById[props.stackId] ?? null;
 
-export const selectCardInstances = (
+export const selectCardInstanceIds = (
   state: RootState,
   props: { stackId: string; tabletopId: string }
-): CardInstance[] | null => selectStack(state, props)?.cardInstances ?? null;
+): string[] | null => selectStack(state, props)?.cardInstances ?? null;
+
+export const selectCardInstance = (
+  state: RootState,
+  props: { cardInstanceId: string; tabletopId: string }
+): CardInstance | null =>
+  selectPresentState(state, props)?.cardInstancesById?.[props.cardInstanceId] ??
+  null;
 
 const historySelectors = history.withSelectors<RootState>(
   (state) => state.tabletops
@@ -293,11 +306,11 @@ export const selectTabletopHasFuture = historySelectors.selectHasFuture;
 export const selectFirstXCardInstances = createCachedSelector<
   RootState,
   { stackId: string; limit: number; tabletopId: string },
-  CardInstance[] | null,
+  string[] | null,
   number,
-  CardInstance[] | null
+  string[] | null
 >(
-  selectCardInstances,
+  selectCardInstanceIds,
   (_, props) => props.limit,
   (cardInstances, limit) => {
     const sliced = cardInstances?.slice(0, limit) ?? [];
@@ -308,6 +321,6 @@ export const selectFirstXCardInstances = createCachedSelector<
 
     return sliced;
   }
-)((state, props) => `${props.stackId}-${props.limit}`);
+)((_, props) => `${props.stackId}-${props.limit}`);
 
 export default tabletopsSlice;
