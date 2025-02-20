@@ -3,7 +3,7 @@ import { StyleProp, ViewStyle } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectFirstXCardInstances,
-  shuffleStack,
+  setStackOrder,
 } from "@/store/slices/tabletop";
 import { selectUserSettings } from "@/store/slices/userSettings";
 import { StackProps, StackDimensions } from "./stack.types";
@@ -28,10 +28,17 @@ export default function useStack(
   );
 
   const handleShuffle = React.useCallback(() => {
+    const randomOrder = cardInstancesIds?.sort(() => Math.random() - 0.5);
+
     dispatch(
-      shuffleStack({ stackId, allCardInstancesState: "noChange", tabletopId })
+      setStackOrder({
+        stackId,
+        allCardInstancesState: "noChange",
+        tabletopId,
+        cardInstanceIds: randomOrder ?? [],
+      })
     );
-  }, [dispatch, stackId, tabletopId]);
+  }, [dispatch, stackId, tabletopId, cardInstancesIds]);
 
   const cardPositions = React.useRef<Array<string | null>>([]);
 

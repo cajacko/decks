@@ -221,14 +221,13 @@ export const tabletopsSlice = createSlice({
         cardInstance.state = action.payload.state;
       }
     ),
-    // TODO: reducers shouldn't inject randomness, maybe we can pass in a string/ key to shuffle by?
-    // or the action can shuffle it
-    shuffleStack: history.withHistory(
+    setStackOrder: history.withHistory(
       (
         state,
         action: PayloadAction<{
           tabletopId: string;
           stackId: string;
+          cardInstanceIds: string[];
           allCardInstancesState: CardInstanceState | "noChange";
         }>
       ) => {
@@ -236,14 +235,12 @@ export const tabletopsSlice = createSlice({
 
         if (!stack) return;
 
-        const shuffledCardInstances = [...stack.cardInstances].sort(
-          () => Math.random() - 0.5
-        );
+        stack.cardInstances = action.payload.cardInstanceIds;
 
         const allCardInstancesState = action.payload.allCardInstancesState;
 
         if (allCardInstancesState !== "noChange") {
-          shuffledCardInstances.forEach((cardInstanceId) => {
+          action.payload.cardInstanceIds.forEach((cardInstanceId) => {
             const cardInstance = state.cardInstancesById[cardInstanceId];
 
             if (!cardInstance) return;
@@ -256,7 +253,7 @@ export const tabletopsSlice = createSlice({
   },
 });
 
-export const { changeCardState, moveCard, shuffleStack, undo, redo } =
+export const { changeCardState, moveCard, setStackOrder, undo, redo } =
   tabletopsSlice.actions;
 
 export const selectTabletop = (
