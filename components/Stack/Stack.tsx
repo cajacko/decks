@@ -45,6 +45,7 @@ export default function Stack(props: StackProps): React.ReactNode {
               if (isTopCard) {
                 return (
                   <StackTopCard
+                    tabletopId={props.tabletopId}
                     key={cardInstance.cardInstanceId}
                     cardId={cardInstance.cardId}
                     state={cardInstance.state}

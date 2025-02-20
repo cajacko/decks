@@ -1,6 +1,6 @@
 import React from "react";
 import { CardProps } from "./Card";
-import { CardInstanceState } from "@/store/slices/stacks";
+import { CardInstanceState } from "@/store/slices/tabletop";
 import { CardRef } from "./Card";
 import CardFront from "./CardFront";
 import CardBack from "./CardBack";

@@ -66,6 +66,7 @@ export default function Tabletop({
           rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
           availableHeight={size.height}
           availableWidth={size.width}
+          tabletopId={tabletopId}
         />
       ))}
     </ScrollView>

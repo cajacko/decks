@@ -1,12 +1,15 @@
 import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectFirstXCardInstances, shuffleStack } from "@/store/slices/stacks";
+import {
+  selectFirstXCardInstances,
+  shuffleStack,
+} from "@/store/slices/tabletop";
 import { selectUserSettings } from "@/store/slices/userSettings";
 import { StackProps, StackDimensions } from "./stack.types";
 
 export default function useStack(
-  { stackId }: StackProps,
+  { stackId, tabletopId }: StackProps,
   { positionStyles }: StackDimensions
 ) {
   const dispatch = useAppDispatch();
@@ -19,13 +22,16 @@ export default function useStack(
   const cardInstances = useAppSelector((state) =>
     selectFirstXCardInstances(state, {
       stackId,
+      tabletopId,
       limit,
     })
   );
 
   const handleShuffle = React.useCallback(() => {
-    dispatch(shuffleStack({ stackId, allCardInstancesState: "noChange" }));
-  }, [dispatch, stackId]);
+    dispatch(
+      shuffleStack({ stackId, allCardInstancesState: "noChange", tabletopId })
+    );
+  }, [dispatch, stackId, tabletopId]);
 
   const cardInstancesIds = React.useMemo(
     () => cardInstances?.map(({ cardInstanceId }) => cardInstanceId) ?? [],

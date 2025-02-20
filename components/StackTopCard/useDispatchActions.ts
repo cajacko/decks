@@ -5,7 +5,7 @@ import {
   changeCardState,
   CardInstanceState,
   MoveCardInstanceMethod,
-} from "@/store/slices/stacks";
+} from "@/store/slices/tabletop";
 import { CardRef } from "@/components/Card";
 import { StackTopCardProps } from "./types";
 import { useAnimateCardMovement } from "@/hooks/useFlag";
@@ -17,6 +17,7 @@ export default function useDispatchActions({
   leftStackId,
   rightStackId,
   state,
+  tabletopId,
 }: StackTopCardProps) {
   const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ export default function useDispatchActions({
   const handleFlipCard = React.useCallback(() => {
     dispatch(
       changeCardState({
+        tabletopId,
         cardInstanceId,
         stackId,
         state:
@@ -35,7 +37,7 @@ export default function useDispatchActions({
             : CardInstanceState.faceDown,
       })
     );
-  }, [dispatch, cardInstanceId, stackId, state]);
+  }, [dispatch, cardInstanceId, stackId, state, tabletopId]);
 
   const moveRight = React.useMemo(() => {
     if (!rightStackId) return undefined;
@@ -52,6 +54,7 @@ export default function useDispatchActions({
 
         dispatch(
           moveCard({
+            tabletopId,
             cardInstanceId,
             fromStackId: stackId,
             toStackId: rightStackId,
@@ -70,6 +73,7 @@ export default function useDispatchActions({
 
         dispatch(
           moveCard({
+            tabletopId,
             cardInstanceId,
             fromStackId: stackId,
             toStackId: rightStackId,
@@ -78,7 +82,7 @@ export default function useDispatchActions({
         );
       },
     };
-  }, [dispatch, cardInstanceId, stackId, rightStackId, cardRef]);
+  }, [dispatch, cardInstanceId, stackId, rightStackId, cardRef, tabletopId]);
 
   const moveLeft = React.useMemo(() => {
     if (!leftStackId) return undefined;
@@ -95,6 +99,7 @@ export default function useDispatchActions({
 
         dispatch(
           moveCard({
+            tabletopId,
             cardInstanceId,
             fromStackId: stackId,
             toStackId: leftStackId,
@@ -113,6 +118,7 @@ export default function useDispatchActions({
 
         dispatch(
           moveCard({
+            tabletopId,
             cardInstanceId,
             fromStackId: stackId,
             toStackId: leftStackId,
@@ -121,7 +127,7 @@ export default function useDispatchActions({
         );
       },
     };
-  }, [dispatch, cardInstanceId, stackId, leftStackId, cardRef]);
+  }, [dispatch, cardInstanceId, stackId, leftStackId, cardRef, tabletopId]);
 
   const handleMoveToBottom = React.useMemo(() => {
     if (!canMoveToBottom) return undefined;
@@ -137,6 +143,7 @@ export default function useDispatchActions({
 
       dispatch(
         moveCard({
+          tabletopId,
           cardInstanceId,
           fromStackId: stackId,
           toStackId: stackId,
@@ -144,7 +151,7 @@ export default function useDispatchActions({
         })
       );
     };
-  }, [dispatch, cardInstanceId, stackId, canMoveToBottom, cardRef]);
+  }, [dispatch, cardInstanceId, stackId, canMoveToBottom, cardRef, tabletopId]);
 
   return {
     cardRef,
