@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
-import { cardSizeRatios } from "../Card";
 import { PositionStyle, StackDimensions } from "./stack.types";
+
+const cardSizeRatios = {
+  poker: { width: 2.5, height: 3.5 },
+};
 
 const roundTo1Decimal = (num: number): number => Math.round(num * 10) / 10;
 

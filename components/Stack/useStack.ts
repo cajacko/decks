@@ -7,12 +7,14 @@ import {
 } from "@/store/slices/tabletop";
 import { selectUserSettings } from "@/store/slices/userSettings";
 import { StackProps, StackDimensions } from "./stack.types";
+import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export default function useStack(
-  { stackId, tabletopId }: StackProps,
+  { stackId }: StackProps,
   { positionStyles }: StackDimensions
 ) {
   const dispatch = useAppDispatch();
+  const { tabletopId } = useTabletopContext();
 
   const { animateCardMovement } = useAppSelector(selectUserSettings);
   const limit = animateCardMovement

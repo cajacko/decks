@@ -6,23 +6,21 @@ import EmptyStack from "../EmptyStack";
 import CardAction from "../CardAction";
 import CardSpacer from "../CardSpacer";
 import { StackProps } from "./stack.types";
-import styles, { getStackDimensions } from "./stack.style";
+import styles from "./stack.style";
 import useStack from "./useStack";
+import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 // TODO: all the same component in map? Maybe the animation should be higher up, not in the
 // component? As it's layout from here, not from the component itself
 
 export default function Stack(props: StackProps): React.ReactNode {
-  const dimensions = getStackDimensions(props);
+  const dimensions = useTabletopContext();
   const { cardInstancesIds, ...state } = useStack(props, dimensions);
 
   return (
     <View style={StyleSheet.flatten([styles.container, props.style])}>
       <View style={{ margin: dimensions.stackPadding }}>
-        <CardSpacer
-          width={dimensions.cardWidth}
-          height={dimensions.cardHeight}
-        />
+        <CardSpacer />
 
         {cardInstancesIds && cardInstancesIds.length > 0 && (
           <>
@@ -48,11 +46,8 @@ export default function Stack(props: StackProps): React.ReactNode {
               if (isTopCard) {
                 return (
                   <StackTopCard
-                    tabletopId={props.tabletopId}
                     key={cardInstanceId}
                     style={style}
-                    width={dimensions.cardWidth}
-                    height={dimensions.cardHeight}
                     cardInstanceId={cardInstanceId}
                     stackId={props.stackId}
                     leftStackId={props.leftStackId}
@@ -66,9 +61,6 @@ export default function Stack(props: StackProps): React.ReactNode {
                 <CardInstance
                   key={cardInstanceId}
                   cardInstanceId={cardInstanceId}
-                  tabletopId={props.tabletopId}
-                  width={dimensions.cardWidth}
-                  height={dimensions.cardHeight}
                   style={style}
                 />
               );
@@ -91,11 +83,7 @@ export default function Stack(props: StackProps): React.ReactNode {
           </>
         )}
 
-        <EmptyStack
-          style={StyleSheet.flatten([styles.card, { zIndex: 0 }])}
-          cardWidth={dimensions.cardWidth}
-          cardHeight={dimensions.cardHeight}
-        />
+        <EmptyStack style={StyleSheet.flatten([styles.card, { zIndex: 0 }])} />
       </View>
     </View>
   );

@@ -4,8 +4,7 @@ import { selectCard } from "@/store/slices/cards";
 import { useAppSelector } from "@/store/hooks";
 import { StyleSheet, Text } from "react-native";
 
-export interface CardBackProps
-  extends Pick<CardProps, "style" | "children" | "width" | "height"> {
+export interface CardBackProps extends Pick<CardProps, "style" | "children"> {
   cardId: string;
 }
 

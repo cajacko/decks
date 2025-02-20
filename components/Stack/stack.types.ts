@@ -2,7 +2,6 @@ import { StyleProp, ViewStyle } from "react-native";
 
 export interface StackProps {
   stackId: string;
-  tabletopId: string;
   style?: StyleProp<ViewStyle>;
   leftStackId?: string;
   rightStackId?: string;

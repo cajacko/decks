@@ -10,6 +10,7 @@ import {
 import { CardRef } from "@/components/Card";
 import { StackTopCardProps } from "./types";
 import { useAnimateCardMovement } from "@/hooks/useFlag";
+import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export default function useDispatchActions({
   cardInstanceId,
@@ -17,8 +18,9 @@ export default function useDispatchActions({
   canMoveToBottom,
   leftStackId,
   rightStackId,
-  tabletopId,
 }: StackTopCardProps) {
+  const { tabletopId } = useTabletopContext();
+
   const cardInstance = useAppSelector((state) =>
     selectCardInstance(state, { tabletopId, cardInstanceId })
   );

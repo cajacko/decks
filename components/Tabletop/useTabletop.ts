@@ -1,6 +1,5 @@
 import React from "react";
 import { ScrollViewProps, Dimensions } from "react-native";
-import { getStackDimensions } from "@/components/Stack";
 import { useAppSelector } from "@/store/hooks";
 import { selectStackIds } from "@/store/slices/tabletop";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
@@ -13,11 +12,6 @@ export default function useTabletop({ tabletopId }: TabletopProps) {
   const [size, setSize] = React.useState<{ height: number; width: number }>(
     Dimensions.get("screen")
   );
-
-  const { spaceBetweenStacks, stackWidth } = getStackDimensions({
-    availableHeight: size.height,
-    availableWidth: size.width,
-  });
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
@@ -35,8 +29,6 @@ export default function useTabletop({ tabletopId }: TabletopProps) {
   return {
     stackIds,
     size,
-    spaceBetweenStacks,
-    stackWidth,
     handleLayout,
   };
 }

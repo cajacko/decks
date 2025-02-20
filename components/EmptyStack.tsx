@@ -2,22 +2,14 @@ import React from "react";
 import { Text, StyleSheet } from "react-native";
 import Card, { CardProps } from "./Card";
 
-export interface EmptyStackProps extends Pick<CardProps, "style"> {
-  cardWidth: number;
-  cardHeight: number;
-}
+export type EmptyStackProps = CardProps;
 
 export default function EmptyStack({
-  cardWidth,
-  cardHeight,
   style,
+  ...rest
 }: EmptyStackProps): React.ReactNode {
   return (
-    <Card
-      style={StyleSheet.flatten([styles.container, style])}
-      width={cardWidth}
-      height={cardHeight}
-    >
+    <Card style={StyleSheet.flatten([styles.container, style])} {...rest}>
       <Text style={styles.text}>Empty Stack</Text>
     </Card>
   );

@@ -1,9 +1,8 @@
 import React from "react";
 import { StyleSheet, StyleProp, ViewStyle, Animated } from "react-native";
+import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
 
 export interface CardProps {
-  width: number;
-  height: number;
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onAnimationChange?: (isAnimating: boolean) => void;
@@ -20,12 +19,10 @@ export interface CardRef {
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
 }
 
-export const cardSizeRatios = {
-  poker: { width: 2.5, height: 3.5 },
-};
-
 const Card = React.forwardRef<CardRef, CardProps>(
-  ({ style, width, height, children, onAnimationChange, ...rest }, ref) => {
+  ({ style, children, onAnimationChange, ...rest }, ref) => {
+    const { cardHeight, cardWidth } = useTabletopContext();
+
     const translateX = React.useRef(new Animated.Value(0)).current;
     const translateY = React.useRef(new Animated.Value(0)).current;
     const opacity = React.useRef(new Animated.Value(1)).current;
@@ -46,16 +43,16 @@ const Card = React.forwardRef<CardRef, CardProps>(
 
           switch (direction) {
             case "top":
-              y = -height;
+              y = -cardHeight;
               break;
             case "right":
-              x = width;
+              x = cardWidth;
               break;
             case "bottom":
-              y = height;
+              y = cardHeight;
               break;
             case "left":
-              x = -width;
+              x = -cardWidth;
               break;
           }
 
@@ -108,9 +105,9 @@ const Card = React.forwardRef<CardRef, CardProps>(
         style={StyleSheet.flatten([
           styles.container,
           {
-            width: width,
-            height,
-            borderRadius: Math.round(width / 20),
+            width: cardWidth,
+            height: cardHeight,
+            borderRadius: Math.round(cardWidth / 20),
           },
           style,
           isAnimating ? animationStyle : undefined,

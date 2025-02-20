@@ -8,6 +8,7 @@ import {
   View,
   TouchableHighlightProps,
 } from "react-native";
+import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
 
 export interface CardActionProps {
   icon: string;
@@ -22,13 +23,20 @@ export default function CardAction({
   onPress,
   active,
 }: CardActionProps): React.ReactNode {
+  const { buttonSize } = useTabletopContext();
+
   return (
     <TouchableHighlight
       onPress={onPress}
       style={StyleSheet.flatten([
         styles.container,
+        {
+          backgroundColor: active ? "lightgray" : "white",
+          height: buttonSize,
+          width: buttonSize,
+          borderRadius: Math.round(buttonSize / 2),
+        },
         style,
-        { backgroundColor: active ? "lightgray" : "white" },
       ])}
     >
       <Text style={styles.text}>{icon}</Text>
@@ -36,15 +44,8 @@ export default function CardAction({
   );
 }
 
-// TODO: Remove this and use the context
-export const size = 80;
-
 const styles = StyleSheet.create({
   container: {
-    height: size,
-    width: size,
-    backgroundColor: "white",
-    borderRadius: Math.round(size / 2),
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,

@@ -1,9 +1,10 @@
 import React from "react";
 import CardInstance from "@/components/CardInstance";
-import CardAction, { size } from "@/components/CardAction";
+import CardAction from "@/components/CardAction";
 import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import HoldMenu, { MenuItem } from "../HoldMenu";
+import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export * from "./types";
 
@@ -11,23 +12,24 @@ export default function StackTopCard(
   props: StackTopCardProps
 ): React.ReactNode {
   const state = useDispatchActions(props);
+  const { buttonSize, cardWidth, cardHeight } = useTabletopContext();
 
   const menuItems = React.useMemo(() => {
-    const centerLeft = props.width / 2 - size / 2;
-    const top = -size / 2;
-    const bottom = props.height - size / 2;
-    const left = -size / 2;
-    const right = props.width - size / 2;
-    const sideTop = props.height / 2 - size * 1.25;
-    const sideBottom = sideTop + size * 1.5;
+    const centerLeft = cardWidth / 2 - buttonSize / 2;
+    const top = -buttonSize / 2;
+    const bottom = cardHeight - buttonSize / 2;
+    const left = -buttonSize / 2;
+    const right = cardWidth - buttonSize / 2;
+    const sideTop = cardHeight / 2 - buttonSize * 1.25;
+    const sideBottom = sideTop + buttonSize * 1.5;
 
     const items: MenuItem<{ icon: string; onPress: () => unknown }>[] = [
       {
         key: "flip",
         top: bottom,
         left: centerLeft,
-        height: size,
-        width: size,
+        height: buttonSize,
+        width: buttonSize,
         icon: "Fl",
         onPress: state.handleFlipCard,
       },
@@ -38,8 +40,8 @@ export default function StackTopCard(
         key: "bottom",
         top: top,
         left: centerLeft,
-        height: size,
-        width: size,
+        height: buttonSize,
+        width: buttonSize,
         icon: "B",
         onPress: state.handleMoveToBottom,
       });
@@ -51,8 +53,8 @@ export default function StackTopCard(
           key: "Rt",
           top: sideTop,
           left: right,
-          height: size,
-          width: size,
+          height: buttonSize,
+          width: buttonSize,
           icon: "Rt",
           onPress: state.moveRight.top,
         },
@@ -60,8 +62,8 @@ export default function StackTopCard(
           key: "Rb",
           top: sideBottom,
           left: right,
-          height: size,
-          width: size,
+          height: buttonSize,
+          width: buttonSize,
           icon: "Rb",
           onPress: state.moveRight.bottom,
         }
@@ -74,8 +76,8 @@ export default function StackTopCard(
           key: "Lt",
           top: sideTop,
           left: left,
-          height: size,
-          width: size,
+          height: buttonSize,
+          width: buttonSize,
           icon: "Lt",
           onPress: state.moveLeft.top,
         },
@@ -83,8 +85,8 @@ export default function StackTopCard(
           key: "Lb",
           top: sideBottom,
           left: left,
-          height: size,
-          width: size,
+          height: buttonSize,
+          width: buttonSize,
           icon: "Lb",
           onPress: state.moveLeft.bottom,
         }
@@ -93,8 +95,9 @@ export default function StackTopCard(
 
     return items;
   }, [
-    props.height,
-    props.width,
+    buttonSize,
+    cardHeight,
+    cardWidth,
     state.handleFlipCard,
     state.handleMoveToBottom,
     state.moveRight,

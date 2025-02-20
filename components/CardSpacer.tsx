@@ -2,7 +2,7 @@ import React from "react";
 import Card, { CardProps } from "./Card";
 import { StyleSheet } from "react-native";
 
-export interface CardSpacerProps extends CardProps {}
+export type CardSpacerProps = CardProps;
 
 // Used to allow room for cards that are absolutely positioned
 export default function CardSpacer(props: CardSpacerProps): React.ReactNode {
