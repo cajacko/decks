@@ -15,6 +15,7 @@ export interface CardInstanceProps
 const CardInstance = React.forwardRef<CardRef, CardInstanceProps>(
   ({ cardInstanceId, ...rest }, ref) => {
     const { tabletopId } = useTabletopContext();
+
     const cardInstance = useAppSelector((state) =>
       selectCardInstance(state, { cardInstanceId, tabletopId })
     );

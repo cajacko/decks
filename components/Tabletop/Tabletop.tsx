@@ -1,66 +1,37 @@
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import Stack from "@/components/Stack";
+import { Dimensions, View, ScrollViewProps } from "react-native";
 import TabletopToolbar from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
-import useTabletop from "./useTabletop";
-import { TabletopProvider, TabletopContextProps } from "./Tabletop.context";
+import { TabletopProvider } from "./Tabletop.context";
+import StackList from "../StackList";
 
 export default function Tabletop({
   tabletopId,
   style,
 }: TabletopProps): React.ReactNode {
-  const state = useTabletop({ tabletopId });
+  const [size, setSize] = React.useState<{ height: number; width: number }>(
+    Dimensions.get("screen")
+  );
+
+  const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
+    (event) => {
+      const { width, height } = event.nativeEvent.layout;
+
+      setSize({ width, height });
+    },
+    []
+  );
 
   return (
     <TabletopProvider
-      height={state.size.height}
-      width={state.size.width}
+      height={size.height}
+      width={size.width}
       tabletopId={tabletopId}
     >
-      {React.useCallback(
-        ({ stackWidth, spaceBetweenStacks }: TabletopContextProps) => (
-          <View style={style}>
-            <TabletopToolbar tabletopId={tabletopId} />
-            <ScrollView
-              onLayout={state.handleLayout}
-              style={StyleSheet.flatten([styles.scrollView])}
-              contentContainerStyle={styles.contentContainer}
-              horizontal
-              snapToAlignment="center"
-              // FIXME: Shouldn't need to add this buffer the calcs should work
-              snapToInterval={stackWidth + 10}
-              decelerationRate="fast"
-            >
-              {state.stackIds.map((stackId) => (
-                <Stack
-                  key={stackId}
-                  stackId={stackId}
-                  style={{ paddingHorizontal: spaceBetweenStacks / 2 }}
-                  leftStackId={
-                    state.stackIds[state.stackIds.indexOf(stackId) - 1]
-                  }
-                  rightStackId={
-                    state.stackIds[state.stackIds.indexOf(stackId) + 1]
-                  }
-                  availableHeight={state.size.height}
-                  availableWidth={state.size.width}
-                />
-              ))}
-            </ScrollView>
-          </View>
-        ),
-        []
-      )}
+      <View style={style}>
+        <TabletopToolbar />
+        <StackList handleLayout={handleLayout} />
+      </View>
     </TabletopProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
-    flexDirection: "row",
-  },
-  contentContainer: {
-    alignItems: "center",
-  },
-});

@@ -8,7 +8,7 @@ export interface CardBackProps extends Pick<CardProps, "style" | "children"> {
   cardId: string;
 }
 
-const CardFront = React.forwardRef<CardRef, CardBackProps>(
+const CardBack = React.forwardRef<CardRef, CardBackProps>(
   ({ cardId, style, children, ...rest }, ref) => {
     const card = useAppSelector((state) => selectCard(state, { cardId }));
 
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardFront;
+export default CardBack;

@@ -8,27 +8,27 @@ import {
 } from "@/store/slices/tabletop";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
+import { useTabletopContext } from "./Tabletop/Tabletop.context";
 
-export interface TabletopToolbarProps {
-  tabletopId: string;
-}
+export interface TabletopToolbarProps {}
 
 export default function TabletopToolbar(
   props: TabletopToolbarProps
 ): React.ReactNode {
+  const { tabletopId } = useTabletopContext();
   const dispatch = useAppDispatch();
   const hasPast = useAppSelector((state) =>
-    selectTabletopHasPast(state, props)
+    selectTabletopHasPast(state, { tabletopId })
   );
   const hasFuture = useAppSelector((state) =>
-    selectTabletopHasFuture(state, props)
+    selectTabletopHasFuture(state, { tabletopId })
   );
 
   return (
     <View style={styles.container}>
       <CardAction
         icon="Un"
-        onPress={hasPast ? () => dispatch(undo(props)) : undefined}
+        onPress={hasPast ? () => dispatch(undo({ tabletopId })) : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: hasPast ? 1 : 0.5 },
@@ -36,7 +36,7 @@ export default function TabletopToolbar(
       />
       <CardAction
         icon="Re"
-        onPress={hasFuture ? () => dispatch(redo(props)) : undefined}
+        onPress={hasFuture ? () => dispatch(redo({ tabletopId })) : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: hasFuture ? 1 : 0.5 },

@@ -74,7 +74,9 @@ const Card = React.forwardRef<CardRef, CardProps>(
               Animated.delay(duration / 2), // Wait for half of the movement duration
               Animated.timing(opacity, {
                 toValue: 0,
-                duration: duration / 2, // Fade out over the second half
+                // We need to make sure this finishes fading before the movement finishes, it causes
+                // weird flickering issues otherwise
+                duration: duration / 3, // Fade out over the second half
                 useNativeDriver: true,
               }),
             ]);

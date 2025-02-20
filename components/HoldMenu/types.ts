@@ -7,13 +7,13 @@ export type MenuItem<P extends {} = {}> = P & {
   touchBuffer?: number;
 };
 
+export type RenderItemMenuItem<P extends MenuItem> = P & {
+  highlight: boolean;
+  holdMenuBehaviour: "hold" | "tap";
+};
+
 export interface HoldMenuProps<I extends MenuItem> {
-  renderItem: (
-    item: I & {
-      highlight: boolean;
-      holdMenuBehaviour: "hold" | "tap";
-    }
-  ) => React.ReactNode;
+  renderItem: (item: RenderItemMenuItem<I>) => React.ReactNode;
   handleAction: (item: I) => void;
   menuItems: I[];
   touchBuffer?: number;

@@ -5,8 +5,6 @@ export interface StackProps {
   style?: StyleProp<ViewStyle>;
   leftStackId?: string;
   rightStackId?: string;
-  availableHeight: number;
-  availableWidth: number;
 }
 
 export type PositionStyle = StyleProp<ViewStyle> | undefined;
