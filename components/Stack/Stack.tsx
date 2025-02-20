@@ -19,13 +19,13 @@ export default function Stack(props: StackProps): React.ReactNode {
   return (
     <View style={StyleSheet.flatten([styles.container, props.style])}>
       <View style={{ margin: dimensions.stackPadding }}>
-        {cardInstancesIds && cardInstancesIds.length > 0 ? (
-          <>
-            <CardSpacer
-              width={dimensions.cardWidth}
-              height={dimensions.cardHeight}
-            />
+        <CardSpacer
+          width={dimensions.cardWidth}
+          height={dimensions.cardHeight}
+        />
 
+        {cardInstancesIds && cardInstancesIds.length > 0 && (
+          <>
             {cardInstancesIds.map((cardInstanceId, i) => {
               const isTopCard = i === 0;
               const positionStyle = state.getCardPositionStyle({
@@ -38,7 +38,7 @@ export default function Stack(props: StackProps): React.ReactNode {
                 positionStyle,
                 // Decrements zIndex for each card, so the top card has the highest zIndex,
                 // finishing at 1
-                { zIndex: cardInstancesIds.length - i },
+                { zIndex: cardInstancesIds.length - i + 1 },
               ]);
 
               // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
@@ -80,7 +80,7 @@ export default function Stack(props: StackProps): React.ReactNode {
                 style={StyleSheet.flatten([
                   styles.shuffleButton,
                   {
-                    zIndex: 0,
+                    zIndex: 1,
                     bottom: -dimensions.stackPadding,
                     left: -dimensions.stackPadding,
                   },
@@ -89,12 +89,13 @@ export default function Stack(props: StackProps): React.ReactNode {
               />
             )}
           </>
-        ) : (
-          <EmptyStack
-            cardWidth={dimensions.cardWidth}
-            cardHeight={dimensions.cardHeight}
-          />
         )}
+
+        <EmptyStack
+          style={StyleSheet.flatten([styles.card, { zIndex: 0 }])}
+          cardWidth={dimensions.cardWidth}
+          cardHeight={dimensions.cardHeight}
+        />
       </View>
     </View>
   );
