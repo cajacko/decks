@@ -77,6 +77,10 @@ const initialState: StackState = {
       id: "stack2",
       cardInstances: [],
     },
+    stack3: {
+      id: "stack3",
+      cardInstances: [],
+    },
     hand1: {
       id: "hand1",
       cardInstances: [],
@@ -224,10 +228,17 @@ export const selectCardInstances = (
 
 // Uses createCachedSelector to select the first 3 cards only from selectCardInstances or null if
 // there were none, or whatever we have if there's less than 3
-export const selectVisibleCardInstances = createCachedSelector(
+export const selectFirstXCardInstances = createCachedSelector<
+  RootState,
+  { stackId: string; limit: number },
+  CardInstance[] | null,
+  number,
+  CardInstance[] | null
+>(
   selectCardInstances,
-  (cardInstances) => {
-    const sliced = cardInstances?.slice(0, 3) ?? [];
+  (_, props) => props.limit,
+  (cardInstances, limit) => {
+    const sliced = cardInstances?.slice(0, limit) ?? [];
 
     if (sliced.length === 0) {
       return null;
@@ -235,6 +246,6 @@ export const selectVisibleCardInstances = createCachedSelector(
 
     return sliced;
   }
-)((state, props) => props.stackId);
+)((state, props) => `${props.stackId}-${props.limit}`);
 
 export default stacksSlice;

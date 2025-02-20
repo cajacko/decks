@@ -3,14 +3,16 @@ import { Text, StyleSheet } from "react-native";
 import Card from "./Card";
 
 export interface EmptyStackProps {
-  cardWidth?: number;
+  cardWidth: number;
+  cardHeight: number;
 }
 
 export default function EmptyStack({
   cardWidth,
+  cardHeight,
 }: EmptyStackProps): React.ReactNode {
   return (
-    <Card style={styles.container} width={cardWidth}>
+    <Card style={styles.container} width={cardWidth} height={cardHeight}>
       <Text style={styles.text}>Empty Stack</Text>
     </Card>
   );

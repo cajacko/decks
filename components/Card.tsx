@@ -1,11 +1,22 @@
 import React from "react";
-import { View, StyleSheet, StyleProp, ViewStyle, Animated } from "react-native";
+import {
+  View,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  Animated,
+  TouchableWithoutFeedback,
+} from "react-native";
 
 export interface CardProps {
-  width?: number;
+  width: number;
+  height: number;
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onAnimationChange?: (isAnimating: boolean) => void;
+  onPress?: () => void;
+  // TODO: Should we handle angles/ offsets here? It may be a common card property to be jiggled about?
+  // offset?: 0 | 1 | 2 | 3 | 4;
 }
 
 export interface AnimateOutProps {
@@ -18,18 +29,15 @@ export interface CardRef {
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
 }
 
-const defaultWidth = 200;
-
-export const getCardHeight = (width: number | null): number =>
-  Math.round((width ?? defaultWidth) * 1.4);
+export const cardSizeRatios = {
+  poker: { width: 2.5, height: 3.5 },
+};
 
 const Card = React.forwardRef<CardRef, CardProps>(
   (
-    { style, width = defaultWidth, children, onAnimationChange, ...rest },
+    { style, width, height, children, onAnimationChange, onPress, ...rest },
     ref
   ) => {
-    const height = getCardHeight(width);
-
     const translateX = React.useRef(new Animated.Value(0)).current;
     const translateY = React.useRef(new Animated.Value(0)).current;
     const opacity = React.useRef(new Animated.Value(1)).current;
@@ -96,6 +104,14 @@ const Card = React.forwardRef<CardRef, CardProps>(
       },
     }));
 
+    const styleTransform = (style as ViewStyle)?.transform || [];
+
+    // TODO: type properly
+    const animationStyle = {
+      transform: [...styleTransform, { translateX }, { translateY }],
+      opacity,
+    } as ViewStyle;
+
     return (
       <Animated.View
         style={StyleSheet.flatten([
@@ -104,13 +120,17 @@ const Card = React.forwardRef<CardRef, CardProps>(
             width: width,
             height,
             borderRadius: Math.round(width / 20),
-            transform: [{ translateX }, { translateY }],
-            opacity,
           },
           style,
+          animationStyle,
         ])}
         {...rest}
       >
+        {onPress && (
+          <TouchableWithoutFeedback onPress={onPress}>
+            <View style={styles.pressableBackground} />
+          </TouchableWithoutFeedback>
+        )}
         {children}
       </Animated.View>
     );
@@ -120,6 +140,16 @@ const Card = React.forwardRef<CardRef, CardProps>(
 export default Card;
 
 const styles = StyleSheet.create({
+  pressableBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    // zIndex: 10000,
+    opacity: 0,
+    backgroundColor: "red",
+  },
   container: {
     backgroundColor: "#fff",
     borderWidth: 1,

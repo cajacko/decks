@@ -3,6 +3,7 @@ import cardsSlice from "./slices/cards";
 import stacksSlice from "./slices/stacks";
 import tabletopsSlice from "./slices/tabletop";
 import decksSlice from "./slices/decks";
+import userSettingsSlice from "./slices/userSettings";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     [stacksSlice.name]: stacksSlice.reducer,
     [tabletopsSlice.name]: tabletopsSlice.reducer,
     [decksSlice.name]: decksSlice.reducer,
+    [userSettingsSlice.name]: userSettingsSlice.reducer,
   },
 });
 

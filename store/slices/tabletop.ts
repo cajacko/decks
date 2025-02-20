@@ -31,7 +31,7 @@ const initialState: TabletopState = {
   tabletopsById: {
     tabletop1: {
       id: "tabletop1",
-      stacksIds: ["stack1", "stack2"],
+      stacksIds: ["stack1", "stack2", "stack3"],
       availableDecks: ["deck1"],
       // additionalAvailableCards: [],
       // handStackId: "hand1",

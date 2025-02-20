@@ -19,6 +19,7 @@ export default function StackTopCard(
       {...props}
       ref={state.cardRef}
       onAnimationChange={state.setIsAnimating}
+      onPress={state.handleCardPress}
     >
       {state.showActions && (
         <>

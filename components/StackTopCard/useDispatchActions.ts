@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   moveCard,
   changeCardState,
@@ -8,9 +8,7 @@ import {
 } from "@/store/slices/stacks";
 import { CardRef } from "@/components/Card";
 import { StackTopCardProps } from "./types";
-
-// TODO: Move to settings
-const animateCardMovement = false;
+import { selectUserSettings } from "@/store/slices/userSettings";
 
 export default function useDispatchActions({
   cardInstanceId,
@@ -20,9 +18,11 @@ export default function useDispatchActions({
   rightStackId,
   state,
 }: StackTopCardProps) {
+  const { animateCardMovement } = useAppSelector(selectUserSettings);
   const dispatch = useAppDispatch();
   const cardRef = React.useRef<CardRef>(null);
   const [isAnimating, setIsAnimating] = React.useState(false);
+  const [showActions, setShowActions] = React.useState(false);
 
   const handleFlipCard = React.useCallback(() => {
     dispatch(
@@ -153,6 +153,13 @@ export default function useDispatchActions({
     moveLeft,
     handleMoveToBottom,
     setIsAnimating,
-    showActions: !isAnimating,
+    showActions: !isAnimating && showActions,
+    handleCardPress: () => {
+      setShowActions(true);
+
+      setTimeout(() => {
+        setShowActions(false);
+      }, 2000);
+    },
   };
 }

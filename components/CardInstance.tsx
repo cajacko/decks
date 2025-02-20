@@ -8,7 +8,7 @@ import CardBack from "./CardBack";
 export interface CardInstanceProps
   extends Pick<
     CardProps,
-    "style" | "width" | "children" | "onAnimationChange"
+    "style" | "width" | "height" | "children" | "onAnimationChange" | "onPress"
   > {
   cardId: string;
   state: CardInstanceState;
