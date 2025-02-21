@@ -6,6 +6,8 @@ import {
 import flags, { Flags } from "@/config/flags";
 
 export default function useFlag<
+  // This is okay in this generic, it is still strongly typed when used
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   L extends (flags: Flags, userSettings: UserSettingsState) => any,
 >(logic: L): ReturnType<L> {
   const userSettings = useAppSelector(selectUserSettings);

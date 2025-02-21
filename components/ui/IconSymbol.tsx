@@ -44,6 +44,7 @@ export function IconSymbol({
       color={color}
       size={size}
       name={MAPPING[name]}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       style={style as any}
     />
   );

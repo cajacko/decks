@@ -1,5 +1,12 @@
 // https://docs.expo.dev/guides/using-eslint/
+
 module.exports = {
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "./tsconfig.json",
+    // eslint-disable-next-line no-undef
+    tsconfigRootDir: __dirname, // Ensures correct resolution of tsconfig
+  },
   extends: ["expo", "prettier"],
   plugins: ["prettier"],
   ignorePatterns: ["/dist/*"],
@@ -8,11 +15,21 @@ module.exports = {
     // Typescript checks this
     "import/no-unresolved": "off",
     // // Lets keep our code lean
-    // "@typescript-eslint/no-unused-vars": "error",
-    // // Come on, we're better than that
-    // "@typescript-eslint/no-explicit-any": "error",
-    // "@typescript-eslint/no-unnecessary-type-assertion": "error",
-    // // Ensures things like fetch don't return with any and need to be typed
-    // "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/no-unused-vars": "error",
+    // Come on, we're better than that
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unnecessary-type-assertion": "error",
   },
+  overrides: [
+    {
+      files: ["**/*.js"], // Target all JS files
+      parser: "espree", // Use the default JavaScript parser
+      rules: {
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+      },
+    },
+  ],
 };
