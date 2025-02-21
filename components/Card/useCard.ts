@@ -1,40 +1,22 @@
 import React from "react";
-import { StyleSheet, StyleProp, ViewStyle, Animated } from "react-native";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { Animated } from "react-native";
+import { CardProps, CardRef } from "./Card.types";
+import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
-export interface CardProps {
-  style?: StyleProp<ViewStyle>;
-  children?: React.ReactNode;
-  onAnimationChange?: (isAnimating: boolean) => void;
-  hidden?: boolean;
-}
-
-export interface AnimateOutProps {
-  direction: "top" | "right" | "bottom" | "left";
-  duration?: number;
-  animateOpacity?: boolean;
-}
-
-export interface CardRef {
-  animateFlip: () => Promise<unknown>;
-  animateOut: (props: AnimateOutProps) => Promise<unknown>;
-}
-
-export function getBorderRadius(width: number): number {
-  return Math.round(width / 20);
-}
-
-export default React.forwardRef<CardRef, CardProps>(function Card(
-  { style, children, onAnimationChange, ...rest },
-  ref
+export default function useCard(
+  props: Pick<CardProps, "onAnimationChange">,
+  ref: React.ForwardedRef<CardRef>
 ) {
-  const { cardHeight, cardWidth } = useTabletopContext();
+  const { onAnimationChange } = props;
+
+  const { cardHeight: height, cardWidth: width } = useTabletopContext();
+  // FIXME: We don't need this, remove and use in ref if need to
+  const [isAnimating, setIsAnimating] = React.useState(false);
 
   const translateX = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(0)).current;
   const opacity = React.useRef(new Animated.Value(1)).current;
-  const [isAnimating, setIsAnimating] = React.useState(false);
-  const scaleAnim = React.useRef(new Animated.Value(1)).current;
+  const scaleX = React.useRef(new Animated.Value(1)).current;
 
   React.useImperativeHandle(ref, () => ({
     animateFlip: async () => {
@@ -43,12 +25,12 @@ export default React.forwardRef<CardRef, CardProps>(function Card(
 
       return new Promise<unknown>((resolve) => {
         Animated.sequence([
-          Animated.timing(scaleAnim, {
+          Animated.timing(scaleX, {
             toValue: 0, // Shrink to zero width
             duration: 200,
             useNativeDriver: true,
           }),
-          Animated.timing(scaleAnim, {
+          Animated.timing(scaleX, {
             toValue: 1, // Expand back to full width
             duration: 200,
             useNativeDriver: true,
@@ -73,16 +55,16 @@ export default React.forwardRef<CardRef, CardProps>(function Card(
 
         switch (direction) {
           case "top":
-            y = -cardHeight;
+            y = -height;
             break;
           case "right":
-            x = cardWidth;
+            x = width;
             break;
           case "bottom":
-            y = cardHeight;
+            y = height;
             break;
           case "left":
-            x = -cardWidth;
+            x = -width;
             break;
         }
 
@@ -124,47 +106,13 @@ export default React.forwardRef<CardRef, CardProps>(function Card(
     },
   }));
 
-  const styleTransform = (style as ViewStyle)?.transform || [];
-
-  // TODO: type properly
-  const animationStyle = {
-    transform: [
-      ...styleTransform,
-      { translateX },
-      { translateY },
-      { scaleX: scaleAnim },
-    ],
+  return {
+    height,
+    width,
+    isAnimating,
     opacity,
-  } as ViewStyle;
-
-  return (
-    <Animated.View
-      style={StyleSheet.flatten([
-        styles.container,
-        {
-          width: cardWidth,
-          height: cardHeight,
-          borderRadius: getBorderRadius(cardWidth),
-        },
-        style,
-        isAnimating ? animationStyle : undefined,
-      ])}
-      {...rest}
-    >
-      {children}
-    </Animated.View>
-  );
-});
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    shadowColor: "#000", // iOS & Android
-    shadowOffset: { width: 0, height: 4 }, // iOS only
-    shadowOpacity: 0.2, // iOS only
-    shadowRadius: 6, // iOS only
-    elevation: 6, // Android only
-  },
-});
+    translateX,
+    translateY,
+    scaleX,
+  };
+}
