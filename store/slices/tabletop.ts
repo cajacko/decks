@@ -1,54 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
-// You can safely import the RootState type from the store file here. It's a circular import, but
-// the TypeScript compiler can correctly handle that for types. This may be needed for use cases
-// like writing selector functions.
-// From: https://redux.js.org/tutorials/typescript-quick-start
-import type { RootState } from "../store";
-import { History, configureHistory } from "../history";
+import { configureHistory } from "../history";
+import {
+  RootState,
+  TabletopState,
+  CardInstanceState,
+  Tabletop,
+  TabletopHistoryState,
+  Stack,
+  CardInstance,
+  MoveCardInstanceMethod,
+} from "../types";
 
-export enum MoveCardInstanceMethod {
-  topFaceUp = "topFaceUp",
-  topFaceDown = "topFaceDown",
-  topNoChange = "topNoChange",
-  bottomFaceUp = "bottomFaceUp",
-  bottomFaceDown = "bottomFaceDown",
-  bottomNoChange = "bottomNoChange",
-}
+export type {
+  TabletopState,
+  Tabletop,
+  TabletopHistoryState,
+  Stack,
+  CardInstance,
+};
 
-export enum CardInstanceState {
-  faceDown = "faceDown",
-  faceUp = "faceUp",
-}
-
-export interface CardInstance {
-  cardInstanceId: string;
-  cardId: string;
-  state: CardInstanceState;
-}
-
-export interface Stack {
-  id: string;
-  cardInstances: string[];
-}
-
-interface TabletopHistoryState {
-  stacksIds: string[];
-  stacksById: Record<string, Stack | undefined>;
-  cardInstancesById: Record<string, CardInstance | undefined>;
-}
-
-type TabletopHistory = History<TabletopHistoryState>;
-
-export interface Tabletop {
-  id: string;
-  stacksIds: string[];
-  history: TabletopHistory;
-}
-
-export interface TabletopState {
-  tabletopsById: Record<string, Tabletop | undefined>;
-}
+export { CardInstanceState, MoveCardInstanceMethod };
 
 // Define the initial state using that type
 const initialState: TabletopState = {

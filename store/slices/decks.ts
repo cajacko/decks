@@ -1,23 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-// You can safely import the RootState type from the store file here. It's a circular import, but
-// the TypeScript compiler can correctly handle that for types. This may be needed for use cases
-// like writing selector functions.
-// From: https://redux.js.org/tutorials/typescript-quick-start
-import type { RootState } from "../store";
-
-export interface DeckCard {
-  cardId: string;
-  quantity: number;
-}
-
-export interface Deck {
-  id: string;
-  deckCards: DeckCard[];
-}
-
-export interface DecksState {
-  decksById: Record<string, Deck | undefined>;
-}
+import { DecksState, Deck, RootState } from "../types";
 
 // Define the initial state using that type
 const initialState: DecksState = {

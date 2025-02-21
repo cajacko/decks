@@ -2,21 +2,18 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import {
   produceWithPatches,
   applyPatches,
-  Patch,
   WritableDraft,
   Draft,
   Objectish,
 } from "immer";
+import { History } from "./versions/latest";
 
-interface Patches {
-  patches: Patch[];
-  inversePatches: Patch[];
-}
-
-export interface History<S = unknown> {
-  past: Patches[];
-  present: S;
-  future: Patches[];
+export function resetHistory<S>(history: History<S>): History<S> {
+  return {
+    future: [],
+    past: [],
+    present: history.present,
+  };
 }
 
 export function configureHistory<
