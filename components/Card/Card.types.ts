@@ -23,6 +23,8 @@ export interface CardProps {
    */
   offsetPosition?: number;
   zIndex?: number;
+  initialRotation?: number;
+  initialScaleX?: number;
 }
 
 export interface AnimateOutProps {
@@ -33,8 +35,10 @@ export interface AnimateOutProps {
 
 export interface CardRef {
   getIsAnimating: () => boolean;
-  animateFlip: () => Promise<unknown>;
+  animateFlipOut: () => Promise<unknown>;
+  animateFlipIn: () => Promise<unknown>;
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
+  prepareForFlipIn: () => void;
 }
 
 export type AnimationUpdate = (key: string, isAnimating: boolean) => void;

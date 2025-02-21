@@ -1,5 +1,10 @@
 import { StyleSheet, Animated } from "react-native";
-import { CardProps, AnimatedViewStyle, OffsetPosition } from "./Card.types";
+import {
+  CardProps,
+  AnimatedViewStyle,
+  OffsetPosition,
+  RequiredRefObject,
+} from "./Card.types";
 
 const roundTo1Decimal = (num: number): number => Math.round(num * 10) / 10;
 
@@ -58,27 +63,27 @@ export function getCardStyle(props: {
   style?: CardProps["style"];
   width: number;
   height: number;
-  opacity: Animated.Value;
-  translateX: Animated.Value;
-  translateY: Animated.Value;
-  scaleX: Animated.Value;
+  opacity: RequiredRefObject<Animated.Value>;
+  translateX: RequiredRefObject<Animated.Value>;
+  translateY: RequiredRefObject<Animated.Value>;
+  scaleX: RequiredRefObject<Animated.Value>;
   zIndex?: number;
   offsetPosition?: number;
-  rotate: Animated.Value;
+  rotate: RequiredRefObject<Animated.Value>;
 }): AnimatedViewStyle {
-  const rotate = props.rotate.interpolate({
+  const rotate = props.rotate.current.interpolate({
     inputRange: [0, 360],
     outputRange: ["0deg", "360deg"],
   });
 
   const animationStyle: AnimatedViewStyle = {
     transform: [
-      { translateX: props.translateX },
-      { translateY: props.translateY },
-      { scaleX: props.scaleX },
+      { translateX: props.translateX.current },
+      { translateY: props.translateY.current },
+      { scaleX: props.scaleX.current },
       { rotate },
     ],
-    opacity: props.opacity,
+    opacity: props.opacity.current,
   };
 
   return StyleSheet.flatten<AnimatedViewStyle>([

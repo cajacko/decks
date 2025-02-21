@@ -3,9 +3,9 @@ import { CardRef, AnimationUpdate, RequiredRefObject } from "./Card.types";
 
 export function withAnimateOut(props: {
   animationUpdate: RequiredRefObject<AnimationUpdate>;
-  opacity: Animated.Value;
-  translateX: Animated.Value;
-  translateY: Animated.Value;
+  opacity: RequiredRefObject<Animated.Value>;
+  translateX: RequiredRefObject<Animated.Value>;
+  translateY: RequiredRefObject<Animated.Value>;
   height: RequiredRefObject<number>;
   width: RequiredRefObject<number>;
 }): CardRef["animateOut"] {
@@ -33,12 +33,12 @@ export function withAnimateOut(props: {
       }
 
       const movementAnimation = Animated.parallel([
-        Animated.timing(props.translateX, {
+        Animated.timing(props.translateX.current, {
           toValue: x,
           duration,
           useNativeDriver: true,
         }),
-        Animated.timing(props.translateY, {
+        Animated.timing(props.translateY.current, {
           toValue: y,
           duration,
           useNativeDriver: true,
@@ -48,7 +48,7 @@ export function withAnimateOut(props: {
       if (animateOpacity) {
         const opacityAnimation = Animated.sequence([
           Animated.delay(duration / 2), // Wait for half of the movement duration
-          Animated.timing(props.opacity, {
+          Animated.timing(props.opacity.current, {
             toValue: 0,
             // We need to make sure this finishes fading before the movement finishes, it causes
             // weird flickering issues otherwise
@@ -65,36 +65,59 @@ export function withAnimateOut(props: {
   };
 }
 
-export function withAnimateFlip(props: {
+export const flipScaleDuration = 200;
+export const flipRotationDuration = Math.round(flipScaleDuration / 4);
+
+export function withAnimateFlipOut(props: {
   animationUpdate: RequiredRefObject<AnimationUpdate>;
-  scaleX: Animated.Value;
+  scaleX: RequiredRefObject<Animated.Value>;
   initialRotation: RequiredRefObject<number>;
-  rotate: Animated.Value;
-}): CardRef["animateFlip"] {
+  rotate: RequiredRefObject<Animated.Value>;
+}): CardRef["animateFlipOut"] {
   return async () => {
     const animateKey = "flip";
     props.animationUpdate.current(animateKey, true);
 
     return new Promise<unknown>((resolve) => {
       Animated.sequence([
-        Animated.timing(props.rotate, {
+        Animated.timing(props.rotate.current, {
           toValue: 0,
-          duration: 50,
+          duration: flipRotationDuration,
           useNativeDriver: true,
         }),
-        Animated.timing(props.scaleX, {
+        Animated.timing(props.scaleX.current, {
           toValue: 0, // Shrink to zero width
-          duration: 200,
+          duration: flipScaleDuration,
           useNativeDriver: true,
         }),
-        Animated.timing(props.scaleX, {
+      ]).start(resolve);
+    }).finally(() => props.animationUpdate.current(animateKey, false));
+  };
+}
+
+export function withAnimateFlipIn(props: {
+  animationUpdate: RequiredRefObject<AnimationUpdate>;
+  scaleX: RequiredRefObject<Animated.Value>;
+  initialRotation: RequiredRefObject<number>;
+  rotate: RequiredRefObject<Animated.Value>;
+}): CardRef["animateFlipIn"] {
+  return async () => {
+    const animateKey = "flipIn";
+    props.animationUpdate.current(animateKey, true);
+
+    props.rotate.current.setValue(0);
+    props.scaleX.current.setValue(0);
+
+    return new Promise<unknown>((resolve) => {
+      Animated.sequence([
+        Animated.timing(props.scaleX.current, {
           toValue: 1, // Expand back to full width
-          duration: 200,
+          duration: flipScaleDuration,
           useNativeDriver: true,
         }),
-        Animated.timing(props.rotate, {
+        Animated.timing(props.rotate.current, {
           toValue: props.initialRotation.current,
-          duration: 50,
+          duration: flipRotationDuration,
           useNativeDriver: true,
         }),
       ]).start(resolve);

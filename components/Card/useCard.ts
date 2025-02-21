@@ -2,12 +2,19 @@ import React from "react";
 import { Animated } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
-import { withAnimateOut, withAnimateFlip } from "./animations";
+import {
+  withAnimateOut,
+  withAnimateFlipIn,
+  withAnimateFlipOut,
+} from "./animations";
 import { getOffsetPositions } from "./card.styles";
 import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 
 export default function useCard(
-  props: Pick<CardProps, "onAnimationChange" | "offsetPosition">,
+  props: Pick<
+    CardProps,
+    "onAnimationChange" | "offsetPosition" | "initialRotation" | "initialScaleX"
+  >,
   ref: React.ForwardedRef<CardRef>,
 ) {
   const { cardHeight: height, cardWidth: width } = useTabletopContext();
@@ -23,21 +30,15 @@ export default function useCard(
   );
 
   const isAnimatingRef = React.useRef<Record<string, boolean | undefined>>({});
-
-  const translateX = React.useRef(
-    new Animated.Value(offsetPosition.x ?? 0),
-  ).current;
-
-  const translateY = React.useRef(
-    new Animated.Value(offsetPosition.y ?? 0),
-  ).current;
+  const translateX = React.useRef(new Animated.Value(offsetPosition.x ?? 0));
+  const translateY = React.useRef(new Animated.Value(offsetPosition.y ?? 0));
 
   const rotate = React.useRef(
-    new Animated.Value(offsetPosition.rotate ?? 0),
-  ).current;
+    new Animated.Value(props.initialRotation ?? offsetPosition.rotate ?? 0),
+  );
 
-  const opacity = React.useRef(new Animated.Value(1)).current;
-  const scaleX = React.useRef(new Animated.Value(1)).current;
+  const opacity = React.useRef(new Animated.Value(1));
+  const scaleX = React.useRef(new Animated.Value(props.initialScaleX ?? 1));
 
   function getIsAnimating() {
     return Object.values(isAnimatingRef.current).some(
@@ -71,7 +72,17 @@ export default function useCard(
 
   React.useImperativeHandle(ref, () => ({
     getIsAnimating,
-    animateFlip: withAnimateFlip({
+    prepareForFlipIn: () => {
+      scaleX.current.setValue(0);
+      rotate.current.setValue(0);
+    },
+    animateFlipOut: withAnimateFlipOut({
+      animationUpdate: animationUpdateRef,
+      scaleX,
+      rotate,
+      initialRotation,
+    }),
+    animateFlipIn: withAnimateFlipIn({
       animationUpdate: animationUpdateRef,
       scaleX,
       rotate,
