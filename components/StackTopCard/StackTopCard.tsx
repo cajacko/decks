@@ -42,11 +42,13 @@ export default function StackTopCard(
       ref={state.cardRef}
       onAnimationChange={state.setIsAnimating}
     >
-      <HoldMenu
-        menuItems={state.menuItems}
-        handleAction={handleAction}
-        renderItem={renderItem}
-      />
+      {!state.hideActions && (
+        <HoldMenu
+          menuItems={state.menuItems}
+          handleAction={handleAction}
+          renderItem={renderItem}
+        />
+      )}
     </CardInstance>
   );
 }

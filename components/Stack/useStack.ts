@@ -45,8 +45,6 @@ export default function useStack({ stackId }: StackProps) {
 
     await new Promise((resolve) => setTimeout(resolve, 250));
 
-    setShowActions(true);
-
     dispatch(
       setStackOrder({
         stackId,
@@ -57,6 +55,8 @@ export default function useStack({ stackId }: StackProps) {
     );
 
     await promise;
+
+    setShowActions(true);
   }, [dispatch, stackId, tabletopId, rotateAnim]);
 
   onUpdateCardList(cardInstancesIds ?? []);

@@ -36,7 +36,6 @@ export default function useDispatchActions({
   const [isAnimating, setIsAnimating] = React.useState(
     cardRef.current?.getIsAnimating() ?? false,
   );
-  const [showActions, setShowActions] = React.useState(false);
 
   const handleFlipCard = React.useCallback(async () => {
     if (cardRef.current && animateCardMovement) {
@@ -202,13 +201,6 @@ export default function useDispatchActions({
     moveLeft,
     handleMoveToBottom,
     setIsAnimating,
-    showActions: !isAnimating && showActions,
-    handleCardPress: () => {
-      setShowActions(true);
-
-      setTimeout(() => {
-        setShowActions(false);
-      }, 2000);
-    },
+    hideActions: isAnimating,
   };
 }
