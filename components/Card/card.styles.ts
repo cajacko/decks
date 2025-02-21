@@ -1,6 +1,5 @@
 import { StyleSheet, Animated } from "react-native";
-import { CardProps, AnimatedViewStyle } from "./Card.types";
-import { OffsetPosition } from "@/components/Stack/stackOffsetPositions";
+import { CardProps, AnimatedViewStyle, OffsetPosition } from "./Card.types";
 
 const roundTo1Decimal = (num: number): number => Math.round(num * 10) / 10;
 

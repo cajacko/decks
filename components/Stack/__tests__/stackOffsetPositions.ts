@@ -1,5 +1,5 @@
+import { OffsetPosition } from "@/components/Card/Card.types";
 import {
-  OffsetPosition,
   getOffsetPosition,
   withStackOffsetPositions,
 } from "../stackOffsetPositions";
