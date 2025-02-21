@@ -1,6 +1,7 @@
 import React from "react";
-import { Text, StyleSheet } from "react-native";
-import Card, { CardProps } from "./Card";
+import { View, Text, StyleSheet } from "react-native";
+import Card, { CardProps, getBorderRadius } from "./Card";
+import { useTabletopContext } from "./Tabletop/Tabletop.context";
 
 export type EmptyStackProps = CardProps;
 
@@ -8,15 +9,35 @@ export default function EmptyStack({
   style,
   ...rest
 }: EmptyStackProps): React.ReactNode {
+  const { cardWidth } = useTabletopContext();
+
   return (
     <Card style={StyleSheet.flatten([styles.container, style])} {...rest}>
-      <Text style={styles.text}>Empty Stack</Text>
+      <View
+        style={StyleSheet.flatten([
+          styles.content,
+          { borderRadius: getBorderRadius(cardWidth) },
+        ])}
+      >
+        <Text style={styles.text}>Empty Stack</Text>
+      </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    position: "relative",
+  },
+  // Slightly smaller so it doesn't poke out of the cards when in a stack
+  content: {
+    position: "absolute",
+    top: "2%",
+    left: "2%",
+    right: "2%",
+    bottom: "2%",
     borderWidth: 2,
     borderColor: "#f0f0f0",
     borderStyle: "dashed",

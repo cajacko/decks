@@ -20,6 +20,10 @@ export interface CardRef {
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
 }
 
+export function getBorderRadius(width: number): number {
+  return Math.round(width / 20);
+}
+
 const Card = React.forwardRef<CardRef, CardProps>(
   ({ style, children, onAnimationChange, ...rest }, ref) => {
     const { cardHeight, cardWidth } = useTabletopContext();
@@ -138,7 +142,7 @@ const Card = React.forwardRef<CardRef, CardProps>(
           {
             width: cardWidth,
             height: cardHeight,
-            borderRadius: Math.round(cardWidth / 20),
+            borderRadius: getBorderRadius(cardWidth),
           },
           style,
           isAnimating ? animationStyle : undefined,
