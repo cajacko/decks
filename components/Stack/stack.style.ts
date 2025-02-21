@@ -1,38 +1,9 @@
-import { StyleSheet } from "react-native";
-import { PositionStyle, StackDimensions } from "./stack.types";
+import { StyleSheet, Animated } from "react-native";
+import { StackDimensions } from "./stack.types";
 
 const cardSizeRatios = {
   poker: { width: 2.5, height: 3.5 },
 };
-
-const roundTo1Decimal = (num: number): number => Math.round(num * 10) / 10;
-
-// Define the position styles for the visible cards. We render as many cards as there are styles in
-// this array, as they would be rendered on top of each other if we did more. So we don't. If we're
-// animating cards we render twice as many so we can see any behind as they animate away.
-const getPositionStyles = (cardWidth: number): PositionStyle[] => [
-  undefined,
-  {
-    top: -roundTo1Decimal(cardWidth / 300),
-    left: roundTo1Decimal(cardWidth / 150),
-    transform: [{ rotate: "0.6deg" }],
-  },
-  {
-    top: roundTo1Decimal(cardWidth / 270),
-    left: -roundTo1Decimal(cardWidth / 300),
-    transform: [{ rotate: "-1.2deg" }],
-  },
-  {
-    top: roundTo1Decimal(cardWidth / 250),
-    left: -roundTo1Decimal(cardWidth / 170),
-    transform: [{ rotate: "1.2deg" }],
-  },
-  {
-    top: roundTo1Decimal(cardWidth / 190),
-    left: -roundTo1Decimal(cardWidth / 280),
-    transform: [{ rotate: "-0.6deg" }],
-  },
-];
 
 function getExampleStackDimensions(
   props: { stackWidth: number } | { stackHeight: number },
@@ -98,7 +69,6 @@ function getExampleStackDimensions(
     buttonSize,
     cardHeight,
     cardWidth,
-    positionStyles: getPositionStyles(cardWidth),
     spaceBetweenStacks,
     stackPadding,
     stackHeight,
@@ -141,6 +111,34 @@ export function getStackDimensions(props: {
   });
 }
 
+export function getInnerStyle(props: {
+  stackPadding: number;
+  rotateAnim: Animated.Value;
+}) {
+  return {
+    margin: props.stackPadding,
+    transform: [
+      {
+        rotate: props.rotateAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: ["0deg", "-360deg"],
+        }),
+      },
+    ],
+  };
+}
+
+export function getShuffleStyle(props: { stackPadding: number }) {
+  return StyleSheet.flatten([
+    styles.shuffleButton,
+    {
+      zIndex: 1,
+      bottom: -props.stackPadding,
+      left: -props.stackPadding,
+    },
+  ]);
+}
+
 const styles = StyleSheet.create({
   container: {
     position: "relative",
@@ -150,6 +148,10 @@ const styles = StyleSheet.create({
   },
   card: {
     position: "absolute",
+  },
+  empty: {
+    position: "absolute",
+    zIndex: 0,
   },
 });
 

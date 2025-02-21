@@ -4,7 +4,7 @@ import { selectCard } from "@/store/slices/cards";
 import { useAppSelector } from "@/store/hooks";
 import { StyleSheet, Text } from "react-native";
 
-export interface CardBackProps extends Pick<CardProps, "style" | "children"> {
+export interface CardBackProps extends CardProps {
   cardId: string;
 }
 
@@ -13,17 +13,17 @@ export default React.forwardRef<CardRef, CardBackProps>(function CardBack(
   ref,
 ) {
   const card = useAppSelector((state) => selectCard(state, { cardId }));
+  const cardStyle = React.useMemo(
+    () => StyleSheet.flatten([styles.container, style]),
+    [style],
+  );
 
   if (!card) {
     throw new Error(`Card with id ${cardId} not found`);
   }
 
   return (
-    <Card
-      {...rest}
-      style={StyleSheet.flatten([style, styles.container])}
-      ref={ref}
-    >
+    <Card {...rest} style={cardStyle} ref={ref}>
       <Text style={styles.text}>{card.cardId} (back)</Text>
       {children}
     </Card>

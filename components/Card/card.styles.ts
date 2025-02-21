@@ -1,5 +1,42 @@
 import { StyleSheet, Animated } from "react-native";
 import { CardProps, AnimatedViewStyle } from "./Card.types";
+import { OffsetPosition } from "@/components/Stack/stackOffsetPositions";
+
+const roundTo1Decimal = (num: number): number => Math.round(num * 10) / 10;
+
+/**
+ * Define the minimum amount needed for a stack to look good, so we're not rendering loads of cards
+ * in stack.
+ */
+export function getOffsetPositions(cardWidth: number): OffsetPosition[] {
+  return [
+    {
+      rotate: 0,
+      x: 0,
+      y: 0,
+    },
+    {
+      y: -roundTo1Decimal(cardWidth / 300),
+      x: roundTo1Decimal(cardWidth / 150),
+      rotate: 0.6,
+    },
+    {
+      y: roundTo1Decimal(cardWidth / 270),
+      x: -roundTo1Decimal(cardWidth / 300),
+      rotate: -1.2,
+    },
+    {
+      y: roundTo1Decimal(cardWidth / 250),
+      x: -roundTo1Decimal(cardWidth / 170),
+      rotate: 1.2,
+    },
+    {
+      y: roundTo1Decimal(cardWidth / 190),
+      x: -roundTo1Decimal(cardWidth / 280),
+      rotate: -0.6,
+    },
+  ];
+}
 
 export function getBorderRadius(width: number): number {
   return Math.round(width / 20);
@@ -19,25 +56,28 @@ export const styles = StyleSheet.create({
 });
 
 export function getCardStyle(props: {
-  styleProp?: CardProps["style"];
+  style?: CardProps["style"];
   width: number;
   height: number;
-  // TODO: Remove this constraint and we have less renders
-  isAnimating: boolean;
   opacity: Animated.Value;
   translateX: Animated.Value;
   translateY: Animated.Value;
   scaleX: Animated.Value;
+  zIndex?: number;
+  offsetPosition?: number;
+  rotate: Animated.Value;
 }): AnimatedViewStyle {
-  // FIXME:
-  const styleTransform = (props.styleProp as any)?.transform;
+  const rotate = props.rotate.interpolate({
+    inputRange: [0, 360],
+    outputRange: ["0deg", "360deg"],
+  });
 
   const animationStyle: AnimatedViewStyle = {
     transform: [
-      ...styleTransform,
       { translateX: props.translateX },
       { translateY: props.translateY },
       { scaleX: props.scaleX },
+      { rotate },
     ],
     opacity: props.opacity,
   };
@@ -45,11 +85,12 @@ export function getCardStyle(props: {
   return StyleSheet.flatten<AnimatedViewStyle>([
     styles.container,
     {
+      zIndex: props.zIndex,
       width: props.width,
       height: props.height,
       borderRadius: getBorderRadius(props.width),
     },
-    props.styleProp,
-    props.isAnimating ? animationStyle : undefined,
+    animationStyle,
+    props.style,
   ]);
 }

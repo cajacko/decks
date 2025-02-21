@@ -1,15 +1,6 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { enablePatches } from "immer";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
+import { persistStore, persistReducer } from "redux-persist";
 import storage from "./storage";
 import cardsSlice from "./slices/cards";
 import tabletopsSlice from "./slices/tabletop";
@@ -19,6 +10,8 @@ import { RootState as VersionRootState } from "./versions/latest";
 import migrations from "./versions/migrations";
 import { version } from "./versions/latest";
 // import { HistoryTransform } from "./transforms";
+
+enablePatches();
 
 const rootReducer = combineReducers({
   [cardsSlice.name]: cardsSlice.reducer,
@@ -52,9 +45,8 @@ export const store = configureStore({
   devTools: true,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
+      serializableCheck: false,
+      immutableCheck: false,
     }),
 });
 
@@ -62,8 +54,6 @@ export const persistor = persistStore(store);
 
 // Quickly reset the store to initial values and remove persisted data
 // persistor.purge();
-
-enablePatches();
 
 // Infer the `RootState`,  `AppDispatch`, and `AppStore` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

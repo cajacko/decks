@@ -6,100 +6,102 @@ import EmptyStack from "../EmptyStack";
 import CardAction from "../CardAction";
 import CardSpacer from "../CardSpacer";
 import { StackProps } from "./stack.types";
-import styles from "./stack.style";
+import styles, { getInnerStyle, getShuffleStyle } from "./stack.style";
 import useStack from "./useStack";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
-// TODO: all the same component in map? Maybe the animation should be higher up, not in the
-// component? As it's layout from here, not from the component itself
-
 export default function Stack(props: StackProps): React.ReactNode {
   const dimensions = useTabletopContext();
-  const { cardInstancesIds, rotateAnim, showActions, ...state } = useStack(
-    props,
-    dimensions,
+  const {
+    cardInstancesIds,
+    rotateAnim,
+    showActions,
+    getCardOffsetPosition,
+    handleShuffle,
+  } = useStack(props);
+
+  const innerStyle = React.useMemo(
+    () => getInnerStyle({ stackPadding: dimensions.stackPadding, rotateAnim }),
+    [dimensions.stackPadding, rotateAnim],
   );
 
-  const rotateStyle = {
-    transform: [
-      {
-        rotate: rotateAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: ["0deg", "-360deg"],
-        }),
-      },
-    ],
-  };
+  const containerStyle = React.useMemo(
+    () => StyleSheet.flatten([styles.container, props.style]),
+    [props.style],
+  );
+
+  const shuffleStyle = React.useMemo(
+    () => getShuffleStyle({ stackPadding: dimensions.stackPadding }),
+    [dimensions.stackPadding],
+  );
+
+  const cardInstances = React.useMemo(() => {
+    if (!cardInstancesIds || cardInstancesIds.length === 0) return undefined;
+
+    return cardInstancesIds.map((cardInstanceId, i) => {
+      const isTopCard = i === 0;
+      const cardOffsetPosition = getCardOffsetPosition(cardInstanceId);
+
+      const zIndex = cardInstancesIds.length - i + 1;
+
+      // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
+      // rename that component to something like StackCard.
+      // It may prevent some remounting and improv some animations? As we're not switching
+      // between components
+      if (isTopCard) {
+        return (
+          <StackTopCard
+            key={cardInstanceId}
+            style={styles.card}
+            cardInstanceId={cardInstanceId}
+            stackId={props.stackId}
+            leftStackId={props.leftStackId}
+            rightStackId={props.rightStackId}
+            canMoveToBottom={cardInstancesIds.length > 1}
+            offsetPosition={cardOffsetPosition}
+            zIndex={zIndex}
+          />
+        );
+      }
+
+      return (
+        <CardInstance
+          key={cardInstanceId}
+          cardInstanceId={cardInstanceId}
+          style={styles.card}
+          offsetPosition={cardOffsetPosition}
+          zIndex={zIndex}
+        />
+      );
+    });
+  }, [
+    props.stackId,
+    props.leftStackId,
+    props.rightStackId,
+    cardInstancesIds,
+    getCardOffsetPosition,
+  ]);
 
   return (
-    <View style={StyleSheet.flatten([styles.container, props.style])}>
-      <Animated.View
-        style={{ margin: dimensions.stackPadding, ...rotateStyle }}
-      >
+    <View style={containerStyle}>
+      <Animated.View style={innerStyle}>
         <CardSpacer />
 
-        {cardInstancesIds && cardInstancesIds.length > 0 && (
+        {cardInstances && (
           <>
-            {cardInstancesIds.map((cardInstanceId, i) => {
-              const isTopCard = i === 0;
-              const positionStyle = state.getCardPositionStyle({
-                cardInstanceId,
-                isTopCard,
-              });
+            {cardInstances}
 
-              const style = StyleSheet.flatten([
-                styles.card,
-                positionStyle,
-                // Decrements zIndex for each card, so the top card has the highest zIndex,
-                // finishing at 1
-                { zIndex: cardInstancesIds.length - i + 1 },
-              ]);
-
-              // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
-              // rename that component to something like StackCard.
-              // It may prevent some remounting and improv some animations? As we're not switching
-              // between components
-              if (isTopCard) {
-                return (
-                  <StackTopCard
-                    key={cardInstanceId}
-                    style={style}
-                    cardInstanceId={cardInstanceId}
-                    stackId={props.stackId}
-                    leftStackId={props.leftStackId}
-                    rightStackId={props.rightStackId}
-                    canMoveToBottom={cardInstancesIds.length > 1}
-                  />
-                );
-              }
-
-              return (
-                <CardInstance
-                  key={cardInstanceId}
-                  cardInstanceId={cardInstanceId}
-                  style={style}
-                />
-              );
-            })}
-
-            {cardInstancesIds && cardInstancesIds.length > 1 && showActions && (
+            {cardInstances.length > 1 && showActions && (
               <CardAction
                 icon="Sh"
-                style={StyleSheet.flatten([
-                  styles.shuffleButton,
-                  {
-                    zIndex: 1,
-                    bottom: -dimensions.stackPadding,
-                    left: -dimensions.stackPadding,
-                  },
-                ])}
-                onPress={state.handleShuffle}
+                style={shuffleStyle}
+                onPress={handleShuffle}
               />
             )}
           </>
         )}
 
-        <EmptyStack style={StyleSheet.flatten([styles.card, { zIndex: 0 }])} />
+        <EmptyStack style={styles.empty} />
       </Animated.View>
     </View>
   );

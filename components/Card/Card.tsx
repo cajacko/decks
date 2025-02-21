@@ -11,23 +11,27 @@ export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
     () =>
       getCardStyle({
         height: state.height,
-        isAnimating: state.isAnimating,
         opacity: state.opacity,
         scaleX: state.scaleX,
         translateX: state.translateX,
         translateY: state.translateY,
         width: state.width,
-        styleProp: props.style,
+        style: props.style,
+        zIndex: props.zIndex,
+        offsetPosition: props.offsetPosition,
+        rotate: state.rotate,
       }),
     [
       state.height,
-      state.isAnimating,
       state.opacity,
       state.scaleX,
       state.translateX,
       state.translateY,
       state.width,
       props.style,
+      props.zIndex,
+      props.offsetPosition,
+      state.rotate,
     ],
   );
 

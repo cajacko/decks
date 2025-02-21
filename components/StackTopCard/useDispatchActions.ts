@@ -33,7 +33,9 @@ export default function useDispatchActions({
   const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
   const cardRef = React.useRef<CardRef>(null);
-  const [isAnimating, setIsAnimating] = React.useState(false);
+  const [isAnimating, setIsAnimating] = React.useState(
+    cardRef.current?.getIsAnimating() ?? false,
+  );
   const [showActions, setShowActions] = React.useState(false);
 
   const handleFlipCard = React.useCallback(async () => {

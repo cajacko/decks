@@ -7,15 +7,12 @@ export interface StackProps {
   rightStackId?: string;
 }
 
-export type PositionStyle = StyleProp<ViewStyle> | undefined;
-
 export type StackDimensions = {
   cardWidth: number;
   cardHeight: number;
   stackWidth: number;
   stackHeight: number;
   buttonSize: number;
-  positionStyles: PositionStyle[];
   stackPadding: number;
   spaceBetweenStacks: number;
 };

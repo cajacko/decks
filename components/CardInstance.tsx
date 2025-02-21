@@ -7,8 +7,7 @@ import CardFront from "./CardFront";
 import CardBack from "./CardBack";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
 
-export interface CardInstanceProps
-  extends Pick<CardProps, "style" | "children" | "onAnimationChange"> {
+export interface CardInstanceProps extends CardProps {
   cardInstanceId: string;
 }
 

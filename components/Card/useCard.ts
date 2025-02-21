@@ -2,117 +2,98 @@ import React from "react";
 import { Animated } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
+import { withAnimateOut, withAnimateFlip } from "./animations";
+import { getOffsetPositions } from "./card.styles";
+import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 
 export default function useCard(
-  props: Pick<CardProps, "onAnimationChange">,
+  props: Pick<CardProps, "onAnimationChange" | "offsetPosition">,
   ref: React.ForwardedRef<CardRef>,
 ) {
-  const { onAnimationChange } = props;
-
   const { cardHeight: height, cardWidth: width } = useTabletopContext();
-  // FIXME: We don't need this, remove and use in ref if need to
-  const [isAnimating, setIsAnimating] = React.useState(false);
 
-  const translateX = React.useRef(new Animated.Value(0)).current;
-  const translateY = React.useRef(new Animated.Value(0)).current;
+  const offsetPositions = React.useMemo(
+    () => getOffsetPositions(width),
+    [width],
+  );
+
+  const offsetPosition = React.useMemo(
+    () => getOffsetPosition(offsetPositions, props.offsetPosition),
+    [offsetPositions, props.offsetPosition],
+  );
+
+  const isAnimatingRef = React.useRef<Record<string, boolean | undefined>>({});
+
+  const translateX = React.useRef(
+    new Animated.Value(offsetPosition.x ?? 0),
+  ).current;
+
+  const translateY = React.useRef(
+    new Animated.Value(offsetPosition.y ?? 0),
+  ).current;
+
+  const rotate = React.useRef(
+    new Animated.Value(offsetPosition.rotate ?? 0),
+  ).current;
+
   const opacity = React.useRef(new Animated.Value(1)).current;
   const scaleX = React.useRef(new Animated.Value(1)).current;
 
+  function getIsAnimating() {
+    return Object.values(isAnimatingRef.current).some(
+      (isAnimating) => isAnimating,
+    );
+  }
+
+  function animationUpdate(key: string, isAnimating: boolean) {
+    const prevIsAnimating = getIsAnimating();
+
+    isAnimatingRef.current[key] = isAnimating;
+
+    const nextIsAnimating = getIsAnimating();
+
+    if (prevIsAnimating === nextIsAnimating) return;
+
+    props.onAnimationChange?.(nextIsAnimating);
+  }
+
+  // These are needed to pass the latest values to useImperativeHandle, as that only initialises the
+  // once and doesn't update when the values change. With refs we can capture them
+  const animationUpdateRef = React.useRef(animationUpdate);
+  const heightRef = React.useRef(height);
+  const widthRef = React.useRef(width);
+  const initialRotation = React.useRef(offsetPosition.rotate);
+
+  animationUpdateRef.current = animationUpdate;
+  heightRef.current = height;
+  widthRef.current = width;
+  initialRotation.current = offsetPosition.rotate;
+
   React.useImperativeHandle(ref, () => ({
-    animateFlip: async () => {
-      setIsAnimating(true);
-      onAnimationChange?.(true);
-
-      return new Promise<unknown>((resolve) => {
-        Animated.sequence([
-          Animated.timing(scaleX, {
-            toValue: 0, // Shrink to zero width
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleX, {
-            toValue: 1, // Expand back to full width
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start(resolve);
-      }).finally(() => {
-        onAnimationChange?.(false);
-        setIsAnimating(false);
-      });
-    },
-    animateOut: async ({
-      direction,
-      animateOpacity = true,
-      duration = 300,
-    }) => {
-      setIsAnimating(true);
-      onAnimationChange?.(true);
-
-      return new Promise<unknown>((resolve) => {
-        let x = 0,
-          y = 0;
-
-        switch (direction) {
-          case "top":
-            y = -height;
-            break;
-          case "right":
-            x = width;
-            break;
-          case "bottom":
-            y = height;
-            break;
-          case "left":
-            x = -width;
-            break;
-        }
-
-        const movementAnimation = Animated.parallel([
-          Animated.timing(translateX, {
-            toValue: x,
-            duration,
-            useNativeDriver: true,
-          }),
-          Animated.timing(translateY, {
-            toValue: y,
-            duration,
-            useNativeDriver: true,
-          }),
-        ]);
-
-        if (animateOpacity) {
-          const opacityAnimation = Animated.sequence([
-            Animated.delay(duration / 2), // Wait for half of the movement duration
-            Animated.timing(opacity, {
-              toValue: 0,
-              // We need to make sure this finishes fading before the movement finishes, it causes
-              // weird flickering issues otherwise
-              duration: duration / 3, // Fade out over the second half
-              useNativeDriver: true,
-            }),
-          ]);
-
-          Animated.parallel([movementAnimation, opacityAnimation]).start(
-            resolve,
-          );
-        } else {
-          movementAnimation.start(resolve);
-        }
-      }).finally(() => {
-        onAnimationChange?.(false);
-        setIsAnimating(false);
-      });
-    },
+    getIsAnimating,
+    animateFlip: withAnimateFlip({
+      animationUpdate: animationUpdateRef,
+      scaleX,
+      rotate,
+      initialRotation,
+    }),
+    animateOut: withAnimateOut({
+      animationUpdate: animationUpdateRef,
+      translateX,
+      height: heightRef,
+      opacity,
+      translateY,
+      width: widthRef,
+    }),
   }));
 
   return {
     height,
     width,
-    isAnimating,
     opacity,
     translateX,
     translateY,
     scaleX,
+    rotate,
   };
 }
