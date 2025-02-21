@@ -17,7 +17,7 @@ export default function Stack(props: StackProps): React.ReactNode {
   const dimensions = useTabletopContext();
   const { cardInstancesIds, rotateAnim, showActions, ...state } = useStack(
     props,
-    dimensions
+    dimensions,
   );
 
   const rotateStyle = {

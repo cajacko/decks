@@ -35,7 +35,7 @@ const getPositionStyles = (cardWidth: number): PositionStyle[] => [
 ];
 
 function getExampleStackDimensions(
-  props: { stackWidth: number } | { stackHeight: number }
+  props: { stackWidth: number } | { stackHeight: number },
 ): StackDimensions {
   const buttonSize = Math.min(
     Math.max(
@@ -45,10 +45,10 @@ function getExampleStackDimensions(
         ? Math.round(props.stackWidth / 4.9)
         : Math.round(props.stackHeight / 6.4),
       // This is our minimum size for making it easy for the users
-      60
+      60,
     ),
     // Never show buttons bigger than this, it looks silly
-    100
+    100,
   );
 
   // The buttons are the closest things together, so base the space between stacks on them
@@ -60,7 +60,7 @@ function getExampleStackDimensions(
     // The shuffle/ stack actions are a bit further out than card actions
     Math.round(buttonSize / 1.75),
     // Card actions are half on/ half off the card
-    Math.round(buttonSize / 2)
+    Math.round(buttonSize / 2),
   );
 
   let stackWidth: number;
@@ -77,7 +77,7 @@ function getExampleStackDimensions(
       stackWidth - stackPadding * 2 - Math.round(spaceBetweenStacks / 2);
 
     cardHeight = Math.round(
-      cardWidth * (cardSizeRatios.poker.height / cardSizeRatios.poker.width)
+      cardWidth * (cardSizeRatios.poker.height / cardSizeRatios.poker.width),
     );
 
     stackHeight = cardHeight + stackPadding * 2;
@@ -87,7 +87,7 @@ function getExampleStackDimensions(
     cardHeight = stackHeight - stackPadding * 2;
 
     cardWidth = Math.round(
-      cardHeight * (cardSizeRatios.poker.width / cardSizeRatios.poker.height)
+      cardHeight * (cardSizeRatios.poker.width / cardSizeRatios.poker.height),
     );
 
     stackWidth =
@@ -122,7 +122,7 @@ export function getStackDimensions(props: {
   let dimensions = getExampleStackDimensions({
     stackWidth: Math.max(
       Math.min(props.availableWidth, maxStackWidth),
-      minStackWidth
+      minStackWidth,
     ),
   });
 
@@ -136,7 +136,7 @@ export function getStackDimensions(props: {
   return getExampleStackDimensions({
     stackHeight: Math.max(
       Math.min(props.availableHeight, maxStackHeight),
-      minStackHeight
+      minStackHeight,
     ),
   });
 }

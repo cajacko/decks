@@ -56,9 +56,9 @@ const maxThresholdTimeout = swipeHoldThresholds.reduce(
   (max, threshold) =>
     Math.max(
       max,
-      threshold.timeout.lessThan ?? threshold.timeout.greaterThan ?? 0
+      threshold.timeout.lessThan ?? threshold.timeout.greaterThan ?? 0,
     ),
-  0
+  0,
 );
 
 export default function useHoldMenu<I extends MenuItem>({
@@ -73,7 +73,7 @@ export default function useHoldMenu<I extends MenuItem>({
   const hoverIndicatorY = React.useRef(new Animated.Value(0)).current;
   const [renderMenu, setRenderMenu] = React.useState(false);
   const [highlightedItemState, setHighlightedItem] = React.useState<I | null>(
-    null
+    null,
   );
   const [menuPosition, setMenuPosition] = React.useState<{
     pageX: number;
@@ -303,7 +303,7 @@ export default function useHoldMenu<I extends MenuItem>({
       onPanResponderRelease: (event, gestureState) => {
         hideHoldMenu(gestureState);
       },
-    })
+    }),
   ).current;
 
   const onTouchStart = React.useCallback(() => {

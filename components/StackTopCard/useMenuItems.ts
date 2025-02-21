@@ -59,7 +59,7 @@ export default function useMenuItems(props: StackTopCardProps) {
           width: buttonSize,
           icon: "Rb",
           onPress: state.moveRight.bottom,
-        }
+        },
       );
     }
 
@@ -82,7 +82,7 @@ export default function useMenuItems(props: StackTopCardProps) {
           width: buttonSize,
           icon: "Lb",
           onPress: state.moveLeft.bottom,
-        }
+        },
       );
     }
 

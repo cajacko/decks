@@ -29,5 +29,5 @@ export const HistoryTransform = createTransform(
   },
   undefined,
   // define which reducers this transform gets called for.
-  { whitelist: [SliceName.Tabletops] }
+  { whitelist: [SliceName.Tabletops] },
 );

@@ -5,7 +5,7 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export default function useCard(
   props: Pick<CardProps, "onAnimationChange">,
-  ref: React.ForwardedRef<CardRef>
+  ref: React.ForwardedRef<CardRef>,
 ) {
   const { onAnimationChange } = props;
 
@@ -94,7 +94,7 @@ export default function useCard(
           ]);
 
           Animated.parallel([movementAnimation, opacityAnimation]).start(
-            resolve
+            resolve,
           );
         } else {
           movementAnimation.start(resolve);

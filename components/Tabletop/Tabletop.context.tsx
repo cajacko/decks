@@ -39,12 +39,12 @@ export function TabletopProvider({
       ...getStackDimensions({ availableHeight: height, availableWidth: width }),
       tabletopId,
     }),
-    [height, width, tabletopId]
+    [height, width, tabletopId],
   );
 
   const child = React.useMemo(
     () => (typeof children === "function" ? children(value) : children),
-    [children, value]
+    [children, value],
   );
 
   return <Context.Provider value={value}>{child}</Context.Provider>;

@@ -45,7 +45,7 @@ export const { setCard, setCards, removeCard } = cardsSlice.actions;
 
 export const selectCard = (
   state: RootState,
-  props: { cardId: string }
+  props: { cardId: string },
 ): Card | null => state[cardsSlice.name].cardsById[props.cardId] ?? null;
 
 export default cardsSlice;

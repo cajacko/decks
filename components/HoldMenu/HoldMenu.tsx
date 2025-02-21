@@ -4,7 +4,7 @@ import { MenuItem, HoldMenuProps } from "./types";
 import useHoldMenu, { DEV_INDICATOR } from "./useHoldMenu";
 
 export default function HoldMenu<I extends MenuItem>(
-  props: HoldMenuProps<I>
+  props: HoldMenuProps<I>,
 ): React.ReactNode {
   const state = useHoldMenu<I>(props);
 

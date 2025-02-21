@@ -1,4 +1,4 @@
-import { StyleSheet, Animated, TransformsStyle } from "react-native";
+import { StyleSheet, Animated } from "react-native";
 import { CardProps, AnimatedViewStyle } from "./Card.types";
 
 export function getBorderRadius(width: number): number {

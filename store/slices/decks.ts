@@ -51,7 +51,7 @@ export const { removeDeck, setDeck } = cardsSlice.actions;
 
 export const selectDeck = (
   state: RootState,
-  props: { deckId: string }
+  props: { deckId: string },
 ): Deck | null => state[cardsSlice.name].decksById[props.deckId] ?? null;
 
 export default cardsSlice;

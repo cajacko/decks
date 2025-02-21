@@ -17,7 +17,7 @@ export default React.forwardRef<CardRef, CardInstanceProps>(
     const { tabletopId } = useTabletopContext();
 
     const cardInstance = useAppSelector((state) =>
-      selectCardInstance(state, { cardInstanceId, tabletopId })
+      selectCardInstance(state, { cardInstanceId, tabletopId }),
     );
 
     if (!cardInstance) {
@@ -35,5 +35,5 @@ export default React.forwardRef<CardRef, CardInstanceProps>(
     }
 
     throw new Error(`Invalid card state: ${state}`);
-  }
+  },
 );

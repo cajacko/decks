@@ -10,7 +10,7 @@ export interface CardFrontProps extends Pick<CardProps, "style" | "children"> {
 
 export default React.forwardRef<CardRef, CardFrontProps>(function CardFront(
   { cardId, style, children, ...rest },
-  ref
+  ref,
 ) {
   const card = useAppSelector((state) => selectCard(state, { cardId }));
 

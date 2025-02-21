@@ -13,7 +13,7 @@ export default function createMigration<From, To>(props: {
   migration: (
     state:
       | { validState: From; unknownState?: undefined }
-      | { validState?: undefined; unknownState: unknown }
+      | { validState?: undefined; unknownState: unknown },
   ) => To | undefined;
 }) {
   const migration = (state: PersistedState): PersistedState => {

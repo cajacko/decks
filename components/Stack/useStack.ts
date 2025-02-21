@@ -11,7 +11,7 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export default function useStack(
   { stackId }: StackProps,
-  { positionStyles }: StackDimensions
+  { positionStyles }: StackDimensions,
 ) {
   const dispatch = useAppDispatch();
   const { tabletopId } = useTabletopContext();
@@ -29,7 +29,7 @@ export default function useStack(
       stackId,
       tabletopId,
       limit,
-    })
+    }),
   );
 
   const handleShuffle = React.useCallback(async () => {
@@ -56,7 +56,7 @@ export default function useStack(
         allCardInstancesState: "noChange",
         tabletopId,
         cardInstanceIds: randomOrder ?? [],
-      })
+      }),
     );
 
     await promise;

@@ -109,7 +109,7 @@ export const tabletopsSlice = createSlice({
           // Do we specify the method, or let the stack define it? Or both? If specified here it's
           // more specific, otherwise do what the stack it's going to says
           method: MoveCardInstanceMethod;
-        }>
+        }>,
       ) => {
         const { fromStackId, cardInstanceId, method, toStackId } =
           action.payload;
@@ -151,7 +151,7 @@ export const tabletopsSlice = createSlice({
         } else {
           // Moving stacks so remove it from the old stack
           fromStack.cardInstances = fromStack.cardInstances.filter(
-            (cardInstance) => cardInstance !== cardInstanceId
+            (cardInstance) => cardInstance !== cardInstanceId,
           );
 
           // Add to the new stack
@@ -174,7 +174,7 @@ export const tabletopsSlice = createSlice({
               break;
           }
         }
-      }
+      },
     ),
     changeCardState: history.withHistory(
       (
@@ -183,7 +183,7 @@ export const tabletopsSlice = createSlice({
           tabletopId: string;
           cardInstanceId: string;
           state: CardInstanceState;
-        }>
+        }>,
       ) => {
         const cardInstance =
           state.cardInstancesById[action.payload.cardInstanceId];
@@ -191,7 +191,7 @@ export const tabletopsSlice = createSlice({
         if (!cardInstance) return;
 
         cardInstance.state = action.payload.state;
-      }
+      },
     ),
     setStackOrder: history.withHistory(
       (
@@ -201,7 +201,7 @@ export const tabletopsSlice = createSlice({
           stackId: string;
           cardInstanceIds: string[];
           allCardInstancesState: CardInstanceState | "noChange";
-        }>
+        }>,
       ) => {
         const stack = state?.stacksById[action.payload.stackId];
 
@@ -220,7 +220,7 @@ export const tabletopsSlice = createSlice({
             cardInstance.state = allCardInstancesState;
           });
         }
-      }
+      },
     ),
   },
 });
@@ -230,41 +230,41 @@ export const { changeCardState, moveCard, setStackOrder, undo, redo } =
 
 export const selectTabletop = (
   state: RootState,
-  props: { tabletopId: string }
+  props: { tabletopId: string },
 ): Tabletop | null =>
   state[tabletopsSlice.name].tabletopsById[props.tabletopId] ?? null;
 
 export const selectPresentState = (
   state: RootState,
-  props: { tabletopId: string }
+  props: { tabletopId: string },
 ): TabletopHistoryState | null =>
   selectTabletop(state, props)?.history.present ?? null;
 
 export const selectStackIds = (
   state: RootState,
-  props: { tabletopId: string }
+  props: { tabletopId: string },
 ): string[] | null => selectPresentState(state, props)?.stacksIds ?? null;
 
 export const selectStack = (
   state: RootState,
-  props: { tabletopId: string; stackId: string }
+  props: { tabletopId: string; stackId: string },
 ): Stack | null =>
   selectPresentState(state, props)?.stacksById[props.stackId] ?? null;
 
 export const selectCardInstanceIds = (
   state: RootState,
-  props: { stackId: string; tabletopId: string }
+  props: { stackId: string; tabletopId: string },
 ): string[] | null => selectStack(state, props)?.cardInstances ?? null;
 
 export const selectCardInstance = (
   state: RootState,
-  props: { cardInstanceId: string; tabletopId: string }
+  props: { cardInstanceId: string; tabletopId: string },
 ): CardInstance | null =>
   selectPresentState(state, props)?.cardInstancesById?.[props.cardInstanceId] ??
   null;
 
 const historySelectors = history.withSelectors<RootState>(
-  (state) => state.tabletops
+  (state) => state.tabletops,
 );
 
 export const selectTabletopHasPast = historySelectors.selectHasPast;
@@ -289,7 +289,7 @@ export const selectFirstXCardInstances = createCachedSelector<
     }
 
     return sliced;
-  }
+  },
 )((_, props) => `${props.stackId}-${props.limit}`);
 
 export default tabletopsSlice;

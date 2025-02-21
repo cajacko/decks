@@ -14,7 +14,7 @@ export default function StackList({
 }: StackListProps): React.ReactNode {
   const { stackWidth, spaceBetweenStacks, tabletopId } = useTabletopContext();
   const stackIds = useAppSelector((state) =>
-    selectStackIds(state, { tabletopId })
+    selectStackIds(state, { tabletopId }),
   );
 
   const children = React.useMemo(
@@ -28,7 +28,7 @@ export default function StackList({
           rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
         />
       )),
-    [spaceBetweenStacks, stackIds]
+    [spaceBetweenStacks, stackIds],
   );
 
   return (

@@ -23,15 +23,15 @@ export function configureHistory<
 >(
   selectHistory: (
     state: WritableDraft<SliceState> | SliceState,
-    props: P
+    props: P,
   ) => WritableDraft<History<HistoryState>> | undefined | null,
-  options?: { maxHistory?: number }
+  options?: { maxHistory?: number },
 ) {
   const maxHistory = options?.maxHistory || 100;
 
   return {
     withSelectors: <RootState>(
-      selectSlice: (state: RootState) => SliceState
+      selectSlice: (state: RootState) => SliceState,
     ) => {
       const selectPastCount = (state: RootState, props: P) =>
         selectHistory(selectSlice(state), props)?.past.length || 0;
@@ -50,7 +50,7 @@ export function configureHistory<
     },
     withHistory:
       <A extends PayloadAction<P>>(
-        callback: (state: Draft<Draft<HistoryState>>, action: A) => void
+        callback: (state: Draft<Draft<HistoryState>>, action: A) => void,
       ) =>
       (state: WritableDraft<SliceState>, action: A): void => {
         const history = selectHistory(state, action.payload);
@@ -59,7 +59,7 @@ export function configureHistory<
 
         const [nextState, patches, inversePatches] = produceWithPatches(
           history.present,
-          (draft) => callback(draft, action)
+          (draft) => callback(draft, action),
         );
 
         history.past.push({ inversePatches, patches });
@@ -82,7 +82,7 @@ export function configureHistory<
 
       const previousState = applyPatches(
         history.present,
-        lastPatches.inversePatches
+        lastPatches.inversePatches,
       );
 
       history.future.unshift(lastPatches); // Save inverse for redo

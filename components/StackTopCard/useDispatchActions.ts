@@ -22,7 +22,7 @@ export default function useDispatchActions({
   const { tabletopId } = useTabletopContext();
 
   const cardInstance = useAppSelector((state) =>
-    selectCardInstance(state, { tabletopId, cardInstanceId })
+    selectCardInstance(state, { tabletopId, cardInstanceId }),
   );
 
   if (!cardInstance) {
@@ -51,7 +51,7 @@ export default function useDispatchActions({
           state === CardInstanceState.faceDown
             ? CardInstanceState.faceUp
             : CardInstanceState.faceDown,
-      })
+      }),
     );
   }, [dispatch, cardInstanceId, state, tabletopId, animateCardMovement]);
 
@@ -75,7 +75,7 @@ export default function useDispatchActions({
             fromStackId: stackId,
             toStackId: rightStackId,
             method: MoveCardInstanceMethod.bottomNoChange,
-          })
+          }),
         );
       },
       top: async () => {
@@ -94,7 +94,7 @@ export default function useDispatchActions({
             fromStackId: stackId,
             toStackId: rightStackId,
             method: MoveCardInstanceMethod.topNoChange,
-          })
+          }),
         );
       },
     };
@@ -128,7 +128,7 @@ export default function useDispatchActions({
             fromStackId: stackId,
             toStackId: leftStackId,
             method: MoveCardInstanceMethod.bottomNoChange,
-          })
+          }),
         );
       },
       top: async () => {
@@ -147,7 +147,7 @@ export default function useDispatchActions({
             fromStackId: stackId,
             toStackId: leftStackId,
             method: MoveCardInstanceMethod.topNoChange,
-          })
+          }),
         );
       },
     };
@@ -180,7 +180,7 @@ export default function useDispatchActions({
           fromStackId: stackId,
           toStackId: stackId,
           method: MoveCardInstanceMethod.bottomNoChange,
-        })
+        }),
       );
     };
   }, [

@@ -10,7 +10,7 @@ export default function Tabletop({
   style,
 }: TabletopProps): React.ReactNode {
   const [size, setSize] = React.useState<{ height: number; width: number }>(
-    Dimensions.get("screen")
+    Dimensions.get("screen"),
   );
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
@@ -19,7 +19,7 @@ export default function Tabletop({
 
       setSize({ width, height });
     },
-    []
+    [],
   );
 
   return (

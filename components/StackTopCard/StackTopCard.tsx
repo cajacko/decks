@@ -12,7 +12,7 @@ import useMenuItems from "./useMenuItems";
 export * from "./types";
 
 export default function StackTopCard(
-  props: StackTopCardProps
+  props: StackTopCardProps,
 ): React.ReactNode {
   const state = useMenuItems(props);
 
@@ -28,12 +28,12 @@ export default function StackTopCard(
         }}
       />
     ),
-    []
+    [],
   );
 
   const handleAction = React.useCallback(
     ({ onPress }: StackTopCardMenuItem) => onPress(),
-    []
+    [],
   );
 
   return (

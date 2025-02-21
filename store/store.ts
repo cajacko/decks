@@ -44,7 +44,7 @@ const persistedReducer = persistReducer(
     // which allows us to persist history until we change the state which is nice if it works
     // transforms: [HistoryTransform],
   },
-  rootReducer
+  rootReducer,
 );
 
 export const store = configureStore({

@@ -27,7 +27,8 @@ export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
       state.translateX,
       state.translateY,
       state.width,
-    ]
+      props.style,
+    ],
   );
 
   return <Animated.View style={style}>{props.children}</Animated.View>;

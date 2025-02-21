@@ -14,10 +14,10 @@ export default function TabletopToolbar(): React.ReactNode {
   const { tabletopId } = useTabletopContext();
   const dispatch = useAppDispatch();
   const hasPast = useAppSelector((state) =>
-    selectTabletopHasPast(state, { tabletopId })
+    selectTabletopHasPast(state, { tabletopId }),
   );
   const hasFuture = useAppSelector((state) =>
-    selectTabletopHasFuture(state, { tabletopId })
+    selectTabletopHasFuture(state, { tabletopId }),
   );
 
   return (

@@ -10,7 +10,7 @@ export interface CardBackProps extends Pick<CardProps, "style" | "children"> {
 
 export default React.forwardRef<CardRef, CardBackProps>(function CardBack(
   { cardId, style, children, ...rest },
-  ref
+  ref,
 ) {
   const card = useAppSelector((state) => selectCard(state, { cardId }));
 
