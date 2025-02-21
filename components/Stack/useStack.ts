@@ -8,6 +8,9 @@ import {
 import { selectUserSettings } from "@/store/slices/userSettings";
 import { StackProps, StackDimensions } from "./stack.types";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
+import { generateSeed } from "@/utils/seededShuffle";
+
+// TODO: Test our logic here
 
 export default function useStack(
   { stackId }: StackProps,
@@ -48,19 +51,17 @@ export default function useStack(
 
     setShowActions(true);
 
-    const randomOrder = cardInstancesIds?.sort(() => Math.random() - 0.5);
-
     dispatch(
       setStackOrder({
         stackId,
         allCardInstancesState: "noChange",
         tabletopId,
-        cardInstanceIds: randomOrder ?? [],
+        seed: generateSeed(),
       }),
     );
 
     await promise;
-  }, [dispatch, stackId, tabletopId, cardInstancesIds, rotateAnim]);
+  }, [dispatch, stackId, tabletopId, rotateAnim]);
 
   const cardPositions = React.useRef<(string | null)[]>([]);
 

@@ -11,6 +11,7 @@ module.exports = {
   plugins: ["prettier"],
   ignorePatterns: ["/dist/*"],
   rules: {
+    "no-console": "error",
     "prettier/prettier": "error",
     // Typescript checks this
     "import/no-unresolved": "off",

@@ -1,37 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DecksState, Deck, RootState } from "../types";
+import flags from "@/config/flags";
+import devInitialState from "../dev/devInitialState";
 
-// Define the initial state using that type
-const initialState: DecksState = {
-  decksById: {
-    deck1: {
-      id: "deck1",
-      // cardIds: ["card1", "card2", "card3", "card4", "card5"],
-      deckCards: [
-        {
-          cardId: "card1",
-          quantity: 1,
-        },
-        {
-          cardId: "card2",
-          quantity: 1,
-        },
-        {
-          cardId: "card3",
-          quantity: 1,
-        },
-        {
-          cardId: "card4",
-          quantity: 1,
-        },
-        {
-          cardId: "card5",
-          quantity: 1,
-        },
-      ],
-    },
-  },
-};
+const initialState: DecksState = flags.USE_DEV_INITIAL_REDUX_STATE
+  ? devInitialState.decks
+  : {
+      decksById: {},
+    };
 
 export const cardsSlice = createSlice({
   name: "decks",

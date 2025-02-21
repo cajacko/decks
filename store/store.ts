@@ -60,6 +60,9 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
+// Quickly reset the store to initial values and remove persisted data
+// persistor.purge();
+
 enablePatches();
 
 // Infer the `RootState`,  `AppDispatch`, and `AppStore` types from the store itself

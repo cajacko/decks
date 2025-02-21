@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
+import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
 import {
   RootState,
@@ -11,6 +12,9 @@ import {
   CardInstance,
   MoveCardInstanceMethod,
 } from "../types";
+import flags from "@/config/flags";
+import devInitialState from "../dev/devInitialState";
+import { withSeededShuffleSort } from "@/utils/seededShuffle";
 
 export type {
   TabletopState,
@@ -22,75 +26,38 @@ export type {
 
 export { CardInstanceState, MoveCardInstanceMethod };
 
-// Define the initial state using that type
-const initialState: TabletopState = {
-  tabletopsById: {
-    tabletop1: {
-      id: "tabletop1",
-      stacksIds: ["stack1", "stack2", "stack3"],
-      history: {
-        past: [],
-        present: {
-          cardInstancesById: {
-            cardInstance1: {
-              cardInstanceId: "cardInstance1",
-              cardId: "card1",
-              state: CardInstanceState.faceUp,
-            },
-            cardInstance2: {
-              cardInstanceId: "cardInstance2",
-              cardId: "card2",
-              state: CardInstanceState.faceUp,
-            },
-            cardInstance3: {
-              cardInstanceId: "cardInstance3",
-              cardId: "card3",
-              state: CardInstanceState.faceUp,
-            },
-            cardInstance4: {
-              cardInstanceId: "cardInstance4",
-              cardId: "card4",
-              state: CardInstanceState.faceUp,
-            },
-            cardInstance5: {
-              cardInstanceId: "cardInstance5",
-              cardId: "card5",
-              state: CardInstanceState.faceUp,
-            },
-          },
-          stacksById: {
-            stack1: {
-              id: "stack1",
-              cardInstances: [
-                "cardInstance1",
-                "cardInstance2",
-                "cardInstance3",
-                "cardInstance4",
-                "cardInstance5",
-              ],
-            },
-            stack2: {
-              id: "stack2",
-              cardInstances: [],
-            },
-            stack3: {
-              id: "stack3",
-              cardInstances: [],
-            },
-          },
-          stacksIds: ["stack1", "stack2", "stack3"],
-        },
-        future: [],
-      },
-    },
-  },
-};
+const initialState: TabletopState = flags.USE_DEV_INITIAL_REDUX_STATE
+  ? devInitialState.tabletops
+  : {
+      tabletopsById: {},
+    };
 
 const history = configureHistory<
   TabletopState,
   TabletopHistoryState,
   { tabletopId: string }
 >((state, props) => state.tabletopsById[props.tabletopId]?.history);
+
+// This helper is great for ensuring we don't have duplicate card instance IDs in stacks (which we
+// had once). But also ensures we don't mutate arrays that don't ned changing.
+function removeCardInstancesFromStacks(
+  state:
+    | WritableDraft<TabletopHistoryState>
+    | WritableDraft<WritableDraft<TabletopHistoryState>>,
+  cardInstanceIds: string[],
+) {
+  Object.values(state.stacksById).forEach((stack) => {
+    if (!stack) return;
+
+    // Don't use filter as this would create new arrays even if the item doesn't exist in this stack
+    // Loop backwards to safely remove items while iterating
+    for (let i = stack.cardInstances.length - 1; i >= 0; i--) {
+      if (cardInstanceIds.includes(stack.cardInstances[i])) {
+        stack.cardInstances.splice(i, 1); // Remove the card instance
+      }
+    }
+  });
+}
 
 export const tabletopsSlice = createSlice({
   name: "tabletops",
@@ -126,13 +93,19 @@ export const tabletopsSlice = createSlice({
         // Update the card instance state based on the method
         switch (method) {
           case MoveCardInstanceMethod.topFaceUp:
-          case MoveCardInstanceMethod.bottomFaceUp:
-            cardInstance.state = CardInstanceState.faceUp;
+          case MoveCardInstanceMethod.bottomFaceUp: {
+            if (cardInstance.state !== CardInstanceState.faceUp) {
+              cardInstance.state = CardInstanceState.faceUp;
+            }
             break;
+          }
           case MoveCardInstanceMethod.topFaceDown:
-          case MoveCardInstanceMethod.bottomFaceDown:
-            cardInstance.state = CardInstanceState.faceDown;
+          case MoveCardInstanceMethod.bottomFaceDown: {
+            if (cardInstance.state !== CardInstanceState.faceDown) {
+              cardInstance.state = CardInstanceState.faceDown;
+            }
             break;
+          }
           case MoveCardInstanceMethod.topNoChange:
           case MoveCardInstanceMethod.bottomNoChange:
           default:
@@ -140,38 +113,22 @@ export const tabletopsSlice = createSlice({
             break;
         }
 
-        if (fromStack.id === toStack.id) {
-          // Moving within the same stack so sort it
-          fromStack.cardInstances = fromStack.cardInstances.sort((a, b) => {
-            if (a === cardInstanceId) return 1;
-            if (b === cardInstanceId) return -1;
+        // Helps prevent duplicates if the action has got confused somehow
+        removeCardInstancesFromStacks(state, [cardInstanceId]);
 
-            return 0;
-          });
-        } else {
-          // Moving stacks so remove it from the old stack
-          fromStack.cardInstances = fromStack.cardInstances.filter(
-            (cardInstance) => cardInstance !== cardInstanceId,
-          );
-
-          // Add to the new stack
-          switch (method) {
-            case MoveCardInstanceMethod.topFaceUp:
-            case MoveCardInstanceMethod.topFaceDown:
-            case MoveCardInstanceMethod.topNoChange:
-              toStack.cardInstances = [
-                cardInstanceId,
-                ...toStack.cardInstances,
-              ];
-              break;
-            case MoveCardInstanceMethod.bottomFaceUp:
-            case MoveCardInstanceMethod.bottomFaceDown:
-            case MoveCardInstanceMethod.bottomNoChange:
-              toStack.cardInstances = [
-                ...toStack.cardInstances,
-                cardInstanceId,
-              ];
-              break;
+        // Add to the new stack
+        switch (method) {
+          case MoveCardInstanceMethod.topFaceUp:
+          case MoveCardInstanceMethod.topFaceDown:
+          case MoveCardInstanceMethod.topNoChange: {
+            toStack.cardInstances.unshift(cardInstanceId);
+            break;
+          }
+          case MoveCardInstanceMethod.bottomFaceUp:
+          case MoveCardInstanceMethod.bottomFaceDown:
+          case MoveCardInstanceMethod.bottomNoChange: {
+            toStack.cardInstances.push(cardInstanceId);
+            break;
           }
         }
       },
@@ -199,7 +156,7 @@ export const tabletopsSlice = createSlice({
         action: PayloadAction<{
           tabletopId: string;
           stackId: string;
-          cardInstanceIds: string[];
+          seed: number | string;
           allCardInstancesState: CardInstanceState | "noChange";
         }>,
       ) => {
@@ -207,19 +164,20 @@ export const tabletopsSlice = createSlice({
 
         if (!stack) return;
 
-        stack.cardInstances = action.payload.cardInstanceIds;
-
         const allCardInstancesState = action.payload.allCardInstancesState;
 
         if (allCardInstancesState !== "noChange") {
-          action.payload.cardInstanceIds.forEach((cardInstanceId) => {
+          stack.cardInstances.forEach((cardInstanceId) => {
             const cardInstance = state.cardInstancesById[cardInstanceId];
 
             if (!cardInstance) return;
+            if (cardInstance.state === allCardInstancesState) return;
 
             cardInstance.state = allCardInstancesState;
           });
         }
+
+        stack.cardInstances.sort(withSeededShuffleSort(action.payload.seed));
       },
     ),
   },
