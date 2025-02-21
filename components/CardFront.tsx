@@ -8,26 +8,27 @@ export interface CardFrontProps extends Pick<CardProps, "style" | "children"> {
   cardId: string;
 }
 
-const CardFront = React.forwardRef<CardRef, CardFrontProps>(
-  ({ cardId, style, children, ...rest }, ref) => {
-    const card = useAppSelector((state) => selectCard(state, { cardId }));
+export default React.forwardRef<CardRef, CardFrontProps>(function CardFront(
+  { cardId, style, children, ...rest },
+  ref
+) {
+  const card = useAppSelector((state) => selectCard(state, { cardId }));
 
-    if (!card) {
-      throw new Error(`Card with id ${cardId} not found`);
-    }
-
-    return (
-      <Card
-        {...rest}
-        style={StyleSheet.flatten([style, styles.container])}
-        ref={ref}
-      >
-        <Text style={styles.text}>{card.cardId} (front)</Text>
-        {children}
-      </Card>
-    );
+  if (!card) {
+    throw new Error(`Card with id ${cardId} not found`);
   }
-);
+
+  return (
+    <Card
+      {...rest}
+      style={StyleSheet.flatten([style, styles.container])}
+      ref={ref}
+    >
+      <Text style={styles.text}>{card.cardId} (front)</Text>
+      {children}
+    </Card>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -40,5 +41,3 @@ const styles = StyleSheet.create({
     color: "black",
   },
 });
-
-export default CardFront;

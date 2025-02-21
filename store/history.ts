@@ -19,7 +19,7 @@ export function resetHistory<S>(history: History<S>): History<S> {
 export function configureHistory<
   SliceState,
   HistoryState extends Objectish,
-  P extends {} = {}
+  P extends object = object,
 >(
   selectHistory: (
     state: WritableDraft<SliceState> | SliceState,

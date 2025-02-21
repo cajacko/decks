@@ -5,7 +5,6 @@ import {
   StyleSheet,
   StyleProp,
   ViewStyle,
-  View,
   TouchableHighlightProps,
 } from "react-native";
 import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";

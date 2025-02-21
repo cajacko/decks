@@ -62,7 +62,7 @@ export default function useStack(
     await promise;
   }, [dispatch, stackId, tabletopId, cardInstancesIds, rotateAnim]);
 
-  const cardPositions = React.useRef<Array<string | null>>([]);
+  const cardPositions = React.useRef<(string | null)[]>([]);
 
   // We need to reset the mapping so when cards come back in to the stack they don't adopt their old
   // position, instead following the first available position.

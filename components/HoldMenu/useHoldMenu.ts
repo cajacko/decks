@@ -11,7 +11,7 @@ import { useHoldMenuBehaviour } from "@/hooks/useFlag";
 export const DEV_INDICATOR = false;
 
 // NOTE: 50ms is the max we ever want to wait before showing the menu
-const swipeHoldThresholds: Array<{
+const swipeHoldThresholds: {
   distance:
     | {
         greaterThan: number;
@@ -31,7 +31,7 @@ const swipeHoldThresholds: Array<{
         lessThan: number;
       };
   showMenu: boolean;
-}> = [
+}[] = [
   {
     distance: {
       lessThan: 1,

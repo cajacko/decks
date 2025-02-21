@@ -53,7 +53,7 @@ export default function useDispatchActions({
             : CardInstanceState.faceDown,
       })
     );
-  }, [dispatch, cardInstanceId, state, tabletopId]);
+  }, [dispatch, cardInstanceId, state, tabletopId, animateCardMovement]);
 
   const moveRight = React.useMemo(() => {
     if (!rightStackId) return undefined;
@@ -98,7 +98,15 @@ export default function useDispatchActions({
         );
       },
     };
-  }, [dispatch, cardInstanceId, stackId, rightStackId, cardRef, tabletopId]);
+  }, [
+    dispatch,
+    cardInstanceId,
+    stackId,
+    rightStackId,
+    cardRef,
+    tabletopId,
+    animateCardMovement,
+  ]);
 
   const moveLeft = React.useMemo(() => {
     if (!leftStackId) return undefined;
@@ -143,7 +151,15 @@ export default function useDispatchActions({
         );
       },
     };
-  }, [dispatch, cardInstanceId, stackId, leftStackId, cardRef, tabletopId]);
+  }, [
+    dispatch,
+    cardInstanceId,
+    stackId,
+    leftStackId,
+    cardRef,
+    tabletopId,
+    animateCardMovement,
+  ]);
 
   const handleMoveToBottom = React.useMemo(() => {
     if (!canMoveToBottom) return undefined;
@@ -167,7 +183,15 @@ export default function useDispatchActions({
         })
       );
     };
-  }, [dispatch, cardInstanceId, stackId, canMoveToBottom, cardRef, tabletopId]);
+  }, [
+    dispatch,
+    cardInstanceId,
+    stackId,
+    canMoveToBottom,
+    cardRef,
+    tabletopId,
+    animateCardMovement,
+  ]);
 
   return {
     cardRef,

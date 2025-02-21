@@ -8,26 +8,27 @@ export interface CardBackProps extends Pick<CardProps, "style" | "children"> {
   cardId: string;
 }
 
-const CardBack = React.forwardRef<CardRef, CardBackProps>(
-  ({ cardId, style, children, ...rest }, ref) => {
-    const card = useAppSelector((state) => selectCard(state, { cardId }));
+export default React.forwardRef<CardRef, CardBackProps>(function CardBack(
+  { cardId, style, children, ...rest },
+  ref
+) {
+  const card = useAppSelector((state) => selectCard(state, { cardId }));
 
-    if (!card) {
-      throw new Error(`Card with id ${cardId} not found`);
-    }
-
-    return (
-      <Card
-        {...rest}
-        style={StyleSheet.flatten([style, styles.container])}
-        ref={ref}
-      >
-        <Text style={styles.text}>{card.cardId} (back)</Text>
-        {children}
-      </Card>
-    );
+  if (!card) {
+    throw new Error(`Card with id ${cardId} not found`);
   }
-);
+
+  return (
+    <Card
+      {...rest}
+      style={StyleSheet.flatten([style, styles.container])}
+      ref={ref}
+    >
+      <Text style={styles.text}>{card.cardId} (back)</Text>
+      {children}
+    </Card>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -41,5 +42,3 @@ const styles = StyleSheet.create({
     color: "white",
   },
 });
-
-export default CardBack;

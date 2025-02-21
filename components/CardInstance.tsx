@@ -12,8 +12,8 @@ export interface CardInstanceProps
   cardInstanceId: string;
 }
 
-const CardInstance = React.forwardRef<CardRef, CardInstanceProps>(
-  ({ cardInstanceId, ...rest }, ref) => {
+export default React.forwardRef<CardRef, CardInstanceProps>(
+  function CardInstance({ cardInstanceId, ...rest }, ref) {
     const { tabletopId } = useTabletopContext();
 
     const cardInstance = useAppSelector((state) =>
@@ -37,5 +37,3 @@ const CardInstance = React.forwardRef<CardRef, CardInstanceProps>(
     throw new Error(`Invalid card state: ${state}`);
   }
 );
-
-export default CardInstance;

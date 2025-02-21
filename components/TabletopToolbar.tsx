@@ -10,11 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
 
-export interface TabletopToolbarProps {}
-
-export default function TabletopToolbar(
-  props: TabletopToolbarProps
-): React.ReactNode {
+export default function TabletopToolbar(): React.ReactNode {
   const { tabletopId } = useTabletopContext();
   const dispatch = useAppDispatch();
   const hasPast = useAppSelector((state) =>

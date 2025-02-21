@@ -32,7 +32,7 @@ export default function useDeviceSize(props?: {
     return () => {
       subscription.remove();
     };
-  }, [props?.listenTo?.width]);
+  }, [props?.listenTo?.width, props?.listenTo?.height]);
 
   return { height, width };
 }

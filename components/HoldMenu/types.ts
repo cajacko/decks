@@ -1,4 +1,4 @@
-export type MenuItem<P extends {} = {}> = P & {
+export type MenuItem<P extends object = object> = P & {
   key: string;
   top: number;
   left: number;
