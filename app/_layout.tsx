@@ -12,6 +12,7 @@ import "react-native-reanimated";
 import { store, persistor } from "@/store/store";
 import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { init as initMousePointer } from "@/utils/mousePosition";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -23,6 +24,10 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  useEffect(() => {
+    initMousePointer();
+  }, []);
 
   useEffect(() => {
     if (loaded) {

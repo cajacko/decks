@@ -42,3 +42,7 @@ export interface CardRef {
 }
 
 export type AnimationUpdate = (key: string, isAnimating: boolean) => void;
+
+export type CardSize =
+  | { height: number; width: number }
+  | { cardHeight: number; cardWidth: number };

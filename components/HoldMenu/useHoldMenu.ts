@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { MenuItem, HoldMenuProps } from "./types";
 import { useHoldMenuBehaviour } from "@/hooks/useFlag";
+import usePointer from "@/hooks/usePointer";
 
 export const DEV_INDICATOR = false;
 
@@ -329,13 +330,23 @@ export default function useHoldMenu<I extends MenuItem>({
     }
   }, [opacity, renderMenu]);
 
+  const onPointerEnter = React.useCallback(() => {
+    setRenderMenu(true);
+  }, []);
+
+  const { getIsPointerOverRef } = usePointer();
+
+  React.useEffect(() => {
+    if (getIsPointerOverRef(menuRef)) {
+      onPointerEnter();
+    }
+  }, [menuRef, onPointerEnter, getIsPointerOverRef]);
+
   return {
-    onPointerEnter: () => {
-      setRenderMenu(true);
-    },
-    onPointerLeave: () => {
+    onPointerEnter,
+    onPointerLeave: React.useCallback(() => {
       setRenderMenu(false);
-    },
+    }, []),
     panResponder: holdMenuBehaviour === "hold" ? panResponder : undefined,
     menuRef,
     renderMenu,

@@ -16,6 +16,7 @@ export default function HoldMenu<I extends MenuItem>(
       ref={state.menuRef}
       onPointerEnter={state.onPointerEnter}
       onPointerLeave={state.onPointerLeave}
+      onPointerMove={state.onPointerEnter}
     >
       {DEV_INDICATOR && (
         <Animated.View

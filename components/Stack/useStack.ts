@@ -11,7 +11,7 @@ import { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { getOffsetPositions } from "@/components/Card/card.styles";
 
-const offsetPositionsCount = getOffsetPositions(0).length;
+const offsetPositionsCount = getOffsetPositions({ height: 0, width: 0 }).length;
 
 export default function useStack({ stackId }: StackProps) {
   const dispatch = useAppDispatch();

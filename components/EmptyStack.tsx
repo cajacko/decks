@@ -9,14 +9,14 @@ export default function EmptyStack({
   style,
   ...rest
 }: EmptyStackProps): React.ReactNode {
-  const { cardWidth } = useTabletopContext();
+  const context = useTabletopContext();
 
   return (
     <Card style={StyleSheet.flatten([styles.container, style])} {...rest}>
       <View
         style={StyleSheet.flatten([
           styles.content,
-          { borderRadius: getBorderRadius(cardWidth) },
+          { borderRadius: getBorderRadius(context) },
         ])}
       >
         <Text style={styles.text}>Empty Stack</Text>

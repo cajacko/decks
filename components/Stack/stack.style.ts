@@ -1,9 +1,6 @@
 import { StyleSheet, Animated } from "react-native";
 import { StackDimensions } from "./stack.types";
-
-const cardSizeRatios = {
-  poker: { width: 2.5, height: 3.5 },
-};
+import { cardSizeRatios } from "@/components/Card/card.styles";
 
 function getExampleStackDimensions(
   props: { stackWidth: number } | { stackHeight: number },

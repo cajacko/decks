@@ -7,7 +7,7 @@ import {
   withAnimateFlipIn,
   withAnimateFlipOut,
 } from "./animations";
-import { getOffsetPositions } from "./card.styles";
+import { getOffsetPositions, parseCardSize } from "./card.styles";
 import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 
 export default function useCard(
@@ -17,11 +17,11 @@ export default function useCard(
   >,
   ref: React.ForwardedRef<CardRef>,
 ) {
-  const { cardHeight: height, cardWidth: width } = useTabletopContext();
+  const { height, width } = parseCardSize(useTabletopContext());
 
   const offsetPositions = React.useMemo(
-    () => getOffsetPositions(width),
-    [width],
+    () => getOffsetPositions({ width, height }),
+    [width, height],
   );
 
   const offsetPosition = React.useMemo(
