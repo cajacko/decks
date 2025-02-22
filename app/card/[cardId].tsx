@@ -1,106 +1,22 @@
-import { StyleSheet, View, Text, ScrollView } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import CardFront from "@/components/CardFront";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
-  SharedValue,
 } from "react-native-reanimated";
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
 import React from "react";
-
-function Drawer({
-  height,
-  children,
-}: {
-  children?: React.ReactNode;
-  height: SharedValue<number>;
-  heightStyle?: ReturnType<typeof useAnimatedStyle>;
-}) {
-  const pressed = useSharedValue<boolean>(false);
-  const draggedDistance = useSharedValue(0);
-
-  const minHeight = 100;
-  const maxHeight = 500;
-
-  const heightStyle = useAnimatedStyle(() => {
-    return {
-      height: height.value,
-    };
-  });
-
-  const dragBarColor = useAnimatedStyle(() => {
-    return {
-      backgroundColor: pressed.value ? "#c5c5c5" : "#e5e5e5",
-    };
-  });
-
-  const pan = Gesture.Pan()
-    .onBegin(() => {
-      pressed.value = true;
-      draggedDistance.value = 0;
-    })
-    .onChange((event) => {
-      height.value = withSpring(
-        Math.min(
-          Math.max(height.value - event.translationY, minHeight),
-          maxHeight,
-        ),
-        {
-          damping: 20,
-          stiffness: 300,
-        },
-      );
-
-      draggedDistance.value = height.value;
-    })
-    .onFinalize(() => {
-      pressed.value = false;
-
-      if (draggedDistance.value > 10) return;
-
-      // This is a press
-
-      const distanceToTop = height.value - minHeight;
-      const distanceToBottom = maxHeight - height.value;
-
-      height.value = withSpring(
-        distanceToTop < distanceToBottom ? maxHeight : minHeight,
-        {
-          damping: 20,
-          stiffness: 100,
-        },
-      );
-    });
-
-  return (
-    <View style={styles.drawer}>
-      <Animated.View style={[styles.drawerContainer, heightStyle]}>
-        <View style={styles.drawerContainer}>
-          <GestureDetector gesture={pan}>
-            <View style={styles.dragBar}>
-              <Animated.View style={[styles.dragBox, dragBarColor]}>
-                <Text style={styles.dragIcon}>====</Text>
-              </Animated.View>
-              <Animated.View style={[styles.dragHeader, dragBarColor]} />
-            </View>
-          </GestureDetector>
-          <ScrollView style={styles.content}>{children}</ScrollView>
-        </View>
-      </Animated.View>
-    </View>
-  );
-}
+import BottonDrawer, {
+  BottomDrawerWrapper,
+  BottomDrawerRef,
+} from "@/components/BottomDrawer";
 
 export default function Modal() {
   const { cardId } = useLocalSearchParams();
 
   const height = useSharedValue(100);
+  const minHeight = useSharedValue(100);
+  const maxHeight = useSharedValue(500);
 
   const bufferStyle = useAnimatedStyle(() => {
     return {
@@ -108,24 +24,35 @@ export default function Modal() {
     };
   });
 
+  const bottomDrawer = React.useRef<BottomDrawerRef>(null);
+
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <BottomDrawerWrapper style={styles.container}>
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.contentContainer}
         scrollEnabled
         horizontal={false}
       >
-        {typeof cardId === "string" && <CardFront cardId={cardId} />}
+        {typeof cardId === "string" && (
+          <Pressable onPress={() => bottomDrawer.current?.open()}>
+            <CardFront cardId={cardId} />
+          </Pressable>
+        )}
         <Animated.View style={[styles.drawerBuffer, bufferStyle]} />
       </ScrollView>
-      <Drawer height={height}>
+      <BottonDrawer
+        height={height}
+        minHeight={minHeight}
+        maxHeight={maxHeight}
+        ref={bottomDrawer}
+      >
         <View style={{ padding: 20 }}>
           <Text style={{ fontSize: 40 }}>Form Content</Text>
           {typeof cardId === "string" && <CardFront cardId={cardId} />}
         </View>
-      </Drawer>
-    </GestureHandlerRootView>
+      </BottonDrawer>
+    </BottomDrawerWrapper>
   );
 }
 
@@ -148,48 +75,6 @@ const styles = StyleSheet.create({
     minHeight: "100%",
     alignItems: "center",
     justifyContent: "center",
-  },
-  dragBar: {
-    position: "absolute",
-    top: -(dragOverlap + dragBuffer),
-    width: "100%",
-    height: dragHeight,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: dragBuffer,
-  },
-  dragBox: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: dragOverlap * 2,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    zIndex: 2,
-    position: "relative",
-  },
-  dragHeader: {
-    marginTop: -dragOverlap,
-    borderTopLeftRadius: borderRadius,
-    borderTopRightRadius: borderRadius,
-    height: dragHeaderHeight,
-    width: "100%",
-    zIndex: 1,
-    position: "relative",
-  },
-  dragIcon: {
-    fontSize: 20,
-  },
-  drawer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  drawerContainer: {
-    borderTopLeftRadius: borderRadius,
-    borderTopRightRadius: borderRadius,
-    flex: 1,
-    width: "100%",
   },
   drawerBuffer: {
     opacity: 0,
