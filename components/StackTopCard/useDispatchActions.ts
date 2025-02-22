@@ -195,6 +195,7 @@ export default function useDispatchActions({
   ]);
 
   return {
+    cardId: cardInstance.cardId,
     cardRef,
     handleFlipCard,
     moveRight,

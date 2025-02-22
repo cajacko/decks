@@ -114,7 +114,7 @@ const scalingStyles = {
   boxShadow: {
     x: withCardStyleScaling(369, 2, boxShadowConfig),
     y: withCardStyleScaling(369, 2, boxShadowConfig),
-    blur: withCardStyleScaling(369, 5, boxShadowConfig),
+    blur: withCardStyleScaling(369, 3, boxShadowConfig),
   },
   borderRadius: withCardStyleScaling(
     cardSizeRatios.poker,
@@ -220,7 +220,7 @@ export function getCardStyle(props: {
     styles.container,
     {
       borderWidth: scalingStyles.borderWidth(props),
-      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.05)`,
+      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.2)`,
       zIndex: props.zIndex,
       width: props.width,
       height: props.height,

@@ -24,7 +24,8 @@ export default React.forwardRef<CardRef, CardFrontProps>(function CardFront(
 
   return (
     <Card {...rest} style={cardStyle} ref={ref}>
-      <Text style={styles.text}>{card.cardId} (front)</Text>
+      <Text style={styles.text}>Title</Text>
+      <Text style={styles.text}>Description - {card.cardId}</Text>
       {children}
     </Card>
   );

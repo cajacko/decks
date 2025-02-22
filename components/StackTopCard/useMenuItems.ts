@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "expo-router";
 import { StackTopCardProps, StackTopCardMenuItem } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
@@ -6,6 +7,7 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
   const { buttonSize, cardWidth, cardHeight } = useTabletopContext();
+  const router = useRouter();
 
   const menuItems = React.useMemo(() => {
     const centerLeft = cardWidth / 2 - buttonSize / 2;
@@ -15,16 +17,27 @@ export default function useMenuItems(props: StackTopCardProps) {
     const right = cardWidth - buttonSize / 2;
     const sideTop = cardHeight / 2 - buttonSize * 1.25;
     const sideBottom = sideTop + buttonSize * 1.5;
+    const verticalLeft = cardWidth / 2 - buttonSize * 1.5;
+    const verticalRight = cardWidth / 2 + buttonSize * 0.5;
 
     const items: StackTopCardMenuItem[] = [
       {
         key: "flip",
         top: bottom,
-        left: centerLeft,
+        left: verticalLeft,
         height: buttonSize,
         width: buttonSize,
         icon: "Fl",
         onPress: state.handleFlipCard,
+      },
+      {
+        key: "edit",
+        top: bottom,
+        left: verticalRight,
+        height: buttonSize,
+        width: buttonSize,
+        icon: "Ed",
+        onPress: () => router.push(`/card/${state.cardId}`),
       },
     ];
 
@@ -95,6 +108,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.handleMoveToBottom,
     state.moveRight,
     state.moveLeft,
+    router,
   ]);
 
   return {
