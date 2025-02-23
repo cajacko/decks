@@ -2,6 +2,8 @@ import { Templates } from "@/store/types";
 
 export type Data = Templates.Data;
 
+export type StyleProp = Templates.ValidStyles;
+
 export interface TemplateProps<D extends Data> {
   data: D;
   markup: Templates.Markup<D>;

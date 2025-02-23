@@ -1,6 +1,6 @@
 import { StyleSheet, Animated } from "react-native";
 import { StackDimensions } from "./stack.types";
-import { cardSizeRatios } from "@/components/Card/card.styles";
+import cardDimensions from "@/config/cardDimensions";
 
 function getExampleStackDimensions(
   props: { stackWidth: number } | { stackHeight: number },
@@ -45,7 +45,8 @@ function getExampleStackDimensions(
       stackWidth - stackPadding * 2 - Math.round(spaceBetweenStacks / 2);
 
     cardHeight = Math.round(
-      cardWidth * (cardSizeRatios.poker.height / cardSizeRatios.poker.width),
+      cardWidth *
+        (cardDimensions.poker.mm.height / cardDimensions.poker.mm.width),
     );
 
     stackHeight = cardHeight + stackPadding * 2;
@@ -55,7 +56,8 @@ function getExampleStackDimensions(
     cardHeight = stackHeight - stackPadding * 2;
 
     cardWidth = Math.round(
-      cardHeight * (cardSizeRatios.poker.width / cardSizeRatios.poker.height),
+      cardHeight *
+        (cardDimensions.poker.mm.width / cardDimensions.poker.mm.height),
     );
 
     stackWidth =

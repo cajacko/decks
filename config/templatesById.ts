@@ -36,6 +36,9 @@ const basicText: Templates.Props<
       id: "markup1",
       type: "text",
       text: "Front of the card",
+      style: {
+        fontSize: 10,
+      },
     },
   ],
 };
@@ -43,13 +46,30 @@ const basicText: Templates.Props<
 const plainBack: Templates.Props = {
   templateId: "plainBack",
   name: "Back Template",
+  backgroundColor: "grey",
   schemaOrder: [],
   schema: {},
   markup: [
     {
       id: "markup1",
-      type: "text",
-      text: "Back of the card",
+      type: "view",
+      style: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 5,
+      },
+      children: [
+        {
+          id: "markup1",
+          type: "text",
+          text: "BACK TEMPLATE",
+          style: {
+            fontSize: 8,
+            textAlign: "center",
+          },
+        },
+      ],
     },
   ],
 };

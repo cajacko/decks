@@ -38,7 +38,10 @@ const selectCardSideTemplate = (
 };
 
 // Is a lookup, doesn't need to be cached
-const selectCardTemplate = (state: RootState, props: CardIdSideProps) => {
+export const selectCardTemplate = (
+  state: RootState,
+  props: CardIdSideProps,
+) => {
   const templateId = selectCardSideTemplate(state, props)?.templateId;
 
   return templateId ? selectTemplate(state, { templateId }) : null;

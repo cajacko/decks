@@ -6,10 +6,7 @@ import {
   RequiredRefObject,
   CardSize,
 } from "./Card.types";
-
-export const cardSizeRatios = {
-  poker: { width: 63.5, height: 88.9, borderRadius: 3.5 },
-};
+import cardDimensions from "@/config/cardDimensions";
 
 export function parseCardSize(cardSize: CardSize) {
   const height = "height" in cardSize ? cardSize.height : cardSize.cardHeight;
@@ -117,8 +114,8 @@ const scalingStyles = {
     blur: withCardStyleScaling(369, 3, boxShadowConfig),
   },
   borderRadius: withCardStyleScaling(
-    cardSizeRatios.poker,
-    cardSizeRatios.poker.borderRadius,
+    cardDimensions.poker.mm.width,
+    cardDimensions.poker.mm.borderRadius,
     {
       min: 0,
       roundToNumberOfDecimals: 0,

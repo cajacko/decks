@@ -1,3 +1,5 @@
+import { TextStyle, ViewStyle } from "react-native";
+
 // Naming the types here makes it easier for us to know what string should be passed
 export type DataItemId = string;
 export type TemplateId = string;
@@ -58,9 +60,11 @@ export type Data<DataItemIds extends DataItemId = DataItemId> = {
 
 type MarkupElementType = "view" | "text";
 
+export type ValidStyles = TextStyle | ViewStyle;
+
 type CreateMarkupElementHelper<
   T extends MarkupElementType,
-  P extends object,
+  P extends { style?: ValidStyles },
 > = {
   id: MarkupElementId;
   type: T;
@@ -70,12 +74,16 @@ type MarkupView<D extends Data> = CreateMarkupElementHelper<
   "view",
   {
     children?: MarkupElement<D>[];
+    style?: ViewStyle;
   }
 >;
 
-type MarkupText = CreateMarkupElementHelper<"text", { text: string }>;
+type MarkupText = CreateMarkupElementHelper<
+  "text",
+  { text: string; style?: TextStyle }
+>;
 
-export type MarkupElement<D extends Data> = MarkupView<D> | MarkupText;
+export type MarkupElement<D extends Data = Data> = MarkupView<D> | MarkupText;
 
 export type Markup<D extends Data = Data> = MarkupElement<D>[];
 
@@ -89,6 +97,7 @@ export interface Props<
   schemaOrder: DataItemIds[];
   schema: D;
   markup: Markup<D>;
+  backgroundColor?: string;
 }
 
 export interface State {

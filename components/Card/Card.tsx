@@ -3,6 +3,8 @@ import { Animated } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
 import { getCardStyle } from "./card.styles";
 import useCard from "./useCard";
+import { PhysicalMeasuresProvider } from "@/context/PhysicalMeasures";
+import cardDimensions from "@/config/cardDimensions";
 
 export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
   const state = useCard(props, ref);
@@ -35,5 +37,12 @@ export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
     ],
   );
 
-  return <Animated.View style={style}>{props.children}</Animated.View>;
+  return (
+    <PhysicalMeasuresProvider
+      mmDistance={cardDimensions.poker.mm.width}
+      dpDistance={state.width}
+    >
+      <Animated.View style={style}>{props.children}</Animated.View>
+    </PhysicalMeasuresProvider>
+  );
 });
