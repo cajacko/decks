@@ -1,6 +1,5 @@
-import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
+import { StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import CardFront from "@/components/CardFront";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,6 +9,8 @@ import BottonDrawer, {
   BottomDrawerWrapper,
   BottomDrawerRef,
 } from "@/components/BottomDrawer";
+import EditCardForm from "@/components/EditCardForm";
+import EditCard from "@/components/EditCard";
 
 export default function Modal() {
   const { cardId } = useLocalSearchParams();
@@ -34,11 +35,7 @@ export default function Modal() {
         scrollEnabled
         horizontal={false}
       >
-        {typeof cardId === "string" && (
-          <Pressable onPress={() => bottomDrawer.current?.open()}>
-            <CardFront cardId={cardId} />
-          </Pressable>
-        )}
+        {typeof cardId === "string" && <EditCard cardId={cardId} />}
         <Animated.View style={[styles.drawerBuffer, bufferStyle]} />
       </ScrollView>
       <BottonDrawer
@@ -47,10 +44,7 @@ export default function Modal() {
         maxHeight={maxHeight}
         ref={bottomDrawer}
       >
-        <View style={{ padding: 20 }}>
-          <Text style={{ fontSize: 40 }}>Form Content</Text>
-          {typeof cardId === "string" && <CardFront cardId={cardId} />}
-        </View>
+        {typeof cardId === "string" && <EditCardForm cardId={cardId} />}
       </BottonDrawer>
     </BottomDrawerWrapper>
   );
@@ -61,7 +55,6 @@ const dragOverlap = 20;
 const dragBuffer = 10;
 const dragHeaderHeight = Math.max(30, borderRadius);
 const dragHeight = dragHeaderHeight + dragOverlap + dragBuffer;
-// const drawerOffset = 10;
 
 const styles = StyleSheet.create({
   container: {

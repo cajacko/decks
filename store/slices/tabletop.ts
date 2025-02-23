@@ -2,29 +2,19 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
-import {
-  RootState,
-  TabletopState,
-  CardInstanceState,
-  Tabletop,
-  TabletopHistoryState,
-  Stack,
-  CardInstance,
-  MoveCardInstanceMethod,
-} from "../types";
+import { RootState, Tabletops, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 
-export type {
-  TabletopState,
-  Tabletop,
-  TabletopHistoryState,
-  Stack,
-  CardInstance,
-};
+export type TabletopState = Tabletops.State;
+export type Tabletop = Tabletops.Props;
+export type TabletopHistoryState = Tabletops.HistoryState;
+export type Stack = Tabletops.Stack;
+export type CardInstance = Tabletops.CardInstance;
 
-export { CardInstanceState, MoveCardInstanceMethod };
+export const CardInstanceState = Tabletops.CardInstanceState;
+export const MoveCardInstanceMethod = Tabletops.MoveCardInstanceMethod;
 
 const initialState: TabletopState = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.tabletops
@@ -60,7 +50,7 @@ function removeCardInstancesFromStacks(
 }
 
 export const tabletopsSlice = createSlice({
-  name: "tabletops",
+  name: SliceName.Tabletops,
   initialState,
   reducers: {
     undo: history.undo,
@@ -75,7 +65,7 @@ export const tabletopsSlice = createSlice({
           toStackId: string;
           // Do we specify the method, or let the stack define it? Or both? If specified here it's
           // more specific, otherwise do what the stack it's going to says
-          method: MoveCardInstanceMethod;
+          method: Tabletops.MoveCardInstanceMethod;
         }>,
       ) => {
         const { fromStackId, cardInstanceId, method, toStackId } =
@@ -139,7 +129,7 @@ export const tabletopsSlice = createSlice({
         action: PayloadAction<{
           tabletopId: string;
           cardInstanceId: string;
-          state: CardInstanceState;
+          state: Tabletops.CardInstanceState;
         }>,
       ) => {
         const cardInstance =
@@ -157,7 +147,7 @@ export const tabletopsSlice = createSlice({
           tabletopId: string;
           stackId: string;
           seed: number | string;
-          allCardInstancesState: CardInstanceState | "noChange";
+          allCardInstancesState: Tabletops.CardInstanceState | "noChange";
         }>,
       ) => {
         const stack = state?.stacksById[action.payload.stackId];

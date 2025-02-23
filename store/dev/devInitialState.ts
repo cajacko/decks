@@ -1,31 +1,148 @@
-import { RootState, CardInstanceState } from "../types";
+import { RootState, Templates, Tabletops } from "../types";
+import templatesById from "@/config/templatesById";
 
 const state: RootState = {
   cards: {
     cardsById: {
       card1: {
         cardId: "card1",
+        deckId: "deck1",
+        data: {
+          title: {
+            value: "Card 1",
+            type: Templates.DataType.Text,
+          },
+          description: {
+            value: "This is card 1",
+            type: Templates.DataType.Text,
+          },
+        },
       },
       card2: {
         cardId: "card2",
+        deckId: "deck1",
+        data: {
+          title: {
+            value: "Card 2",
+            type: Templates.DataType.Text,
+          },
+          description: {
+            value: "This is card 2",
+            type: Templates.DataType.Text,
+          },
+          backgroundColor: {
+            value: "blue",
+            type: Templates.DataType.Color,
+          },
+        },
       },
       card3: {
         cardId: "card3",
+        deckId: "deck1",
+        data: {
+          title: {
+            value: "Card 3",
+            type: Templates.DataType.Text,
+          },
+          description: {
+            value: "This is card 3",
+            type: Templates.DataType.Text,
+          },
+        },
       },
       card4: {
         cardId: "card4",
+        deckId: "deck1",
+        data: {
+          title: {
+            value: "Card 4",
+            type: Templates.DataType.Text,
+          },
+          description: {
+            value: "This is card 4",
+            type: Templates.DataType.Text,
+          },
+        },
       },
       card5: {
         cardId: "card5",
+        deckId: "deck1",
+        data: {
+          title: {
+            value: "Card 5",
+            type: Templates.DataType.Text,
+          },
+          description: {
+            value: "This is card 5",
+            type: Templates.DataType.Text,
+          },
+        },
       },
     },
+  },
+  templates: {
+    templatesById,
   },
   decks: {
     decksById: {
       deck1: {
         id: "deck1",
-        // cardIds: ["card1", "card2", "card3", "card4", "card5"],
-        deckCards: [
+        dataSchemaOrder: [
+          "cardSchema-title",
+          "cardSchema-subTitle",
+          "cardSchema-frontColor",
+        ],
+        dataSchema: {
+          "cardSchema-title": {
+            id: "cardSchema-title",
+            title: "Title",
+            type: Templates.DataType.Text,
+          },
+          "cardSchema-subTitle": {
+            id: "cardSchema-subTitle",
+            title: "Subtitle",
+            type: Templates.DataType.Text,
+          },
+          "cardSchema-frontColor": {
+            id: "cardSchema-frontColor",
+            title: "Front Color",
+            type: Templates.DataType.Color,
+            defaultValue: {
+              value: "green",
+              type: Templates.DataType.Color,
+            },
+          },
+        },
+        name: "Deck 1",
+        templates: {
+          front: {
+            templateId: templatesById.basicText.templateId,
+            dataTemplateMapping: {
+              "template1-title": {
+                dataSchemaItemId: "cardSchema-title",
+                templateSchemaItemId: "template1-title",
+              },
+              "template1-description": {
+                dataSchemaItemId: "cardSchema-subTitle",
+                templateSchemaItemId: "template1-description",
+              },
+              "template1-backgroundColor": {
+                dataSchemaItemId: "cardSchema-frontColor",
+                templateSchemaItemId: "template1-backgroundColor",
+                defaultValue: {
+                  value: "yellow",
+                  type: Templates.DataType.Color,
+                },
+              },
+            },
+          },
+          back: {
+            templateId: templatesById.plainBack.templateId,
+            dataTemplateMapping: {},
+          },
+        },
+        description: "This is a deck",
+        cards: [
           {
             cardId: "card1",
             quantity: 1,
@@ -62,27 +179,27 @@ const state: RootState = {
               cardInstance1: {
                 cardInstanceId: "cardInstance1",
                 cardId: "card1",
-                state: CardInstanceState.faceUp,
+                state: Tabletops.CardInstanceState.faceUp,
               },
               cardInstance2: {
                 cardInstanceId: "cardInstance2",
                 cardId: "card2",
-                state: CardInstanceState.faceUp,
+                state: Tabletops.CardInstanceState.faceUp,
               },
               cardInstance3: {
                 cardInstanceId: "cardInstance3",
                 cardId: "card3",
-                state: CardInstanceState.faceUp,
+                state: Tabletops.CardInstanceState.faceUp,
               },
               cardInstance4: {
                 cardInstanceId: "cardInstance4",
                 cardId: "card4",
-                state: CardInstanceState.faceUp,
+                state: Tabletops.CardInstanceState.faceUp,
               },
               cardInstance5: {
                 cardInstanceId: "cardInstance5",
                 cardId: "card5",
-                state: CardInstanceState.faceUp,
+                state: Tabletops.CardInstanceState.faceUp,
               },
             },
             stacksById: {

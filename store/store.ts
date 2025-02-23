@@ -2,13 +2,14 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { enablePatches } from "immer";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "./storage";
+import { RootState as VersionRootState } from "./versions/latest";
+import migrations from "./versions/migrations";
+import { version } from "./versions/latest";
 import cardsSlice from "./slices/cards";
 import tabletopsSlice from "./slices/tabletop";
 import decksSlice from "./slices/decks";
 import userSettingsSlice from "./slices/userSettings";
-import { RootState as VersionRootState } from "./versions/latest";
-import migrations from "./versions/migrations";
-import { version } from "./versions/latest";
+import templatesSlice from "./slices/templates";
 // import { HistoryTransform } from "./transforms";
 
 enablePatches();
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   [tabletopsSlice.name]: tabletopsSlice.reducer,
   [decksSlice.name]: decksSlice.reducer,
   [userSettingsSlice.name]: userSettingsSlice.reducer,
+  [templatesSlice.name]: templatesSlice.reducer,
 });
 
 const persistedReducer = persistReducer(
@@ -32,6 +34,7 @@ const persistedReducer = persistReducer(
       tabletopsSlice.name,
       decksSlice.name,
       cardsSlice.name,
+      templatesSlice.name,
     ],
     // Enable to not persist history, currently we're invalidating it during migration instead,
     // which allows us to persist history until we change the state which is nice if it works
@@ -53,7 +56,7 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 
 // Quickly reset the store to initial values and remove persisted data
-// persistor.purge();
+persistor.purge();
 
 // Infer the `RootState`,  `AppDispatch`, and `AppStore` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

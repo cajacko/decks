@@ -1,16 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState, CardsState, Card } from "../types";
+import { RootState, Cards, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 
-const initialState: CardsState = flags.USE_DEV_INITIAL_REDUX_STATE
+export type Card = Cards.Props;
+
+const initialState: Cards.State = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.cards
   : {
       cardsById: {},
     };
 
 export const cardsSlice = createSlice({
-  name: "cards",
+  name: SliceName.Cards,
   initialState,
   reducers: {
     setCard: (state, actions: PayloadAction<Card>) => {

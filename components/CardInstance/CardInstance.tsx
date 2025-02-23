@@ -1,8 +1,7 @@
 import React from "react";
-import CardFront from "@/components/CardFront";
-import CardBack from "@/components/CardBack";
 import useCardInstance from "./useCardInstance";
 import { CardInstanceProps, CardInstanceRef } from "./CardInstance.types";
+import CardSide from "@/components/CardSide";
 
 export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
   function CardInstance({ cardInstanceId, ...rest }, ref) {
@@ -11,8 +10,9 @@ export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
     return (
       <>
         {state.renderFaceUp && (
-          <CardFront
+          <CardSide
             cardId={state.cardInstance.cardId}
+            side="front"
             {...rest}
             initialScaleX={
               state.flipState === "flipping-to-front" ? 0 : rest.initialRotation
@@ -25,8 +25,9 @@ export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
         )}
 
         {state.renderFaceDown && (
-          <CardBack
+          <CardSide
             cardId={state.cardInstance.cardId}
+            side="back"
             {...rest}
             initialScaleX={
               state.flipState === "flipping-to-back" ? 0 : rest.initialRotation

@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState, UserSettingsState } from "../types";
+import { RootState, UserSettings, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 
-export type { UserSettingsState };
+export type UserSettingsState = UserSettings.State;
 
 const initialState: UserSettingsState = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.userSettings
@@ -13,7 +13,7 @@ const initialState: UserSettingsState = flags.USE_DEV_INITIAL_REDUX_STATE
     };
 
 export const userSettingsSlice = createSlice({
-  name: "userSettings",
+  name: SliceName.UserSettings,
   initialState,
   reducers: {},
 });

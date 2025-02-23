@@ -45,6 +45,14 @@ export default function RootLayout() {
         <PersistGate loading={null} persistor={persistor}>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="card/[cardId]"
+              options={{
+                headerShown: true,
+                presentation: "modal",
+                headerTitle: "Edit Card",
+              }}
+            />
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />
