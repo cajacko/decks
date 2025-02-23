@@ -109,6 +109,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.moveRight,
     state.moveLeft,
     router,
+    state.cardId,
   ]);
 
   return {

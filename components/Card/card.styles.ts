@@ -1,4 +1,4 @@
-import { StyleSheet, Animated } from "react-native";
+import { StyleSheet, Animated, ViewStyle } from "react-native";
 import {
   CardProps,
   AnimatedViewStyle,
@@ -180,13 +180,31 @@ export function getBorderRadius(cardSize: CardSize): number {
 }
 
 export const styles = StyleSheet.create({
-  container: {
+  inner: {
+    flex: 1,
+    height: "100%",
+    width: "100%",
     backgroundColor: "#fff",
-    borderColor: "#ebebeb",
+    overflow: "hidden",
   },
 });
 
-export function getCardStyle(props: {
+export function getInnerStyle(props: {
+  style?: CardProps["innerStyle"];
+  width: number;
+  height: number;
+}): ViewStyle {
+  return StyleSheet.flatten<ViewStyle>([
+    styles.inner,
+    {
+      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.2)`,
+      borderRadius: getBorderRadius(props),
+    },
+    props.style,
+  ]);
+}
+
+export function getContainerStyle(props: {
   style?: CardProps["style"];
   width: number;
   height: number;
@@ -214,14 +232,10 @@ export function getCardStyle(props: {
   };
 
   return StyleSheet.flatten<AnimatedViewStyle>([
-    styles.container,
     {
-      borderWidth: scalingStyles.borderWidth(props),
-      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.2)`,
       zIndex: props.zIndex,
       width: props.width,
       height: props.height,
-      borderRadius: getBorderRadius(props),
     },
     animationStyle,
     props.style,

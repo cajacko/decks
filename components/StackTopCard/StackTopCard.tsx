@@ -41,14 +41,15 @@ export default function StackTopCard(
       {...props}
       ref={state.cardRef}
       onAnimationChange={state.setIsAnimating}
-    >
-      {!state.hideActions && (
-        <HoldMenu
-          menuItems={state.menuItems}
-          handleAction={handleAction}
-          renderItem={renderItem}
-        />
-      )}
-    </CardInstance>
+      overlay={
+        !state.hideActions && (
+          <HoldMenu
+            menuItems={state.menuItems}
+            handleAction={handleAction}
+            renderItem={renderItem}
+          />
+        )
+      }
+    />
   );
 }

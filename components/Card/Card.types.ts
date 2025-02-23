@@ -9,6 +9,7 @@ export type RequiredRefObject<T> = { current: T };
 
 export interface CardProps {
   style?: StyleProp<AnimatedViewStyle>;
+  innerStyle?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onAnimationChange?: (isAnimating: boolean) => void;
   hidden?: boolean;
@@ -25,6 +26,7 @@ export interface CardProps {
   zIndex?: number;
   initialRotation?: number;
   initialScaleX?: number;
+  overlay?: React.ReactNode;
 }
 
 export interface AnimateOutProps {

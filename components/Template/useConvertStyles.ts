@@ -41,7 +41,9 @@ export default function useConvertStyles() {
    * a performant way
    */
   return React.useCallback(
-    <S extends StyleProp>(style: S): S => {
+    <S extends StyleProp>(style?: S): S | undefined => {
+      if (!style) return undefined;
+
       const newStyle = { ...style };
 
       for (const property of distanceProperties) {

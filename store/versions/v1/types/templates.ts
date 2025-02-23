@@ -97,7 +97,6 @@ export interface Props<
   schemaOrder: DataItemIds[];
   schema: D;
   markup: Markup<D>;
-  backgroundColor?: string;
 }
 
 export interface State {

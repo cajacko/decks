@@ -1,7 +1,7 @@
 import React from "react";
-import { Animated } from "react-native";
+import { Animated, View } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
-import { getCardStyle } from "./card.styles";
+import { getContainerStyle, getInnerStyle } from "./card.styles";
 import useCard from "./useCard";
 import { PhysicalMeasuresProvider } from "@/context/PhysicalMeasures";
 import cardDimensions from "@/config/cardDimensions";
@@ -9,9 +9,9 @@ import cardDimensions from "@/config/cardDimensions";
 export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
   const state = useCard(props, ref);
 
-  const style = React.useMemo(
+  const containerStyle = React.useMemo(
     () =>
-      getCardStyle({
+      getContainerStyle({
         height: state.height,
         opacity: state.opacity,
         scaleX: state.scaleX,
@@ -37,12 +37,25 @@ export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
     ],
   );
 
+  const innerStyle = React.useMemo(
+    () =>
+      getInnerStyle({
+        height: state.height,
+        width: state.width,
+        style: props.innerStyle,
+      }),
+    [state.height, state.width, props.innerStyle],
+  );
+
   return (
     <PhysicalMeasuresProvider
       mmDistance={cardDimensions.poker.mm.width}
       dpDistance={state.width}
     >
-      <Animated.View style={style}>{props.children}</Animated.View>
+      <Animated.View style={containerStyle}>
+        <View style={innerStyle}>{props.children}</View>
+        {props.overlay}
+      </Animated.View>
     </PhysicalMeasuresProvider>
   );
 });
