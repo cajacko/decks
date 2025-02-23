@@ -3,7 +3,6 @@ import { TextStyle, ViewStyle } from "react-native";
 // Naming the types here makes it easier for us to know what string should be passed
 export type DataItemId = string;
 export type TemplateId = string;
-export type MarkupElementId = string;
 
 export enum DataType {
   Text = "text",
@@ -61,13 +60,24 @@ export type Data<DataItemIds extends DataItemId = DataItemId> = {
 type MarkupElementType = "view" | "text";
 
 export type ValidStyles = TextStyle | ViewStyle;
+export type AllStyles = TextStyle & ViewStyle;
+
+// NOTE: We could add conditional and loop nodes in here and rename Element to Node. That would
+// better explain it all. A conditional node renders entire separate branches.
+
+/**
+ * This can be expanded to include more types of conditionals
+ *
+ * Id | { type: "=", condition: "{{templateItemId}}", value: "value" }
+ */
+type Conditional<Id extends DataItemId = DataItemId> = Id;
 
 type CreateMarkupElementHelper<
   T extends MarkupElementType,
   P extends { style?: ValidStyles },
 > = {
-  id: MarkupElementId;
   type: T;
+  conditional?: Conditional;
 } & P;
 
 type MarkupView<D extends Data> = CreateMarkupElementHelper<

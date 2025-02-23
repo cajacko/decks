@@ -30,11 +30,12 @@ const persistedReducer = persistReducer(
     migrate: migrations,
     // stateReconciler // remove history from persisted state
     whitelist: [
-      userSettingsSlice.name,
       tabletopsSlice.name,
-      decksSlice.name,
-      cardsSlice.name,
-      templatesSlice.name,
+      // TODO: Add these when we're done in dev
+      // userSettingsSlice.name,
+      // decksSlice.name,
+      // cardsSlice.name,
+      // templatesSlice.name,
     ],
     // Enable to not persist history, currently we're invalidating it during migration instead,
     // which allows us to persist history until we change the state which is nice if it works

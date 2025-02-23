@@ -12,7 +12,11 @@ export default function EmptyStack({
   const context = useTabletopContext();
 
   return (
-    <Card style={StyleSheet.flatten([styles.container, style])} {...rest}>
+    <Card
+      style={StyleSheet.flatten([styles.container, style])}
+      innerStyle={styles.inner}
+      {...rest}
+    >
       <View
         style={StyleSheet.flatten([
           styles.content,
@@ -27,9 +31,11 @@ export default function EmptyStack({
 
 const styles = StyleSheet.create({
   container: {
+    position: "relative",
+  },
+  inner: {
     borderWidth: 0,
     backgroundColor: "transparent",
-    position: "relative",
   },
   // Slightly smaller so it doesn't poke out of the cards when in a stack
   content: {

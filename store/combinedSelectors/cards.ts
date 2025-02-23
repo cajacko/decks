@@ -47,21 +47,29 @@ export const selectCardTemplate = (
   return templateId ? selectTemplate(state, { templateId }) : null;
 };
 
-// TODO: Be more specific on what we're selecting in these (specifically the data)
 const selectMergedCardData = createCachedSelector(
-  selectCard,
-  selectDeckByCard,
-  (card, deck): Cards.Data | null => {
-    if (!card) return null;
-    if (!deck) return card.data;
+  (state: RootState, props: CardId) => selectCard(state, props)?.data,
+  (state: RootState, props: CardId) =>
+    selectDeckByCard(state, props)?.dataSchema,
+  (cardData, deckDataSchema): Cards.Data | null => {
+    if (!cardData) return null;
+    if (!deckDataSchema) return cardData;
 
-    // const cardData = card.data;
+    const combinedData = { ...cardData };
 
-    // deck.cardSchema.forEach((schemaItem) => {
-    //   schemaItem.
-    // });
+    Object.entries(deckDataSchema).forEach(([key, schemaItem]) => {
+      const cardDataValue = combinedData[key];
 
-    return card.data;
+      if (cardDataValue) return;
+
+      const deckDataDefaultValue = schemaItem.defaultValue;
+
+      if (!deckDataDefaultValue) return;
+
+      combinedData[key] = deckDataDefaultValue;
+    });
+
+    return combinedData;
   },
 )(cardKey);
 
@@ -70,7 +78,6 @@ type CardTemplate<Props extends Templates.Props = Templates.Props> = {
   markup: Props["markup"];
 };
 
-// TODO: Be more specific in what we're selecting here
 export const selectCardTemplateData = createCachedSelector(
   (state: RootState, props: CardIdSideProps) =>
     selectCardTemplate(state, props)?.markup,

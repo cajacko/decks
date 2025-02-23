@@ -23,16 +23,8 @@ const state: RootState = {
         deckId: "deck1",
         data: {
           title: {
-            value: "Card 2",
+            value: "Card 2 (no description)",
             type: Templates.DataType.Text,
-          },
-          description: {
-            value: "This is card 2",
-            type: Templates.DataType.Text,
-          },
-          backgroundColor: {
-            value: "blue",
-            type: Templates.DataType.Color,
           },
         },
       },
@@ -45,8 +37,12 @@ const state: RootState = {
             type: Templates.DataType.Text,
           },
           description: {
-            value: "This is card 3",
+            value: "Blue background",
             type: Templates.DataType.Text,
+          },
+          backgroundColor: {
+            value: "blue",
+            type: Templates.DataType.Color,
           },
         },
       },
@@ -87,30 +83,22 @@ const state: RootState = {
     decksById: {
       deck1: {
         id: "deck1",
-        dataSchemaOrder: [
-          "cardSchema-title",
-          "cardSchema-subTitle",
-          "cardSchema-frontColor",
-        ],
+        dataSchemaOrder: ["title", "description", "backgroundColor"],
         dataSchema: {
-          "cardSchema-title": {
-            id: "cardSchema-title",
+          title: {
+            id: "title",
             title: "Title",
             type: Templates.DataType.Text,
           },
-          "cardSchema-subTitle": {
-            id: "cardSchema-subTitle",
+          description: {
+            id: "description",
             title: "Subtitle",
             type: Templates.DataType.Text,
           },
-          "cardSchema-frontColor": {
-            id: "cardSchema-frontColor",
+          backgroundColor: {
+            id: "backgroundColor",
             title: "Front Color",
             type: Templates.DataType.Color,
-            defaultValue: {
-              value: "green",
-              type: Templates.DataType.Color,
-            },
           },
         },
         name: "Deck 1",
@@ -119,20 +107,16 @@ const state: RootState = {
             templateId: templatesById.basicText.templateId,
             dataTemplateMapping: {
               "template1-title": {
-                dataSchemaItemId: "cardSchema-title",
+                dataSchemaItemId: "title",
                 templateSchemaItemId: "template1-title",
               },
               "template1-description": {
-                dataSchemaItemId: "cardSchema-subTitle",
+                dataSchemaItemId: "description",
                 templateSchemaItemId: "template1-description",
               },
               "template1-backgroundColor": {
-                dataSchemaItemId: "cardSchema-frontColor",
+                dataSchemaItemId: "backgroundColor",
                 templateSchemaItemId: "template1-backgroundColor",
-                defaultValue: {
-                  value: "yellow",
-                  type: Templates.DataType.Color,
-                },
               },
             },
           },

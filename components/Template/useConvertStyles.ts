@@ -1,9 +1,10 @@
 import React from "react";
-import { TextStyle, ViewStyle } from "react-native";
+import { Templates } from "@/store/types";
 import { usePhysicalMeasures } from "@/context/PhysicalMeasures";
-import { StyleProp } from "./Template.types";
+import Handlebars from "handlebars";
+import { Values } from "./Template.types";
 
-const distanceProperties: (keyof TextStyle | keyof ViewStyle)[] = [
+const distanceProperties: string[] = [
   "width",
   "height",
   "margin",
@@ -31,9 +32,17 @@ const distanceProperties: (keyof TextStyle | keyof ViewStyle)[] = [
   "borderBottomWidth",
   "borderLeftWidth",
   "fontSize",
-];
+] satisfies (keyof Templates.AllStyles)[];
 
-export default function useConvertStyles() {
+export const variableRegex = /{{(.*?)}}/;
+
+export function replaceVariables(text: string, values: Values): string {
+  const template = Handlebars.compile(text);
+
+  return template(values);
+}
+
+export default function useConvertStyles(values: Values) {
   const { mmToDp } = usePhysicalMeasures();
 
   /**
@@ -41,22 +50,35 @@ export default function useConvertStyles() {
    * a performant way
    */
   return React.useCallback(
-    <S extends StyleProp>(style?: S): S | undefined => {
+    <S extends Templates.ValidStyles>(style?: S): S | undefined => {
       if (!style) return undefined;
 
-      const newStyle = { ...style };
+      const newStyle: S = { ...style };
 
-      for (const property of distanceProperties) {
-        const key = property as keyof S;
+      for (const key in newStyle) {
+        const value = newStyle[key];
 
-        if (typeof newStyle[key] === "number") {
-          // @ts-ignore
-          newStyle[key] = mmToDp(newStyle[key]);
+        if (typeof value === "number" && distanceProperties.includes(key)) {
+          const newValue: number = mmToDp(value);
+
+          // This is been a bit annoying so ignoring
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          newStyle[key] = newValue as any;
+        } else if (typeof value === "string") {
+          const match = value.match(variableRegex);
+
+          if (match) {
+            const newValue: string = replaceVariables(value, values);
+
+            // This is been a bit annoying so ignoring
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            newStyle[key] = newValue as any;
+          }
         }
       }
 
       return newStyle;
     },
-    [mmToDp],
+    [mmToDp, values],
   );
 }

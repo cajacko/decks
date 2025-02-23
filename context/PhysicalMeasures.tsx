@@ -31,10 +31,8 @@ export function PhysicalMeasuresProvider({
   dpDistance,
   mmDistance,
 }: PhysicalMeasuresProviderProps) {
-  const mmToDp = React.useCallback<ContextState["mmToDp"]>(
-    (mm) => {
-      return (mm / mmDistance) * dpDistance;
-    },
+  const mmToDp = React.useCallback(
+    (mm: number): number => (mm / mmDistance) * dpDistance,
     [dpDistance, mmDistance],
   );
 

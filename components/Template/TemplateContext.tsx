@@ -1,5 +1,5 @@
 import React from "react";
-import { TemplateContext, Data } from "./Template.types";
+import { TemplateContext, Data, Values } from "./Template.types";
 
 const Context = React.createContext<TemplateContext<Data> | null>(null);
 
@@ -7,7 +7,7 @@ function getIsTemplateData<D extends Data>(data: Data): data is D {
   return true;
 }
 
-export function useTemplateDataItem<D extends Data>(key: keyof D): D[keyof D] {
+export function useTemplateDataItem<D extends Data>() {
   const context = React.useContext(Context);
 
   if (!context) {
@@ -18,7 +18,7 @@ export function useTemplateDataItem<D extends Data>(key: keyof D): D[keyof D] {
     throw new Error("Template data is not valid");
   }
 
-  return context.data[key];
+  return context;
 }
 
 export function TemplateProvider<D extends Data>({
@@ -28,7 +28,17 @@ export function TemplateProvider<D extends Data>({
   data: D;
   children: React.ReactNode;
 }): JSX.Element {
-  const value = React.useMemo<TemplateContext<D>>(() => ({ data }), [data]);
+  const value = React.useMemo<TemplateContext<D>>(() => {
+    const init: Values = {};
+
+    const values = Object.entries(data).reduce((acc, [key, value]) => {
+      acc[key] = value.value?.value;
+
+      return acc;
+    }, init);
+
+    return { data, values };
+  }, [data]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
