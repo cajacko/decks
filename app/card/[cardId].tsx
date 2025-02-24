@@ -1,13 +1,12 @@
 import { StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import React from "react";
 import BottonDrawer, {
   BottomDrawerWrapper,
   BottomDrawerRef,
+  useHeight,
+  useMaxHeight,
 } from "@/components/BottomDrawer";
 import EditCardForm from "@/components/EditCardForm";
 import EditCard from "@/components/EditCard";
@@ -20,33 +19,31 @@ export default function Modal() {
     throw new Error("cardId must be a string");
   }
 
-  const height = useSharedValue(100);
-  const minHeight = useSharedValue(100);
-  const maxHeight = useSharedValue(500);
-
-  const bufferStyle = useAnimatedStyle(() => {
-    return {
-      height: height.value,
-    };
-  });
+  const height = useHeight();
+  const { maxHeight, onContainerLayout } = useMaxHeight();
 
   const bottomDrawer = React.useRef<BottomDrawerRef>(null);
 
+  const onPress = React.useCallback(() => {
+    bottomDrawer.current?.open();
+  }, []);
+
   return (
     <EditCardProvider cardId={cardId}>
-      <BottomDrawerWrapper style={styles.container}>
+      <BottomDrawerWrapper
+        onLayout={onContainerLayout}
+        style={styles.container}
+      >
         <ScrollView
-          style={styles.scrollContainer}
           contentContainerStyle={styles.contentContainer}
           scrollEnabled
           horizontal={false}
         >
-          <EditCard cardId={cardId} />
-          <Animated.View style={[styles.drawerBuffer, bufferStyle]} />
+          <EditCard cardId={cardId} onPress={onPress} />
+          <Animated.View style={[styles.drawerBuffer, height.heightStyle]} />
         </ScrollView>
         <BottonDrawer
-          height={height}
-          minHeight={minHeight}
+          height={height.sharedValue}
           maxHeight={maxHeight}
           ref={bottomDrawer}
         >
@@ -68,7 +65,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: "hidden",
   },
-  scrollContainer: {},
   contentContainer: {
     paddingVertical: 40,
     paddingHorizontal: 10,

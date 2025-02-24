@@ -1,9 +1,18 @@
-import { StyleSheet, View, Text, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  ScrollViewProps,
+  LayoutChangeEvent,
+} from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   SharedValue,
+  withClamp,
+  useDerivedValue,
 } from "react-native-reanimated";
 import {
   Gesture,
@@ -17,13 +26,45 @@ export const BottomDrawerWrapper = GestureHandlerRootView;
 export interface BottomDrawerProps {
   children?: React.ReactNode;
   height: SharedValue<number>;
-  maxHeight: SharedValue<number>;
-  minHeight: SharedValue<number>;
+  maxHeight?: number;
+  minHeight?: number;
 }
 
 export interface BottomDrawerRef {
   open: () => void;
   close: () => void;
+}
+
+const defaultProps = {
+  maxHeight: 1000,
+  minHeight: 100,
+};
+
+export function useMaxHeight() {
+  const [maxHeight, setMaxHeight] = React.useState<number>();
+
+  return {
+    maxHeight,
+    onContainerLayout: React.useCallback((event: LayoutChangeEvent) => {
+      // Update maxHeight with the max height of the inner scroll content when layout occurs
+      const { height } = event.nativeEvent.layout;
+
+      setMaxHeight(height);
+    }, []),
+  };
+}
+
+export function useHeight(startingHeight?: number) {
+  const sharedValue = useSharedValue(startingHeight ?? defaultProps.minHeight);
+
+  return {
+    sharedValue,
+    heightStyle: useAnimatedStyle(() => {
+      return {
+        height: sharedValue.value,
+      };
+    }),
+  };
 }
 
 const autoAnimateConfig = {
@@ -32,9 +73,42 @@ const autoAnimateConfig = {
 };
 
 export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
-  function BottonDrawer({ height, children, maxHeight, minHeight }, ref) {
+  function BottonDrawer(
+    { height, children, maxHeight: maxHeightProp, minHeight: minHeightProp },
+    ref,
+  ) {
+    const minHeight = useSharedValue(minHeightProp ?? defaultProps.minHeight);
+    const customMaxHeight = useSharedValue(
+      maxHeightProp ?? defaultProps.maxHeight,
+    );
+    const drawerContentHeight = useSharedValue(0);
     const pressed = useSharedValue<boolean>(false);
     const draggedDistance = useSharedValue(0);
+
+    const maxHeight = useDerivedValue<number>(() => {
+      const maxAvailableSpace =
+        customMaxHeight.value - dragOverlap - dragBuffer;
+
+      const maxHeightForContent = drawerContentHeight.value + dragHeight;
+
+      return Math.min(maxAvailableSpace, maxHeightForContent);
+    });
+
+    React.useEffect(() => {
+      const newMaxHeight = maxHeightProp ?? defaultProps.maxHeight;
+
+      if (customMaxHeight.value !== newMaxHeight) {
+        customMaxHeight.value = newMaxHeight;
+      }
+    }, [maxHeightProp, customMaxHeight]);
+
+    React.useEffect(() => {
+      const newMinHeight = minHeightProp ?? defaultProps.minHeight;
+
+      if (minHeight.value !== newMinHeight) {
+        minHeight.value = newMinHeight;
+      }
+    }, [minHeightProp, minHeight]);
 
     const heightStyle = useAnimatedStyle(() => {
       return {
@@ -56,20 +130,18 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
       .onChange((event) => {
         let newHeight = height.value - event.changeY * 10;
 
-        if (newHeight < minHeight.value) {
-          newHeight = minHeight.value;
-        }
-
-        if (newHeight > maxHeight.value) {
-          newHeight = maxHeight.value;
-        }
-
         draggedDistance.value = event.translationY;
 
-        height.value = withSpring(newHeight, {
-          damping: 20,
-          stiffness: 300,
-        });
+        height.value = withClamp(
+          {
+            max: maxHeight.value,
+            min: minHeight.value,
+          },
+          withSpring(newHeight, {
+            damping: 20,
+            stiffness: 300,
+          }),
+        );
       })
       .onFinalize(() => {
         pressed.value = false;
@@ -81,9 +153,15 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
         const distanceToTop = height.value - minHeight.value;
         const distanceToBottom = maxHeight.value - height.value;
 
-        height.value = withSpring(
-          distanceToTop < distanceToBottom ? maxHeight.value : minHeight.value,
-          autoAnimateConfig,
+        const newHeight =
+          distanceToTop < distanceToBottom ? maxHeight.value : minHeight.value;
+
+        height.value = withClamp(
+          {
+            max: maxHeight.value,
+            min: minHeight.value,
+          },
+          withSpring(newHeight, autoAnimateConfig),
         );
       });
 
@@ -95,6 +173,15 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
         height.value = withSpring(minHeight.value, autoAnimateConfig);
       },
     }));
+
+    const onContentLayout = React.useCallback<
+      Required<ScrollViewProps>["onLayout"]
+    >(
+      (event) => {
+        drawerContentHeight.value = event.nativeEvent.layout.height;
+      },
+      [drawerContentHeight],
+    );
 
     return (
       <View style={styles.drawer}>
@@ -108,7 +195,9 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
                 <Animated.View style={[styles.dragHeader, dragBarColor]} />
               </View>
             </GestureDetector>
-            <ScrollView style={styles.content}>{children}</ScrollView>
+            <ScrollView style={styles.content}>
+              <View onLayout={onContentLayout}>{children}</View>
+            </ScrollView>
           </View>
         </Animated.View>
       </View>
