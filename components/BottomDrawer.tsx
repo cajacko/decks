@@ -94,6 +94,10 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
       return Math.min(maxAvailableSpace, maxHeightForContent);
     });
 
+    const maxAutoHeight = useDerivedValue<number>(() => {
+      return Math.min(maxHeight.value, customMaxHeight.value / 2);
+    });
+
     React.useEffect(() => {
       const newMaxHeight = maxHeightProp ?? defaultProps.maxHeight;
 
@@ -152,24 +156,28 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
 
         // This is a press
 
+        let moveTo: "top" | "bottom";
+
         const distanceToTop = height.value - minHeight.value;
-        const distanceToBottom = maxHeight.value - height.value;
+        const distanceToBottom = maxAutoHeight.value - height.value;
 
-        const newHeight =
-          distanceToTop < distanceToBottom ? maxHeight.value : minHeight.value;
+        if (height.value >= maxAutoHeight.value) {
+          moveTo = "bottom";
+        } else if (distanceToTop < distanceToBottom) {
+          moveTo = "top";
+        } else {
+          moveTo = "bottom";
+        }
 
-        height.value = withClamp(
-          {
-            max: maxHeight.value,
-            min: minHeight.value,
-          },
-          withSpring(newHeight, autoAnimateConfig),
+        height.value = withSpring(
+          moveTo === "top" ? maxAutoHeight.value : minHeight.value,
+          autoAnimateConfig,
         );
       });
 
     React.useImperativeHandle(ref, () => ({
       open: () => {
-        height.value = withSpring(maxHeight.value, autoAnimateConfig);
+        height.value = withSpring(maxAutoHeight.value, autoAnimateConfig);
       },
       close: () => {
         height.value = withSpring(minHeight.value, autoAnimateConfig);
