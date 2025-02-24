@@ -18,7 +18,7 @@ type CreateDataSchemaItemHelper<
   title: string;
   description?: string;
   type: T;
-  defaultValue?: TemplatesType.DataValue<T>;
+  defaultValidatedValue?: TemplatesType.ValidatedValue<T>;
 };
 
 type DataSchemaItem<Id extends DataSchemaItemId> = {
@@ -38,7 +38,7 @@ type DataTemplateMapItem = {
    * The key the template uses to render data
    */
   templateSchemaItemId: TemplatesType.DataItemId;
-  defaultValue?: TemplatesType.DataValue;
+  defaultValidatedValue?: TemplatesType.ValidatedValue;
 };
 
 export type DataTemplateMapping = Record<

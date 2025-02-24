@@ -4,6 +4,7 @@ import TextInput from "@/components/TextInput";
 import { useAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
 import { useEditCardTemplateSchemaItem } from "@/context/EditCard";
+import { Templates } from "@/store/types";
 
 export interface TemplateSchemaItemProps {
   cardId: string;
@@ -21,28 +22,54 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     throw new Error(`Schema item not found: ${props.templateSchemaItemId}`);
   }
 
-  const {
-    onChange,
-    value: { type, value },
-    placeholder,
-  } = useEditCardTemplateSchemaItem(props);
+  const { onChange, validatedValue, placeholder, hasChanges } =
+    useEditCardTemplateSchemaItem(props);
 
   const onChangeText = React.useCallback(
     (text: string) => {
-      onChange({ value: text, type });
+      switch (validatedValue.type) {
+        case Templates.DataType.Text:
+        case Templates.DataType.Color:
+          onChange({ value: text, type: validatedValue.type });
+          break;
+        default:
+          return;
+      }
     },
-    [onChange, type],
+    [onChange, validatedValue.type],
   );
+
+  const input = React.useMemo(() => {
+    switch (validatedValue.type) {
+      case Templates.DataType.Text:
+      case Templates.DataType.Color: {
+        return (
+          <TextInput
+            style={styles.input}
+            value={validatedValue.value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+          />
+        );
+      }
+      default:
+        return null;
+    }
+  }, [validatedValue, onChangeText, placeholder]);
+
+  if (!input) {
+    throw new Error(
+      `We do not have an TemplateSchemaItem input set up for this data type: ${validatedValue.type}`,
+    );
+  }
 
   return (
     <View>
-      <Text style={styles.label}>{schemaItem.name}</Text>
-      <TextInput
-        style={styles.input}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-      />
+      <Text style={styles.label}>
+        {schemaItem.name}
+        {hasChanges ? " (changed)" : ""}
+      </Text>
+      {input}
     </View>
   );
 }

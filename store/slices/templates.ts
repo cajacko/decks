@@ -28,7 +28,7 @@ export const selectTemplateSchemaItem = (
     templateId: Templates.TemplateId;
     templateSchemaItemId: Templates.DataItemId;
   },
-): Templates.DataItem | null =>
+): Templates.LooseDataItem | null =>
   selectTemplate(state, props)?.schema[props.templateSchemaItemId] ?? null;
 
 export default templatesSlice;

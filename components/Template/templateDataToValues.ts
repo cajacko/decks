@@ -3,7 +3,7 @@ import { Values, Data } from "./Template.types";
 
 export { Values };
 
-export type DataValueMap = Record<string, Templates.DataValue | undefined>;
+export type DataValueMap = Record<string, Templates.ValidatedValue | undefined>;
 
 export default function templateDataToValues(
   data: Data | DataValueMap,
@@ -14,8 +14,7 @@ export default function templateDataToValues(
     const prop = data[key];
 
     if (prop) {
-      values[key] =
-        typeof prop.value === "object" ? prop.value.value : prop.value;
+      values[key] = "value" in prop ? prop.value : prop.validatedValue?.value;
     }
   }
 

@@ -25,7 +25,7 @@ const basicText: Templates.Props<
       id: "template1-backgroundColor",
       name: "Background Colour",
       type: Templates.DataType.Color,
-      defaultValue: {
+      defaultValidatedValue: {
         value: "white",
         type: Templates.DataType.Color,
       },

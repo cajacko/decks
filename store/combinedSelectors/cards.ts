@@ -62,7 +62,7 @@ const selectMergedCardData = createCachedSelector(
 
       if (cardDataValue) return;
 
-      const deckDataDefaultValue = schemaItem.defaultValue;
+      const deckDataDefaultValue = schemaItem.defaultValidatedValue;
 
       if (!deckDataDefaultValue) return;
 
@@ -99,9 +99,9 @@ export const selectCardTemplateData = createCachedSelector(
     Object.entries(schema).forEach(([key, schemaItem]) => {
       const templateExpectedType = schemaItem.type;
 
-      const getValidValue = (
-        value: Templates.DataValue | undefined,
-      ): Templates.DataValue | undefined => {
+      const getValidatedValue = (
+        value: Templates.ValidatedValue | undefined,
+      ): Templates.ValidatedValue | undefined => {
         if (!value) return undefined;
 
         if (value.type !== templateExpectedType) return undefined;
@@ -109,16 +109,16 @@ export const selectCardTemplateData = createCachedSelector(
         return value;
       };
 
-      const templateDefaultValue = schemaItem.defaultValue;
+      const templateDefaultValue = schemaItem.defaultValidatedValue;
 
-      let cardValue: Templates.DataValue | undefined;
-      let dataMappingDefaultValue: Templates.DataValue | undefined;
+      let cardValue: Templates.ValidatedValue | undefined;
+      let dataMappingDefaultValue: Templates.ValidatedValue | undefined;
 
       if (dataTemplateMapping) {
         const mapping = dataTemplateMapping[key];
 
         if (mapping) {
-          dataMappingDefaultValue = mapping.defaultValue;
+          dataMappingDefaultValue = mapping.defaultValidatedValue;
 
           const cardDataKey = mapping.dataSchemaItemId;
 
@@ -126,16 +126,14 @@ export const selectCardTemplateData = createCachedSelector(
         }
       }
 
-      const value =
-        getValidValue(cardValue) ??
-        getValidValue(dataMappingDefaultValue) ??
-        getValidValue(templateDefaultValue);
+      const validatedValue =
+        getValidatedValue(cardValue) ??
+        getValidatedValue(dataMappingDefaultValue) ??
+        getValidatedValue(templateDefaultValue);
 
-      // FIXME:
-      // @ts-ignore
       data[key] = {
         ...schemaItem,
-        value,
+        validatedValue,
       };
     });
 

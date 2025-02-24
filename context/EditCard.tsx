@@ -1,39 +1,47 @@
 import React from "react";
-import { Templates } from "@/store/types";
+import { Cards, Templates } from "@/store/types";
 import { useAppSelector } from "@/store/hooks";
 import { selectCardTemplateData } from "@/store/combinedSelectors/cards";
 import { Values } from "@/components/Template/templateDataToValues";
 import { createContext, useContextSelector } from "use-context-selector";
-
-type ValidatedPartialDataValue<T extends Templates.DataType> = {
-  type: Templates.DataValue<T>["type"];
-  value?: Templates.DataValue<T>["value"];
-};
-
-type ValidatedEditingDataType<T extends Templates.DataType> = {
-  type: Templates.DataValue<T>["type"];
-  savedValue?: Templates.DataValue<T>["value"];
-  editValue?: Templates.DataValue<T>["value"];
-  hasChanges: boolean;
-};
-
-type EditingDataValue<T extends Templates.DataType = Templates.DataType> = {
-  [K in Templates.DataType]: ValidatedEditingDataType<K>;
-}[T];
+import { produce, WritableDraft } from "immer";
 
 type PartialDataValue<T extends Templates.DataType = Templates.DataType> = {
-  [K in Templates.DataType]: ValidatedPartialDataValue<K>;
+  [K in T]: {
+    type: Templates.ValidatedValue<K>["type"];
+    value?: Templates.ValidatedValue<K>["value"];
+  };
 }[T];
 
-export type EditDataValueMap = Record<string, EditingDataValue | undefined>;
+type LooseEditingDataValues<T extends Templates.DataType = Templates.DataType> =
+  {
+    type: Templates.ValidatedValue<T>["type"];
+    savedValue?: Templates.ValidatedValue<T>["value"];
+    editValue?: Templates.ValidatedValue<T>["value"];
+    hasChanges: boolean;
+  };
+
+type EditingDataValues<T extends Templates.DataType = Templates.DataType> = {
+  [K in T]: LooseEditingDataValues<K>;
+}[T];
+
+export type EditDataValueMap = Record<
+  string,
+  LooseEditingDataValues | undefined
+>;
 
 interface EditCardState {
   front: EditDataValueMap;
   back: EditDataValueMap;
 }
+
+type EditState = (
+  recipe: (draft: WritableDraft<EditCardState>) => void,
+) => void;
+
 interface EditCardContext {
   state: EditCardState;
-  setState: React.Dispatch<React.SetStateAction<EditCardState>>;
+  editState: EditState;
 }
 
 const Context = createContext<EditCardContext | null>(null);
@@ -41,7 +49,7 @@ const Context = createContext<EditCardContext | null>(null);
 export function useEditCardTemplateValues({
   side,
 }: {
-  side: "front" | "back";
+  side: Cards.Side;
 }): Values | null {
   const data = useContextSelector(Context, (context) => context?.state[side]);
 
@@ -63,11 +71,13 @@ export function useEditCardTemplateValues({
 }
 
 export function useEditCardTemplateSchemaItem(props: {
-  side: "front" | "back";
+  side: Cards.Side;
   templateSchemaItemId: string;
 }): {
-  onChange: (value: PartialDataValue) => void;
-  value: PartialDataValue;
+  onChange: <T extends Templates.DataType>(
+    validatedValue: PartialDataValue<T>,
+  ) => void;
+  validatedValue: PartialDataValue;
   placeholder?: string;
   hasChanges: boolean;
 } {
@@ -76,71 +86,63 @@ export function useEditCardTemplateSchemaItem(props: {
     (context) => context?.state[props.side][props.templateSchemaItemId],
   );
 
-  const setState = useContextSelector(Context, (context) => context?.setState);
+  const editState = useContextSelector(
+    Context,
+    (context) => context?.editState,
+  );
 
-  if (!editingItem || !setState) {
+  if (!editingItem || !editState) {
     throw new Error(
       `Template schema item ${props.templateSchemaItemId} not found`,
     );
   }
 
   const onChange = React.useCallback(
-    (value: PartialDataValue) => {
-      setState((prevState) => {
-        const prop = prevState[props.side][props.templateSchemaItemId];
+    <T extends Templates.DataType>(value: PartialDataValue<T>) => {
+      editState((draft) => {
+        const editingItemDraft = draft[props.side][props.templateSchemaItemId];
 
-        let updatedProp: EditingDataValue | undefined;
+        const newEditingItem: EditingDataValues<T> = {
+          type: value.type,
+          editValue: value.value,
+          hasChanges: true,
+          savedValue: undefined,
+        };
 
-        if (prop) {
-          if (prop.editValue === value.value) return prevState;
+        if (!editingItemDraft) {
+          draft[props.side][props.templateSchemaItemId] = newEditingItem;
 
-          if (prop.type !== value.type) {
-            updatedProp = {
-              type: value.type,
-              hasChanges: true,
-              savedValue: undefined,
-              editValue: value.value,
-            };
-          } else {
-            updatedProp = {
-              ...prop,
-              hasChanges: true,
-              editValue: value.value,
-            };
-          }
-        } else {
-          updatedProp = {
-            type: value.type,
-            hasChanges: true,
-            savedValue: undefined,
-            editValue: value.value,
-          };
+          return;
         }
 
-        if (!updatedProp) return prevState;
+        if (editingItemDraft.editValue === value.value) return;
 
-        return {
-          ...prevState,
-          [props.side]: {
-            ...prevState[props.side],
-            [props.templateSchemaItemId]: updatedProp,
-          },
-        };
+        if (editingItemDraft.type !== value.type) {
+          // NOTE: We should never get to here, it's only if something updated from the api like a
+          // new data type change or something. Best never to change data types, just create new
+          // ones?
+          draft[props.side][props.templateSchemaItemId] = newEditingItem;
+        } else {
+          editingItemDraft.editValue = value.value;
+
+          editingItemDraft.hasChanges =
+            editingItemDraft.savedValue !== editingItemDraft.editValue;
+        }
       });
     },
-    [props.side, props.templateSchemaItemId, setState],
+    [props.side, props.templateSchemaItemId, editState],
   );
 
-  const value = React.useMemo<PartialDataValue>(() => {
+  const validatedValue = React.useMemo<PartialDataValue>(() => {
     return {
       type: editingItem.type,
       value: editingItem.editValue,
-    };
+    } as PartialDataValue;
   }, [editingItem.type, editingItem.editValue]);
 
   return {
     onChange,
-    value,
+    validatedValue,
     hasChanges: !!editingItem.hasChanges,
   };
 }
@@ -155,19 +157,24 @@ export function useEditCardStatus(): {
   };
 }
 
+function templateDataItemToEditingDataValue<T extends Templates.DataType>(
+  item: Templates.LooseDataItem<T>,
+): EditingDataValues<T> {
+  const value = item.validatedValue?.value;
+
+  return {
+    type: item.type,
+    hasChanges: false,
+    savedValue: value,
+    editValue: value,
+  };
+}
+
 function templateDataToEditingValues(data: Templates.Data): EditDataValueMap {
   const result: EditDataValueMap = {};
 
   for (const key in data) {
-    const item = data[key];
-    const value = item.value?.value;
-
-    result[key] = {
-      type: item.type,
-      hasChanges: false,
-      savedValue: value,
-      editValue: value,
-    };
+    result[key] = templateDataItemToEditingDataValue(data[key]);
   }
 
   return result;
@@ -197,34 +204,78 @@ export const EditCardProvider: React.FC<{
     back: templateDataToEditingValues(back),
   }));
 
+  const prevCardId = React.useRef(cardId);
+  const hasInitialised = React.useRef(false);
+
+  const editState = React.useCallback<EditState>((recipe) => {
+    setState((prevState) => produce(prevState, recipe));
+  }, []);
+
   const value = React.useMemo<EditCardContext>(
-    () => ({ state, setState }),
-    [state, setState],
+    () => ({ state, editState }),
+    [state, editState],
   );
 
   React.useEffect(() => {
-    setState((prevState) => {
-      const newFrontData = templateDataToEditingValues(front);
-      const newBackData = templateDataToEditingValues(back);
+    // When the card id changes, nuke everything and start again
+    if (cardId !== prevCardId.current) {
+      prevCardId.current = cardId;
 
-      let hasChanged = false;
+      editState((draft) => {
+        draft.back = templateDataToEditingValues(back);
+        draft.front = templateDataToEditingValues(front);
+      });
 
-      const newState = { ...prevState };
+      return;
+    }
 
-      function updateSide(side: "front" | "back") {
-        const data = side === "front" ? newFrontData : newBackData;
+    // This effect runs on mount as well as the prop changes, we already set the initial state, so
+    // this helps us avoid running again on mount
+    if (!hasInitialised.current) {
+      hasInitialised.current = true;
+
+      return;
+    }
+
+    // We have new saved data lets update
+
+    editState((draft) => {
+      function updateSide(side: Cards.Side) {
+        const data = side === "front" ? front : back;
 
         for (const key in data) {
-          // TODO: Fill me in
+          const dataItem = data[key];
+          const draftItem = draft[side][key];
+
+          if (draftItem) {
+            // The saved/ editing types have changed. This shouldn't really happen unless background
+            // api's are updating types with the same id
+            if (draftItem.type !== dataItem.type) {
+              draft[side][key] = templateDataItemToEditingDataValue(dataItem);
+            } else {
+              if (draftItem.savedValue !== dataItem.validatedValue?.value) {
+                draftItem.savedValue = dataItem.validatedValue?.value;
+              }
+
+              // Do a new check for changes
+              const hasChanges = draftItem.editValue !== draftItem.savedValue;
+
+              if (hasChanges !== draftItem.hasChanges) {
+                draftItem.hasChanges = hasChanges;
+              }
+            }
+          } else {
+            draft[side][key] = templateDataItemToEditingDataValue(dataItem);
+          }
         }
       }
 
       updateSide("front");
       updateSide("back");
-
-      return hasChanged ? newState : prevState;
     });
-  }, [front, back]);
+
+    // The saved data has changed, lets update it
+  }, [cardId, editState, back, front]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 };

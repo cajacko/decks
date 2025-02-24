@@ -7,7 +7,7 @@ export { Side, SideTemplate, DataTemplateMapping };
 
 export type CardId = string;
 
-export type Data = Record<string, TemplatesType.DataValue | undefined>;
+export type Data = Record<string, TemplatesType.ValidatedValue | undefined>;
 
 export interface Props {
   cardId: CardId;

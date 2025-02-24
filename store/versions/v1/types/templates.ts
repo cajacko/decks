@@ -7,20 +7,36 @@ export type TemplateId = string;
 export enum DataType {
   Text = "text",
   Color = "color",
+  Number = "number",
+  Boolean = "boolean",
 }
 
 // Gives us some safety that the value has already been checked. e.g. text and colours are both
 // strings, we don't want to accidentally map a text to a colour when a user remaps a template
 // because we saw them both as strings
-type ValidatedDataType<T extends DataType, V> = {
-  value: V;
+type CreateValidatedValue<T extends DataType, V> = {
   type: T;
+  value: V;
 };
 
-export type DataValue<T extends DataType = DataType> = {
-  [DataType.Text]: ValidatedDataType<DataType.Text, string>;
-  [DataType.Color]: ValidatedDataType<DataType.Color, string>;
+export type ValidatedValue<T extends DataType = DataType> = {
+  [DataType.Text]: CreateValidatedValue<DataType.Text, string>;
+  [DataType.Color]: CreateValidatedValue<DataType.Color, string>;
+  [DataType.Number]: CreateValidatedValue<DataType.Number, number>;
+  [DataType.Boolean]: CreateValidatedValue<DataType.Boolean, boolean>;
 }[T];
+
+export type LooseDataItem<
+  T extends DataType = DataType,
+  Id extends DataItemId = DataItemId,
+> = {
+  id: Id;
+  type: T;
+  validatedValue?: ValidatedValue<T>;
+  defaultValidatedValue?: ValidatedValue<T>;
+  name: string;
+  description?: string;
+};
 
 // Helper type to get the value type of a schema item. We mainly use DataItem which is stricter and
 // ensures that event if T = DataType, the type and defaultValue must still match e.g.
@@ -32,24 +48,22 @@ export type DataValue<T extends DataType = DataType> = {
 //     defaultValue: "hi",
 //   },
 // };
-type CreateDataItemHelper<
+export type DataItem<
   T extends DataType = DataType,
-  Id extends DataItemId = string,
+  Id extends DataItemId = DataItemId,
 > = {
-  id: Id;
-  type: T;
-  value?: DataValue<T>;
-  defaultValue?: DataValue<T>;
-  name: string;
-  description?: string;
-};
-
-export type DataItem<Id extends DataItemId = DataItemId> = {
-  [T in DataType]: CreateDataItemHelper<T, Id>;
-}[DataType];
+  [K in DataType]: {
+    id: Id;
+    type: K;
+    validatedValue?: ValidatedValue<K>;
+    defaultValidatedValue?: ValidatedValue<K>;
+    name: string;
+    description?: string;
+  };
+}[T];
 
 export type Data<DataItemIds extends DataItemId = DataItemId> = {
-  [Id in DataItemIds]: DataItem<Id>;
+  [Id in DataItemIds]: LooseDataItem<DataType, Id>;
 };
 
 type MarkupElementType = "view" | "text";
