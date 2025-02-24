@@ -113,6 +113,8 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
     const heightStyle = useAnimatedStyle(() => {
       return {
         height: height.value,
+        // Needed for web
+        maxHeight: height.value,
       };
     });
 
