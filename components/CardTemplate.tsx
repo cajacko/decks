@@ -1,6 +1,6 @@
 import React from "react";
 import Template from "./Template";
-import { useAppSelector } from "@/store/hooks";
+import { useRequiredAppSelector } from "@/store/hooks";
 import { selectCardTemplateData } from "@/store/combinedSelectors/cards";
 import { useEditCardTemplateValues } from "@/context/EditCard";
 import templateDataToValues from "@/components/Template/templateDataToValues";
@@ -13,15 +13,9 @@ export interface CardTemplateProps {
 export default function CardTemplate(
   props: CardTemplateProps,
 ): React.ReactNode {
-  const template = useAppSelector((state) =>
+  const template = useRequiredAppSelector((state) =>
     selectCardTemplateData(state, props),
   );
-
-  if (!template) {
-    throw new Error(
-      `CardTemplate: template not found for cardId ${props.cardId}`,
-    );
-  }
 
   const values = React.useMemo(
     () => templateDataToValues(template.data),

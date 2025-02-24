@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import TextInput from "@/components/TextInput";
-import { useAppSelector } from "@/store/hooks";
+import { useRequiredAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
 import { useEditCardTemplateSchemaItem } from "@/context/EditCard";
 import { Templates } from "@/store/types";
@@ -14,13 +14,9 @@ export interface TemplateSchemaItemProps {
 }
 
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
-  const schemaItem = useAppSelector((state) =>
+  const schemaItem = useRequiredAppSelector((state) =>
     selectTemplateSchemaItem(state, props),
   );
-
-  if (!schemaItem) {
-    throw new Error(`Schema item not found: ${props.templateSchemaItemId}`);
-  }
 
   const { onChange, validatedValue, placeholder, hasChanges } =
     useEditCardTemplateSchemaItem(props);

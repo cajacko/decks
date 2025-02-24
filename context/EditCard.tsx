@@ -1,6 +1,6 @@
 import React from "react";
 import { Cards, Templates } from "@/store/types";
-import { useAppSelector } from "@/store/hooks";
+import { useRequiredAppSelector } from "@/store/hooks";
 import { selectCardTemplateData } from "@/store/combinedSelectors/cards";
 import { Values } from "@/components/Template/templateDataToValues";
 import { createContext, useContextSelector } from "use-context-selector";
@@ -184,20 +184,12 @@ export const EditCardProvider: React.FC<{
   children?: React.ReactNode;
   cardId: string;
 }> = ({ children, cardId }) => {
-  const front = useAppSelector(
+  const front = useRequiredAppSelector(
     (state) => selectCardTemplateData(state, { cardId, side: "front" })?.data,
   );
-  const back = useAppSelector(
+  const back = useRequiredAppSelector(
     (state) => selectCardTemplateData(state, { cardId, side: "front" })?.data,
   );
-
-  if (!front) {
-    throw new Error(`Front template not found for card ${cardId}`);
-  }
-
-  if (!back) {
-    throw new Error(`Back template not found for card ${cardId}`);
-  }
 
   const [state, setState] = React.useState<EditCardState>(() => ({
     front: templateDataToEditingValues(front),

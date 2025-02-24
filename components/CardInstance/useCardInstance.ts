@@ -1,6 +1,6 @@
 import React from "react";
 import { CardInstanceState, selectCardInstance } from "@/store/slices/tabletop";
-import { useAppSelector } from "@/store/hooks";
+import { useRequiredAppSelector } from "@/store/hooks";
 import { CardRef } from "@/components/Card";
 import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
 import { CardInstanceProps, CardInstanceRef } from "./CardInstance.types";
@@ -11,16 +11,12 @@ export default function useCardInstance(
 ) {
   const { tabletopId } = useTabletopContext();
 
-  const cardInstance = useAppSelector((state) =>
+  const cardInstance = useRequiredAppSelector((state) =>
     selectCardInstance(state, {
       cardInstanceId: props.cardInstanceId,
       tabletopId,
     }),
   );
-
-  if (!cardInstance) {
-    throw new Error(`Card instance with id ${props.cardInstanceId} not found`);
-  }
 
   const [flipState, setFlipState] = React.useState<
     | null
