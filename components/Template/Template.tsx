@@ -4,11 +4,11 @@ import { MarkupChildren } from "./MarkupElement";
 import { TemplateProvider } from "./TemplateContext";
 
 export default function Template<D extends Data>({
-  data,
+  values,
   markup,
 }: TemplateProps<D>): React.ReactNode {
   return (
-    <TemplateProvider data={data}>
+    <TemplateProvider values={values}>
       <MarkupChildren elements={markup} />
     </TemplateProvider>
   );

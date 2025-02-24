@@ -22,4 +22,13 @@ export const selectTemplate = (
 ): Templates.Props | null =>
   state[templatesSlice.name].templatesById[props.templateId] ?? null;
 
+export const selectTemplateSchemaItem = (
+  state: RootState,
+  props: {
+    templateId: Templates.TemplateId;
+    templateSchemaItemId: Templates.DataItemId;
+  },
+): Templates.DataItem | null =>
+  selectTemplate(state, props)?.schema[props.templateSchemaItemId] ?? null;
+
 export default templatesSlice;

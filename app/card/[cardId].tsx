@@ -11,9 +11,14 @@ import BottonDrawer, {
 } from "@/components/BottomDrawer";
 import EditCardForm from "@/components/EditCardForm";
 import EditCard from "@/components/EditCard";
+import { EditCardProvider } from "@/context/EditCard";
 
 export default function Modal() {
   const { cardId } = useLocalSearchParams();
+
+  if (typeof cardId !== "string") {
+    throw new Error("cardId must be a string");
+  }
 
   const height = useSharedValue(100);
   const minHeight = useSharedValue(100);
@@ -28,25 +33,27 @@ export default function Modal() {
   const bottomDrawer = React.useRef<BottomDrawerRef>(null);
 
   return (
-    <BottomDrawerWrapper style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.contentContainer}
-        scrollEnabled
-        horizontal={false}
-      >
-        {typeof cardId === "string" && <EditCard cardId={cardId} />}
-        <Animated.View style={[styles.drawerBuffer, bufferStyle]} />
-      </ScrollView>
-      <BottonDrawer
-        height={height}
-        minHeight={minHeight}
-        maxHeight={maxHeight}
-        ref={bottomDrawer}
-      >
-        {typeof cardId === "string" && <EditCardForm cardId={cardId} />}
-      </BottonDrawer>
-    </BottomDrawerWrapper>
+    <EditCardProvider cardId={cardId}>
+      <BottomDrawerWrapper style={styles.container}>
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.contentContainer}
+          scrollEnabled
+          horizontal={false}
+        >
+          <EditCard cardId={cardId} />
+          <Animated.View style={[styles.drawerBuffer, bufferStyle]} />
+        </ScrollView>
+        <BottonDrawer
+          height={height}
+          minHeight={minHeight}
+          maxHeight={maxHeight}
+          ref={bottomDrawer}
+        >
+          <EditCardForm cardId={cardId} />
+        </BottonDrawer>
+      </BottomDrawerWrapper>
+    </EditCardProvider>
   );
 }
 

@@ -13,7 +13,7 @@ export function MarkupChildren(props: MarkupChildrenProps): React.ReactNode {
 export default function MarkupElement({
   element,
 }: MarkupElementProps): React.ReactNode {
-  const { values } = useTemplateDataItem();
+  const values = useTemplateDataItem();
   const convertStyles = useConvertStyles(values);
 
   if (element.conditional) {

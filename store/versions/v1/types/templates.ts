@@ -12,20 +12,15 @@ export enum DataType {
 // Gives us some safety that the value has already been checked. e.g. text and colours are both
 // strings, we don't want to accidentally map a text to a colour when a user remaps a template
 // because we saw them both as strings
-export type ValidatedDataType<T extends DataType, V> = {
+type ValidatedDataType<T extends DataType, V> = {
   value: V;
   type: T;
 };
 
-// Helper type to get the value type of a schema item, as some don't need to be validated (e.g.
-// text) and some do (e.g. color)
-type DataTypeValueMapHelper = {
+export type DataValue<T extends DataType = DataType> = {
   [DataType.Text]: ValidatedDataType<DataType.Text, string>;
   [DataType.Color]: ValidatedDataType<DataType.Color, string>;
-};
-
-export type DataValue<T extends DataType = DataType> =
-  DataTypeValueMapHelper[T];
+}[T];
 
 // Helper type to get the value type of a schema item. We mainly use DataItem which is stricter and
 // ensures that event if T = DataType, the type and defaultValue must still match e.g.
@@ -49,7 +44,7 @@ type CreateDataItemHelper<
   description?: string;
 };
 
-export type DataItem<Id extends DataItemId> = {
+export type DataItem<Id extends DataItemId = DataItemId> = {
   [T in DataType]: CreateDataItemHelper<T, Id>;
 }[DataType];
 

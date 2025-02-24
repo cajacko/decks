@@ -1,6 +1,9 @@
 import React from "react";
-import { View, Text, TextInput } from "react-native";
-// import useCardData from "@/hooks/useCardData";
+import { View, Button } from "react-native";
+import { useAppSelector } from "@/store/hooks";
+import { selectCardTemplate } from "@/store/combinedSelectors/cards";
+import TemplateSchemaItem from "@/components/TemplateSchemaItem";
+import { useEditCardStatus } from "@/context/EditCard";
 
 export interface EditCardFormProps {
   cardId: string;
@@ -9,12 +12,41 @@ export interface EditCardFormProps {
 export default function EditCardForm(
   props: EditCardFormProps,
 ): React.ReactNode {
-  // const card = useCardData(props);
+  const backTemplate = useAppSelector((state) =>
+    selectCardTemplate(state, { cardId: props.cardId, side: "back" }),
+  );
+
+  const frontTemplate = useAppSelector((state) =>
+    selectCardTemplate(state, { cardId: props.cardId, side: "front" }),
+  );
+
+  const editStatus = useEditCardStatus();
 
   return (
     <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 20 }}>Title</Text>
-      <TextInput value="Title" style={{ fontSize: 16 }} />
+      {frontTemplate?.schemaOrder.map((templateSchemaItemId) => (
+        <TemplateSchemaItem
+          key={templateSchemaItemId}
+          templateSchemaItemId={templateSchemaItemId}
+          templateId={frontTemplate.templateId}
+          cardId={props.cardId}
+          side="front"
+        />
+      ))}
+      {backTemplate?.schemaOrder.map((templateSchemaItemId) => (
+        <TemplateSchemaItem
+          key={templateSchemaItemId}
+          templateSchemaItemId={templateSchemaItemId}
+          templateId={backTemplate.templateId}
+          cardId={props.cardId}
+          side="back"
+        />
+      ))}
+      <Button
+        title="Save"
+        onPress={editStatus.save}
+        disabled={!editStatus.hasChanges}
+      />
     </View>
   );
 }
