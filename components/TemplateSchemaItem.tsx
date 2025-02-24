@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import TextInput from "@/components/TextInput";
 import { useAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
 import { useEditCardTemplateSchemaItem } from "@/context/EditCard";
