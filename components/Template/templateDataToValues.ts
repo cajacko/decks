@@ -1,12 +1,13 @@
 import { Templates } from "@/store/types";
-import { Values, Data } from "./Template.types";
+import { Values } from "./Template.types";
+import { LooseCardTemplateData } from "@/store/combinedSelectors/cards";
 
 export { Values };
 
 export type DataValueMap = Record<string, Templates.ValidatedValue | undefined>;
 
 export default function templateDataToValues(
-  data: Data | DataValueMap,
+  data: LooseCardTemplateData | DataValueMap,
 ): Values {
   const values: Values = {};
 

@@ -73,8 +73,34 @@ const selectMergedCardData = createCachedSelector(
   },
 )(cardKey);
 
+// type Helper<
+//   T extends Templates.DataType = Templates.DataType,
+//   Id extends Templates.DataItemId = Templates.DataItemId,
+// > = {
+//   [K in T]: {
+//     id: Id;
+//     type: K;
+//     validatedValue: Templates.ValidatedValue<K> | null;
+//   };
+// }[T];
+
+export type LooseCardTemplateDataItem<
+  T extends Templates.DataType = Templates.DataType,
+  Id extends Templates.DataItemId = Templates.DataItemId,
+> = Templates.LooseDataItem<T, Id> & {
+  validatedValue: Templates.ValidatedValue<T> | null;
+  cardDataItemId: Decks.DataSchemaItemId | null;
+};
+
+export type LooseCardTemplateData<
+  T extends Templates.DataType = Templates.DataType,
+  Id extends Templates.DataItemId = Templates.DataItemId,
+> = {
+  [K in Id]: LooseCardTemplateDataItem<T, K>;
+};
+
 type CardTemplate<Props extends Templates.Props = Templates.Props> = {
-  data: Props["schema"];
+  data: LooseCardTemplateData;
   markup: Props["markup"];
 };
 
@@ -88,16 +114,16 @@ export const selectCardTemplateData = createCachedSelector(
   selectMergedCardData,
   (
     markup,
-    schema,
+    templateSchema,
     dataTemplateMapping,
     mergedCardData,
   ): null | CardTemplate => {
-    if (!markup || !schema) return null;
+    if (!markup || !templateSchema) return null;
 
-    const data: Templates.Data = {};
+    const data: LooseCardTemplateData = {};
 
-    Object.entries(schema).forEach(([key, schemaItem]) => {
-      const templateExpectedType = schemaItem.type;
+    Object.entries(templateSchema).forEach(([key, templateSchemaItem]) => {
+      const templateExpectedType = templateSchemaItem.type;
 
       const getValidatedValue = (
         value: Templates.ValidatedValue | undefined,
@@ -109,10 +135,11 @@ export const selectCardTemplateData = createCachedSelector(
         return value;
       };
 
-      const templateDefaultValue = schemaItem.defaultValidatedValue;
+      const templateDefaultValue = templateSchemaItem.defaultValidatedValue;
 
       let cardValue: Templates.ValidatedValue | undefined;
       let dataMappingDefaultValue: Templates.ValidatedValue | undefined;
+      let cardDataItemId: Decks.DataSchemaItemId | undefined;
 
       if (dataTemplateMapping) {
         const mapping = dataTemplateMapping[key];
@@ -120,21 +147,25 @@ export const selectCardTemplateData = createCachedSelector(
         if (mapping) {
           dataMappingDefaultValue = mapping.defaultValidatedValue;
 
-          const cardDataKey = mapping.dataSchemaItemId;
+          cardDataItemId = mapping.dataSchemaItemId;
 
-          cardValue = mergedCardData?.[cardDataKey];
+          cardValue = mergedCardData?.[cardDataItemId];
         }
       }
 
       const validatedValue =
         getValidatedValue(cardValue) ??
         getValidatedValue(dataMappingDefaultValue) ??
-        getValidatedValue(templateDefaultValue);
+        getValidatedValue(templateDefaultValue) ??
+        null;
 
-      data[key] = {
-        ...schemaItem,
+      const dataItem: LooseCardTemplateDataItem = {
+        ...templateSchemaItem,
         validatedValue,
+        cardDataItemId: cardDataItemId ?? null,
       };
+
+      data[key] = dataItem;
     });
 
     return {

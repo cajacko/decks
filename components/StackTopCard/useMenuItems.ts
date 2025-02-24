@@ -15,8 +15,9 @@ export default function useMenuItems(props: StackTopCardProps) {
     const bottom = cardHeight - buttonSize / 2;
     const left = -buttonSize / 2;
     const right = cardWidth - buttonSize / 2;
-    const sideTop = cardHeight / 2 - buttonSize * 1.25;
-    const sideBottom = sideTop + buttonSize * 1.5;
+    // const sideTop = cardHeight / 2 - buttonSize * 1.25;
+    // const sideBottom = sideTop + buttonSize * 1.5;
+    const sideMiddle = cardHeight / 2 - buttonSize / 2;
     const verticalLeft = cardWidth / 2 - buttonSize * 1.5;
     const verticalRight = cardWidth / 2 + buttonSize * 0.5;
 
@@ -54,49 +55,27 @@ export default function useMenuItems(props: StackTopCardProps) {
     }
 
     if (state.moveRight) {
-      items.push(
-        {
-          key: "Rt",
-          top: sideTop,
-          left: right,
-          height: buttonSize,
-          width: buttonSize,
-          icon: "Rt",
-          onPress: state.moveRight.top,
-        },
-        {
-          key: "Rb",
-          top: sideBottom,
-          left: right,
-          height: buttonSize,
-          width: buttonSize,
-          icon: "Rb",
-          onPress: state.moveRight.bottom,
-        },
-      );
+      items.push({
+        key: "Rt",
+        top: sideMiddle,
+        left: right,
+        height: buttonSize,
+        width: buttonSize,
+        icon: "Rt",
+        onPress: state.moveRight.top,
+      });
     }
 
     if (state.moveLeft) {
-      items.push(
-        {
-          key: "Lt",
-          top: sideTop,
-          left: left,
-          height: buttonSize,
-          width: buttonSize,
-          icon: "Lt",
-          onPress: state.moveLeft.top,
-        },
-        {
-          key: "Lb",
-          top: sideBottom,
-          left: left,
-          height: buttonSize,
-          width: buttonSize,
-          icon: "Lb",
-          onPress: state.moveLeft.bottom,
-        },
-      );
+      items.push({
+        key: "Lt",
+        top: sideMiddle,
+        left: left,
+        height: buttonSize,
+        width: buttonSize,
+        icon: "Lt",
+        onPress: state.moveLeft.top,
+      });
     }
 
     return items;

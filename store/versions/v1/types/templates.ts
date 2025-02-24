@@ -32,7 +32,6 @@ export type LooseDataItem<
 > = {
   id: Id;
   type: T;
-  validatedValue?: ValidatedValue<T>;
   defaultValidatedValue?: ValidatedValue<T>;
   name: string;
   description?: string;

@@ -12,10 +12,10 @@ const state: RootState = {
             value: "Card 1",
             type: Templates.DataType.Text,
           },
-          description: {
-            value: "This is card 1",
-            type: Templates.DataType.Text,
-          },
+          // description: {
+          //   value: "This is card 1",
+          //   type: Templates.DataType.Text,
+          // },
         },
       },
       card2: {
@@ -36,10 +36,10 @@ const state: RootState = {
             value: "Card 3",
             type: Templates.DataType.Text,
           },
-          description: {
-            value: "Blue background",
-            type: Templates.DataType.Text,
-          },
+          // description: {
+          //   value: "Blue background",
+          //   type: Templates.DataType.Text,
+          // },
           backgroundColor: {
             value: "blue",
             type: Templates.DataType.Color,
@@ -54,10 +54,10 @@ const state: RootState = {
             value: "Card 4",
             type: Templates.DataType.Text,
           },
-          description: {
-            value: "This is card 4",
-            type: Templates.DataType.Text,
-          },
+          // description: {
+          //   value: "This is card 4",
+          //   type: Templates.DataType.Text,
+          // },
         },
       },
       card5: {
@@ -68,10 +68,10 @@ const state: RootState = {
             value: "Card 5",
             type: Templates.DataType.Text,
           },
-          description: {
-            value: "This is card 5",
-            type: Templates.DataType.Text,
-          },
+          // description: {
+          //   value: "This is card 5",
+          //   type: Templates.DataType.Text,
+          // },
         },
       },
     },
@@ -83,18 +83,18 @@ const state: RootState = {
     decksById: {
       deck1: {
         id: "deck1",
-        dataSchemaOrder: ["title", "description", "backgroundColor"],
+        dataSchemaOrder: ["title", "backgroundColor"],
         dataSchema: {
           title: {
             id: "title",
             title: "Title",
             type: Templates.DataType.Text,
           },
-          description: {
-            id: "description",
-            title: "Subtitle",
-            type: Templates.DataType.Text,
-          },
+          // description: {
+          //   id: "description",
+          //   title: "Subtitle",
+          //   type: Templates.DataType.Text,
+          // },
           backgroundColor: {
             id: "backgroundColor",
             title: "Front Color",
@@ -110,10 +110,10 @@ const state: RootState = {
                 dataSchemaItemId: "title",
                 templateSchemaItemId: "template1-title",
               },
-              "template1-description": {
-                dataSchemaItemId: "description",
-                templateSchemaItemId: "template1-description",
-              },
+              // "template1-description": {
+              //   dataSchemaItemId: "description",
+              //   templateSchemaItemId: "template1-description",
+              // },
               "template1-backgroundColor": {
                 dataSchemaItemId: "backgroundColor",
                 templateSchemaItemId: "template1-backgroundColor",

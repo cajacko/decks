@@ -3,9 +3,9 @@ import * as TemplatesType from "./templates";
 export type CardSide = "front" | "back";
 
 export type DeckId = string;
-type DataSchemaItemId = string;
+export type DataSchemaItemId = string;
 
-export interface Card {
+interface Card {
   cardId: string;
   quantity: number;
 }

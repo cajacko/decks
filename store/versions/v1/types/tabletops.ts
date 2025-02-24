@@ -36,7 +36,7 @@ export interface HistoryState {
   cardInstancesById: Record<CardInstanceId, CardInstance | undefined>;
 }
 
-export type History = CreateHistoryHelper<HistoryState>;
+type History = CreateHistoryHelper<HistoryState>;
 
 export interface Props {
   id: TabletopId;

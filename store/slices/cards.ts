@@ -2,8 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
+import { updateCard } from "../combinedActions/cards";
+import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 
 export type Card = Cards.Props;
+
+export { updateCard };
 
 const initialState: Cards.State = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.cards
@@ -15,22 +19,34 @@ export const cardsSlice = createSlice({
   name: SliceName.Cards,
   initialState,
   reducers: {
-    setCard: (state, actions: PayloadAction<Card>) => {
-      state.cardsById[actions.payload.cardId] = actions.payload;
-    },
-    setCards: (state, actions: PayloadAction<Card[]>) => {
-      actions.payload.forEach((card) => {
-        state.cardsById[card.cardId] = card;
-      });
-    },
     removeCard: (state, actions: PayloadAction<{ cardId: string }>) => {
       // TODO: Remove from decks, stacks, tabletops, etc.
       delete state.cardsById[actions.payload.cardId];
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(updateCard, (state, actions) => {
+      const card = state.cardsById[actions.payload.cardId];
+
+      if (!card) return;
+
+      actions.payload.data.forEach((dataItem) => {
+        const cardDataSchemaId =
+          "cardDataId" in dataItem
+            ? dataItem.cardDataId
+            : createCardDataSchemaId(dataItem);
+
+        if (dataItem.value === null) {
+          delete card.data[cardDataSchemaId];
+        } else {
+          card.data[cardDataSchemaId] = dataItem.value;
+        }
+      });
+    });
+  },
 });
 
-export const { setCard, setCards, removeCard } = cardsSlice.actions;
+export const { removeCard } = cardsSlice.actions;
 
 export const selectCard = (
   state: RootState,
