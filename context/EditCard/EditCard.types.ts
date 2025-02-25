@@ -1,5 +1,11 @@
+import React from "react";
 import { Decks, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
+
+export type EditCardProviderProps = {
+  children?: React.ReactNode;
+  cardId: string;
+};
 
 export type PartialDataValue<
   T extends Templates.DataType = Templates.DataType,
@@ -33,7 +39,6 @@ export type EditDataValueMap = Record<
 
 export interface EditCardState {
   cardId: string;
-  deckId: string;
   front: EditDataValueMap;
   back: EditDataValueMap;
   hasChanges: {
@@ -43,11 +48,20 @@ export interface EditCardState {
   getContextState: () => EditCardState;
 }
 
-export type EditState = (
-  recipe: (draft: WritableDraft<EditCardState>) => void,
-) => void;
+export type EditDraftRecipe = (draft: WritableDraft<EditCardState>) => void;
+
+export type EditState = (recipe: EditDraftRecipe) => void;
 
 export interface EditCardContext {
   state: EditCardState;
   editState: EditState;
 }
+
+export type UseEditCardTemplateSchemaItemReturn = {
+  onChange: <T extends Templates.DataType>(
+    validatedValue: PartialDataValue<T>,
+  ) => void;
+  validatedValue: PartialDataValue;
+  placeholder?: string;
+  hasChanges: boolean;
+};
