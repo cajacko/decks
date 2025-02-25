@@ -1,5 +1,6 @@
-import { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { useSharedValue } from "react-native-reanimated";
 import { defaultProps } from "./BottomDrawer.types";
+import { useAnimatedHeightStyle } from "./useAnimatedStyles";
 
 /**
  * Helper to manage access the height of the bottom drawer from the parent component, the
@@ -10,10 +11,6 @@ export default function useHeight(startingHeight?: number) {
 
   return {
     sharedValue,
-    heightStyle: useAnimatedStyle(() => {
-      return {
-        height: sharedValue.value,
-      };
-    }),
+    heightStyle: useAnimatedHeightStyle(sharedValue),
   };
 }

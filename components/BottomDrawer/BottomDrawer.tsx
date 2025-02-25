@@ -16,27 +16,27 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
     const state = useBottomDrawer(props, ref);
 
     const drawerContainerStyle = React.useMemo(
-      () => [styles.drawerContainer, state.heightStyle],
-      [state.heightStyle],
+      () => [styles.drawerContainer, state.animatedStyles.height],
+      [state.animatedStyles.height],
     );
 
     // NOTE: StyleSheet.flatten would remove the dragBarColor for some reason? And AnimatedView
     // thing from reanamiated perhaps?
     const dragBoxStyle = React.useMemo(
-      () => [styles.dragBox, state.dragBarColor],
-      [state.dragBarColor],
+      () => [styles.dragBox, state.animatedStyles.dragBarColor],
+      [state.animatedStyles.dragBarColor],
     );
 
     const dragHeaderStyle = React.useMemo(
-      () => [styles.dragHeader, state.dragBarColor],
-      [state.dragBarColor],
+      () => [styles.dragHeader, state.animatedStyles.dragBarColor],
+      [state.animatedStyles.dragBarColor],
     );
 
     return (
       <View style={styles.drawer}>
         <Animated.View style={drawerContainerStyle}>
           <View style={styles.drawerContainer}>
-            <GestureDetector gesture={state.pan}>
+            <GestureDetector gesture={state.drag}>
               <View style={styles.dragBar}>
                 <Animated.View style={dragBoxStyle}>
                   <Text style={styles.dragIcon}>====</Text>

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { WithSpringConfig } from "react-native-reanimated";
 
 const borderRadius = 20;
 export const dragOverlap = 20;
@@ -8,6 +9,11 @@ export const dragHeight = dragHeaderHeight + dragOverlap + dragBuffer;
 
 export const dragBarBackgroundColorPressed = "#c5c5c5";
 export const dragBarBackgroundColorDefault = "#e5e5e5";
+
+export const autoAnimateConfig: WithSpringConfig = {
+  damping: 20,
+  stiffness: 100,
+};
 
 export default StyleSheet.create({
   dragBar: {
