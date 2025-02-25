@@ -5,6 +5,7 @@ import {
   useContextSelector,
 } from "./useContextSelector";
 import * as Types from "./EditCard.types";
+import getHasChanges from "./getHasChanges";
 
 function withOnChange(props: {
   editState: Types.EditState;
@@ -56,21 +57,13 @@ function withOnChange(props: {
 
       editingItemDraft.editValue = value.value ?? null;
 
-      const hasSavedValue = !!editingItemDraft.savedValue;
-      const hasEditValue = !!editingItemDraft.editValue;
-
-      // If both values are empty, we don't have any changes
-      // This fixes an issue where we had null/ undefined or "" values and them being treated as
-      // changes, whereas for the user they are not
-      if (!hasSavedValue && !hasEditValue) {
-        draft.hasChanges[props.side][props.templateSchemaItemId] = false;
-
-        return;
-      }
+      const hasChanges = getHasChanges(
+        editingItemDraft.savedValue,
+        editingItemDraft.editValue,
+      );
 
       // Update if we have changes or not
-      draft.hasChanges[props.side][props.templateSchemaItemId] =
-        editingItemDraft.savedValue !== editingItemDraft.editValue;
+      draft.hasChanges[props.side][props.templateSchemaItemId] = hasChanges;
     });
   };
 }

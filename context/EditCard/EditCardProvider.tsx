@@ -10,6 +10,7 @@ import {
 import { produce } from "immer";
 import * as Types from "./EditCard.types";
 import { context as Context } from "./useContextSelector";
+import getHasChanges from "./getHasChanges";
 
 function templateDataItemToEditingDataValue<T extends Templates.DataType>(
   item: LooseCardTemplateDataItem<T>,
@@ -107,13 +108,10 @@ function withUpdateStateFromProps(props: {
           draftItem.savedValue = savedItemValue;
         }
 
-        // If both values are falsey then there's no changes
-        if (!draftItem.editValue && !savedItemValue) {
-          draft.hasChanges[side][key] = false;
-        } else {
-          draft.hasChanges[side][key] =
-            draftItem.editValue !== draftItem.savedValue;
-        }
+        draft.hasChanges[side][key] = getHasChanges(
+          draftItem.editValue,
+          draftItem.savedValue,
+        );
       }
     }
 
