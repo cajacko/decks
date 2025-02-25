@@ -1,0 +1,60 @@
+import { StyleSheet } from "react-native";
+
+const borderRadius = 20;
+export const dragOverlap = 20;
+export const dragBuffer = 10;
+const dragHeaderHeight = Math.max(30, borderRadius);
+export const dragHeight = dragHeaderHeight + dragOverlap + dragBuffer;
+
+export const dragBarBackgroundColorPressed = "#c5c5c5";
+export const dragBarBackgroundColorDefault = "#e5e5e5";
+
+export default StyleSheet.create({
+  dragBar: {
+    position: "absolute",
+    top: -(dragOverlap + dragBuffer),
+    width: "100%",
+    height: dragHeight,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: dragBuffer,
+  },
+  dragBox: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: dragOverlap * 2,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    zIndex: 2,
+    position: "relative",
+  },
+  dragHeader: {
+    marginTop: -dragOverlap,
+    borderTopLeftRadius: borderRadius,
+    borderTopRightRadius: borderRadius,
+    height: dragHeaderHeight,
+    width: "100%",
+    zIndex: 1,
+    position: "relative",
+  },
+  dragIcon: {
+    fontSize: 20,
+  },
+  drawer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  drawerContainer: {
+    borderTopLeftRadius: borderRadius,
+    borderTopRightRadius: borderRadius,
+    flex: 1,
+    width: "100%",
+  },
+  content: {
+    backgroundColor: "white",
+    flex: 1,
+    marginTop: dragHeight - dragOverlap - dragBuffer,
+  },
+});
