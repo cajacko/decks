@@ -1,16 +1,37 @@
 import React from "react";
-import Template from "./Template";
+import Template, { Values } from "./Template";
 import { useRequiredAppSelector } from "@/store/hooks";
 import {
   selectCardTemplateData,
   selectCardTemplate,
 } from "@/store/combinedSelectors/cards";
-import { useEditCardTemplateValues } from "@/context/EditCard";
+import { useEditCardSideState } from "@/context/EditCard";
 import templateDataToValues from "@/components/Template/templateDataToValues";
+import { Cards } from "@/store/types";
 
 export interface CardTemplateProps {
   cardId: string;
-  side: "front" | "back";
+  side: Cards.Side;
+}
+
+function useEditCardTemplateValues(side: Cards.Side): Values | null {
+  const data = useEditCardSideState(side);
+
+  return React.useMemo<Values | null>(() => {
+    if (!data) return null;
+
+    const values: Values = {};
+
+    for (const key in data) {
+      const prop = data[key];
+
+      if (prop) {
+        values[key] = prop.editValue;
+      }
+    }
+
+    return values;
+  }, [data]);
 }
 
 export default function CardTemplate(
@@ -26,7 +47,7 @@ export default function CardTemplate(
 
   const values = React.useMemo(() => templateDataToValues(data), [data]);
 
-  const editValues = useEditCardTemplateValues(props);
+  const editValues = useEditCardTemplateValues(props.side);
 
   return <Template values={editValues ?? values} markup={markup} />;
 }
