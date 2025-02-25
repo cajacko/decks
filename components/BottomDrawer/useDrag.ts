@@ -16,6 +16,7 @@ export default function useDrag(props: {
 }) {
   const { pressed, height, maxAutoHeight, maxHeight, minHeight } = props;
 
+  // Used to decide whether we have pressed or dragged
   const draggedDistance = useSharedValue(0);
 
   return Gesture.Pan()

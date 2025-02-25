@@ -14,7 +14,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { init as initMousePointer } from "@/utils/mousePosition";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "@/expoExample/hooks/useColorScheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
