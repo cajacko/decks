@@ -47,30 +47,30 @@ export default function getUpdateCardData(
 
       const editingValue = editingValues[key];
 
-      if (editingValue) {
-        const value: Templates.ValidatedValue | null = editingValue.editValue
-          ? ({
-              type: editingValue.type,
-              value: editingValue.editValue,
-            } as Templates.ValidatedValue) // FIXME:
-          : null;
+      if (!editingValue) continue;
 
-        if (editingValue.cardDataItemId) {
-          data.push({
-            cardDataId: editingValue.cardDataItemId,
-            value,
-          });
-        } else {
-          data.push({
-            templateDataItemId: editingValue.templateItemId,
-            side,
-            value,
-            templateDataItemTitle: getTemplateSchemaItemTitle({
-              templateId: editingValue.templateId,
-              templateSchemaItemId: editingValue.templateItemId,
-            }),
-          });
-        }
+      const value: Templates.ValidatedValue | null = editingValue.editValue
+        ? ({
+            type: editingValue.type,
+            value: editingValue.editValue,
+          } as Templates.ValidatedValue) // FIXME:
+        : null;
+
+      if (editingValue.cardDataItemId) {
+        data.push({
+          cardDataId: editingValue.cardDataItemId,
+          value,
+        });
+      } else {
+        data.push({
+          templateDataItemId: editingValue.templateItemId,
+          side,
+          value,
+          templateDataItemTitle: getTemplateSchemaItemTitle({
+            templateId: editingValue.templateId,
+            templateSchemaItemId: editingValue.templateItemId,
+          }),
+        });
       }
     }
   }

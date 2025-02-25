@@ -14,8 +14,8 @@ export interface TemplateSchemaItemProps {
 }
 
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
-  const schemaItem = useRequiredAppSelector((state) =>
-    selectTemplateSchemaItem(state, props),
+  const schemaItemName = useRequiredAppSelector(
+    (state) => selectTemplateSchemaItem(state, props)?.name,
   );
 
   const { onChange, validatedValue, placeholder, hasChanges } =
@@ -62,7 +62,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   return (
     <View>
       <Text style={styles.label}>
-        {schemaItem.name}
+        {schemaItemName}
         {hasChanges ? " (changed)" : ""}
       </Text>
       {input}

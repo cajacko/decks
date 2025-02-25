@@ -82,38 +82,37 @@ function withUpdateStateFromProps(props: {
       const data = side === "front" ? front : back;
 
       for (const key in data) {
-        const dataItem = data[key];
+        const savedItem = data[key];
         const draftItem = draft[side][key];
 
         // There's no draft item so we can just use the saved info as it is
         // Or there is a type mismatch (which shouldn't really happen unless we have background
         // syncing of data and we're not creating new data items for them). But if we do have a
         // mismatch just use the saved value
-        if (!draftItem || draftItem.type !== dataItem.type) {
+        if (!draftItem || draftItem.type !== savedItem.type) {
           draft[side][key] = templateDataItemToEditingDataValue(
-            dataItem,
+            savedItem,
             templateId,
           );
+
+          draft.hasChanges[side][key] = false;
 
           continue;
         }
 
-        const haveEditedDataItem = draft.hasChanges[side][key];
+        const savedItemValue = savedItem.validatedValue?.value ?? null;
 
-        // There's a new saved value so update the draft item, unless we've been editing it, in
-        // which case keep the edit
-        if (
-          draftItem.savedValue !== dataItem.validatedValue?.value &&
-          !haveEditedDataItem
-        ) {
-          draftItem.savedValue = dataItem.validatedValue?.value ?? null;
+        // There's a new saved value so update the draft item saved item
+        if (draftItem.savedValue !== savedItemValue) {
+          draftItem.savedValue = savedItemValue;
         }
-        // Do a new check for changes
-        const hasChanges = draftItem.editValue !== draftItem.savedValue;
 
-        // Update the changed state
-        if (hasChanges !== draft.hasChanges[side][key]) {
-          draft.hasChanges[side][key] = hasChanges;
+        // If both values are falsey then there's no changes
+        if (!draftItem.editValue && !savedItemValue) {
+          draft.hasChanges[side][key] = false;
+        } else {
+          draft.hasChanges[side][key] =
+            draftItem.editValue !== draftItem.savedValue;
         }
       }
     }
@@ -137,7 +136,7 @@ export default function EditCardProvider({
     selectCardTemplateData(state, { cardId, side: "front" }),
   );
   const back = useRequiredAppSelector((state) =>
-    selectCardTemplateData(state, { cardId, side: "front" }),
+    selectCardTemplateData(state, { cardId, side: "back" }),
   );
 
   const stateRef = React.useRef<Types.EditCardState>();
