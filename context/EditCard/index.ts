@@ -3,3 +3,6 @@ export { default as useEditCardTemplateSchemaItem } from "./useEditCardTemplateS
 export { default as useSaveEditCard } from "./useSaveEditCard";
 export { default as EditCardProvider } from "./EditCardProvider";
 export { default as useHasEditCardChanges } from "./useHasEditCardChanges";
+export { default as useIsNewCard } from "./useIsNewCard";
+
+export * from "./EditCard.types";

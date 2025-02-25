@@ -5,19 +5,21 @@ import { selectCardTemplate } from "@/store/combinedSelectors/cards";
 import TemplateSchemaItem from "@/components/TemplateSchemaItem";
 import { useSaveEditCard, useHasEditCardChanges } from "@/context/EditCard";
 
-export interface EditCardFormProps {
-  cardId: string;
-}
+export type EditCardFormProps =
+  | {
+      cardId: string;
+    }
+  | { deckId: string };
 
 export default function EditCardForm(
   props: EditCardFormProps,
 ): React.ReactNode {
   const backTemplate = useAppSelector((state) =>
-    selectCardTemplate(state, { cardId: props.cardId, side: "back" }),
+    selectCardTemplate(state, { ...props, side: "back" }),
   );
 
   const frontTemplate = useAppSelector((state) =>
-    selectCardTemplate(state, { cardId: props.cardId, side: "front" }),
+    selectCardTemplate(state, { ...props, side: "front" }),
   );
 
   const save = useSaveEditCard();
@@ -30,7 +32,6 @@ export default function EditCardForm(
           key={templateSchemaItemId}
           templateSchemaItemId={templateSchemaItemId}
           templateId={frontTemplate.templateId}
-          cardId={props.cardId}
           side="front"
         />
       ))}
@@ -39,7 +40,6 @@ export default function EditCardForm(
           key={templateSchemaItemId}
           templateSchemaItemId={templateSchemaItemId}
           templateId={backTemplate.templateId}
-          cardId={props.cardId}
           side="back"
         />
       ))}

@@ -1,5 +1,5 @@
 import React from "react";
-import CardInstance from "@/components/CardInstance";
+import CardInstance, { CardInstanceProps } from "@/components/CardInstance";
 import CardAction from "@/components/CardAction";
 import {
   StackTopCardProps,
@@ -36,20 +36,33 @@ export default function StackTopCard(
     [],
   );
 
+  const cardProps = React.useMemo(
+    (): CardInstanceProps["CardProps"] => ({
+      ...props.CardProps,
+      onAnimationChange: state.setIsAnimating,
+      overlay: !state.hideActions && (
+        <HoldMenu
+          menuItems={state.menuItems}
+          handleAction={handleAction}
+          renderItem={renderItem}
+        />
+      ),
+    }),
+    [
+      props.CardProps,
+      state.setIsAnimating,
+      state.hideActions,
+      state.menuItems,
+      handleAction,
+      renderItem,
+    ],
+  );
+
   return (
     <CardInstance
       {...props}
-      ref={state.cardRef}
-      onAnimationChange={state.setIsAnimating}
-      overlay={
-        !state.hideActions && (
-          <HoldMenu
-            menuItems={state.menuItems}
-            handleAction={handleAction}
-            renderItem={renderItem}
-          />
-        )
-      }
+      ref={state.cardInstanceRef}
+      CardProps={cardProps}
     />
   );
 }

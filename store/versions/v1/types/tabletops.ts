@@ -3,7 +3,7 @@ import * as Cards from "./cards";
 
 type TabletopId = string;
 type StackId = string;
-type CardInstanceId = string;
+export type CardInstanceId = string;
 
 export enum MoveCardInstanceMethod {
   topFaceUp = "topFaceUp",

@@ -27,6 +27,7 @@ export interface CardProps {
   initialRotation?: number;
   initialScaleX?: number;
   overlay?: React.ReactNode;
+  ref?: React.Ref<CardRef>;
 }
 
 export interface AnimateOutProps {

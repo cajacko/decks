@@ -3,17 +3,20 @@ import { View, Text, StyleSheet } from "react-native";
 import TextInput from "@/components/TextInput";
 import { useRequiredAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
-import { useEditCardTemplateSchemaItem } from "@/context/EditCard";
+import {
+  useEditCardTemplateSchemaItem,
+  useIsNewCard,
+} from "@/context/EditCard";
 import { Templates } from "@/store/types";
 
 export interface TemplateSchemaItemProps {
-  cardId: string;
   side: "front" | "back";
   templateId: string;
   templateSchemaItemId: string;
 }
 
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
+  const isNewCard = useIsNewCard();
   const schemaItemName = useRequiredAppSelector(
     (state) => selectTemplateSchemaItem(state, props)?.name,
   );
@@ -63,7 +66,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     <View>
       <Text style={styles.label}>
         {schemaItemName}
-        {hasChanges ? " (changed)" : ""}
+        {hasChanges && !isNewCard ? " (changed)" : ""}
       </Text>
       {input}
     </View>

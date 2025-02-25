@@ -32,15 +32,15 @@ export default function useDispatchActions({
   const state = cardInstance.state;
   const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
-  const cardRef = React.useRef<CardInstanceRef>(null);
+  const cardInstanceRef = React.useRef<CardInstanceRef>(null);
   const [isAnimating, setIsAnimating] = React.useState(
-    cardRef.current?.getIsAnimating() ?? false,
+    cardInstanceRef.current?.getIsAnimating() ?? false,
   );
 
   const handleFlipCard = React.useCallback(async () => {
-    if (cardRef.current && animateCardMovement) {
+    if (cardInstanceRef.current && animateCardMovement) {
       try {
-        await cardRef.current.animateFlip();
+        await cardInstanceRef.current.animateFlip();
       } catch {}
     }
 
@@ -61,9 +61,9 @@ export default function useDispatchActions({
 
     return {
       bottom: async () => {
-        if (cardRef.current && animateCardMovement) {
+        if (cardInstanceRef.current && animateCardMovement) {
           try {
-            await cardRef.current.animateOut({
+            await cardInstanceRef.current.animateOut({
               direction: "right",
             });
           } catch {}
@@ -80,9 +80,9 @@ export default function useDispatchActions({
         );
       },
       top: async () => {
-        if (cardRef.current && animateCardMovement) {
+        if (cardInstanceRef.current && animateCardMovement) {
           try {
-            await cardRef.current.animateOut({
+            await cardInstanceRef.current.animateOut({
               direction: "right",
             });
           } catch {}
@@ -104,7 +104,7 @@ export default function useDispatchActions({
     cardInstanceId,
     stackId,
     rightStackId,
-    cardRef,
+    cardInstanceRef,
     tabletopId,
     animateCardMovement,
   ]);
@@ -114,9 +114,9 @@ export default function useDispatchActions({
 
     return {
       bottom: async () => {
-        if (cardRef.current && animateCardMovement) {
+        if (cardInstanceRef.current && animateCardMovement) {
           try {
-            await cardRef.current.animateOut({
+            await cardInstanceRef.current.animateOut({
               direction: "left",
             });
           } catch {}
@@ -133,9 +133,9 @@ export default function useDispatchActions({
         );
       },
       top: async () => {
-        if (cardRef.current && animateCardMovement) {
+        if (cardInstanceRef.current && animateCardMovement) {
           try {
-            await cardRef.current.animateOut({
+            await cardInstanceRef.current.animateOut({
               direction: "left",
             });
           } catch {}
@@ -157,7 +157,7 @@ export default function useDispatchActions({
     cardInstanceId,
     stackId,
     leftStackId,
-    cardRef,
+    cardInstanceRef,
     tabletopId,
     animateCardMovement,
   ]);
@@ -166,9 +166,9 @@ export default function useDispatchActions({
     if (!canMoveToBottom) return undefined;
 
     return async () => {
-      if (cardRef.current && animateCardMovement) {
+      if (cardInstanceRef.current && animateCardMovement) {
         try {
-          await cardRef.current.animateOut({
+          await cardInstanceRef.current.animateOut({
             direction: "top",
           });
         } catch {}
@@ -189,14 +189,14 @@ export default function useDispatchActions({
     cardInstanceId,
     stackId,
     canMoveToBottom,
-    cardRef,
+    cardInstanceRef,
     tabletopId,
     animateCardMovement,
   ]);
 
   return {
     cardId: cardInstance.cardId,
-    cardRef,
+    cardInstanceRef,
     handleFlipCard,
     moveRight,
     moveLeft,

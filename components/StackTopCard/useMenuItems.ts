@@ -93,7 +93,7 @@ export default function useMenuItems(props: StackTopCardProps) {
 
   return {
     menuItems,
-    cardRef: state.cardRef,
+    cardInstanceRef: state.cardInstanceRef,
     setIsAnimating: state.setIsAnimating,
     hideActions: state.hideActions,
   };

@@ -1,10 +1,14 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { updateCard } from "@/store/combinedActions/cards";
+import { updateCard, createCard } from "@/store/combinedActions/cards";
 import { selectCard } from "@/store/slices/cards";
-import { useRequiredContextSelector } from "./useContextSelector";
+import {
+  useContextSelector,
+  useRequiredContextSelector,
+} from "./useContextSelector";
 import { store } from "@/store/store";
 import getUpdateCardData from "./getUpdateCardData";
+import uuid from "@/utils/uuid";
 
 /**
  * Get the deckId outside of the UI render cycle, otherwise we'd use react-redux
@@ -23,6 +27,7 @@ function getDeckId(cardId: string): string {
 
 export default function useSaveEditCard(): () => void {
   const dispatch = useAppDispatch();
+  const onCreateCard = useContextSelector((context) => context?.onCreateCard);
 
   const getContextState = useRequiredContextSelector(
     (context) => context?.state.getContextState,
@@ -32,12 +37,26 @@ export default function useSaveEditCard(): () => void {
     const contextState = getContextState();
     const data = getUpdateCardData(contextState);
 
-    dispatch(
-      updateCard({
-        cardId: contextState.cardId,
-        data,
-        deckId: getDeckId(contextState.cardId),
-      }),
-    );
-  }, [getContextState, dispatch]);
+    if ("cardId" in contextState.cardOrDeckId) {
+      dispatch(
+        updateCard({
+          cardId: contextState.cardOrDeckId.cardId,
+          data,
+          deckId: getDeckId(contextState.cardOrDeckId.cardId),
+        }),
+      );
+    } else {
+      const newCardId = uuid();
+
+      dispatch(
+        createCard({
+          cardId: newCardId,
+          data,
+          deckId: contextState.cardOrDeckId.deckId,
+        }),
+      );
+
+      onCreateCard?.(newCardId);
+    }
+  }, [getContextState, dispatch, onCreateCard]);
 }

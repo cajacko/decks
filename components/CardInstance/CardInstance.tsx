@@ -4,8 +4,38 @@ import { CardInstanceProps, CardInstanceRef } from "./CardInstance.types";
 import CardSide from "@/components/CardSide";
 
 export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
-  function CardInstance({ cardInstanceId, ...rest }, ref) {
+  function CardInstance({ cardInstanceId, CardProps }, ref) {
     const state = useCardInstance({ cardInstanceId }, ref);
+
+    const frontCardProps = React.useMemo(
+      () => ({
+        ...CardProps,
+        initialScaleX:
+          state.flipState === "flipping-to-front"
+            ? 0
+            : CardProps?.initialRotation,
+        initialRotation:
+          state.flipState === "flipping-to-front"
+            ? 0
+            : CardProps?.initialRotation,
+      }),
+      [CardProps, state.flipState],
+    );
+
+    const backCardProps = React.useMemo(
+      () => ({
+        ...CardProps,
+        initialScaleX:
+          state.flipState === "flipping-to-back"
+            ? 0
+            : CardProps?.initialRotation,
+        initialRotation:
+          state.flipState === "flipping-to-back"
+            ? 0
+            : CardProps?.initialRotation,
+      }),
+      [CardProps, state.flipState],
+    );
 
     return (
       <>
@@ -13,13 +43,7 @@ export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
           <CardSide
             cardId={state.cardInstance.cardId}
             side="front"
-            {...rest}
-            initialScaleX={
-              state.flipState === "flipping-to-front" ? 0 : rest.initialRotation
-            }
-            initialRotation={
-              state.flipState === "flipping-to-front" ? 0 : rest.initialRotation
-            }
+            CardProps={frontCardProps}
             ref={state.faceUpRef}
           />
         )}
@@ -28,13 +52,7 @@ export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
           <CardSide
             cardId={state.cardInstance.cardId}
             side="back"
-            {...rest}
-            initialScaleX={
-              state.flipState === "flipping-to-back" ? 0 : rest.initialRotation
-            }
-            initialRotation={
-              state.flipState === "flipping-to-back" ? 0 : rest.initialRotation
-            }
+            CardProps={backCardProps}
             ref={state.faceDownRef}
           />
         )}

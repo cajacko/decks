@@ -2,9 +2,13 @@ import React from "react";
 import { Decks, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
 
-export type EditCardProviderProps = {
+export type CardOrDeckId = { cardId: string } | { deckId: string };
+
+export type OnCreateCard = (cardId: string) => void;
+
+export type EditCardProviderProps = CardOrDeckId & {
   children?: React.ReactNode;
-  cardId: string;
+  onCreateCard?: OnCreateCard | null;
 };
 
 export type PartialDataValue<
@@ -38,7 +42,10 @@ export type EditDataValueMap = Record<
 >;
 
 export interface EditCardState {
-  cardId: string;
+  /**
+   * Deck ID is used when creating a new card for a deck
+   */
+  cardOrDeckId: CardOrDeckId;
   front: EditDataValueMap;
   back: EditDataValueMap;
   hasChanges: {
@@ -55,6 +62,7 @@ export type EditState = (recipe: EditDraftRecipe) => void;
 export interface EditCardContext {
   state: EditCardState;
   editState: EditState;
+  onCreateCard: OnCreateCard | null;
 }
 
 export type UseEditCardTemplateSchemaItemReturn = {

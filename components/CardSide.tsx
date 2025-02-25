@@ -1,19 +1,20 @@
 import React from "react";
 import Card, { CardProps, CardRef } from "./Card";
-import CardTemplate from "./CardTemplate";
+import CardTemplate, { CardTemplateProps } from "./CardTemplate";
 
-export interface CardSideProps extends CardProps {
-  cardId: string;
-  side: "front" | "back";
-}
+export type CardSideProps = CardTemplateProps & {
+  CardProps?: CardProps;
+};
 
 export default React.forwardRef<CardRef, CardSideProps>(function CardFront(
-  { cardId, side, children, ...rest },
+  { CardProps, side, ...cardOrDeck },
   ref,
 ) {
+  const { children, ...rest } = CardProps ?? {};
+
   return (
     <Card {...rest} ref={ref}>
-      <CardTemplate cardId={cardId} side={side} />
+      <CardTemplate side={side} {...cardOrDeck} />
       {children}
     </Card>
   );

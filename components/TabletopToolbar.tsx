@@ -9,6 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
+import { useRouter } from "expo-router";
 
 export default function TabletopToolbar(): React.ReactNode {
   const { tabletopId } = useTabletopContext();
@@ -20,6 +21,10 @@ export default function TabletopToolbar(): React.ReactNode {
     selectTabletopHasFuture(state, { tabletopId }),
   );
 
+  const router = useRouter();
+
+  const deckId = "deck1";
+
   return (
     <View style={styles.container}>
       <CardAction
@@ -29,6 +34,11 @@ export default function TabletopToolbar(): React.ReactNode {
           styles.action,
           { opacity: hasPast ? 1 : 0.5 },
         ])}
+      />
+      <CardAction
+        icon="+"
+        onPress={() => router.push(`/deck/${deckId}/new-card`)}
+        style={styles.action}
       />
       <CardAction
         icon="Re"

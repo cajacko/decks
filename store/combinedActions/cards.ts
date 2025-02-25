@@ -18,8 +18,8 @@ export const updateCard = createAction<{
   data: CardDataItem[];
 }>("updateCard");
 
-// export const setCard = createAction<{
-//   cardId: Cards.CardId;
-//   deckId: Decks.DeckId;
-//   data: CardDataItem[];
-// }>("setCard");
+export const createCard = createAction<{
+  cardId: Cards.CardId;
+  deckId: Decks.DeckId;
+  data: CardDataItem[];
+}>("createCard");

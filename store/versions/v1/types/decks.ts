@@ -25,7 +25,7 @@ type DataSchemaItem<Id extends DataSchemaItemId> = {
   [K in TemplatesType.DataType]: CreateDataSchemaItemHelper<Id, K>;
 }[TemplatesType.DataType];
 
-type DataSchema<DsId extends DataSchemaItemId = DataSchemaItemId> = {
+export type DataSchema<DsId extends DataSchemaItemId = DataSchemaItemId> = {
   [K in DsId]: DataSchemaItem<K>;
 };
 

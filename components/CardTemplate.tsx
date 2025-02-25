@@ -2,6 +2,7 @@ import React from "react";
 import Template, { Values } from "./Template";
 import { useRequiredAppSelector } from "@/store/hooks";
 import {
+  DeckOrCardSideProps,
   selectCardTemplateData,
   selectCardTemplate,
 } from "@/store/combinedSelectors/cards";
@@ -9,10 +10,7 @@ import { useEditCardSideState } from "@/context/EditCard";
 import templateDataToValues from "@/components/Template/templateDataToValues";
 import { Cards } from "@/store/types";
 
-export interface CardTemplateProps {
-  cardId: string;
-  side: Cards.Side;
-}
+export type CardTemplateProps = DeckOrCardSideProps;
 
 function useEditCardTemplateValues(side: Cards.Side): Values | null {
   const data = useEditCardSideState(side);

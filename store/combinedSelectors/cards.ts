@@ -4,16 +4,33 @@ import { selectDeck } from "../slices/decks";
 import { selectTemplate } from "../slices/templates";
 import { RootState, Decks, Cards, Templates } from "../types";
 
-type CardId = { cardId: string };
+type CardIdProps = { cardId: string };
+type DeckIdSideProps = { deckId: string; side: Cards.Side };
 type CardIdSideProps = { cardId: string; side: Cards.Side };
 
-const cardKey = (_: unknown, props: { cardId: string; side?: Cards.Side }) =>
-  `${props.cardId}-${props.side ?? ""}`;
+export type DeckOrCardSideProps = DeckIdSideProps | CardIdSideProps;
+
+const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
+  "deckId" in props
+    ? `deck:${props.deckId}-${props.side}`
+    : `card:${props.cardId}-${props.side}`;
+
+// const selectDeckSideTemplate = (
+//   state: RootState,
+//   props: DeckIdSideProps,
+// ): Cards.SideTemplate | null =>
+//   selectDeck(state, props)?.templates?.[props.side] ?? null;
+
+// const selectDeckTemplate = (state: RootState, props: DeckIdSideProps) => {
+//   const templateId = selectDeckSideTemplate(state, props)?.templateId;
+
+//   return templateId ? selectTemplate(state, { templateId }) : null;
+// };
 
 // Is a lookup, doesn't need to be cached
 const selectDeckByCard = (
   state: RootState,
-  props: CardId,
+  props: CardIdProps,
 ): Decks.Props | null => {
   const deckId = selectCard(state, props)?.deckId;
 
@@ -25,37 +42,53 @@ const selectDeckByCard = (
 // Is a lookup, doesn't need to be cached
 const selectCardSideTemplate = (
   state: RootState,
-  props: CardIdSideProps,
+  props: DeckOrCardSideProps,
 ): Cards.SideTemplate | null => {
-  const card = selectCard(state, props);
-  const deck = selectDeckByCard(state, props);
+  if ("cardId" in props) {
+    const card = selectCard(state, props);
+    const deck = selectDeckByCard(state, props);
 
-  const cardTemplate = card?.templates?.[props.side];
+    const cardTemplate = card?.templates?.[props.side];
 
-  if (cardTemplate) return cardTemplate;
+    if (cardTemplate) return cardTemplate;
 
-  return deck?.templates?.[props.side] ?? null;
+    return deck?.templates?.[props.side] ?? null;
+  }
+
+  return selectDeck(state, props)?.templates?.[props.side] ?? null;
 };
 
 // Is a lookup, doesn't need to be cached
 export const selectCardTemplate = (
   state: RootState,
-  props: CardIdSideProps,
+  props: DeckOrCardSideProps,
 ) => {
   const templateId = selectCardSideTemplate(state, props)?.templateId;
 
   return templateId ? selectTemplate(state, { templateId }) : null;
 };
 
+/**
+ * Selects the data for a card by merging the card data with the deck defaults.
+ * If a cardId is passed we merge the data with the deck defaults
+ * If a deckId is passed we just return the deck defaults (useful for creating new cards)
+ *
+ * NOTE: This does not merge in any defaults from the templates and doesn't have any awareness of
+ * templates at this time
+ */
 const selectMergedCardData = createCachedSelector(
-  (state: RootState, props: CardId) => selectCard(state, props)?.data,
-  (state: RootState, props: CardId) =>
-    selectDeckByCard(state, props)?.dataSchema,
+  (state: RootState, props: DeckOrCardSideProps) =>
+    "cardId" in props ? selectCard(state, props)?.data : null,
+  (state: RootState, props: DeckOrCardSideProps) =>
+    "cardId" in props
+      ? selectDeckByCard(state, props)?.dataSchema
+      : selectDeck(state, props)?.dataSchema,
   (cardData, deckDataSchema): Cards.Data | null => {
-    if (!cardData) return null;
-    if (!deckDataSchema) return cardData;
+    // If there's no deck schema then there's no defaults to find, so just return the card data or null
+    if (!deckDataSchema) return cardData ?? null;
 
-    const combinedData = { ...cardData };
+    // Now we merge the deck defaults into the missing entries from the card data
+    const combinedData: Cards.Data = { ...cardData };
 
     Object.entries(deckDataSchema).forEach(([key, schemaItem]) => {
       const cardDataValue = combinedData[key];
@@ -71,7 +104,7 @@ const selectMergedCardData = createCachedSelector(
 
     return combinedData;
   },
-)(cardKey);
+)(cardOrDeckKey);
 
 export type LooseCardTemplateDataItem<
   T extends Templates.DataType = Templates.DataType,
@@ -89,9 +122,9 @@ export type LooseCardTemplateData<
 };
 
 export const selectCardTemplateData = createCachedSelector(
-  (state: RootState, props: CardIdSideProps) =>
+  (state: RootState, props: DeckOrCardSideProps) =>
     selectCardTemplate(state, props)?.schema,
-  (state: RootState, props: CardIdSideProps) =>
+  (state: RootState, props: DeckOrCardSideProps) =>
     selectCardSideTemplate(state, props)?.dataTemplateMapping,
   selectMergedCardData,
   (
@@ -151,4 +184,4 @@ export const selectCardTemplateData = createCachedSelector(
 
     return data;
   },
-)(cardKey);
+)(cardOrDeckKey);

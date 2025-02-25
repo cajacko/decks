@@ -6,6 +6,7 @@ export interface CardInstanceRef
   animateFlip: () => Promise<unknown>;
 }
 
-export interface CardInstanceProps extends CardProps {
+export interface CardInstanceProps {
   cardInstanceId: string;
+  CardProps?: CardProps;
 }

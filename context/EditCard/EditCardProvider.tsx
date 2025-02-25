@@ -42,7 +42,7 @@ function templateDataToEditingValues(
 }
 
 function getInitState(props: {
-  cardId: string;
+  cardOrDeckId: Types.CardOrDeckId;
   front: LooseCardTemplateData;
   back: LooseCardTemplateData;
   frontTemplateId: Templates.TemplateId;
@@ -50,7 +50,7 @@ function getInitState(props: {
   stateRef: React.MutableRefObject<Types.EditCardState | undefined>;
 }): Types.EditCardState {
   return {
-    cardId: props.cardId,
+    cardOrDeckId: props.cardOrDeckId,
     front: templateDataToEditingValues(props.front, props.frontTemplateId),
     back: templateDataToEditingValues(props.back, props.backTemplateId),
     hasChanges: {
@@ -120,21 +120,46 @@ function withUpdateStateFromProps(props: {
   };
 }
 
+function getIsSameId(a: Types.CardOrDeckId, b: Types.CardOrDeckId): boolean {
+  if ("cardId" in a && "cardId" in b) {
+    return a.cardId === b.cardId;
+  }
+
+  if ("deckId" in a && "deckId" in b) {
+    return a.deckId === b.deckId;
+  }
+
+  // Different id types, so is always false
+  return false;
+}
+
 export default function EditCardProvider({
   children,
-  cardId,
+  onCreateCard = null,
+  ...props
 }: Types.EditCardProviderProps) {
+  // NOTE: We need to prioritise cardId over deckId
+  const id = "cardId" in props ? props.cardId : props.deckId;
+  const idType = "cardId" in props ? "card" : "deck";
+
+  const cardOrDeckId: Types.CardOrDeckId = React.useMemo(
+    () => (idType === "card" ? { cardId: id } : { deckId: id }),
+    [id, idType],
+  );
+
   const frontTemplateId = useRequiredAppSelector(
-    (state) => selectCardTemplate(state, { cardId, side: "front" })?.templateId,
+    (state) =>
+      selectCardTemplate(state, { ...cardOrDeckId, side: "front" })?.templateId,
   );
   const backTemplateId = useRequiredAppSelector(
-    (state) => selectCardTemplate(state, { cardId, side: "back" })?.templateId,
+    (state) =>
+      selectCardTemplate(state, { ...cardOrDeckId, side: "back" })?.templateId,
   );
   const front = useRequiredAppSelector((state) =>
-    selectCardTemplateData(state, { cardId, side: "front" }),
+    selectCardTemplateData(state, { ...cardOrDeckId, side: "front" }),
   );
   const back = useRequiredAppSelector((state) =>
-    selectCardTemplateData(state, { cardId, side: "back" }),
+    selectCardTemplateData(state, { ...cardOrDeckId, side: "back" }),
   );
 
   const stateRef = React.useRef<Types.EditCardState>();
@@ -142,7 +167,7 @@ export default function EditCardProvider({
   const [state, setState] = React.useState<Types.EditCardState>(
     (): Types.EditCardState =>
       getInitState({
-        cardId,
+        cardOrDeckId,
         front,
         back,
         frontTemplateId,
@@ -153,7 +178,7 @@ export default function EditCardProvider({
 
   stateRef.current = state;
 
-  const prevCardId = React.useRef(cardId);
+  const prevCardOrDeckId = React.useRef(cardOrDeckId);
   const hasInitialised = React.useRef(false);
 
   const editState = React.useCallback<Types.EditState>((recipe) => {
@@ -161,18 +186,18 @@ export default function EditCardProvider({
   }, []);
 
   const value = React.useMemo<Types.EditCardContext>(
-    () => ({ state, editState }),
-    [state, editState],
+    () => ({ state, editState, onCreateCard }),
+    [state, editState, onCreateCard],
   );
 
   React.useEffect(() => {
     // When the card id changes, nuke everything and start again
-    if (cardId !== prevCardId.current) {
-      prevCardId.current = cardId;
+    if (!getIsSameId(cardOrDeckId, prevCardOrDeckId.current)) {
+      prevCardOrDeckId.current = cardOrDeckId;
 
       editState((draft) => {
         draft = getInitState({
-          cardId,
+          cardOrDeckId,
           front,
           back,
           frontTemplateId,
@@ -201,7 +226,7 @@ export default function EditCardProvider({
         frontTemplateId,
       }),
     );
-  }, [cardId, editState, back, front, frontTemplateId, backTemplateId]);
+  }, [cardOrDeckId, editState, back, front, frontTemplateId, backTemplateId]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
