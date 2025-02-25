@@ -1,7 +1,10 @@
 import React from "react";
 import Template from "./Template";
 import { useRequiredAppSelector } from "@/store/hooks";
-import { selectCardTemplateData } from "@/store/combinedSelectors/cards";
+import {
+  selectCardTemplateData,
+  selectCardTemplate,
+} from "@/store/combinedSelectors/cards";
 import { useEditCardTemplateValues } from "@/context/EditCard";
 import templateDataToValues from "@/components/Template/templateDataToValues";
 
@@ -13,16 +16,17 @@ export interface CardTemplateProps {
 export default function CardTemplate(
   props: CardTemplateProps,
 ): React.ReactNode {
-  const template = useRequiredAppSelector((state) =>
+  const data = useRequiredAppSelector((state) =>
     selectCardTemplateData(state, props),
   );
 
-  const values = React.useMemo(
-    () => templateDataToValues(template.data),
-    [template.data],
+  const markup = useRequiredAppSelector(
+    (state) => selectCardTemplate(state, props)?.markup,
   );
+
+  const values = React.useMemo(() => templateDataToValues(data), [data]);
 
   const editValues = useEditCardTemplateValues(props);
 
-  return <Template values={editValues ?? values} markup={template.markup} />;
+  return <Template values={editValues ?? values} markup={markup} />;
 }

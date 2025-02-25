@@ -73,17 +73,6 @@ const selectMergedCardData = createCachedSelector(
   },
 )(cardKey);
 
-// type Helper<
-//   T extends Templates.DataType = Templates.DataType,
-//   Id extends Templates.DataItemId = Templates.DataItemId,
-// > = {
-//   [K in T]: {
-//     id: Id;
-//     type: K;
-//     validatedValue: Templates.ValidatedValue<K> | null;
-//   };
-// }[T];
-
 export type LooseCardTemplateDataItem<
   T extends Templates.DataType = Templates.DataType,
   Id extends Templates.DataItemId = Templates.DataItemId,
@@ -99,26 +88,18 @@ export type LooseCardTemplateData<
   [K in Id]: LooseCardTemplateDataItem<T, K>;
 };
 
-type CardTemplate<Props extends Templates.Props = Templates.Props> = {
-  data: LooseCardTemplateData;
-  markup: Props["markup"];
-};
-
 export const selectCardTemplateData = createCachedSelector(
-  (state: RootState, props: CardIdSideProps) =>
-    selectCardTemplate(state, props)?.markup,
   (state: RootState, props: CardIdSideProps) =>
     selectCardTemplate(state, props)?.schema,
   (state: RootState, props: CardIdSideProps) =>
     selectCardSideTemplate(state, props)?.dataTemplateMapping,
   selectMergedCardData,
   (
-    markup,
     templateSchema,
     dataTemplateMapping,
     mergedCardData,
-  ): null | CardTemplate => {
-    if (!markup || !templateSchema) return null;
+  ): null | LooseCardTemplateData => {
+    if (!templateSchema) return null;
 
     const data: LooseCardTemplateData = {};
 
@@ -168,9 +149,6 @@ export const selectCardTemplateData = createCachedSelector(
       data[key] = dataItem;
     });
 
-    return {
-      data,
-      markup,
-    };
+    return data;
   },
 )(cardKey);

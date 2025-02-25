@@ -335,11 +335,11 @@ export const EditCardProvider: React.FC<{
   const backTemplateId = useRequiredAppSelector(
     (state) => selectCardTemplate(state, { cardId, side: "back" })?.templateId,
   );
-  const front = useRequiredAppSelector(
-    (state) => selectCardTemplateData(state, { cardId, side: "front" })?.data,
+  const front = useRequiredAppSelector((state) =>
+    selectCardTemplateData(state, { cardId, side: "front" }),
   );
-  const back = useRequiredAppSelector(
-    (state) => selectCardTemplateData(state, { cardId, side: "front" })?.data,
+  const back = useRequiredAppSelector((state) =>
+    selectCardTemplateData(state, { cardId, side: "front" }),
   );
   const deckId = useRequiredAppSelector(
     (state) => selectCard(state, { cardId })?.deckId,
