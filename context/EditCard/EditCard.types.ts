@@ -1,8 +1,7 @@
 import React from "react";
 import { Decks, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
-
-export type CardOrDeckId = { cardId: string } | { deckId: string };
+import { CardOrDeckId } from "@/utils/cardOrDeck";
 
 export type OnCreateCard = (cardId: string) => void;
 
@@ -41,11 +40,7 @@ export type EditDataValueMap = Record<
   LooseEditingDataValues | undefined
 >;
 
-export interface EditCardState {
-  /**
-   * Deck ID is used when creating a new card for a deck
-   */
-  cardOrDeckId: CardOrDeckId;
+export type EditCardState = CardOrDeckId & {
   front: EditDataValueMap;
   back: EditDataValueMap;
   hasChanges: {
@@ -53,7 +48,7 @@ export interface EditCardState {
     back: Record<string, boolean | undefined>;
   };
   getContextState: () => EditCardState;
-}
+};
 
 export type EditDraftRecipe = (draft: WritableDraft<EditCardState>) => void;
 

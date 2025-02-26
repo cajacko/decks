@@ -7,14 +7,14 @@ export type CardSideProps = CardTemplateProps & {
 };
 
 export default React.forwardRef<CardRef, CardSideProps>(function CardFront(
-  { CardProps, side, ...cardOrDeck },
+  { CardProps, ...cardTemplateProps },
   ref,
 ) {
   const { children, ...rest } = CardProps ?? {};
 
   return (
     <Card {...rest} ref={ref}>
-      <CardTemplate side={side} {...cardOrDeck} />
+      <CardTemplate {...cardTemplateProps} />
       {children}
     </Card>
   );

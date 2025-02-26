@@ -41,7 +41,8 @@ export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
       <>
         {state.renderFaceUp && (
           <CardSide
-            cardId={state.cardInstance.cardId}
+            targetId={state.cardInstance.cardId}
+            targetType="card"
             side="front"
             CardProps={frontCardProps}
             ref={state.faceUpRef}
@@ -50,7 +51,8 @@ export default React.forwardRef<CardInstanceRef, CardInstanceProps>(
 
         {state.renderFaceDown && (
           <CardSide
-            cardId={state.cardInstance.cardId}
+            targetId={state.cardInstance.cardId}
+            targetType="card"
             side="back"
             CardProps={backCardProps}
             ref={state.faceDownRef}

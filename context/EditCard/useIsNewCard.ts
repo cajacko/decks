@@ -1,7 +1,8 @@
 import { useRequiredContextSelector } from "./useContextSelector";
 
-export default function useIsNewCard() {
-  return useRequiredContextSelector(
-    (context): boolean => !!context && "deckId" in context.state.cardOrDeckId,
+export default function useIsNewCard(): boolean {
+  return (
+    useRequiredContextSelector((context) => context?.state.targetType) ===
+    "deck"
   );
 }

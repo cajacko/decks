@@ -3,29 +3,14 @@ import { selectCard } from "../slices/cards";
 import { selectDeck } from "../slices/decks";
 import { selectTemplate } from "../slices/templates";
 import { RootState, Decks, Cards, Templates } from "../types";
+import { getIsCardId, CardOrDeckId } from "@/utils/cardOrDeck";
 
 type CardIdProps = { cardId: string };
-type DeckIdSideProps = { deckId: string; side: Cards.Side };
-type CardIdSideProps = { cardId: string; side: Cards.Side };
 
-export type DeckOrCardSideProps = DeckIdSideProps | CardIdSideProps;
+export type DeckOrCardSideProps = CardOrDeckId & { side: Cards.Side };
 
 const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
-  "deckId" in props
-    ? `deck:${props.deckId}-${props.side}`
-    : `card:${props.cardId}-${props.side}`;
-
-// const selectDeckSideTemplate = (
-//   state: RootState,
-//   props: DeckIdSideProps,
-// ): Cards.SideTemplate | null =>
-//   selectDeck(state, props)?.templates?.[props.side] ?? null;
-
-// const selectDeckTemplate = (state: RootState, props: DeckIdSideProps) => {
-//   const templateId = selectDeckSideTemplate(state, props)?.templateId;
-
-//   return templateId ? selectTemplate(state, { templateId }) : null;
-// };
+  `${props.targetType}:${props.targetId}-${props.side}`;
 
 // Is a lookup, doesn't need to be cached
 const selectDeckByCard = (
@@ -44,9 +29,9 @@ const selectCardSideTemplate = (
   state: RootState,
   props: DeckOrCardSideProps,
 ): Cards.SideTemplate | null => {
-  if ("cardId" in props) {
-    const card = selectCard(state, props);
-    const deck = selectDeckByCard(state, props);
+  if (getIsCardId(props)) {
+    const card = selectCard(state, { cardId: props.targetId });
+    const deck = selectDeckByCard(state, { cardId: props.targetId });
 
     const cardTemplate = card?.templates?.[props.side];
 
@@ -55,7 +40,10 @@ const selectCardSideTemplate = (
     return deck?.templates?.[props.side] ?? null;
   }
 
-  return selectDeck(state, props)?.templates?.[props.side] ?? null;
+  return (
+    selectDeck(state, { deckId: props.targetId })?.templates?.[props.side] ??
+    null
+  );
 };
 
 // Is a lookup, doesn't need to be cached
@@ -78,11 +66,13 @@ export const selectCardTemplate = (
  */
 const selectMergedCardData = createCachedSelector(
   (state: RootState, props: DeckOrCardSideProps) =>
-    "cardId" in props ? selectCard(state, props)?.data : null,
+    getIsCardId(props)
+      ? selectCard(state, { cardId: props.targetId })?.data
+      : null,
   (state: RootState, props: DeckOrCardSideProps) =>
-    "cardId" in props
-      ? selectDeckByCard(state, props)?.dataSchema
-      : selectDeck(state, props)?.dataSchema,
+    getIsCardId(props)
+      ? selectDeckByCard(state, { cardId: props.targetId })?.dataSchema
+      : selectDeck(state, { deckId: props.targetId })?.dataSchema,
   (cardData, deckDataSchema): Cards.Data | null => {
     // If there's no deck schema then there's no defaults to find, so just return the card data or null
     if (!deckDataSchema) return cardData ?? null;

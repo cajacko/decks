@@ -9,6 +9,7 @@ import {
 import { store } from "@/store/store";
 import getUpdateCardData from "./getUpdateCardData";
 import uuid from "@/utils/uuid";
+import { getIsCardId } from "@/utils/cardOrDeck";
 
 /**
  * Get the deckId outside of the UI render cycle, otherwise we'd use react-redux
@@ -37,12 +38,12 @@ export default function useSaveEditCard(): () => void {
     const contextState = getContextState();
     const data = getUpdateCardData(contextState);
 
-    if ("cardId" in contextState.cardOrDeckId) {
+    if (getIsCardId(contextState)) {
       dispatch(
         updateCard({
-          cardId: contextState.cardOrDeckId.cardId,
+          cardId: contextState.targetId,
           data,
-          deckId: getDeckId(contextState.cardOrDeckId.cardId),
+          deckId: getDeckId(contextState.targetId),
         }),
       );
     } else {
@@ -52,7 +53,7 @@ export default function useSaveEditCard(): () => void {
         createCard({
           cardId: newCardId,
           data,
-          deckId: contextState.cardOrDeckId.deckId,
+          deckId: contextState.targetId,
         }),
       );
 

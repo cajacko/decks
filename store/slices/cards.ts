@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
-import { updateCard } from "../combinedActions/cards";
+import { updateCard, createCard } from "../combinedActions/cards";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 
 export type Card = Cards.Props;
@@ -42,6 +42,27 @@ export const cardsSlice = createSlice({
           card.data[cardDataSchemaId] = dataItem.value;
         }
       });
+    });
+
+    builder.addCase(createCard, (state, actions) => {
+      const card: Card = {
+        cardId: actions.payload.cardId,
+        deckId: actions.payload.deckId,
+        data: {},
+      };
+
+      actions.payload.data.forEach((dataItem) => {
+        const cardDataSchemaId =
+          "cardDataId" in dataItem
+            ? dataItem.cardDataId
+            : createCardDataSchemaId(dataItem);
+
+        if (dataItem.value !== null) {
+          card.data[cardDataSchemaId] = dataItem.value;
+        }
+      });
+
+      state.cardsById[actions.payload.cardId] = card;
     });
   },
 });

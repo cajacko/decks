@@ -11,5 +11,11 @@ export default function DeckNewCardScene() {
     throw new Error("deckId must be a string");
   }
 
-  return <EditCard deckId={deckId} cardId={cardId} onCreateCard={setCardId} />;
+  return (
+    <EditCard
+      targetId={cardId ?? deckId}
+      targetType={cardId ? "card" : "deck"}
+      onCreateCard={setCardId}
+    />
+  );
 }

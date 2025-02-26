@@ -9,5 +9,5 @@ export default function EditCardScene() {
     throw new Error("cardId must be a string");
   }
 
-  return <EditCard cardId={cardId} />;
+  return <EditCard targetId={cardId} targetType="card" />;
 }

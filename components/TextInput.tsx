@@ -38,5 +38,7 @@ export default function TextInput({
     setValue(valueProp);
   }, [valueProp]);
 
-  return <RNTextInput {...props} value={value} onChangeText={onChangeText} />;
+  return (
+    <RNTextInput {...props} value={value ?? ""} onChangeText={onChangeText} />
+  );
 }

@@ -4,12 +4,9 @@ import { useAppSelector } from "@/store/hooks";
 import { selectCardTemplate } from "@/store/combinedSelectors/cards";
 import TemplateSchemaItem from "@/components/TemplateSchemaItem";
 import { useSaveEditCard, useHasEditCardChanges } from "@/context/EditCard";
+import { CardOrDeckId } from "@/utils/cardOrDeck";
 
-export type EditCardFormProps =
-  | {
-      cardId: string;
-    }
-  | { deckId: string };
+export type EditCardFormProps = CardOrDeckId;
 
 export default function EditCardForm(
   props: EditCardFormProps,

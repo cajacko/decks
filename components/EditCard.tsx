@@ -9,16 +9,17 @@ import BottonDrawer, {
 } from "@/components/BottomDrawer";
 import EditCardForm from "@/components/EditCardForm";
 import CardSide from "@/components/CardSide";
-import {
-  EditCardProvider,
-  CardOrDeckId,
-  EditCardProviderProps,
-} from "@/context/EditCard";
+import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Pressable } from "react-native";
+import { CardOrDeckId } from "@/utils/cardOrDeck";
 
 export type Props = CardOrDeckId & Pick<EditCardProviderProps, "onCreateCard">;
 
-export default function EditCard({ onCreateCard, ...cardOrDeck }: Props) {
+export default function EditCard({
+  onCreateCard,
+  targetId,
+  targetType,
+}: Props) {
   const height = useHeight();
   const { maxHeight, onContainerLayout } = useMaxHeight();
 
@@ -29,7 +30,11 @@ export default function EditCard({ onCreateCard, ...cardOrDeck }: Props) {
   }, []);
 
   return (
-    <EditCardProvider onCreateCard={onCreateCard} {...cardOrDeck}>
+    <EditCardProvider
+      onCreateCard={onCreateCard}
+      targetId={targetId}
+      targetType={targetType}
+    >
       <BottomDrawerWrapper
         onLayout={onContainerLayout}
         style={styles.container}
@@ -40,7 +45,11 @@ export default function EditCard({ onCreateCard, ...cardOrDeck }: Props) {
           horizontal={false}
         >
           <Pressable onPress={onPress}>
-            <CardSide {...cardOrDeck} side="front" />
+            <CardSide
+              targetId={targetId}
+              targetType={targetType}
+              side="front"
+            />
           </Pressable>
           <Animated.View style={[styles.drawerBuffer, height.heightStyle]} />
         </ScrollView>
@@ -49,7 +58,7 @@ export default function EditCard({ onCreateCard, ...cardOrDeck }: Props) {
           maxHeight={maxHeight}
           ref={bottomDrawer}
         >
-          <EditCardForm {...cardOrDeck} />
+          <EditCardForm targetId={targetId} targetType={targetType} />
         </BottonDrawer>
       </BottomDrawerWrapper>
     </EditCardProvider>
