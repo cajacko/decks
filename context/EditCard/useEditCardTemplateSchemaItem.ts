@@ -73,12 +73,12 @@ export default function useEditCardTemplateSchemaItem(props: {
   templateSchemaItemId: string;
 }): Types.UseEditCardTemplateSchemaItemReturn {
   const editingItem = useRequiredContextSelector(
-    (context) => context?.state[props.side][props.templateSchemaItemId],
+    (context) => context?.state?.[props.side][props.templateSchemaItemId],
   );
 
   const hasChanges = useContextSelector(
     (context) =>
-      context?.state.hasChanges[props.side][props.templateSchemaItemId],
+      context?.state?.hasChanges[props.side][props.templateSchemaItemId],
   );
 
   const editState = useRequiredContextSelector((context) => context?.editState);

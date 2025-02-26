@@ -1,11 +1,17 @@
 import React from "react";
 import { Decks, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
-import { CardOrDeckId } from "@/utils/cardOrDeck";
+import { Target } from "@/utils/cardTarget";
 
 export type OnCreateCard = (cardId: string) => void;
 
-export type EditCardProviderProps = CardOrDeckId & {
+export type EditCardProviderProps = {
+  /**
+   * null - When you want the context children to decide what the target is dynamically
+   * type = "deck" - when you want to create a new card in a deck
+   * type = "card" - when you want to edit an existing card
+   */
+  target: Target | null;
   children?: React.ReactNode;
   onCreateCard?: OnCreateCard | null;
 };
@@ -40,7 +46,8 @@ export type EditDataValueMap = Record<
   LooseEditingDataValues | undefined
 >;
 
-export type EditCardState = CardOrDeckId & {
+export type EditCardState = {
+  target: Target;
   front: EditDataValueMap;
   back: EditDataValueMap;
   hasChanges: {
@@ -55,9 +62,10 @@ export type EditDraftRecipe = (draft: WritableDraft<EditCardState>) => void;
 export type EditState = (recipe: EditDraftRecipe) => void;
 
 export interface EditCardContext {
-  state: EditCardState;
-  editState: EditState;
+  state: EditCardState | null;
+  editState: EditState | null;
   onCreateCard: OnCreateCard | null;
+  setTarget: React.Dispatch<React.SetStateAction<Target | null>>;
 }
 
 export type UseEditCardTemplateSchemaItemReturn = {

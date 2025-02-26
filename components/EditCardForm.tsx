@@ -4,9 +4,9 @@ import { useAppSelector } from "@/store/hooks";
 import { selectCardTemplate } from "@/store/combinedSelectors/cards";
 import TemplateSchemaItem from "@/components/TemplateSchemaItem";
 import { useSaveEditCard, useHasEditCardChanges } from "@/context/EditCard";
-import { CardOrDeckId } from "@/utils/cardOrDeck";
+import { Target } from "@/utils/cardTarget";
 
-export type EditCardFormProps = CardOrDeckId;
+export type EditCardFormProps = Target;
 
 export default function EditCardForm(
   props: EditCardFormProps,

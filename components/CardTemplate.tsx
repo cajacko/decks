@@ -9,11 +9,15 @@ import {
 import { useEditCardSideState } from "@/context/EditCard";
 import templateDataToValues from "@/components/Template/templateDataToValues";
 import { Cards } from "@/store/types";
+import { Target } from "@/utils/cardTarget";
 
 export type CardTemplateProps = DeckOrCardSideProps;
 
-function useEditCardTemplateValues(side: Cards.Side): Values | null {
-  const data = useEditCardSideState(side);
+function useEditCardTemplateValues(
+  side: Cards.Side,
+  target: Target,
+): Values | null {
+  const data = useEditCardSideState(side, target);
 
   return React.useMemo<Values | null>(() => {
     if (!data) return null;
@@ -45,7 +49,7 @@ export default function CardTemplate(
 
   const values = React.useMemo(() => templateDataToValues(data), [data]);
 
-  const editValues = useEditCardTemplateValues(props.side);
+  const editValues = useEditCardTemplateValues(props.side, props);
 
   return <Template values={editValues ?? values} markup={markup} />;
 }

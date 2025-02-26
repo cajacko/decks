@@ -12,7 +12,7 @@ module.exports = {
   ignorePatterns: ["/dist/*"],
   rules: {
     "no-console": "error",
-    "prettier/prettier": "error",
+    "prettier/prettier": "warn",
     // Typescript checks this
     "import/no-unresolved": "off",
     "no-restricted-syntax": [

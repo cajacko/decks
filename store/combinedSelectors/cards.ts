@@ -3,14 +3,14 @@ import { selectCard } from "../slices/cards";
 import { selectDeck } from "../slices/decks";
 import { selectTemplate } from "../slices/templates";
 import { RootState, Decks, Cards, Templates } from "../types";
-import { getIsCardId, CardOrDeckId } from "@/utils/cardOrDeck";
+import { getIsCardId, Target } from "@/utils/cardTarget";
 
 type CardIdProps = { cardId: string };
 
-export type DeckOrCardSideProps = CardOrDeckId & { side: Cards.Side };
+export type DeckOrCardSideProps = Target & { side: Cards.Side };
 
 const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
-  `${props.targetType}:${props.targetId}-${props.side}`;
+  `${props.type}:${props.id}-${props.side}`;
 
 // Is a lookup, doesn't need to be cached
 const selectDeckByCard = (
@@ -30,8 +30,8 @@ const selectCardSideTemplate = (
   props: DeckOrCardSideProps,
 ): Cards.SideTemplate | null => {
   if (getIsCardId(props)) {
-    const card = selectCard(state, { cardId: props.targetId });
-    const deck = selectDeckByCard(state, { cardId: props.targetId });
+    const card = selectCard(state, { cardId: props.id });
+    const deck = selectDeckByCard(state, { cardId: props.id });
 
     const cardTemplate = card?.templates?.[props.side];
 
@@ -41,8 +41,7 @@ const selectCardSideTemplate = (
   }
 
   return (
-    selectDeck(state, { deckId: props.targetId })?.templates?.[props.side] ??
-    null
+    selectDeck(state, { deckId: props.id })?.templates?.[props.side] ?? null
   );
 };
 
@@ -66,13 +65,11 @@ export const selectCardTemplate = (
  */
 const selectMergedCardData = createCachedSelector(
   (state: RootState, props: DeckOrCardSideProps) =>
-    getIsCardId(props)
-      ? selectCard(state, { cardId: props.targetId })?.data
-      : null,
+    getIsCardId(props) ? selectCard(state, { cardId: props.id })?.data : null,
   (state: RootState, props: DeckOrCardSideProps) =>
     getIsCardId(props)
-      ? selectDeckByCard(state, { cardId: props.targetId })?.dataSchema
-      : selectDeck(state, { deckId: props.targetId })?.dataSchema,
+      ? selectDeckByCard(state, { cardId: props.id })?.dataSchema
+      : selectDeck(state, { deckId: props.id })?.dataSchema,
   (cardData, deckDataSchema): Cards.Data | null => {
     // If there's no deck schema then there's no defaults to find, so just return the card data or null
     if (!deckDataSchema) return cardData ?? null;

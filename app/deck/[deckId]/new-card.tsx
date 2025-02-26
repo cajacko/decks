@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import EditCard from "@/components/EditCard";
+import AppError from "@/classes/AppError";
 
 export default function DeckNewCardScene() {
   const { deckId } = useLocalSearchParams();
@@ -8,13 +9,13 @@ export default function DeckNewCardScene() {
   const [cardId, setCardId] = React.useState<string | undefined>(undefined);
 
   if (typeof deckId !== "string") {
-    throw new Error("deckId must be a string");
+    throw new AppError(`${DeckNewCardScene.name}: deckId must be a string`);
   }
 
   return (
     <EditCard
-      targetId={cardId ?? deckId}
-      targetType={cardId ? "card" : "deck"}
+      id={cardId ?? deckId}
+      type={cardId ? "card" : "new-card-in-deck"}
       onCreateCard={setCardId}
     />
   );
