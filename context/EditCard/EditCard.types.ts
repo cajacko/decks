@@ -1,9 +1,10 @@
 import React from "react";
-import { Decks, Templates } from "@/store/types";
+import { Cards, Decks, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
 import { Target } from "@/utils/cardTarget";
 
 export type OnCreateCard = (cardId: string) => void;
+export type OnChangeTarget = (target: Target | null) => void;
 
 export type EditCardProviderProps = {
   /**
@@ -14,6 +15,7 @@ export type EditCardProviderProps = {
   target: Target | null;
   children?: React.ReactNode;
   onCreateCard?: OnCreateCard | null;
+  onChangeTarget?: OnChangeTarget | null;
 };
 
 export type PartialDataValue<
@@ -46,14 +48,14 @@ export type EditDataValueMap = Record<
   LooseEditingDataValues | undefined
 >;
 
+export type HasSideChanges = Record<string, boolean | undefined>;
+export type HasChangesMap = Record<Cards.Side, HasSideChanges>;
+
 export type EditCardState = {
   target: Target;
   front: EditDataValueMap;
   back: EditDataValueMap;
-  hasChanges: {
-    front: Record<string, boolean | undefined>;
-    back: Record<string, boolean | undefined>;
-  };
+  hasChanges: HasChangesMap;
   getContextState: () => EditCardState;
 };
 
@@ -61,11 +63,13 @@ export type EditDraftRecipe = (draft: WritableDraft<EditCardState>) => void;
 
 export type EditState = (recipe: EditDraftRecipe) => void;
 
+export type SetTarget = React.Dispatch<React.SetStateAction<Target | null>>;
+
 export interface EditCardContext {
   state: EditCardState | null;
   editState: EditState | null;
   onCreateCard: OnCreateCard | null;
-  setTarget: React.Dispatch<React.SetStateAction<Target | null>>;
+  setTarget: SetTarget;
 }
 
 export type UseEditCardTemplateSchemaItemReturn = {

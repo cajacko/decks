@@ -13,9 +13,12 @@ import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Pressable } from "react-native";
 import { Target } from "@/utils/cardTarget";
 
-export type Props = Target & Pick<EditCardProviderProps, "onCreateCard">;
+export type EditCardProps = Pick<
+  EditCardProviderProps,
+  "onCreateCard" | "onChangeTarget"
+> & { target: Target };
 
-export default function EditCard({ onCreateCard, id, type }: Props) {
+export default function EditCard(props: EditCardProps) {
   const height = useHeight();
   const { maxHeight, onContainerLayout } = useMaxHeight();
 
@@ -25,10 +28,8 @@ export default function EditCard({ onCreateCard, id, type }: Props) {
     bottomDrawer.current?.open();
   }, []);
 
-  const target = React.useMemo(() => ({ id, type }), [id, type]);
-
   return (
-    <EditCardProvider onCreateCard={onCreateCard} target={target}>
+    <EditCardProvider {...props}>
       <BottomDrawerWrapper
         onLayout={onContainerLayout}
         style={styles.container}
@@ -39,7 +40,7 @@ export default function EditCard({ onCreateCard, id, type }: Props) {
           horizontal={false}
         >
           <Pressable onPress={onPress}>
-            <CardSide {...target} side="front" />
+            <CardSide {...props.target} side="front" />
           </Pressable>
           <Animated.View style={[styles.drawerBuffer, height.heightStyle]} />
         </ScrollView>
@@ -48,7 +49,7 @@ export default function EditCard({ onCreateCard, id, type }: Props) {
           maxHeight={maxHeight}
           ref={bottomDrawer}
         >
-          <EditCardForm {...target} />
+          <EditCardForm {...props.target} />
         </BottonDrawer>
       </BottomDrawerWrapper>
     </EditCardProvider>

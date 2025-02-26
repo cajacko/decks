@@ -133,14 +133,44 @@ function withUpdateStateFromProps(props: {
   };
 }
 
-export default function EditCardProvider({
-  children,
-  onCreateCard = null,
-  target: targetProp,
-}: Types.EditCardProviderProps) {
-  const [target, setTarget] = React.useState<Target | null>(targetProp);
+function useTarget({
+  onChangeTarget,
+  ...props
+}: {
+  target: Target | null;
+  onChangeTarget?: Types.OnChangeTarget | null;
+}) {
+  const [target, _setTarget] = React.useState<Target | null>(props.target);
 
-  useControlTarget(targetProp, setTarget);
+  const setTarget = React.useCallback<Types.SetTarget>(
+    (_newTarget) => {
+      _setTarget((prevTarget) => {
+        let newTarget: Target | null;
+
+        if (typeof _newTarget === "function") {
+          newTarget = _newTarget(prevTarget);
+        } else {
+          newTarget = _newTarget;
+        }
+
+        onChangeTarget?.(newTarget);
+
+        return newTarget;
+      });
+    },
+    [onChangeTarget, _setTarget],
+  );
+
+  useControlTarget(props.target, setTarget);
+
+  return [target, setTarget] as const;
+}
+
+export default function EditCardProvider({
+  onCreateCard = null,
+  ...props
+}: Types.EditCardProviderProps) {
+  const [target, setTarget] = useTarget(props);
 
   const frontTemplateId = useAppSelector((state) =>
     target
@@ -202,7 +232,7 @@ export default function EditCardProvider({
 
   const value = React.useMemo<Types.EditCardContext>(
     () => ({ state, editState, onCreateCard, setTarget }),
-    [state, editState, onCreateCard],
+    [state, editState, onCreateCard, setTarget],
   );
 
   // Update the state when the target or it's saved props changes
@@ -299,5 +329,5 @@ export default function EditCardProvider({
     );
   }, [target, editState, back, front, frontTemplateId, backTemplateId]);
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }

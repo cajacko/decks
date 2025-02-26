@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import EditCard from "@/components/EditCard";
 import AppError from "@/classes/AppError";
+import { Target } from "@/utils/cardTarget";
 
 export default function EditCardScene() {
   const { cardId } = useLocalSearchParams();
@@ -10,5 +11,13 @@ export default function EditCardScene() {
     throw new AppError(`${EditCardScene.name} cardId must be a string`);
   }
 
-  return <EditCard id={cardId} type="card" />;
+  const target = React.useMemo<Target>(
+    () => ({
+      id: cardId,
+      type: "card",
+    }),
+    [cardId],
+  );
+
+  return <EditCard target={target} />;
 }

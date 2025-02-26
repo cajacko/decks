@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Button } from "react-native";
+import { View } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectCardTemplate } from "@/store/combinedSelectors/cards";
 import TemplateSchemaItem from "@/components/TemplateSchemaItem";
-import { useSaveEditCard, useHasEditCardChanges } from "@/context/EditCard";
+import { useSaveEditCard } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 
 export type EditCardFormProps = Target;
@@ -19,8 +19,7 @@ export default function EditCardForm(
     selectCardTemplate(state, { ...props, side: "front" }),
   );
 
-  const save = useSaveEditCard();
-  const hasChanges = useHasEditCardChanges();
+  useSaveEditCard(true);
 
   return (
     <View style={{ padding: 20 }}>
@@ -40,7 +39,6 @@ export default function EditCardForm(
           side="back"
         />
       ))}
-      <Button title="Save" onPress={save} disabled={!hasChanges} />
     </View>
   );
 }

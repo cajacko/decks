@@ -1,10 +1,8 @@
 import React from "react";
 import { Target, getIsSameTarget } from "@/utils/cardTarget";
 import { useContextSelector } from "./useContextSelector";
-import { EditCardContext } from "./EditCard.types";
+import { SetTarget } from "./EditCard.types";
 import AppError from "@/classes/AppError";
-
-type SetTarget = EditCardContext["setTarget"];
 
 export default function useControlTarget(
   target: Target | null,

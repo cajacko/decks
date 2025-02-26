@@ -3,6 +3,15 @@ import { useContextSelector } from "./useContextSelector";
 import { Cards } from "@/store/types";
 import useIsContextTarget from "./useIsContextTarget";
 import { Target } from "@/utils/cardTarget";
+import { HasChangesMap, HasSideChanges } from "./EditCard.types";
+
+function getHasSideChanges(side: HasSideChanges): boolean {
+  return Object.values(side).some((hasChanges) => !!hasChanges);
+}
+
+export function getHasChanges(props: HasChangesMap): boolean {
+  return getHasSideChanges(props.front) || getHasSideChanges(props.back);
+}
 
 function useDoesCardSideHaveChanges(
   side: Cards.Side,
@@ -14,9 +23,7 @@ function useDoesCardSideHaveChanges(
 
   const hasChanges = React.useMemo(
     (): boolean | null =>
-      hasChangesMap
-        ? Object.values(hasChangesMap).some((hasChanges) => !!hasChanges)
-        : null,
+      hasChangesMap ? getHasSideChanges(hasChangesMap) : null,
     [hasChangesMap],
   );
 
