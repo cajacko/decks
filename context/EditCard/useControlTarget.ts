@@ -2,7 +2,6 @@ import React from "react";
 import { Target, getIsSameTarget } from "@/utils/cardTarget";
 import { useContextSelector } from "./useContextSelector";
 import { EditCardContext } from "./EditCard.types";
-import logger from "@/utils/logger";
 import AppError from "@/classes/AppError";
 
 type SetTarget = EditCardContext["setTarget"];
@@ -17,11 +16,9 @@ export default function useControlTarget(
   React.useEffect(() => {
     // We're already logging above, so all goi
     if (!finalSetTarget) {
-      logger.error(
-        new AppError(
-          `${useControlTarget.name} could not find a setTarget function. We shouldn't get here`,
-        ),
-      );
+      new AppError(
+        `${useControlTarget.name} could not find a setTarget function. We shouldn't get here`,
+      ).log("error");
 
       return;
     }

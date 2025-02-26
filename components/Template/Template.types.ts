@@ -3,7 +3,7 @@ import { Templates } from "@/store/types";
 export type Data = Templates.Data;
 
 export interface TemplateProps<D extends Data> {
-  values: Values;
+  values?: Values | null;
   markup: Templates.Markup<D>;
 }
 

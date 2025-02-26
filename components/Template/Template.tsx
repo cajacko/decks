@@ -8,7 +8,7 @@ export default function Template<D extends Data>({
   markup,
 }: TemplateProps<D>): React.ReactNode {
   return (
-    <TemplateProvider values={values}>
+    <TemplateProvider values={values ?? null}>
       <MarkupChildren elements={markup} />
     </TemplateProvider>
   );

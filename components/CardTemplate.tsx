@@ -1,6 +1,6 @@
 import React from "react";
 import Template, { Values } from "./Template";
-import { useRequiredAppSelector } from "@/store/hooks";
+import { useAppSelector, useRequiredAppSelector } from "@/store/hooks";
 import {
   DeckOrCardSideProps,
   selectCardTemplateData,
@@ -39,15 +39,17 @@ function useEditCardTemplateValues(
 export default function CardTemplate(
   props: CardTemplateProps,
 ): React.ReactNode {
-  const data = useRequiredAppSelector((state) =>
-    selectCardTemplateData(state, props),
-  );
+  const data = useAppSelector((state) => selectCardTemplateData(state, props));
 
   const markup = useRequiredAppSelector(
     (state) => selectCardTemplate(state, props)?.markup,
+    selectCardTemplate.name,
   );
 
-  const values = React.useMemo(() => templateDataToValues(data), [data]);
+  const values = React.useMemo(
+    () => (data ? templateDataToValues(data) : null),
+    [data],
+  );
 
   const editValues = useEditCardTemplateValues(props.side, props);
 

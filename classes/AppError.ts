@@ -1,5 +1,16 @@
 import logger, { LogLevel, safeData } from "@/utils/logger";
 
+/**
+ * When used in try/catch .catch follow this pattern:
+ *
+ * ```typescript
+ * try {
+ *   // Code that might throw an error
+ * } catch (unknownError: unknown) { // specifically call the error unknownError to make it clear
+ *   throw AppError.getError(unknownError, "Error message", data);
+ * }
+ * ```
+ */
 class AppError extends Error {
   private data: unknown;
 

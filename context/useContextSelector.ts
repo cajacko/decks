@@ -1,3 +1,4 @@
+import AppError from "@/classes/AppError";
 import {
   useContextSelector,
   createContext,
@@ -15,8 +16,8 @@ export function useRequiredContextSelector<Value, Selected>(
   const value = useContextSelector<Value, Selected>(context, selector);
 
   if (value === null || value === undefined) {
-    throw new Error(
-      `Selector "${selector.name}" returned null or undefined value within useRequiredContextSelector`,
+    throw new AppError(
+      `Selector "${selector.name}" returned null or undefined value within ${useRequiredContextSelector.name}`,
     );
   }
 

@@ -20,7 +20,7 @@ function getDeckId(cardId: string): string {
   const deckId = selectCard(store.getState(), { cardId })?.deckId;
 
   if (!deckId) {
-    throw new Error(`Deck not found for card ${cardId}`);
+    throw new AppError(`${getDeckId.name}: Deck not found for card ${cardId}`);
   }
 
   return deckId;

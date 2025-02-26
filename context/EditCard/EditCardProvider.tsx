@@ -12,7 +12,6 @@ import * as Types from "./EditCard.types";
 import { context as Context } from "./useContextSelector";
 import getHasChanges from "./getHasChanges";
 import { Target, getIsSameTarget } from "@/utils/cardTarget";
-import logger from "@/utils/logger";
 import AppError from "@/classes/AppError";
 import useControlTarget from "./useControlTarget";
 
@@ -73,7 +72,7 @@ function stateFromProps(props: {
     },
     getContextState: () => {
       if (!props.stateRef.current) {
-        throw new Error(
+        throw new AppError(
           "getContextState called before state was initialised in EditCardProvider",
         );
       }
@@ -189,9 +188,11 @@ export default function EditCardProvider({
       // This condition shouldn't actually trigger based on the conditional above
       setState((prevState) => {
         if (prevState === null) {
-          throw new Error(
-            `Edit state called with no state, this should have been handled by conditionals`,
-          );
+          new AppError(
+            `${EditCardProvider.name}: Edit state called with no state, this should have been handled by conditionals`,
+          ).log("error");
+
+          return prevState;
         }
 
         return produce<Types.EditCardState>(prevState, recipe);
@@ -248,11 +249,9 @@ export default function EditCardProvider({
     }
 
     if (!front || !back || !frontTemplateId || !backTemplateId) {
-      logger.error(
-        new AppError(
-          `Front, back, frontTemplateId or backTemplateId not set when we have prop changes to apply`,
-        ),
-      );
+      new AppError(
+        `Front, back, frontTemplateId or backTemplateId not set when we have prop changes to apply`,
+      ).log("error");
 
       return;
     }
@@ -261,11 +260,9 @@ export default function EditCardProvider({
     // we can't edit the state. So we either leave things as they are or override them. Neither is
     // great so avoid getting here
     if (!editState) {
-      logger.error(
-        new AppError(
-          `editState not set in ${EditCardProvider.name} when we have prop changes to apply`,
-        ),
-      );
+      new AppError(
+        `editState not set in ${EditCardProvider.name} when we have prop changes to apply`,
+      ).log("error");
 
       const newSavedState = stateFromProps({
         target,
@@ -277,11 +274,9 @@ export default function EditCardProvider({
       });
 
       if (!newSavedState) {
-        logger.error(
-          new AppError(
-            `${EditCardProvider.name} could not apply fallback state changes, we shouldn't be here`,
-          ),
-        );
+        new AppError(
+          `${EditCardProvider.name} could not apply fallback state changes, we shouldn't be here`,
+        ).log("error");
 
         setState(null);
 

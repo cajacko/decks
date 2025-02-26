@@ -5,6 +5,7 @@ import { getContainerStyle, getInnerStyle } from "./card.styles";
 import useCard from "./useCard";
 import { PhysicalMeasuresProvider } from "@/context/PhysicalMeasures";
 import cardDimensions from "@/config/cardDimensions";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
   const state = useCard(props, ref);
@@ -53,7 +54,9 @@ export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
       dpDistance={state.width}
     >
       <Animated.View style={containerStyle}>
-        <View style={innerStyle}>{props.children}</View>
+        <View style={innerStyle}>
+          <ErrorBoundary logLevel="error">{props.children}</ErrorBoundary>
+        </View>
         {props.overlay}
       </Animated.View>
     </PhysicalMeasuresProvider>

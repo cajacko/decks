@@ -11,11 +11,13 @@ export default function useCardInstance(
 ) {
   const { tabletopId } = useTabletopContext();
 
-  const cardInstance = useRequiredAppSelector((state) =>
-    selectCardInstance(state, {
-      cardInstanceId: props.cardInstanceId,
-      tabletopId,
-    }),
+  const cardInstance = useRequiredAppSelector(
+    (state) =>
+      selectCardInstance(state, {
+        cardInstanceId: props.cardInstanceId,
+        tabletopId,
+      }),
+    selectCardInstance.name,
   );
 
   const [flipState, setFlipState] = React.useState<

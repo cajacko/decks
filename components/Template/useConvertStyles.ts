@@ -42,7 +42,7 @@ export function replaceVariables(text: string, values: Values): string {
   return template(values);
 }
 
-export default function useConvertStyles(values: Values) {
+export default function useConvertStyles(values?: Values | null) {
   const { mmToDp } = usePhysicalMeasures();
 
   /**
@@ -65,14 +65,16 @@ export default function useConvertStyles(values: Values) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           newStyle[key] = newValue as any;
         } else if (typeof value === "string") {
-          const match = value.match(variableRegex);
+          if (values) {
+            const match = value.match(variableRegex);
 
-          if (match) {
-            const newValue: string = replaceVariables(value, values);
+            if (match) {
+              const newValue: string = replaceVariables(value, values);
 
-            // This is been a bit annoying so ignoring
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            newStyle[key] = newValue as any;
+              // This is been a bit annoying so ignoring
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              newStyle[key] = newValue as any;
+            }
           }
         }
       }

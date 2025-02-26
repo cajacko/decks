@@ -1,3 +1,4 @@
+import AppError from "@/classes/AppError";
 import React from "react";
 
 interface ContextState {
@@ -12,8 +13,8 @@ export function usePhysicalMeasures() {
   const context = React.useContext(Context);
 
   if (!context) {
-    throw new Error(
-      "usePhysicalMeasures must be used within a PhysicalMeasuresProvider component",
+    throw new AppError(
+      `${usePhysicalMeasures.name} must be used within a PhysicalMeasuresProvider component`,
     );
   }
 

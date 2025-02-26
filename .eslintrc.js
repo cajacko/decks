@@ -16,7 +16,7 @@ module.exports = {
     // Typescript checks this
     "import/no-unresolved": "off",
     "no-restricted-syntax": [
-      "warn",
+      "error",
       {
         selector: "NewExpression[callee.name='Error']",
         message:

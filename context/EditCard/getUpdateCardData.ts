@@ -3,6 +3,7 @@ import { CardDataItem } from "@/store/combinedActions/cards";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
 import { store } from "@/store/store";
 import { EditCardState } from "./EditCard.types";
+import AppError from "@/classes/AppError";
 
 /**
  * Get the template schema item title outside of the UI render cycle, otherwise we'd use react-redux
@@ -22,8 +23,9 @@ function getTemplateSchemaItemTitle(props: {
   )?.name;
 
   if (!templateDataItemTitle) {
-    throw new Error(
+    throw new AppError(
       `Template data item not found for template ${props.templateId} and item ${props.templateSchemaItemId}`,
+      props,
     );
   }
 

@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./store";
+import AppError from "@/classes/AppError";
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
@@ -9,12 +10,13 @@ type Selector<T> = (state: RootState) => T;
 
 export const useRequiredAppSelector = <T>(
   selector: Selector<T>,
+  selectorName: string,
 ): NonNullable<T> => {
   const value = useAppSelector(selector);
 
   if (value === null || value === undefined) {
-    throw new Error(
-      `Selector "${selector.name}" returned null or undefined value within useRequiredAppSelector`,
+    throw new AppError(
+      `Selector "${selectorName ?? selector.name}" returned null or undefined value within ${useRequiredAppSelector.name}`,
     );
   }
 

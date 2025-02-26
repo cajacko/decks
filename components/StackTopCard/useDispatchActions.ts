@@ -11,6 +11,7 @@ import { CardInstanceRef } from "@/components/CardInstance";
 import { StackTopCardProps } from "./types";
 import { useAnimateCardMovement } from "@/hooks/useFlag";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
+import AppError from "@/classes/AppError";
 
 export default function useDispatchActions({
   cardInstanceId,
@@ -26,7 +27,9 @@ export default function useDispatchActions({
   );
 
   if (!cardInstance) {
-    throw new Error(`Card with id ${cardInstanceId} not found`);
+    throw new AppError(
+      `${useDispatchActions.name}: Card with id ${cardInstanceId} not found`,
+    );
   }
 
   const state = cardInstance.state;
