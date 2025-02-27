@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
-import { RootState, Tabletops, SliceName } from "../types";
+import { RootState, Tabletops, SliceName, Cards } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
@@ -13,7 +13,6 @@ export type TabletopHistoryState = Tabletops.HistoryState;
 export type Stack = Tabletops.Stack;
 export type CardInstance = Tabletops.CardInstance;
 
-export const CardInstanceState = Tabletops.CardInstanceState;
 export const MoveCardInstanceMethod = Tabletops.MoveCardInstanceMethod;
 
 const initialState: TabletopState = flags.USE_DEV_INITIAL_REDUX_STATE
@@ -84,15 +83,15 @@ export const tabletopsSlice = createSlice({
         switch (method) {
           case MoveCardInstanceMethod.topFaceUp:
           case MoveCardInstanceMethod.bottomFaceUp: {
-            if (cardInstance.state !== CardInstanceState.faceUp) {
-              cardInstance.state = CardInstanceState.faceUp;
+            if (cardInstance.side !== "front") {
+              cardInstance.side = "front";
             }
             break;
           }
           case MoveCardInstanceMethod.topFaceDown:
           case MoveCardInstanceMethod.bottomFaceDown: {
-            if (cardInstance.state !== CardInstanceState.faceDown) {
-              cardInstance.state = CardInstanceState.faceDown;
+            if (cardInstance.side !== "back") {
+              cardInstance.side = "back";
             }
             break;
           }
@@ -129,7 +128,7 @@ export const tabletopsSlice = createSlice({
         action: PayloadAction<{
           tabletopId: string;
           cardInstanceId: string;
-          state: Tabletops.CardInstanceState;
+          side: Cards.Side;
         }>,
       ) => {
         const cardInstance =
@@ -137,7 +136,7 @@ export const tabletopsSlice = createSlice({
 
         if (!cardInstance) return;
 
-        cardInstance.state = action.payload.state;
+        cardInstance.side = action.payload.side;
       },
     ),
     setStackOrder: history.withHistory(
@@ -147,7 +146,7 @@ export const tabletopsSlice = createSlice({
           tabletopId: string;
           stackId: string;
           seed: number | string;
-          allCardInstancesState: Tabletops.CardInstanceState | "noChange";
+          allCardInstancesState: Cards.Side | "noChange";
         }>,
       ) => {
         const stack = state?.stacksById[action.payload.stackId];
@@ -161,9 +160,9 @@ export const tabletopsSlice = createSlice({
             const cardInstance = state.cardInstancesById[cardInstanceId];
 
             if (!cardInstance) return;
-            if (cardInstance.state === allCardInstancesState) return;
+            if (cardInstance.side === allCardInstancesState) return;
 
-            cardInstance.state = allCardInstancesState;
+            cardInstance.side = allCardInstancesState;
           });
         }
 

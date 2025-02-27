@@ -3,7 +3,7 @@ import CardSides, {
   CardSidesRef,
   CardSidesProps,
 } from "@/components/CardSides";
-import { CardInstanceState, selectCardInstance } from "@/store/slices/tabletop";
+import { selectCardInstance } from "@/store/slices/tabletop";
 import { useRequiredAppSelector } from "@/store/hooks";
 import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
 
@@ -27,9 +27,7 @@ export default React.forwardRef<CardSidesRef, CardInstanceProps>(
     return (
       <CardSides
         ref={ref}
-        side={
-          cardInstance.state === CardInstanceState.faceUp ? "front" : "back"
-        }
+        side={cardInstance.side}
         id={cardInstance.cardId}
         type="card"
         {...cardSidesProps}

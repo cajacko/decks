@@ -49,14 +49,17 @@ export default function useCardSides(
         await faceDownRef.current?.animateFlipIn();
 
         setFlipState("flipped-to-back");
-      } else {
-        setFlipState("flipping-to-front");
 
-        await faceDownRef.current?.animateFlipOut();
-        await faceUpRef.current?.animateFlipIn();
-
-        setFlipState("flipped-to-front");
+        return "back";
       }
+      setFlipState("flipping-to-front");
+
+      await faceDownRef.current?.animateFlipOut();
+      await faceUpRef.current?.animateFlipIn();
+
+      setFlipState("flipped-to-front");
+
+      return "front";
     },
     animateOut: async (props) => {
       if (side.current === "front") {

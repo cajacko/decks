@@ -14,15 +14,10 @@ export enum MoveCardInstanceMethod {
   bottomNoChange = "bottomNoChange",
 }
 
-export enum CardInstanceState {
-  faceDown = "faceDown",
-  faceUp = "faceUp",
-}
-
 export interface CardInstance {
   cardInstanceId: CardInstanceId;
   cardId: Cards.CardId;
-  state: CardInstanceState;
+  side: Cards.Side;
 }
 
 export interface Stack {

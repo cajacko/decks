@@ -6,7 +6,7 @@ import { ViewStyle } from "react-native";
 
 export interface CardSidesRef
   extends Pick<CardRef, "animateOut" | "getIsAnimating"> {
-  animateFlip: () => Promise<unknown>;
+  animateFlip: () => Promise<Cards.Side>;
 }
 
 export interface CardSidesProps extends CardSideProps {

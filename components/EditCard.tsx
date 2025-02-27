@@ -17,7 +17,7 @@ import { Cards } from "@/store/types";
 export type EditCardProps = Pick<
   EditCardProviderProps,
   "onCreateCard" | "onChangeTarget"
-> & { target: Target };
+> & { target: Target; initialSide?: Cards.Side | null };
 
 export default function EditCard(props: EditCardProps) {
   const height = useHeight();
@@ -29,7 +29,9 @@ export default function EditCard(props: EditCardProps) {
     bottomDrawer.current?.open();
   }, []);
 
-  const [side, setSide] = React.useState<Cards.Side>("front");
+  const [side, setSide] = React.useState<Cards.Side>(
+    props.initialSide ?? "front",
+  );
   const cardSidesRef = React.useRef<CardSidesRef>(null);
 
   const flipSide = React.useCallback(async () => {
@@ -39,7 +41,7 @@ export default function EditCard(props: EditCardProps) {
   }, []);
 
   return (
-    <EditCardProvider onChangeSide={setSide} {...props}>
+    <EditCardProvider onChangeSide={setSide} side={side} {...props}>
       <BottomDrawerWrapper
         onLayout={onContainerLayout}
         style={styles.container}

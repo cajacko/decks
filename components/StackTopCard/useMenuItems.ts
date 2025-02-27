@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { StackTopCardProps, StackTopCardMenuItem } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
+import { paramKeys } from "@/app/card/[cardId]";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
@@ -38,7 +39,8 @@ export default function useMenuItems(props: StackTopCardProps) {
         height: buttonSize,
         width: buttonSize,
         icon: "Ed",
-        onPress: () => router.push(`/card/${state.cardId}`),
+        onPress: () =>
+          router.push(`/card/${state.cardId}?${paramKeys.side}=${state.side}`),
       },
     ];
 
@@ -89,6 +91,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.moveLeft,
     router,
     state.cardId,
+    state.side,
   ]);
 
   return {

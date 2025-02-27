@@ -1,4 +1,4 @@
-import { RootState, Templates, Tabletops } from "../types";
+import { RootState, Templates } from "../types";
 import templatesById from "@/config/templatesById";
 
 const state: RootState = {
@@ -163,27 +163,27 @@ const state: RootState = {
               cardInstance1: {
                 cardInstanceId: "cardInstance1",
                 cardId: "card1",
-                state: Tabletops.CardInstanceState.faceUp,
+                side: "front",
               },
               cardInstance2: {
                 cardInstanceId: "cardInstance2",
                 cardId: "card2",
-                state: Tabletops.CardInstanceState.faceUp,
+                side: "front",
               },
               cardInstance3: {
                 cardInstanceId: "cardInstance3",
                 cardId: "card3",
-                state: Tabletops.CardInstanceState.faceUp,
+                side: "front",
               },
               cardInstance4: {
                 cardInstanceId: "cardInstance4",
                 cardId: "card4",
-                state: Tabletops.CardInstanceState.faceUp,
+                side: "front",
               },
               cardInstance5: {
                 cardInstanceId: "cardInstance5",
                 cardId: "card5",
-                state: Tabletops.CardInstanceState.faceUp,
+                side: "front",
               },
             },
             stacksById: {

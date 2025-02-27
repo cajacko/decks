@@ -1,9 +1,8 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useRequiredAppSelector } from "@/store/hooks";
 import {
   moveCard,
   changeCardState,
-  CardInstanceState,
   MoveCardInstanceMethod,
   selectCardInstance,
 } from "@/store/slices/tabletop";
@@ -11,7 +10,6 @@ import { CardSidesRef } from "@/components/CardSides";
 import { StackTopCardProps } from "./types";
 import { useAnimateCardMovement } from "@/hooks/useFlag";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
-import AppError from "@/classes/AppError";
 
 export default function useDispatchActions({
   cardInstanceId,
@@ -22,17 +20,11 @@ export default function useDispatchActions({
 }: StackTopCardProps) {
   const { tabletopId } = useTabletopContext();
 
-  const cardInstance = useAppSelector((state) =>
-    selectCardInstance(state, { tabletopId, cardInstanceId }),
+  const { cardId, side } = useRequiredAppSelector(
+    (state) => selectCardInstance(state, { tabletopId, cardInstanceId }),
+    useDispatchActions.name,
   );
 
-  if (!cardInstance) {
-    throw new AppError(
-      `${useDispatchActions.name}: Card with id ${cardInstanceId} not found`,
-    );
-  }
-
-  const state = cardInstance.state;
   const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
   const cardInstanceRef = React.useRef<CardSidesRef>(null);
@@ -51,13 +43,10 @@ export default function useDispatchActions({
       changeCardState({
         tabletopId,
         cardInstanceId,
-        state:
-          state === CardInstanceState.faceDown
-            ? CardInstanceState.faceUp
-            : CardInstanceState.faceDown,
+        side: side === "back" ? "front" : "back",
       }),
     );
-  }, [dispatch, cardInstanceId, state, tabletopId, animateCardMovement]);
+  }, [dispatch, cardInstanceId, side, tabletopId, animateCardMovement]);
 
   const moveRight = React.useMemo(() => {
     if (!rightStackId) return undefined;
@@ -198,7 +187,9 @@ export default function useDispatchActions({
   ]);
 
   return {
-    cardId: cardInstance.cardId,
+    side,
+    tabletopId,
+    cardId,
     cardInstanceRef,
     handleFlipCard,
     moveRight,
