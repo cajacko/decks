@@ -68,7 +68,7 @@ const basicText: Templates.Props<
 const plainBack: Templates.Props = {
   templateId: "plainBack",
   name: "Back Template",
-  schemaOrder: [],
+  schemaOrder: ["template2-background"],
   schema: {
     "template2-background": {
       id: "template2-background",
@@ -85,7 +85,7 @@ const plainBack: Templates.Props = {
       type: "view",
       style: {
         flex: 1,
-        backgroundColor: "grey",
+        backgroundColor: "{{template2-background}}",
         justifyContent: "center",
         alignItems: "center",
         padding: 5,
