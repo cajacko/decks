@@ -13,6 +13,8 @@ export type EditCardProviderProps = {
    * type = "card" - when you want to edit an existing card
    */
   target: Target | null;
+  side?: Cards.Side;
+  onChangeSide?: (side: Cards.Side) => void;
   children?: React.ReactNode;
   onCreateCard?: OnCreateCard | null;
   onChangeTarget?: OnChangeTarget | null;
@@ -64,11 +66,14 @@ export type EditDraftRecipe = (draft: WritableDraft<EditCardState>) => void;
 export type EditState = (recipe: EditDraftRecipe) => void;
 
 export type SetTarget = React.Dispatch<React.SetStateAction<Target | null>>;
+export type SetSide = React.Dispatch<React.SetStateAction<Cards.Side>>;
 
 export interface EditCardContext {
   state: EditCardState | null;
   editState: EditState | null;
   onCreateCard: OnCreateCard | null;
+  setSide: SetSide;
+  side: Cards.Side;
   setTarget: SetTarget;
 }
 

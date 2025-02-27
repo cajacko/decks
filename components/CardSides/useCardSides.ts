@@ -1,25 +1,12 @@
 import React from "react";
-import { CardInstanceState, selectCardInstance } from "@/store/slices/tabletop";
-import { useRequiredAppSelector } from "@/store/hooks";
 import { CardRef } from "@/components/Card";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
-import { CardInstanceProps, CardInstanceRef } from "./CardInstance.types";
+import { CardSidesRef } from "./CardSides.types";
+import { Cards } from "@/store/types";
 
-export default function useCardInstance(
-  props: Pick<CardInstanceProps, "cardInstanceId">,
-  ref: React.Ref<CardInstanceRef>,
+export default function useCardSides(
+  sideProp: Cards.Side,
+  ref: React.Ref<CardSidesRef>,
 ) {
-  const { tabletopId } = useTabletopContext();
-
-  const cardInstance = useRequiredAppSelector(
-    (state) =>
-      selectCardInstance(state, {
-        cardInstanceId: props.cardInstanceId,
-        tabletopId,
-      }),
-    selectCardInstance.name,
-  );
-
   const [flipState, setFlipState] = React.useState<
     | null
     | "flipping-to-back"
@@ -28,8 +15,10 @@ export default function useCardInstance(
     | "flipped-to-back"
   >();
 
-  const state = React.useRef(cardInstance.state);
-  state.current = cardInstance.state;
+  // useImperativeHandle doesn't use the latest prop so we need to use a ref to store the latest
+  // value
+  const side = React.useRef(sideProp);
+  side.current = sideProp;
 
   const faceUpRef = React.useRef<CardRef>(null);
   const faceDownRef = React.useRef<CardRef>(null);
@@ -39,27 +28,21 @@ export default function useCardInstance(
   // state
   React.useEffect(() => {
     setFlipState((prevState) => {
-      if (
-        prevState === "flipped-to-front" &&
-        cardInstance.state === CardInstanceState.faceUp
-      ) {
+      if (prevState === "flipped-to-front" && side.current === "front") {
         return null;
       }
 
-      if (
-        prevState === "flipped-to-back" &&
-        cardInstance.state === CardInstanceState.faceDown
-      ) {
+      if (prevState === "flipped-to-back" && side.current === "back") {
         return null;
       }
 
       return prevState;
     });
-  }, [cardInstance.state]);
+  }, [side]);
 
   React.useImperativeHandle(ref, () => ({
     animateFlip: async () => {
-      if (state.current === CardInstanceState.faceUp) {
+      if (side.current === "front") {
         setFlipState("flipping-to-back");
 
         await faceUpRef.current?.animateFlipOut();
@@ -76,7 +59,7 @@ export default function useCardInstance(
       }
     },
     animateOut: async (props) => {
-      if (state.current === CardInstanceState.faceUp) {
+      if (side.current === "front") {
         return faceUpRef.current?.animateOut(props);
       } else {
         return faceDownRef.current?.animateOut(props);
@@ -95,21 +78,21 @@ export default function useCardInstance(
     flipState === "flipping-to-back" || flipState === "flipping-to-front";
 
   const renderFaceUp =
-    cardInstance.state === CardInstanceState.faceUp ||
-    flipping ||
-    flipState === "flipped-to-front";
+    side.current === "front" || flipping || flipState === "flipped-to-front";
 
   const renderFaceDown =
-    cardInstance.state === CardInstanceState.faceDown ||
-    flipping ||
-    flipState === "flipped-to-back";
+    side.current === "back" || flipping || flipState === "flipped-to-back";
+
+  // We need to absolutely position the components when they are both being rendered, otherwise
+  // they jank around
+  const renderSpacer = !!renderFaceUp && !!renderFaceDown;
 
   return {
+    renderSpacer,
     renderFaceUp,
     renderFaceDown,
     faceUpRef,
     faceDownRef,
-    cardInstance,
     flipState,
   };
 }

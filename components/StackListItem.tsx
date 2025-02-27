@@ -23,11 +23,15 @@ export default function StackListItem(
 
   const cardProps = React.useMemo(
     (): CardProps => ({
-      style: styles.card,
       offsetPosition: cardOffsetPosition,
       zIndex,
     }),
     [cardOffsetPosition, zIndex],
+  );
+
+  const style = React.useMemo(
+    () => StyleSheet.flatten([styles.card, { zIndex }]),
+    [zIndex],
   );
 
   // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
@@ -37,6 +41,7 @@ export default function StackListItem(
   if (isTopCard) {
     return (
       <StackTopCard
+        style={style}
         key={cardInstanceId}
         cardInstanceId={cardInstanceId}
         stackId={props.stackId}
@@ -50,6 +55,7 @@ export default function StackListItem(
 
   return (
     <CardInstance
+      style={style}
       key={cardInstanceId}
       cardInstanceId={cardInstanceId}
       CardProps={cardProps}

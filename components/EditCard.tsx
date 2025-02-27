@@ -8,10 +8,11 @@ import BottonDrawer, {
   useMaxHeight,
 } from "@/components/BottomDrawer";
 import EditCardForm from "@/components/EditCardForm";
-import CardSide from "@/components/CardSide";
+import CardSides, { CardSidesRef } from "@/components/CardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Pressable } from "react-native";
 import { Target } from "@/utils/cardTarget";
+import { Cards } from "@/store/types";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
@@ -28,8 +29,17 @@ export default function EditCard(props: EditCardProps) {
     bottomDrawer.current?.open();
   }, []);
 
+  const [side, setSide] = React.useState<Cards.Side>("front");
+  const cardSidesRef = React.useRef<CardSidesRef>(null);
+
+  const flipSide = React.useCallback(async () => {
+    await cardSidesRef.current?.animateFlip();
+
+    setSide((side) => (side === "front" ? "back" : "front"));
+  }, []);
+
   return (
-    <EditCardProvider {...props}>
+    <EditCardProvider onChangeSide={setSide} {...props}>
       <BottomDrawerWrapper
         onLayout={onContainerLayout}
         style={styles.container}
@@ -40,7 +50,7 @@ export default function EditCard(props: EditCardProps) {
           horizontal={false}
         >
           <Pressable onPress={onPress}>
-            <CardSide {...props.target} side="front" />
+            <CardSides ref={cardSidesRef} {...props.target} side={side} />
           </Pressable>
           <Animated.View style={[styles.drawerBuffer, height.heightStyle]} />
         </ScrollView>
@@ -49,7 +59,7 @@ export default function EditCard(props: EditCardProps) {
           maxHeight={maxHeight}
           ref={bottomDrawer}
         >
-          <EditCardForm {...props.target} />
+          <EditCardForm flipSide={flipSide} {...props.target} />
         </BottonDrawer>
       </BottomDrawerWrapper>
     </EditCardProvider>

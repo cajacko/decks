@@ -7,7 +7,7 @@ import {
   MoveCardInstanceMethod,
   selectCardInstance,
 } from "@/store/slices/tabletop";
-import { CardInstanceRef } from "@/components/CardInstance";
+import { CardSidesRef } from "@/components/CardSides";
 import { StackTopCardProps } from "./types";
 import { useAnimateCardMovement } from "@/hooks/useFlag";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
@@ -35,7 +35,7 @@ export default function useDispatchActions({
   const state = cardInstance.state;
   const animateCardMovement = useAnimateCardMovement();
   const dispatch = useAppDispatch();
-  const cardInstanceRef = React.useRef<CardInstanceRef>(null);
+  const cardInstanceRef = React.useRef<CardSidesRef>(null);
   const [isAnimating, setIsAnimating] = React.useState(
     cardInstanceRef.current?.getIsAnimating() ?? false,
   );
