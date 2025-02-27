@@ -1,21 +1,33 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import Card, { CardProps, getBorderRadius } from "./Card";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
+import { useAppDispatch } from "@/store/hooks";
+import { deleteStack } from "@/store/slices/tabletop";
 
-export type EmptyStackProps = CardProps;
+export type EmptyStackProps = {
+  stackId: string;
+  style?: CardProps["style"];
+  CardProps?: CardProps;
+};
 
 export default function EmptyStack({
+  stackId,
   style,
-  ...rest
+  CardProps,
 }: EmptyStackProps): React.ReactNode {
   const context = useTabletopContext();
+  const dispatch = useAppDispatch();
+
+  const handleDeleteStack = React.useCallback(() => {
+    dispatch(deleteStack({ tabletopId: context.tabletopId, stackId: stackId }));
+  }, [dispatch, stackId, context.tabletopId]);
 
   return (
     <Card
-      style={StyleSheet.flatten([styles.container, style])}
       innerStyle={styles.inner}
-      {...rest}
+      {...CardProps}
+      style={StyleSheet.flatten([styles.container, style, CardProps?.style])}
     >
       <View
         style={StyleSheet.flatten([
@@ -24,6 +36,9 @@ export default function EmptyStack({
         ])}
       >
         <Text style={styles.text}>Empty Stack</Text>
+        <View style={styles.delete}>
+          <Button title="Delete stack" onPress={handleDeleteStack} />
+        </View>
       </View>
     </Card>
   );
@@ -36,6 +51,9 @@ const styles = StyleSheet.create({
   inner: {
     borderWidth: 0,
     backgroundColor: "transparent",
+  },
+  delete: {
+    marginTop: 20,
   },
   // Slightly smaller so it doesn't poke out of the cards when in a stack
   content: {

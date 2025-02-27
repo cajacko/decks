@@ -58,21 +58,16 @@ export const tabletopsSlice = createSlice({
         action: PayloadAction<{
           tabletopId: string;
           cardInstanceId: string;
-          fromStackId: string;
           toStackId: string;
+          newStackDirection: "start" | "end";
           // Do we specify the method, or let the stack define it? Or both? If specified here it's
           // more specific, otherwise do what the stack it's going to says
           method: Tabletops.MoveCardInstanceMethod;
         }>,
       ) => {
-        const { fromStackId, cardInstanceId, method, toStackId } =
+        const { cardInstanceId, method, toStackId, newStackDirection } =
           action.payload;
-
-        const fromStack = state?.stacksById[fromStackId];
         const toStack = state.stacksById[toStackId];
-
-        if (!fromStack || !toStack) return;
-
         const cardInstance = state.cardInstancesById[cardInstanceId];
 
         if (!cardInstance) return;
@@ -102,6 +97,24 @@ export const tabletopsSlice = createSlice({
 
         // Helps prevent duplicates if the action has got confused somehow
         removeCardInstancesFromStacks(state, [cardInstanceId]);
+
+        // It's a new stack, lets add it
+        if (!toStack) {
+          const newStack: Stack = {
+            id: toStackId,
+            cardInstances: [cardInstanceId],
+          };
+
+          state.stacksById[toStackId] = newStack;
+
+          if (newStackDirection === "start") {
+            state.stacksIds.unshift(toStackId);
+          } else {
+            state.stacksIds.push(toStackId);
+          }
+
+          return;
+        }
 
         // Add to the new stack
         switch (method) {
@@ -167,6 +180,19 @@ export const tabletopsSlice = createSlice({
         stack.cardInstances.sort(withSeededShuffleSort(action.payload.seed));
       },
     ),
+    deleteStack: history.withHistory(
+      (
+        state,
+        action: PayloadAction<{ tabletopId: string; stackId: string }>,
+      ) => {
+        delete state.stacksById[action.payload.stackId];
+
+        removeFromArray(
+          state.stacksIds,
+          (item) => item === action.payload.stackId,
+        );
+      },
+    ),
   },
   extraReducers: (builder) => {
     builder.addCase(deleteCard, (state, actions) => {
@@ -214,8 +240,14 @@ export const tabletopsSlice = createSlice({
   },
 });
 
-export const { changeCardState, moveCard, setStackOrder, undo, redo } =
-  tabletopsSlice.actions;
+export const {
+  changeCardState,
+  moveCard,
+  setStackOrder,
+  undo,
+  redo,
+  deleteStack,
+} = tabletopsSlice.actions;
 
 export const selectTabletop = (
   state: RootState,

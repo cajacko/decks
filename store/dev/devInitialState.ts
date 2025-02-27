@@ -202,12 +202,8 @@ const state: RootState = {
                 id: "stack2",
                 cardInstances: [],
               },
-              stack3: {
-                id: "stack3",
-                cardInstances: [],
-              },
             },
-            stacksIds: ["stack1", "stack2", "stack3"],
+            stacksIds: ["stack1", "stack2"],
           },
           future: [],
         },

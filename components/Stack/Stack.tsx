@@ -77,7 +77,7 @@ export default function Stack(props: StackProps): React.ReactNode {
           </>
         )}
 
-        <EmptyStack style={styles.empty} />
+        <EmptyStack stackId={props.stackId} style={styles.empty} />
       </Animated.View>
     </View>
   );
