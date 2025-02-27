@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, StyleSheet, Pressable } from "react-native";
+import { Text, StyleSheet, View, Button } from "react-native";
 import { useRequiredAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
@@ -18,21 +18,39 @@ export default function DeckListItem(
     DeckListItem.name,
   );
 
-  const onPress = React.useCallback(() => {
-    push(`/deck/${props.deckId}/tabletop`);
+  const edit = React.useCallback(() => {
+    push(`/deck/${props.deckId}`);
+  }, [props.deckId, push]);
+
+  const play = React.useCallback(() => {
+    push(`/deck/${props.deckId}/play`);
   }, [props.deckId, push]);
 
   return (
-    <Pressable style={styles.container} onPress={onPress}>
-      <Text>{name}</Text>
-    </Pressable>
+    <View style={styles.container}>
+      <Text style={styles.text}>{name}</Text>
+      <View style={styles.button}>
+        <Button title="Play" onPress={play} />
+      </View>
+      <View style={styles.button}>
+        <Button title="Edit" onPress={edit} />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 300,
+    padding: 10,
+  },
+  text: {
+    flex: 1,
+    fontSize: 20,
+  },
+  button: {
+    marginVertical: 10,
   },
 });

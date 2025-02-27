@@ -5,7 +5,7 @@ export type CardSide = "front" | "back";
 export type DeckId = string;
 export type DataSchemaItemId = string;
 
-interface Card {
+export interface Card {
   cardId: string;
   quantity: number;
 }

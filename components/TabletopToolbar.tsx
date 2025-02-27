@@ -9,10 +9,11 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function TabletopToolbar(): React.ReactNode {
   const { tabletopId } = useTabletopContext();
+  const params = useLocalSearchParams();
   const dispatch = useAppDispatch();
   const hasPast = useAppSelector((state) =>
     selectTabletopHasPast(state, { tabletopId }),
@@ -21,9 +22,8 @@ export default function TabletopToolbar(): React.ReactNode {
     selectTabletopHasFuture(state, { tabletopId }),
   );
 
+  const deckId = typeof params.deckId === "string" ? params.deckId : null;
   const router = useRouter();
-
-  const deckId = "deck1";
 
   return (
     <View style={styles.container}>
@@ -35,11 +35,20 @@ export default function TabletopToolbar(): React.ReactNode {
           { opacity: hasPast ? 1 : 0.5 },
         ])}
       />
-      <CardAction
-        icon="+"
-        onPress={() => router.push(`/deck/${deckId}/new-card`)}
-        style={styles.action}
-      />
+      {deckId && (
+        <CardAction
+          icon="De"
+          onPress={() => router.push(`/deck/${deckId}`)}
+          style={styles.action}
+        />
+      )}
+      {deckId && (
+        <CardAction
+          icon="+"
+          onPress={() => router.push(`/deck/${deckId}/new-card`)}
+          style={styles.action}
+        />
+      )}
       <CardAction
         icon="Re"
         onPress={hasFuture ? () => dispatch(redo({ tabletopId })) : undefined}

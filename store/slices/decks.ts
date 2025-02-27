@@ -112,6 +112,15 @@ export const cardsSlice = createSlice({
 
     builder.addCase(createCard, (state, actions) => {
       updateDeckTemplateMapping(state, actions.payload);
+
+      const deck = state.decksById[actions.payload.deckId];
+
+      if (!deck) return;
+
+      deck.cards.push({
+        cardId: actions.payload.cardId,
+        quantity: 1,
+      });
     });
 
     builder.addCase(deleteCard, (state, actions) => {
@@ -138,5 +147,10 @@ export const selectDeck = (
 
 export const selectDeckIds = (state: RootState): Decks.DeckId[] =>
   state[cardsSlice.name].deckIds;
+
+export const selectDeckCards = (
+  state: RootState,
+  props: { deckId: string },
+): Decks.Card[] | null => selectDeck(state, props)?.cards ?? null;
 
 export default cardsSlice;

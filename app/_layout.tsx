@@ -50,19 +50,10 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="tabletop/[tabletopId]"
+              name="deck/[deckId]/play"
               options={{
                 headerShown: true,
-                headerTitle: "Tabletop",
-                headerBackVisible: true,
-                animation: "slide_from_right",
-              }}
-            />
-            <Stack.Screen
-              name="deck/[deckId]/tabletop"
-              options={{
-                headerShown: true,
-                headerTitle: "Tabletop",
+                headerTitle: "Play Deck",
                 headerBackVisible: true,
                 animation: "slide_from_right",
               }}
@@ -102,7 +93,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 presentation: "modal",
-                headerTitle: "Deck Defaults",
+                headerTitle: "Card Defaults",
                 headerBackVisible: true,
                 animation: "slide_from_right",
               }}
