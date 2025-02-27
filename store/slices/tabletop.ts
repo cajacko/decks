@@ -6,6 +6,8 @@ import { RootState, Tabletops, SliceName, Cards } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
+import removeFromArray from "@/utils/immer/removeFromArray";
+import { deleteCard } from "../combinedActions/cards";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -38,13 +40,9 @@ function removeCardInstancesFromStacks(
   Object.values(state.stacksById).forEach((stack) => {
     if (!stack) return;
 
-    // Don't use filter as this would create new arrays even if the item doesn't exist in this stack
-    // Loop backwards to safely remove items while iterating
-    for (let i = stack.cardInstances.length - 1; i >= 0; i--) {
-      if (cardInstanceIds.includes(stack.cardInstances[i])) {
-        stack.cardInstances.splice(i, 1); // Remove the card instance
-      }
-    }
+    removeFromArray(stack.cardInstances, (item) =>
+      cardInstanceIds.includes(item),
+    );
   });
 }
 
@@ -169,6 +167,50 @@ export const tabletopsSlice = createSlice({
         stack.cardInstances.sort(withSeededShuffleSort(action.payload.seed));
       },
     ),
+  },
+  extraReducers: (builder) => {
+    builder.addCase(deleteCard, (state, actions) => {
+      const { deckId, cardId } = actions.payload;
+
+      if (!deckId) return;
+
+      Object.values(state.tabletopsById).forEach((tabletop) => {
+        if (!tabletop) return;
+        if (!tabletop.availableDecks?.includes(deckId)) return;
+
+        const present = tabletop.history.present;
+
+        let didEdit = false;
+
+        // NOTE: We may want to do this a different way, perhaps having a separate lookup table that
+        // stays in sync?
+
+        const cardInstanceIdsToRemove: string[] = [];
+
+        Object.values(present.cardInstancesById).forEach((cardInstance) => {
+          if (!cardInstance) return;
+          if (cardInstance.cardId !== cardId) return;
+
+          cardInstanceIdsToRemove.push(cardInstance.cardInstanceId);
+          delete present.cardInstancesById[cardInstance.cardInstanceId];
+          didEdit = true;
+        });
+
+        Object.values(present.stacksById).forEach((stack) => {
+          if (!stack) return;
+
+          removeFromArray(stack.cardInstances, (item) =>
+            cardInstanceIdsToRemove.includes(item),
+          );
+        });
+
+        // It feels like a bit of a cluster fuck to try and support this after a card is deleted
+        if (didEdit) {
+          tabletop.history.past = [];
+          tabletop.history.future = [];
+        }
+      });
+    });
   },
 });
 

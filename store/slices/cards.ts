@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
-import { updateCard, createCard } from "../combinedActions/cards";
+import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 
 export type Card = Cards.Props;
@@ -63,6 +63,10 @@ export const cardsSlice = createSlice({
       });
 
       state.cardsById[actions.payload.cardId] = card;
+    });
+
+    builder.addCase(deleteCard, (state, actions) => {
+      delete state.cardsById[actions.payload.cardId];
     });
   },
 });

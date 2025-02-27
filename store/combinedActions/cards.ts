@@ -23,3 +23,8 @@ export const createCard = createAction<{
   deckId: Decks.DeckId;
   data: CardDataItem[];
 }>("createCard");
+
+export const deleteCard = createAction<{
+  cardId: Cards.CardId;
+  deckId: Decks.DeckId | null;
+}>("deleteCard");

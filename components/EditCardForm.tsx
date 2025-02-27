@@ -1,61 +1,83 @@
 import React from "react";
-import { View, Button, StyleSheet, Text } from "react-native";
-import { useAppSelector } from "@/store/hooks";
+import { View, Button, StyleSheet } from "react-native";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectCardTemplate } from "@/store/combinedSelectors/cards";
-import TemplateSchemaItem from "@/components/TemplateSchemaItem";
 import { useSaveEditCard } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
-import { Cards, Templates } from "@/store/types";
+import EditCardSideForm from "@/components/EditCardSideForm";
+import { deleteCardHelper } from "@/store/actionHelpers/cards";
+import Alert, { AlertButton } from "@/components/Alert";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
+  onDelete?: () => void;
 };
-
-function SideTemplateForm(props: {
-  templateId: Templates.TemplateId;
-  schemaOrder: Templates.DataItemId[];
-  title: string | null;
-  side: Cards.Side;
-}) {
-  if (props.schemaOrder.length === 0) return null;
-
-  return (
-    <>
-      {props.title !== null && <Text style={styles.title}>{props.title}</Text>}
-      {props.schemaOrder.map((templateSchemaItemId) => (
-        <TemplateSchemaItem
-          key={templateSchemaItemId}
-          templateSchemaItemId={templateSchemaItemId}
-          templateId={props.templateId}
-          side={props.side}
-        />
-      ))}
-    </>
-  );
-}
 
 export default function EditCardForm({
   flipSide,
-  ...target
+  id,
+  type,
+  onDelete,
 }: EditCardFormProps): React.ReactNode {
+  const dispatch = useAppDispatch();
+
   const backTemplate = useAppSelector((state) =>
-    selectCardTemplate(state, { ...target, side: "back" }),
+    selectCardTemplate(state, { id, type, side: "back" }),
   );
 
   const frontTemplate = useAppSelector((state) =>
-    selectCardTemplate(state, { ...target, side: "front" }),
+    selectCardTemplate(state, { id, type, side: "front" }),
   );
 
   useSaveEditCard(true);
 
+  const cardId = type === "card" ? id : null;
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+
+  const openDeleteConfirmation = React.useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const closeDeleteConfirmation = React.useCallback(() => {
+    setShowDeleteConfirm(false);
+  }, []);
+
+  const deleteCard = React.useCallback(() => {
+    onDelete?.();
+
+    if (cardId) {
+      dispatch(deleteCardHelper({ cardId }));
+    }
+  }, [cardId, dispatch, onDelete]);
+
+  const deleteButtons = React.useMemo<AlertButton[]>(
+    () => [
+      { text: "Cancel", onPress: closeDeleteConfirmation, style: "cancel" },
+      { text: "Delete", onPress: deleteCard, style: "destructive" },
+    ],
+    [closeDeleteConfirmation, deleteCard],
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.flipButton}>
-        <Button title="Flip Card" onPress={flipSide} />
+      <Alert
+        visible={showDeleteConfirm}
+        onRequestClose={closeDeleteConfirmation}
+        title="Delete Card"
+        message="Are you sure you want to delete this card?"
+        buttons={deleteButtons}
+      />
+      <View style={styles.buttonContainer}>
+        <View style={styles.buttonLeft}>
+          <Button title="Flip Card" onPress={flipSide} />
+        </View>
+        <View style={styles.buttonRight}>
+          <Button title="Delete" onPress={openDeleteConfirmation} />
+        </View>
       </View>
       {frontTemplate && (
-        <SideTemplateForm
-          {...target}
+        <EditCardSideForm
           side="front"
           schemaOrder={frontTemplate.schemaOrder}
           templateId={frontTemplate.templateId}
@@ -63,8 +85,7 @@ export default function EditCardForm({
         />
       )}
       {backTemplate && (
-        <SideTemplateForm
-          {...target}
+        <EditCardSideForm
           side="back"
           schemaOrder={backTemplate.schemaOrder}
           templateId={backTemplate.templateId}
@@ -79,11 +100,16 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  flipButton: {
+  buttonContainer: {
     marginBottom: 20,
+    flexDirection: "row",
   },
-  title: {
-    fontSize: 20,
-    marginBottom: 10,
+  buttonLeft: {
+    flex: 1,
+    marginRight: 10,
+  },
+  buttonRight: {
+    flex: 1,
+    marginLeft: 10,
   },
 });

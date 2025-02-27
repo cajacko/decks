@@ -155,6 +155,7 @@ const state: RootState = {
     tabletopsById: {
       tabletop1: {
         id: "tabletop1",
+        availableDecks: ["deck1"],
         stacksIds: ["stack1", "stack2", "stack3"],
         history: {
           past: [],

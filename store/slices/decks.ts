@@ -2,8 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Decks, RootState, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
-import { updateCard } from "../combinedActions/cards";
+import { updateCard, deleteCard } from "../combinedActions/cards";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
+import removeFromArray from "@/utils/immer/removeFromArray";
 
 const initialState: Decks.State = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.decks
@@ -57,6 +58,19 @@ export const cardsSlice = createSlice({
           type: dataItem.value?.type,
         };
       });
+    });
+
+    builder.addCase(deleteCard, (state, actions) => {
+      if (!actions.payload.deckId) return;
+
+      const deck = state.decksById[actions.payload.deckId];
+
+      if (!deck) return;
+
+      removeFromArray(
+        deck.cards,
+        (item) => item.cardId === actions.payload.cardId,
+      );
     });
   },
 });

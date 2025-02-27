@@ -53,6 +53,14 @@ export default function RootLayout() {
                 headerTitle: "Edit Card",
               }}
             />
+            <Stack.Screen
+              name="deck/[deckId]/new-card"
+              options={{
+                headerShown: true,
+                presentation: "modal",
+                headerTitle: "New Card",
+              }}
+            />
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />

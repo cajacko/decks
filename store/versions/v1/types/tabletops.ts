@@ -1,5 +1,6 @@
 import { History as CreateHistoryHelper } from "./helpers";
 import * as Cards from "./cards";
+import * as Decks from "./decks";
 
 type TabletopId = string;
 type StackId = string;
@@ -36,6 +37,7 @@ type History = CreateHistoryHelper<HistoryState>;
 export interface Props {
   id: TabletopId;
   stacksIds: StackId[];
+  availableDecks: Decks.DeckId[];
   history: History;
 }
 

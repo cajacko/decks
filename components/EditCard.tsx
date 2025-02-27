@@ -17,7 +17,7 @@ import { Cards } from "@/store/types";
 export type EditCardProps = Pick<
   EditCardProviderProps,
   "onCreateCard" | "onChangeTarget"
-> & { target: Target; initialSide?: Cards.Side | null };
+> & { target: Target; initialSide?: Cards.Side | null; onDelete?: () => void };
 
 export default function EditCard(props: EditCardProps) {
   const height = useHeight();
@@ -62,7 +62,11 @@ export default function EditCard(props: EditCardProps) {
           ref={bottomDrawer}
           openOnMount
         >
-          <EditCardForm flipSide={flipSide} {...props.target} />
+          <EditCardForm
+            flipSide={flipSide}
+            onDelete={props.onDelete}
+            {...props.target}
+          />
         </BottonDrawer>
       </BottomDrawerWrapper>
     </EditCardProvider>
