@@ -3,6 +3,7 @@ import { defaultProps, BottomDrawerProps } from "./BottomDrawer.types";
 import { dragBuffer, dragHeight, dragOverlap } from "./bottomDrawer.style";
 import React from "react";
 import { ScrollViewProps } from "react-native";
+import debugLog from "./debugLog";
 
 // TODO: When we update the constraints, then check if the drawer height needs to change
 
@@ -13,6 +14,12 @@ export default function useHeightConstraints(
   props: Pick<BottomDrawerProps, "maxHeight" | "minHeight">,
 ) {
   const { maxHeight: maxHeightProp, minHeight: minHeightProp } = props;
+
+  /**
+   * If the max height prop is null, it means we're pending setting the max height (normally waiting
+   * for an onLayoutChange event in the parent)
+   */
+  const hasGotMaxHeight = maxHeightProp !== null;
 
   const sharedStyles = useSharedValue({
     dragBuffer,
@@ -49,6 +56,10 @@ export default function useHeightConstraints(
     Required<ScrollViewProps>["onLayout"]
   >(
     (event) => {
+      debugLog(
+        `onContentLayout (Drawer Scroll Content) - ${Math.round(event.nativeEvent.layout.height)}`,
+      );
+
       drawerContentHeight.value = event.nativeEvent.layout.height;
     },
     [drawerContentHeight],
@@ -73,6 +84,7 @@ export default function useHeightConstraints(
   }, [minHeightProp, minHeight]);
 
   return {
+    hasGotMaxHeight,
     onContentLayout,
     maxAutoHeight,
     minHeight,

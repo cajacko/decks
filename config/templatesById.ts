@@ -69,7 +69,17 @@ const plainBack: Templates.Props = {
   templateId: "plainBack",
   name: "Back Template",
   schemaOrder: [],
-  schema: {},
+  schema: {
+    "template2-background": {
+      id: "template2-background",
+      name: "Background Colour",
+      type: Templates.DataType.Color,
+      defaultValidatedValue: {
+        value: "grey",
+        type: Templates.DataType.Color,
+      },
+    },
+  },
   markup: [
     {
       type: "view",

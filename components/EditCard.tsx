@@ -58,6 +58,7 @@ export default function EditCard(props: EditCardProps) {
           height={height.sharedValue}
           maxHeight={maxHeight}
           ref={bottomDrawer}
+          openOnMount
         >
           <EditCardForm flipSide={flipSide} {...props.target} />
         </BottonDrawer>

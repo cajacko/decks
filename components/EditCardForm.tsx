@@ -5,7 +5,6 @@ import { selectCardTemplate } from "@/store/combinedSelectors/cards";
 import TemplateSchemaItem from "@/components/TemplateSchemaItem";
 import { useSaveEditCard } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
-import { flip } from "lodash";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
