@@ -148,8 +148,10 @@ const state: RootState = {
             quantity: 1,
           },
         ],
+        defaultTabletopId: "tabletop1",
       },
     },
+    deckIds: ["deck1"],
   },
   tabletops: {
     tabletopsById: {

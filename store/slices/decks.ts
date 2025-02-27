@@ -10,6 +10,7 @@ const initialState: Decks.State = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.decks
   : {
       decksById: {},
+      deckIds: [],
     };
 
 export const cardsSlice = createSlice({
@@ -81,5 +82,8 @@ export const selectDeck = (
   state: RootState,
   props: { deckId: string },
 ): Decks.Props | null => state[cardsSlice.name].decksById[props.deckId] ?? null;
+
+export const selectDeckIds = (state: RootState): Decks.DeckId[] =>
+  state[cardsSlice.name].deckIds;
 
 export default cardsSlice;

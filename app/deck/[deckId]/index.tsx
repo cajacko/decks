@@ -4,15 +4,9 @@ import EditCard, { EditCardProps } from "@/components/EditCard";
 import AppError from "@/classes/AppError";
 import { Target } from "@/utils/cardTarget";
 
-export const paramKeys = {
-  deckId: "deckId",
-};
-
 export default function DeckNewCardScene() {
-  const params = useLocalSearchParams();
+  const { deckId } = useLocalSearchParams();
   const { canGoBack, back, push } = useRouter();
-
-  const deckId = params[paramKeys.deckId];
 
   if (typeof deckId !== "string") {
     throw new AppError(`${DeckNewCardScene.name}: deckId must be a string`);

@@ -13,7 +13,6 @@ import { store, persistor } from "@/store/store";
 import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { init as initMousePointer } from "@/utils/mousePosition";
-
 import { useColorScheme } from "@/expoExample/hooks/useColorScheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -44,13 +43,48 @@ export default function RootLayout() {
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="tabletop/[tabletopId]"
+              options={{
+                headerShown: true,
+                headerTitle: "Tabletop",
+                headerBackVisible: true,
+                animation: "slide_from_right",
+              }}
+            />
+            <Stack.Screen
+              name="deck/[deckId]/tabletop"
+              options={{
+                headerShown: true,
+                headerTitle: "Tabletop",
+                headerBackVisible: true,
+                animation: "slide_from_right",
+              }}
+            />
             <Stack.Screen
               name="card/[cardId]"
               options={{
                 headerShown: true,
                 presentation: "modal",
                 headerTitle: "Edit Card",
+                headerBackVisible: true,
+                animation: "slide_from_right",
+              }}
+            />
+            <Stack.Screen
+              name="deck/[deckId]/card/[cardId]"
+              options={{
+                headerShown: true,
+                presentation: "modal",
+                headerTitle: "Edit Card",
+                headerBackVisible: true,
+                animation: "slide_from_right",
               }}
             />
             <Stack.Screen
@@ -59,6 +93,17 @@ export default function RootLayout() {
                 headerShown: true,
                 presentation: "modal",
                 headerTitle: "New Card",
+                headerBackVisible: true,
+                animation: "slide_from_right",
+              }}
+            />
+            <Stack.Screen
+              name="deck/[deckId]/index"
+              options={{
+                headerShown: true,
+                headerTitle: "Edit Deck",
+                headerBackVisible: true,
+                animation: "slide_from_right",
               }}
             />
             <Stack.Screen name="+not-found" />

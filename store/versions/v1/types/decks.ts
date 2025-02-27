@@ -61,8 +61,10 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
   description?: string;
   dataSchemaOrder: DsId[];
   dataSchema: DataSchema<DsId>;
+  defaultTabletopId: string;
 }
 
 export interface State {
   decksById: Record<DeckId, Props | undefined>;
+  deckIds: DeckId[];
 }
