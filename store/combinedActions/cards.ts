@@ -1,16 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
-import { Cards, Decks, Templates } from "../types";
-import { CreateCardDataSchemaProps } from "../utils/createCardDataSchemaId";
-
-export type CardDataItem =
-  | {
-      cardDataId: string;
-      value: Templates.ValidatedValue | null;
-    }
-  | (CreateCardDataSchemaProps & {
-      value: Templates.ValidatedValue | null;
-      templateDataItemTitle: string;
-    });
+import { Cards, Decks } from "../types";
+import { CardDataItem } from "./types";
 
 export const updateCard = createAction<{
   cardId: Cards.CardId;

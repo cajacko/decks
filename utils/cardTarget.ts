@@ -1,4 +1,4 @@
-type TargetType = "new-card-in-deck" | "card";
+type TargetType = "new-card-in-deck" | "card" | "deck-defaults";
 
 export type Target<T extends TargetType = TargetType> = {
   id: string;

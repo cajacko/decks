@@ -87,7 +87,6 @@ const state: RootState = {
         dataSchema: {
           title: {
             id: "title",
-            title: "Title",
             type: Templates.DataType.Text,
           },
           // description: {
@@ -97,7 +96,6 @@ const state: RootState = {
           // },
           backgroundColor: {
             id: "backgroundColor",
-            title: "Front Color",
             type: Templates.DataType.Color,
           },
         },

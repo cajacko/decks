@@ -1,6 +1,7 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { createCard } from "@/store/combinedActions/cards";
+import { setDeckCardDefaults } from "@/store/slices/decks";
 import { updateCardHelper } from "@/store/actionHelpers/cards";
 import {
   useContextSelector,
@@ -38,7 +39,7 @@ function useAutoSave(props: {
           `${useAutoSave.name}: failed to auto save on interval`,
         ).log("warn");
       }
-    }, 10000);
+    }, 3000);
 
     return () => {
       clearInterval(interval);
@@ -95,14 +96,13 @@ export default function useSaveEditCard(autoSave = false) {
 
   const save = React.useCallback((): null => {
     const contextState = getContextState();
-    const data = getUpdateCardData(contextState);
 
     switch (contextState.target.type) {
       case "card": {
         dispatch(
           updateCardHelper({
             cardId: contextState.target.id,
-            data,
+            data: getUpdateCardData(contextState),
           }),
         );
 
@@ -114,7 +114,7 @@ export default function useSaveEditCard(autoSave = false) {
         dispatch(
           createCard({
             cardId: newCardId,
-            data,
+            data: getUpdateCardData(contextState),
             deckId: contextState.target.id,
           }),
         );
@@ -122,6 +122,16 @@ export default function useSaveEditCard(autoSave = false) {
         // We're now in edit card mode so update the target
         setTarget({ type: "card", id: newCardId });
         onCreateCard?.(newCardId);
+
+        return null;
+      }
+      case "deck-defaults": {
+        dispatch(
+          setDeckCardDefaults({
+            deckId: contextState.target.id,
+            data: getUpdateCardData(contextState),
+          }),
+        );
 
         return null;
       }

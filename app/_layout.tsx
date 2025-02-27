@@ -98,6 +98,16 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
+              name="deck/[deckId]/card-defaults"
+              options={{
+                headerShown: true,
+                presentation: "modal",
+                headerTitle: "Deck Defaults",
+                headerBackVisible: true,
+                animation: "slide_from_right",
+              }}
+            />
+            <Stack.Screen
               name="deck/[deckId]/index"
               options={{
                 headerShown: true,

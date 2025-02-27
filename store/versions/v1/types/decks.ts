@@ -15,18 +15,20 @@ type CreateDataSchemaItemHelper<
   T extends TemplatesType.DataType = TemplatesType.DataType,
 > = {
   id: Id;
-  title: string;
-  description?: string;
+  // title?: string;
+  // description?: string;
   type: T;
   defaultValidatedValue?: TemplatesType.ValidatedValue<T>;
 };
 
-type DataSchemaItem<Id extends DataSchemaItemId> = {
+export type DataSchemaItem<Id extends DataSchemaItemId = DataSchemaItemId> = {
   [K in TemplatesType.DataType]: CreateDataSchemaItemHelper<Id, K>;
 }[TemplatesType.DataType];
 
+export type LooseDataSchemaItem = CreateDataSchemaItemHelper<DataSchemaItemId>;
+
 export type DataSchema<DsId extends DataSchemaItemId = DataSchemaItemId> = {
-  [K in DsId]: DataSchemaItem<K>;
+  [K in DsId]: DataSchemaItem<K> | undefined;
 };
 
 type DataTemplateMapItem = {

@@ -82,7 +82,7 @@ const selectMergedCardData = createCachedSelector(
 
       if (cardDataValue) return;
 
-      const deckDataDefaultValue = schemaItem.defaultValidatedValue;
+      const deckDataDefaultValue = schemaItem?.defaultValidatedValue;
 
       if (!deckDataDefaultValue) return;
 

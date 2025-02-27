@@ -1,19 +1,9 @@
-import { Decks, Templates } from "../types";
-import { CreateCardDataSchemaProps } from "../utils/createCardDataSchemaId";
+import { Decks } from "../types";
 import AppError from "@/classes/AppError";
 import { selectCard } from "../slices/cards";
 import { updateCard, deleteCard } from "../combinedActions/cards";
 import { store } from "../store";
-
-export type CardDataItem =
-  | {
-      cardDataId: string;
-      value: Templates.ValidatedValue | null;
-    }
-  | (CreateCardDataSchemaProps & {
-      value: Templates.ValidatedValue | null;
-      templateDataItemTitle: string;
-    });
+import { CardDataItem } from "../combinedActions/types";
 
 export function updateCardHelper(props: {
   cardId: string;
