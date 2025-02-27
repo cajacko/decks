@@ -15,6 +15,6 @@ export interface BottomDrawerProps {
 }
 
 export interface BottomDrawerRef {
-  open: () => void;
-  close: () => void;
+  open: () => Promise<void>;
+  close: () => Promise<void>;
 }

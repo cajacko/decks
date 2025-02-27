@@ -1,32 +1,46 @@
 import React from "react";
-import { View, StyleSheet, Animated } from "react-native";
-import EmptyStack from "../EmptyStack";
-import CardAction from "../CardAction";
-import CardSpacer from "../CardSpacer";
+import { View, StyleSheet } from "react-native";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import EmptyStack from "@/components/EmptyStack";
+import CardAction from "@/components/CardAction";
+import CardSpacer from "@/components/CardSpacer";
 import { StackProps } from "./stack.types";
-import styles, { getInnerStyle, getShuffleStyle } from "./stack.style";
+import styles, { getShuffleStyle } from "./stack.style";
 import useStack from "./useStack";
-import { useTabletopContext } from "../Tabletop/Tabletop.context";
-import StackListItem from "../StackListItem";
+import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import StackListItem from "@/components/StackListItem";
 
 export default function Stack(props: StackProps): React.ReactNode {
   const dimensions = useTabletopContext();
+
   const {
     cardInstancesIds,
-    rotateAnim,
     showActions,
     getCardOffsetPosition,
     handleShuffle,
+    rotation,
+    width,
+    handleDeleteStack,
+    opacity,
   } = useStack(props);
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  const widthStyle = useAnimatedStyle(() => ({
+    width: width.value,
+    opacity: opacity.value,
+  }));
+
   const innerStyle = React.useMemo(
-    () => getInnerStyle({ stackPadding: dimensions.stackPadding, rotateAnim }),
-    [dimensions.stackPadding, rotateAnim],
+    () => [styles.inner, animatedStyle],
+    [animatedStyle],
   );
 
   const containerStyle = React.useMemo(
-    () => StyleSheet.flatten([styles.container, props.style]),
-    [props.style],
+    () => StyleSheet.flatten([widthStyle, styles.container, props.style]),
+    [props.style, widthStyle],
   );
 
   const shuffleStyle = React.useMemo(
@@ -59,12 +73,11 @@ export default function Stack(props: StackProps): React.ReactNode {
   ]);
 
   return (
-    <View style={containerStyle}>
+    <Animated.View style={containerStyle}>
       <Animated.View style={innerStyle}>
-        <CardSpacer />
-
         {cardInstances && (
-          <>
+          <View style={styles.cardInstances}>
+            <CardSpacer />
             {cardInstances}
 
             {cardInstances.length > 1 && showActions && (
@@ -74,11 +87,15 @@ export default function Stack(props: StackProps): React.ReactNode {
                 onPress={handleShuffle}
               />
             )}
-          </>
+          </View>
         )}
 
-        <EmptyStack stackId={props.stackId} style={styles.empty} />
+        <EmptyStack
+          stackId={props.stackId}
+          style={styles.empty}
+          handleDeleteStack={handleDeleteStack}
+        />
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 }

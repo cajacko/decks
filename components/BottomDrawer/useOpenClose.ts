@@ -1,5 +1,10 @@
 import React from "react";
-import { withSpring, SharedValue, DerivedValue } from "react-native-reanimated";
+import {
+  withSpring,
+  SharedValue,
+  DerivedValue,
+  runOnJS,
+} from "react-native-reanimated";
 import { BottomDrawerRef } from "./BottomDrawer.types";
 import { autoAnimateConfig } from "./bottomDrawer.style";
 import debugLog from "./debugLog";
@@ -20,23 +25,29 @@ export default function useOpenClose(
 ) {
   const { height, maxAutoHeight, minHeight, hasGotMaxHeight } = props;
 
-  const open = React.useCallback(() => {
+  const open = React.useCallback((): Promise<void> => {
     debugLog(`open - ${Math.round(maxAutoHeight.value)}`);
 
-    height.value = withSpring(maxAutoHeight.value, autoAnimateConfig);
+    return new Promise((resolve) => {
+      height.value = withSpring(maxAutoHeight.value, autoAnimateConfig, () => {
+        runOnJS(resolve)();
+      });
+    });
   }, [height, maxAutoHeight]);
 
-  const close = React.useCallback(() => {
+  const close = React.useCallback((): Promise<void> => {
     debugLog(`close - ${Math.round(minHeight.value)}`);
 
-    height.value = withSpring(minHeight.value, autoAnimateConfig);
+    return new Promise((resolve) => {
+      height.value = withSpring(minHeight.value, autoAnimateConfig, () => {
+        runOnJS(resolve)();
+      });
+    });
   }, [height, minHeight]);
 
   React.useImperativeHandle(ref, () => ({
-    open: open,
-    close: () => {
-      height.value = withSpring(minHeight.value, autoAnimateConfig);
-    },
+    open,
+    close,
   }));
 
   const checkOpenOnMount = React.useRef(true);

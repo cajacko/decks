@@ -1,4 +1,4 @@
-import { StyleSheet, Animated } from "react-native";
+import { StyleSheet } from "react-native";
 import { StackDimensions } from "./stack.types";
 import cardDimensions from "@/config/cardDimensions";
 
@@ -110,23 +110,6 @@ export function getStackDimensions(props: {
   });
 }
 
-export function getInnerStyle(props: {
-  stackPadding: number;
-  rotateAnim: Animated.Value;
-}) {
-  return {
-    margin: props.stackPadding,
-    transform: [
-      {
-        rotate: props.rotateAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: ["0deg", "-360deg"],
-        }),
-      },
-    ],
-  };
-}
-
 export function getShuffleStyle(props: { stackPadding: number }) {
   return StyleSheet.flatten([
     styles.shuffleButton,
@@ -141,6 +124,14 @@ export function getShuffleStyle(props: { stackPadding: number }) {
 const styles = StyleSheet.create({
   container: {
     position: "relative",
+  },
+  inner: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardInstances: {
+    position: "relative",
+    zIndex: 1,
   },
   shuffleButton: {
     position: "absolute",

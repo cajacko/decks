@@ -1,5 +1,4 @@
 import React from "react";
-import { Animated } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectFirstXCardInstances,
@@ -10,15 +9,22 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { getOffsetPositions } from "@/components/Card/card.styles";
+import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
+import { deleteStack } from "@/store/slices/tabletop";
 
 const offsetPositionsCount = getOffsetPositions({ height: 0, width: 0 }).length;
 
-export default function useStack({ stackId }: StackProps) {
+export default function useStack({ stackId, stackListRef }: StackProps) {
   const dispatch = useAppDispatch();
-  const { tabletopId } = useTabletopContext();
-
-  const rotateAnim = React.useRef(new Animated.Value(0)).current;
+  const { tabletopId, stackWidth } = useTabletopContext();
+  const width = useSharedValue(stackWidth);
+  const opacity = useSharedValue(1);
+  const rotation = useSharedValue(0);
   const [showActions, setShowActions] = React.useState(true);
+
+  React.useEffect(() => {
+    width.value = stackWidth;
+  }, [width, stackWidth]);
 
   const { getCardOffsetPosition, onUpdateCardList, stackCountLimit } =
     React.useMemo(() => withStackOffsetPositions(offsetPositionsCount), []);
@@ -32,18 +38,18 @@ export default function useStack({ stackId }: StackProps) {
   );
 
   const handleShuffle = React.useCallback(async () => {
-    rotateAnim.setValue(0);
+    rotation.value = 0;
     setShowActions(false);
 
-    const promise = new Promise((resolve) => {
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(resolve);
+    const duration = 500;
+
+    const promise = new Promise<void>((resolve) => {
+      rotation.value = withTiming(360, { duration }, () => {
+        runOnJS(resolve)();
+      });
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await new Promise((resolve) => setTimeout(resolve, duration / 2));
 
     dispatch(
       setStackOrder({
@@ -57,15 +63,35 @@ export default function useStack({ stackId }: StackProps) {
     await promise;
 
     setShowActions(true);
-  }, [dispatch, stackId, tabletopId, rotateAnim]);
+  }, [dispatch, stackId, tabletopId, rotation]);
 
   onUpdateCardList(cardInstancesIds ?? []);
 
+  const handleDeleteStack = React.useCallback(async () => {
+    const scroll = stackListRef.current?.scrollPrev?.();
+
+    const transform = new Promise<void>((resolve) => {
+      const toValue = withTiming(0, { duration: 500 }, () => {
+        runOnJS(resolve)();
+      });
+
+      opacity.value = toValue;
+      width.value = toValue;
+    });
+
+    await Promise.all([scroll, transform]);
+
+    dispatch(deleteStack({ tabletopId, stackId: stackId }));
+  }, [stackId, width, tabletopId, dispatch, stackListRef, opacity]);
+
   return {
+    opacity,
+    width,
     cardInstancesIds,
     getCardOffsetPosition,
     handleShuffle,
-    rotateAnim,
     showActions,
+    rotation,
+    handleDeleteStack,
   };
 }

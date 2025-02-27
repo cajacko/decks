@@ -9,17 +9,19 @@ export type EmptyStackProps = {
   stackId: string;
   style?: CardProps["style"];
   CardProps?: CardProps;
+  handleDeleteStack?: () => void;
 };
 
 export default function EmptyStack({
   stackId,
   style,
   CardProps,
+  handleDeleteStack: handleDeleteStackProp,
 }: EmptyStackProps): React.ReactNode {
   const context = useTabletopContext();
   const dispatch = useAppDispatch();
 
-  const handleDeleteStack = React.useCallback(() => {
+  const handleDeleteStack = React.useCallback(async () => {
     dispatch(deleteStack({ tabletopId: context.tabletopId, stackId: stackId }));
   }, [dispatch, stackId, context.tabletopId]);
 
@@ -37,7 +39,10 @@ export default function EmptyStack({
       >
         <Text style={styles.text}>Empty Stack</Text>
         <View style={styles.delete}>
-          <Button title="Delete stack" onPress={handleDeleteStack} />
+          <Button
+            title="Delete stack"
+            onPress={handleDeleteStackProp ?? handleDeleteStack}
+          />
         </View>
       </View>
     </Card>

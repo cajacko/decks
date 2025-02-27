@@ -1,10 +1,12 @@
 import { StyleProp, ViewStyle } from "react-native";
+import { StackListRef } from "@/components/StackList/StackList.types";
 
 export interface StackProps {
   stackId: string;
   style?: StyleProp<ViewStyle>;
   leftStackId?: string;
   rightStackId?: string;
+  stackListRef: React.RefObject<StackListRef>;
 }
 
 export type StackDimensions = {

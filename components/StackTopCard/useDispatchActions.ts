@@ -100,6 +100,9 @@ export default function useDispatchActions({
   ]);
 
   const moveLeft = React.useMemo(() => {
+    // Disabling this until we want to tackle the auto scrolling when editing number of stacks
+    if (!leftStackId) return undefined;
+
     return {
       bottom: async () => {
         if (cardInstanceRef.current && animateCardMovement) {
