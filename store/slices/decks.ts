@@ -4,7 +4,7 @@ import { Decks, RootState, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
-import { deleteDeck } from "../combinedActions/decks";
+import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { CardDataItem } from "../combinedActions/types";
@@ -149,6 +149,29 @@ export const cardsSlice = createSlice({
       if (!deck) return;
 
       removeFromArray(deck.cards, (item) => item.cardId === cardId);
+    });
+
+    builder.addCase(createDeck.pending, (state, actions) => {
+      const deckId = actions.meta.arg.deck.id;
+
+      state.decksById[deckId] = actions.meta.arg.deck;
+    });
+
+    builder.addCase(createDeck.fulfilled, (state, actions) => {
+      const deckId = actions.meta.arg.deck.id;
+
+      state.deckIds.push(deckId);
+
+      const deck = state.decksById[deckId];
+
+      if (deck) {
+        deck.status = "active";
+      } else {
+        state.decksById[deckId] = {
+          ...actions.meta.arg.deck,
+          status: "active",
+        };
+      }
     });
   },
 });

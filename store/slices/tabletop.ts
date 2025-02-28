@@ -8,7 +8,7 @@ import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard } from "../combinedActions/cards";
-import { deleteDeck } from "../combinedActions/decks";
+import { deleteDeck, createDeck } from "../combinedActions/decks";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -261,6 +261,12 @@ export const tabletopsSlice = createSlice({
         deckId: actions.meta.arg.deckId,
         cardIds: actions.meta.arg.cardIds,
       });
+    });
+
+    builder.addCase(createDeck.pending, (state, actions) => {
+      const tabletop = actions.meta.arg.defaultTabletop;
+
+      state.tabletopsById[tabletop.id] = tabletop;
     });
   },
 });

@@ -4,6 +4,7 @@ import Stack from "@/components/Stack";
 import Animated from "react-native-reanimated";
 import { StackListProps } from "./StackList.types";
 import useStackList from "./useStackList";
+import minStackCount from "@/config/minStackCount";
 
 export default function StackList({
   handleLayout,
@@ -19,8 +20,7 @@ export default function StackList({
           leftStackId={stackIds[stackIds.indexOf(stackId) - 1]}
           rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
           stackListRef={stackListRef}
-          // Must always have 2 stacks
-          canDelete={stackIds.length > 2}
+          canDelete={stackIds.length > minStackCount}
         />
       )),
     [stackIds, stackListRef],

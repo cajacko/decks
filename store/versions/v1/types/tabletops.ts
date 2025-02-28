@@ -36,7 +36,6 @@ type History = CreateHistoryHelper<HistoryState>;
 
 export interface Props {
   id: TabletopId;
-  stacksIds: StackId[];
   availableDecks: Decks.DeckId[];
   history: History;
 }

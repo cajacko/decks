@@ -3,7 +3,7 @@ import { RootState, Cards, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
-import { deleteDeck } from "../combinedActions/decks";
+import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 
 export type Card = Cards.Props;
@@ -96,6 +96,34 @@ export const cardsSlice = createSlice({
 
       cardIds.forEach((cardId) => {
         delete state.cardsById[cardId];
+      });
+    });
+
+    builder.addCase(createDeck.pending, (state, actions) => {
+      const cards = actions.meta.arg.cards;
+
+      cards.forEach((card) => {
+        state.cardsById[card.cardId] = {
+          ...card,
+          status: "creating",
+        };
+      });
+    });
+
+    builder.addCase(createDeck.fulfilled, (state, actions) => {
+      const cards = actions.meta.arg.cards;
+
+      cards.forEach((card) => {
+        const existingCard = state.cardsById[card.cardId];
+
+        if (existingCard) {
+          existingCard.status = "active";
+        } else {
+          state.cardsById[card.cardId] = {
+            ...card,
+            status: "active",
+          };
+        }
       });
     });
   },
