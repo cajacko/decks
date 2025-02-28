@@ -7,7 +7,7 @@ import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
-import { deleteCard } from "../combinedActions/cards";
+import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 
 export type TabletopState = Tabletops.State;
@@ -280,6 +280,42 @@ export const tabletopsSlice = createSlice({
       const tabletop = actions.meta.arg.defaultTabletop;
 
       state.tabletopsById[tabletop.id] = tabletop;
+    });
+
+    builder.addCase(createCard, (state, actions) => {
+      actions.payload.tabletops.forEach(({ cardInstances, tabletopId }) => {
+        const tabletop = state.tabletopsById[tabletopId];
+
+        if (!tabletop) return;
+
+        const present = tabletop.history.present;
+
+        let didEdit = false;
+
+        cardInstances.forEach((cardInstance) => {
+          didEdit = true;
+
+          present.cardInstancesById[cardInstance.cardInstanceId] = cardInstance;
+
+          const stackId = present.stacksIds[0];
+
+          if (!stackId) return;
+
+          const stack = present.stacksById[stackId];
+
+          if (!stack) return;
+
+          stack.cardInstances.push(cardInstance.cardInstanceId);
+        });
+
+        // It feels like a bit of a cluster fuck to try and support. As they can then undo a card
+        // getting in the tabletop and then have a lost card until they reset. If we add a batter
+        // solution we can change this
+        if (didEdit) {
+          tabletop.history.past = [];
+          tabletop.history.future = [];
+        }
+      });
     });
   },
 });

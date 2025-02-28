@@ -7,6 +7,7 @@ import CardAction from "./CardAction";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
+import { ScrollView } from "react-native-gesture-handler";
 
 export interface DecksScreenProps {
   style?: ViewStyle;
@@ -26,12 +27,12 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   }, [push, dispatch]);
 
   return (
-    <View style={StyleSheet.flatten([props.style, styles.container])}>
+    <ScrollView style={StyleSheet.flatten([props.style, styles.container])}>
       {deckIds.map((deckId) => (
         <DeckListItem key={deckId} deckId={deckId} />
       ))}
       <CardAction icon="+" onPress={createDeck} />
-    </View>
+    </ScrollView>
   );
 }
 

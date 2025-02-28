@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { createCard } from "@/store/combinedActions/cards";
+import { createCardHelper } from "@/store/actionHelpers/cards";
 import { setDeckCardDefaults } from "@/store/slices/decks";
 import { updateCardHelper } from "@/store/actionHelpers/cards";
 import {
@@ -44,7 +44,7 @@ export default function useSaveEditCard(autoSave = false) {
         const newCardId = uuid();
 
         dispatch(
-          createCard({
+          createCardHelper({
             cardId: newCardId,
             data: getUpdateCardData(contextState),
             deckId: contextState.target.id,
