@@ -13,6 +13,7 @@ import { selectDeckCards } from "@/store/slices/decks";
 import CardSide from "@/components/CardSide";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { deleteDeckHelper } from "@/store/actionHelpers/decks";
+import DeckDetails from "@/components/DeckDetails";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -65,6 +66,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           <Button title="Delete" onPress={open} />
         </View>
       </View>
+      <DeckDetails deckId={props.deckId} />
       <ScrollView>
         {cards?.map((card) => (
           <Pressable

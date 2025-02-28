@@ -10,76 +10,8 @@ import {
 import getUpdateCardData from "./getUpdateCardData";
 import uuid from "@/utils/uuid";
 import AppError from "@/classes/AppError";
-import { EditCardState } from "./EditCard.types";
 import { getHasChanges } from "./useHasEditCardChanges";
-import { AppState } from "react-native";
-
-function useAutoSave(props: {
-  save: () => void;
-  autoSave: boolean;
-  getContextState: () => EditCardState;
-}) {
-  const { autoSave, save, getContextState } = props;
-
-  React.useEffect(() => {
-    if (!autoSave) return;
-
-    const interval = setInterval(() => {
-      const hasChanges = getHasChanges(getContextState().hasChanges);
-
-      if (!hasChanges) {
-        return;
-      }
-
-      try {
-        save();
-      } catch (unknownError) {
-        AppError.getError(
-          unknownError,
-          `${useAutoSave.name}: failed to auto save on interval`,
-        ).log("warn");
-      }
-    }, 3000);
-
-    return () => {
-      clearInterval(interval);
-
-      const hasChanges = getHasChanges(getContextState().hasChanges);
-
-      if (!hasChanges) {
-        return;
-      }
-
-      try {
-        save();
-      } catch (unknownError) {
-        AppError.getError(
-          unknownError,
-          `${useAutoSave.name}: failed to auto save on end of effect`,
-        ).log("error");
-      }
-    };
-  }, [autoSave, save, getContextState]);
-
-  React.useEffect(() => {
-    if (!autoSave) return;
-
-    const subscription = AppState.addEventListener("change", () => {
-      try {
-        save();
-      } catch (unknownError) {
-        AppError.getError(
-          unknownError,
-          `${useAutoSave.name}: failed to auto save on app state change`,
-        ).log("error");
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [save, autoSave]);
-}
+import useAutoSave from "@/hooks/useAutoSave";
 
 /**
  * Must be used within the EditCard context and with a valid target. Otherwise why is this component
@@ -143,7 +75,14 @@ export default function useSaveEditCard(autoSave = false) {
     }
   }, [getContextState, dispatch, onCreateCard, setTarget]);
 
-  useAutoSave({ save, autoSave, getContextState });
+  useAutoSave({
+    save,
+    autoSave,
+    hasChanges: React.useCallback(
+      () => getHasChanges(getContextState().hasChanges),
+      [getContextState],
+    ),
+  });
 
   return {
     save,

@@ -59,11 +59,25 @@ export const cardsSlice = createSlice({
   name: SliceName.Decks,
   initialState,
   reducers: {
-    setDeck: (state, actions: PayloadAction<Decks.Props>) => {
-      state.decksById[actions.payload.id] = actions.payload;
-    },
-    removeDeck: (state, actions: PayloadAction<{ cardId: string }>) => {
-      delete state.decksById[actions.payload.cardId];
+    setDeckDetails: (
+      state,
+      actions: PayloadAction<{
+        deckId: Decks.DeckId;
+        name?: string;
+        description?: string;
+      }>,
+    ) => {
+      const deck = state.decksById[actions.payload.deckId];
+
+      if (!deck) return;
+
+      if (actions.payload.name !== undefined) {
+        deck.name = actions.payload.name;
+      }
+
+      if (actions.payload.description !== undefined) {
+        deck.description = actions.payload.description;
+      }
     },
     setDeckCardDefaults: (
       state,
@@ -176,7 +190,7 @@ export const cardsSlice = createSlice({
   },
 });
 
-export const { removeDeck, setDeck, setDeckCardDefaults } = cardsSlice.actions;
+export const { setDeckCardDefaults, setDeckDetails } = cardsSlice.actions;
 
 export const selectDeck = (
   state: RootState,
