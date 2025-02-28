@@ -1,9 +1,14 @@
 import React from "react";
-import { Dimensions, View, ScrollViewProps } from "react-native";
+import { Dimensions, ScrollViewProps } from "react-native";
 import TabletopToolbar from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
 import { TabletopProvider } from "./Tabletop.context";
-import StackList from "../StackList";
+import StackList from "@/components/StackList";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 export default function Tabletop({
   tabletopId,
@@ -13,13 +18,25 @@ export default function Tabletop({
     Dimensions.get("screen"),
   );
 
+  // Prevents janky layout reorganising when we get the initial layout
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
       const { width, height } = event.nativeEvent.layout;
 
+      opacity.value = withTiming(1, {
+        duration: 200,
+      });
       setSize({ width, height });
     },
-    [],
+    [opacity],
   );
 
   return (
@@ -28,10 +45,10 @@ export default function Tabletop({
       width={size.width}
       tabletopId={tabletopId}
     >
-      <View style={style}>
+      <Animated.View style={style}>
         <TabletopToolbar />
-        <StackList handleLayout={handleLayout} />
-      </View>
+        <StackList style={animatedStyle} handleLayout={handleLayout} />
+      </Animated.View>
     </TabletopProvider>
   );
 }

@@ -8,6 +8,7 @@ import { minStackCount } from "@/utils/minStacks";
 
 export default function StackList({
   handleLayout,
+  style,
 }: StackListProps): React.ReactNode {
   const { animatedRef, interval, stackIds, stackListRef } = useStackList();
 
@@ -26,10 +27,15 @@ export default function StackList({
     [stackIds, stackListRef],
   );
 
+  const scrollViewStyle = React.useMemo(
+    () => StyleSheet.flatten([styles.scrollView, style]),
+    [style],
+  );
+
   return (
     <Animated.ScrollView
       ref={animatedRef}
-      style={StyleSheet.flatten([styles.scrollView])}
+      style={scrollViewStyle}
       contentContainerStyle={styles.contentContainer}
       horizontal
       snapToAlignment="center"
