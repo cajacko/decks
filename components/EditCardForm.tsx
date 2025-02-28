@@ -6,7 +6,7 @@ import { useSaveEditCard } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import EditCardSideForm from "@/components/EditCardSideForm";
 import { deleteCardHelper } from "@/store/actionHelpers/cards";
-import Alert, { AlertButton } from "@/components/Alert";
+import useDeleteWarning from "@/hooks/useDeleteWarning";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
@@ -33,16 +33,6 @@ export default function EditCardForm({
 
   const cardId = type === "card" ? id : null;
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
-
-  const openDeleteConfirmation = React.useCallback(() => {
-    setShowDeleteConfirm(true);
-  }, []);
-
-  const closeDeleteConfirmation = React.useCallback(() => {
-    setShowDeleteConfirm(false);
-  }, []);
-
   const deleteCard = React.useCallback(() => {
     onDelete?.();
 
@@ -51,29 +41,21 @@ export default function EditCardForm({
     }
   }, [cardId, dispatch, onDelete]);
 
-  const deleteButtons = React.useMemo<AlertButton[]>(
-    () => [
-      { text: "Cancel", onPress: closeDeleteConfirmation, style: "cancel" },
-      { text: "Delete", onPress: deleteCard, style: "destructive" },
-    ],
-    [closeDeleteConfirmation, deleteCard],
-  );
+  const { open, component } = useDeleteWarning({
+    handleDelete: deleteCard,
+    title: "Delete Card",
+    message: "Are you sure you want to delete this card?",
+  });
 
   return (
     <View style={styles.container}>
-      <Alert
-        visible={showDeleteConfirm}
-        onRequestClose={closeDeleteConfirmation}
-        title="Delete Card"
-        message="Are you sure you want to delete this card?"
-        buttons={deleteButtons}
-      />
+      {component}
       <View style={styles.buttonContainer}>
         <View style={styles.buttonLeft}>
           <Button title="Flip Card" onPress={flipSide} />
         </View>
         <View style={styles.buttonRight}>
-          <Button title="Delete" onPress={openDeleteConfirmation} />
+          <Button title="Delete" onPress={open} />
         </View>
       </View>
       {frontTemplate && (

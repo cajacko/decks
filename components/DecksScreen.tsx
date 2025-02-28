@@ -4,11 +4,11 @@ import { useAppSelector } from "@/store/hooks";
 import { selectDeckIds } from "@/store/slices/decks";
 import DeckListItem from "@/components/DeckListItem";
 
-export interface DecksSceneProps {
+export interface DecksScreenProps {
   style?: ViewStyle;
 }
 
-export default function DecksScene(props: DecksSceneProps): React.ReactNode {
+export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const deckIds = useAppSelector(selectDeckIds);
 
   return (

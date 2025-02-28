@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
-import DecksScene from "@/components/DecksScene";
+import DecksScreen from "@/components/DecksScreen";
 
-export default function HomeScreen() {
-  return <DecksScene style={styles.container} />;
+export default function DecksRoute() {
+  return <DecksScreen style={styles.container} />;
 }
 
 const styles = StyleSheet.create({

@@ -64,6 +64,7 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
   dataSchemaOrder: DsId[];
   dataSchema: DataSchema<DsId>;
   defaultTabletopId: string;
+  status: "active" | "deleting";
 }
 
 export interface State {

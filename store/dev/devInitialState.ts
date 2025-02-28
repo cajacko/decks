@@ -5,6 +5,7 @@ const state: RootState = {
   cards: {
     cardsById: {
       card1: {
+        status: "active",
         cardId: "card1",
         deckId: "deck1",
         data: {
@@ -19,6 +20,7 @@ const state: RootState = {
         },
       },
       card2: {
+        status: "active",
         cardId: "card2",
         deckId: "deck1",
         data: {
@@ -29,6 +31,7 @@ const state: RootState = {
         },
       },
       card3: {
+        status: "active",
         cardId: "card3",
         deckId: "deck1",
         data: {
@@ -47,6 +50,7 @@ const state: RootState = {
         },
       },
       card4: {
+        status: "active",
         cardId: "card4",
         deckId: "deck1",
         data: {
@@ -61,6 +65,7 @@ const state: RootState = {
         },
       },
       card5: {
+        status: "active",
         cardId: "card5",
         deckId: "deck1",
         data: {
@@ -82,6 +87,7 @@ const state: RootState = {
   decks: {
     decksById: {
       deck1: {
+        status: "active",
         id: "deck1",
         dataSchemaOrder: ["title", "backgroundColor"],
         dataSchema: {

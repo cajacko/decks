@@ -2,12 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
-import { RootState, Tabletops, SliceName, Cards } from "../types";
+import { RootState, Tabletops, SliceName, Cards, Decks } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard } from "../combinedActions/cards";
+import { deleteDeck } from "../combinedActions/decks";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -195,10 +196,14 @@ export const tabletopsSlice = createSlice({
     ),
   },
   extraReducers: (builder) => {
-    builder.addCase(deleteCard, (state, actions) => {
-      const { deckId, cardId } = actions.payload;
-
-      if (!deckId) return;
+    function deleteCards(
+      state: WritableDraft<TabletopState>,
+      props: {
+        deckId: Decks.DeckId;
+        cardIds: Cards.CardId[];
+      },
+    ) {
+      const { deckId, cardIds } = props;
 
       Object.values(state.tabletopsById).forEach((tabletop) => {
         if (!tabletop) return;
@@ -215,7 +220,7 @@ export const tabletopsSlice = createSlice({
 
         Object.values(present.cardInstancesById).forEach((cardInstance) => {
           if (!cardInstance) return;
-          if (cardInstance.cardId !== cardId) return;
+          if (!cardIds.includes(cardInstance.cardId)) return;
 
           cardInstanceIdsToRemove.push(cardInstance.cardInstanceId);
           delete present.cardInstancesById[cardInstance.cardInstanceId];
@@ -235,6 +240,26 @@ export const tabletopsSlice = createSlice({
           tabletop.history.past = [];
           tabletop.history.future = [];
         }
+      });
+    }
+
+    builder.addCase(deleteCard.pending, (state, actions) => {
+      if (!actions.meta.arg.deckId) return;
+
+      deleteCards(state, {
+        deckId: actions.meta.arg.deckId,
+        cardIds: [actions.meta.arg.cardId],
+      });
+    });
+
+    builder.addCase(deleteDeck.pending, (state, actions) => {
+      if (actions.meta.arg.tabletopId) {
+        delete state.tabletopsById[actions.meta.arg.tabletopId];
+      }
+
+      deleteCards(state, {
+        deckId: actions.meta.arg.deckId,
+        cardIds: actions.meta.arg.cardIds,
       });
     });
   },

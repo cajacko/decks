@@ -4,6 +4,7 @@ import { Decks, RootState, SliceName } from "../types";
 import flags from "@/config/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
+import { deleteDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { CardDataItem } from "../combinedActions/types";
@@ -106,6 +107,20 @@ export const cardsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(deleteDeck.pending, (state, actions) => {
+      const deck = state.decksById[actions.meta.arg.deckId];
+
+      if (deck) {
+        deck.status = "deleting";
+      }
+
+      removeFromArray(state.deckIds, (id) => id === actions.meta.arg.deckId);
+    });
+
+    builder.addCase(deleteDeck.fulfilled, (state, actions) => {
+      delete state.decksById[actions.payload.deckId];
+    });
+
     builder.addCase(updateCard, (state, actions) => {
       updateDeckTemplateMapping(state, actions.payload);
     });
@@ -123,17 +138,17 @@ export const cardsSlice = createSlice({
       });
     });
 
-    builder.addCase(deleteCard, (state, actions) => {
-      if (!actions.payload.deckId) return;
+    builder.addCase(deleteCard.pending, (state, actions) => {
+      const deckId = actions.meta.arg.deckId;
+      const cardId = actions.meta.arg.cardId;
 
-      const deck = state.decksById[actions.payload.deckId];
+      if (!deckId) return;
+
+      const deck = state.decksById[deckId];
 
       if (!deck) return;
 
-      removeFromArray(
-        deck.cards,
-        (item) => item.cardId === actions.payload.cardId,
-      );
+      removeFromArray(deck.cards, (item) => item.cardId === cardId);
     });
   },
 });

@@ -14,6 +14,7 @@ export interface Props {
   deckId: Decks.DeckId;
   data: Data;
   templates?: Partial<Decks.Templates>;
+  status: "active" | "deleting";
 }
 
 export interface State {
