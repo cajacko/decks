@@ -91,7 +91,6 @@ export default function Stack(props: StackProps): React.ReactNode {
         )}
 
         <EmptyStack
-          stackId={props.stackId}
           style={styles.empty}
           handleDeleteStack={handleDeleteStack}
         />

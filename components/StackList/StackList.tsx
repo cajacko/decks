@@ -19,6 +19,8 @@ export default function StackList({
           leftStackId={stackIds[stackIds.indexOf(stackId) - 1]}
           rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
           stackListRef={stackListRef}
+          // Must always have 2 stacks
+          canDelete={stackIds.length > 2}
         />
       )),
     [stackIds, stackListRef],

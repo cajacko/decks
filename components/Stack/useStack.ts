@@ -14,7 +14,11 @@ import { deleteStack } from "@/store/slices/tabletop";
 
 const offsetPositionsCount = getOffsetPositions({ height: 0, width: 0 }).length;
 
-export default function useStack({ stackId, stackListRef }: StackProps) {
+export default function useStack({
+  stackId,
+  stackListRef,
+  canDelete = false,
+}: StackProps) {
   const dispatch = useAppDispatch();
   const { tabletopId, stackWidth } = useTabletopContext();
   const width = useSharedValue(stackWidth);
@@ -67,22 +71,26 @@ export default function useStack({ stackId, stackListRef }: StackProps) {
 
   onUpdateCardList(cardInstancesIds ?? []);
 
-  const handleDeleteStack = React.useCallback(async () => {
-    const scroll = stackListRef.current?.scrollPrev?.();
+  const handleDeleteStack = React.useMemo(() => {
+    if (!canDelete) return;
 
-    const transform = new Promise<void>((resolve) => {
-      const toValue = withTiming(0, { duration: 500 }, () => {
-        runOnJS(resolve)();
+    return async () => {
+      const scroll = stackListRef.current?.scrollPrev?.();
+
+      const transform = new Promise<void>((resolve) => {
+        const toValue = withTiming(0, { duration: 500 }, () => {
+          runOnJS(resolve)();
+        });
+
+        opacity.value = toValue;
+        width.value = toValue;
       });
 
-      opacity.value = toValue;
-      width.value = toValue;
-    });
+      await Promise.all([scroll, transform]);
 
-    await Promise.all([scroll, transform]);
-
-    dispatch(deleteStack({ tabletopId, stackId: stackId }));
-  }, [stackId, width, tabletopId, dispatch, stackListRef, opacity]);
+      dispatch(deleteStack({ tabletopId, stackId: stackId }));
+    };
+  }, [stackId, width, tabletopId, dispatch, stackListRef, opacity, canDelete]);
 
   return {
     opacity,
