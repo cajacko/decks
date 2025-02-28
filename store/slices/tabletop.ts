@@ -194,6 +194,19 @@ export const tabletopsSlice = createSlice({
         );
       },
     ),
+    resetTabletop: history.withHistory(
+      (
+        state,
+        action: PayloadAction<{
+          tabletopId: string;
+          historyState: Tabletops.HistoryState;
+        }>,
+      ) => {
+        state.stacksIds = action.payload.historyState.stacksIds;
+        state.stacksById = action.payload.historyState.stacksById;
+        state.cardInstancesById = action.payload.historyState.cardInstancesById;
+      },
+    ),
   },
   extraReducers: (builder) => {
     function deleteCards(
@@ -278,6 +291,7 @@ export const {
   undo,
   redo,
   deleteStack,
+  resetTabletop,
 } = tabletopsSlice.actions;
 
 export const selectTabletop = (

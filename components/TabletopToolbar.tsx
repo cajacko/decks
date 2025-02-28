@@ -6,6 +6,7 @@ import {
   selectTabletopHasFuture,
   redo,
 } from "@/store/slices/tabletop";
+import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
@@ -28,16 +29,21 @@ export default function TabletopToolbar(): React.ReactNode {
   return (
     <View style={styles.container}>
       <CardAction
-        icon="Un"
+        icon="Undo"
         onPress={hasPast ? () => dispatch(undo({ tabletopId })) : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: hasPast ? 1 : 0.5 },
         ])}
       />
+      <CardAction
+        icon="Reset"
+        onPress={() => dispatch(resetTabletopHelper({ tabletopId }))}
+        style={styles.action}
+      />
       {deckId && (
         <CardAction
-          icon="De"
+          icon="Deck"
           onPress={() => router.push(`/deck/${deckId}`)}
           style={styles.action}
         />
@@ -50,7 +56,7 @@ export default function TabletopToolbar(): React.ReactNode {
         />
       )}
       <CardAction
-        icon="Re"
+        icon="Redo"
         onPress={hasFuture ? () => dispatch(redo({ tabletopId })) : undefined}
         style={StyleSheet.flatten([
           styles.action,

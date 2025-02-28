@@ -2,7 +2,7 @@ import { History as CreateHistoryHelper } from "./helpers";
 import * as Cards from "./cards";
 import * as Decks from "./decks";
 
-type TabletopId = string;
+export type TabletopId = string;
 type StackId = string;
 export type CardInstanceId = string;
 

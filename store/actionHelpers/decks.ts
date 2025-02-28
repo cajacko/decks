@@ -4,7 +4,7 @@ import { selectDeck } from "../slices/decks";
 import { Cards, Decks, Tabletops } from "../types";
 import uuid from "@/utils/uuid";
 import builtInTemplates from "@/config/builtInTemplates";
-import minStackCount from "@/config/minStackCount";
+import { createInitStacks } from "@/utils/minStacks";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.DeckId;
@@ -46,19 +46,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
 
   const cards: Cards.Props[] = [];
 
-  // Generate stack ids equal to minStackCount
-  const stackIds = Array.from({ length: minStackCount }, () => uuid());
-
-  const stacksById: Tabletops.HistoryState["stacksById"] = stackIds.reduce(
-    (acc, stackId) => ({
-      ...acc,
-      [stackId]: {
-        id: stackId,
-        cardInstances: [],
-      },
-    }),
-    {},
-  );
+  const { stacksIds, stacksById } = createInitStacks();
 
   const defaultTabletop: Tabletops.Props = {
     id: tabletopId,
@@ -69,7 +57,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
       present: {
         cardInstancesById: {},
         stacksById,
-        stacksIds: stackIds,
+        stacksIds,
       },
     },
   };

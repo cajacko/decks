@@ -4,7 +4,7 @@ import Stack from "@/components/Stack";
 import Animated from "react-native-reanimated";
 import { StackListProps } from "./StackList.types";
 import useStackList from "./useStackList";
-import minStackCount from "@/config/minStackCount";
+import { minStackCount } from "@/utils/minStacks";
 
 export default function StackList({
   handleLayout,

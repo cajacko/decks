@@ -6,7 +6,6 @@ import { RootState, Decks, Cards, Templates } from "../types";
 import { getIsCardId, Target } from "@/utils/cardTarget";
 
 type CardIdProps = { cardId: string };
-
 export type DeckOrCardSideProps = Target & { side: Cards.Side };
 
 const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
