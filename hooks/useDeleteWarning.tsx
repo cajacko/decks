@@ -6,6 +6,7 @@ export interface UseDeleteWarningProps {
   title?: string;
   message?: string;
   buttons?: AlertButton[];
+  deleteButtonText?: string;
 }
 
 export default function useDeleteWarning({
@@ -13,6 +14,7 @@ export default function useDeleteWarning({
   buttons,
   message,
   title,
+  deleteButtonText,
 }: UseDeleteWarningProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
@@ -28,7 +30,7 @@ export default function useDeleteWarning({
     () => [
       { text: "Cancel", onPress: close, style: "cancel" },
       {
-        text: "Delete",
+        text: deleteButtonText ?? "Delete",
         onPress: () => {
           handleDelete();
           close();
@@ -36,7 +38,7 @@ export default function useDeleteWarning({
         style: "destructive",
       },
     ],
-    [close, handleDelete],
+    [close, handleDelete, deleteButtonText],
   );
 
   return {

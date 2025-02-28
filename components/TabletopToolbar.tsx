@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import useDeleteWarning from "@/hooks/useDeleteWarning";
 
 export default function TabletopToolbar(): React.ReactNode {
   const { tabletopId } = useTabletopContext();
@@ -23,11 +24,22 @@ export default function TabletopToolbar(): React.ReactNode {
     selectTabletopHasFuture(state, { tabletopId }),
   );
 
+  const { component, open } = useDeleteWarning({
+    handleDelete: () => {
+      dispatch(resetTabletopHelper({ tabletopId }));
+    },
+    title: "Reset Play Area",
+    message:
+      "This will move all cards back into the first stack and deck order",
+    deleteButtonText: "Reset",
+  });
+
   const deckId = typeof params.deckId === "string" ? params.deckId : null;
   const router = useRouter();
 
   return (
     <View style={styles.container}>
+      {component}
       <CardAction
         icon="Undo"
         onPress={hasPast ? () => dispatch(undo({ tabletopId })) : undefined}
@@ -36,11 +48,7 @@ export default function TabletopToolbar(): React.ReactNode {
           { opacity: hasPast ? 1 : 0.5 },
         ])}
       />
-      <CardAction
-        icon="Reset"
-        onPress={() => dispatch(resetTabletopHelper({ tabletopId }))}
-        style={styles.action}
-      />
+      <CardAction icon="Reset" onPress={open} style={styles.action} />
       {deckId && (
         <CardAction
           icon="Deck"
