@@ -46,6 +46,12 @@
         "projectId": "e9b5331b-fd5c-4a1c-ae88-d238028836a6"
       }
     },
-    "owner": "charliejackson"
+    "owner": "charliejackson",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e9b5331b-fd5c-4a1c-ae88-d238028836a6"
+    }
   }
 }

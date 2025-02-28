@@ -10,7 +10,8 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "build:android:development": "eas build -p android --profile development",
-    "build:android:preview": "eas build -p android --profile development"
+    "build:android:preview": "eas build -p android --profile development",
+    "publish:go": "eas update --branch=main"
   },
   "jest": {
     "preset": "jest-expo"
@@ -35,6 +36,7 @@
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
     "expo-system-ui": "~4.0.8",
+    "expo-updates": "~0.27.1",
     "expo-web-browser": "~14.0.2",
     "handlebars": "^4.7.8",
     "lodash": "^4.17.21",
