@@ -15,6 +15,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { init as initMousePointer } from "@/utils/mousePosition";
 import { useColorScheme } from "@/expoExample/hooks/useColorScheme";
 import { getDeckName } from "@/app/deck/[deckId]/_layout";
+import { ModalProvider } from "@/context/Modal";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -48,35 +49,37 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <Stack
-            screenOptions={{
-              animation: "slide_from_right",
-            }}
-          >
-            <Stack.Screen
-              name="index"
-              options={{
-                headerShown: true,
-                headerBackButtonMenuEnabled: false,
-                headerTitle: "Decks",
+          <ModalProvider>
+            <Stack
+              screenOptions={{
+                animation: "slide_from_right",
               }}
-            />
-            <Stack.Screen
-              name="deck/[deckId]"
-              options={({ route: { params } }) => ({
-                headerShown: true,
-                headerTitle: getDeckName(
-                  params &&
-                    "deckId" in params &&
-                    typeof params.deckId === "string"
-                    ? params.deckId
-                    : null,
-                ),
-              })}
-            />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
+            >
+              <Stack.Screen
+                name="index"
+                options={{
+                  headerShown: true,
+                  headerBackButtonMenuEnabled: false,
+                  headerTitle: "Decks",
+                }}
+              />
+              <Stack.Screen
+                name="deck/[deckId]"
+                options={({ route: { params } }) => ({
+                  headerShown: true,
+                  headerTitle: getDeckName(
+                    params &&
+                      "deckId" in params &&
+                      typeof params.deckId === "string"
+                      ? params.deckId
+                      : null,
+                  ),
+                })}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </ModalProvider>
         </PersistGate>
       </ReduxProvider>
     </ThemeProvider>

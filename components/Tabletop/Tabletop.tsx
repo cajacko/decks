@@ -1,6 +1,6 @@
 import React from "react";
-import { Dimensions, ScrollViewProps } from "react-native";
-import TabletopToolbar from "@/components/TabletopToolbar";
+import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
+import { useTabletopToolbar } from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
 import { TabletopProvider } from "./Tabletop.context";
 import StackList from "@/components/StackList";
@@ -9,12 +9,20 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
+import { useEditCardModal } from "@/components/EditCardModal";
+import CardAction from "@/components/CardAction";
 
 export default function Tabletop({
   tabletopId,
   style,
   deckId,
 }: TabletopProps): React.ReactNode {
+  useTabletopToolbar({ tabletopId });
+  const { component, open } = useEditCardModal({
+    type: "new-card-in-deck",
+    id: deckId,
+  });
+
   const [size, setSize] = React.useState<{ height: number; width: number }>(
     Dimensions.get("screen"),
   );
@@ -49,15 +57,27 @@ export default function Tabletop({
   );
 
   return (
-    <TabletopProvider
-      height={size.height}
-      width={size.width}
-      tabletopId={tabletopId}
-    >
-      <Animated.View style={style}>
-        <TabletopToolbar deckId={deckId} />
-        <StackList style={animatedStyle} handleLayout={handleLayout} />
-      </Animated.View>
-    </TabletopProvider>
+    <>
+      <TabletopProvider
+        height={size.height}
+        width={size.width}
+        tabletopId={tabletopId}
+      >
+        <Animated.View style={style}>
+          <StackList style={animatedStyle} handleLayout={handleLayout} />
+
+          {component}
+          <CardAction icon="+" onPress={open} style={styles.action} />
+        </Animated.View>
+      </TabletopProvider>
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  action: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+  },
+});

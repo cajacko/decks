@@ -1,24 +1,31 @@
 import React from "react";
+import { StyleSheet, View } from "react-native";
 import {
-  Modal as RNModal,
-  ModalProps as RNModalProps,
-  StyleSheet,
-} from "react-native";
+  Modal as ContextModal,
+  ModalProps as ContextModalProps,
+} from "@/context/Modal";
 
-export type ModalProps = RNModalProps;
+export type ModalProps = ContextModalProps;
 
 export default function Modal({
   children,
   ...props
 }: ModalProps): React.ReactNode {
   return (
-    <RNModal animationType="fade" transparent {...props}>
-      {children}
-    </RNModal>
+    <ContextModal animationType="fade" transparent {...props}>
+      <View style={styles.container}>{children}</View>
+    </ContextModal>
   );
 }
 
 export const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   content: {
     position: "relative",
     zIndex: 2,
