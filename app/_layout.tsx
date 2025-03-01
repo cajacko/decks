@@ -47,70 +47,24 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <Stack>
+          <Stack
+            screenOptions={{
+              animation: "slide_from_right",
+            }}
+          >
             <Stack.Screen
               name="index"
               options={{
-                headerShown: false,
-                animation: "slide_from_right",
+                headerShown: true,
+                headerBackButtonMenuEnabled: false,
+                headerTitle: "Decks",
               }}
             />
             <Stack.Screen
-              name="deck/[deckId]/play"
+              name="deck/[deckId]"
               options={{
                 headerShown: true,
-                headerTitle: "Play Deck",
-                headerBackVisible: true,
-                animation: "none",
-              }}
-            />
-            <Stack.Screen
-              name="card/[cardId]"
-              options={{
-                headerShown: true,
-                presentation: "modal",
-                headerTitle: "Edit Card",
-                headerBackVisible: true,
-                animation: "none",
-              }}
-            />
-            <Stack.Screen
-              name="deck/[deckId]/card/[cardId]"
-              options={{
-                headerShown: true,
-                presentation: "modal",
-                headerTitle: "Edit Card",
-                headerBackVisible: true,
-                animation: "none",
-              }}
-            />
-            <Stack.Screen
-              name="deck/[deckId]/new-card"
-              options={{
-                headerShown: true,
-                presentation: "modal",
-                headerTitle: "New Card",
-                headerBackVisible: true,
-                animation: "none",
-              }}
-            />
-            <Stack.Screen
-              name="deck/[deckId]/card-defaults"
-              options={{
-                headerShown: true,
-                presentation: "modal",
-                headerTitle: "Card Defaults",
-                headerBackVisible: true,
-                animation: "none",
-              }}
-            />
-            <Stack.Screen
-              name="deck/[deckId]/index"
-              options={{
-                headerShown: true,
-                headerTitle: "Edit Deck",
-                headerBackVisible: true,
-                animation: "none",
+                headerTitle: "Deck",
               }}
             />
             <Stack.Screen name="+not-found" />

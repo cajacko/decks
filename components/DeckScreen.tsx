@@ -83,12 +83,6 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           <Button title="Add Card" onPress={openNewCard} />
         </View>
         <View style={styles.button}>
-          <Button
-            title="Play"
-            onPress={() => navigate(`/deck/${props.deckId}/play`)}
-          />
-        </View>
-        <View style={styles.button}>
           <Button title="Delete" onPress={open} />
         </View>
       </View>

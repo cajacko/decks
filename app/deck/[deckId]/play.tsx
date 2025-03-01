@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import Tabletop from "@/components/Tabletop/Tabletop";
-import { useLocalSearchParams } from "expo-router";
+import { useGlobalSearchParams } from "expo-router";
 import React from "react";
 import AppError from "@/classes/AppError";
 import { useRequiredAppSelector } from "@/store/hooks";
@@ -11,11 +11,11 @@ export const paramKeys = {
 };
 
 export default function DeckTabletopScreen() {
-  const params = useLocalSearchParams();
+  const params = useGlobalSearchParams();
   const deckId = params[paramKeys.deckId];
 
   if (typeof deckId !== "string") {
-    throw new AppError(`${DeckTabletopScreen.name} deckId must be a string`);
+    throw new AppError(`${DeckTabletopScreen.name}: deckId must be a string`);
   }
 
   const defaultTabletopId = useRequiredAppSelector(
@@ -23,7 +23,13 @@ export default function DeckTabletopScreen() {
     DeckTabletopScreen.name,
   );
 
-  return <Tabletop tabletopId={defaultTabletopId} style={styles.tabletop} />;
+  return (
+    <Tabletop
+      tabletopId={defaultTabletopId}
+      deckId={deckId}
+      style={styles.tabletop}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

@@ -13,6 +13,7 @@ import Animated, {
 export default function Tabletop({
   tabletopId,
   style,
+  deckId,
 }: TabletopProps): React.ReactNode {
   const [size, setSize] = React.useState<{ height: number; width: number }>(
     Dimensions.get("screen"),
@@ -54,7 +55,7 @@ export default function Tabletop({
       tabletopId={tabletopId}
     >
       <Animated.View style={style}>
-        <TabletopToolbar />
+        <TabletopToolbar deckId={deckId} />
         <StackList style={animatedStyle} handleLayout={handleLayout} />
       </Animated.View>
     </TabletopProvider>

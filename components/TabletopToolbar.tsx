@@ -10,14 +10,14 @@ import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
-import { useRouter, useLocalSearchParams } from "expo-router";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import EditCardModal from "./EditCardModal";
 import { Target } from "@/utils/cardTarget";
 
-export default function TabletopToolbar(): React.ReactNode {
+export default function TabletopToolbar(props: {
+  deckId: string;
+}): React.ReactNode {
   const { tabletopId } = useTabletopContext();
-  const params = useLocalSearchParams();
   const dispatch = useAppDispatch();
   const hasPast = useAppSelector((state) =>
     selectTabletopHasPast(state, { tabletopId }),
@@ -36,12 +36,8 @@ export default function TabletopToolbar(): React.ReactNode {
     deleteButtonText: "Reset",
   });
 
-  const deckId = typeof params.deckId === "string" ? params.deckId : null;
-  const router = useRouter();
-
   const [editCardTarget, setEditCardTarget] = React.useState(
-    (): Target | null =>
-      deckId ? { type: "new-card-in-deck", id: deckId } : null,
+    (): Target | null => ({ type: "new-card-in-deck", id: props.deckId }),
   );
 
   const [showEditCard, setShowEditCard] = React.useState(false);
@@ -49,8 +45,8 @@ export default function TabletopToolbar(): React.ReactNode {
   const closeEditCard = React.useCallback(() => setShowEditCard(false), []);
   const openEditCard = React.useCallback(() => {
     setShowEditCard(true);
-    setEditCardTarget(deckId ? { type: "new-card-in-deck", id: deckId } : null);
-  }, [deckId]);
+    setEditCardTarget({ type: "new-card-in-deck", id: props.deckId });
+  }, [props.deckId]);
 
   return (
     <View style={styles.container}>
@@ -64,14 +60,7 @@ export default function TabletopToolbar(): React.ReactNode {
         ])}
       />
       <CardAction icon="Reset" onPress={open} style={styles.action} />
-      {deckId && (
-        <CardAction
-          icon="Deck"
-          onPress={() => router.navigate(`/deck/${deckId}`)}
-          style={styles.action}
-        />
-      )}
-      {deckId && editCardTarget && (
+      {editCardTarget && (
         <>
           <EditCardModal
             visible={showEditCard}
