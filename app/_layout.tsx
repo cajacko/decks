@@ -18,6 +18,11 @@ import { useColorScheme } from "@/expoExample/hooks/useColorScheme";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+export const unstable_settings = {
+  // Ensure any route can link back to `/`
+  initialRouteName: "index",
+};
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
@@ -47,6 +52,7 @@ export default function RootLayout() {
               name="index"
               options={{
                 headerShown: false,
+                animation: "slide_from_right",
               }}
             />
             <Stack.Screen
@@ -55,7 +61,7 @@ export default function RootLayout() {
                 headerShown: true,
                 headerTitle: "Play Deck",
                 headerBackVisible: true,
-                animation: "slide_from_right",
+                animation: "none",
               }}
             />
             <Stack.Screen
@@ -65,7 +71,7 @@ export default function RootLayout() {
                 presentation: "modal",
                 headerTitle: "Edit Card",
                 headerBackVisible: true,
-                animation: "slide_from_right",
+                animation: "none",
               }}
             />
             <Stack.Screen
@@ -75,7 +81,7 @@ export default function RootLayout() {
                 presentation: "modal",
                 headerTitle: "Edit Card",
                 headerBackVisible: true,
-                animation: "slide_from_right",
+                animation: "none",
               }}
             />
             <Stack.Screen
@@ -85,7 +91,7 @@ export default function RootLayout() {
                 presentation: "modal",
                 headerTitle: "New Card",
                 headerBackVisible: true,
-                animation: "slide_from_right",
+                animation: "none",
               }}
             />
             <Stack.Screen
@@ -95,7 +101,7 @@ export default function RootLayout() {
                 presentation: "modal",
                 headerTitle: "Card Defaults",
                 headerBackVisible: true,
-                animation: "slide_from_right",
+                animation: "none",
               }}
             />
             <Stack.Screen
@@ -104,7 +110,7 @@ export default function RootLayout() {
                 headerShown: true,
                 headerTitle: "Edit Deck",
                 headerBackVisible: true,
-                animation: "slide_from_right",
+                animation: "none",
               }}
             />
             <Stack.Screen name="+not-found" />

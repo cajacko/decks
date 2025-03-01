@@ -7,10 +7,12 @@ import { useAnimatedHeightStyle } from "./useAnimatedStyles";
  * sharedValue from here should be passed into the `BottomDrawer` component.
  */
 export default function useHeight(startingHeight?: number) {
-  const sharedValue = useSharedValue(startingHeight ?? defaultProps.minHeight);
+  const initHeight = startingHeight ?? defaultProps.minHeight;
+  const sharedValue = useSharedValue(initHeight);
 
   return {
     sharedValue,
     heightStyle: useAnimatedHeightStyle(sharedValue),
+    initHeight,
   };
 }

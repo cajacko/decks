@@ -10,7 +10,7 @@ export const paramKeys = {
 
 export default function DeckNewCardScene() {
   const params = useLocalSearchParams();
-  const { canGoBack, back, push } = useRouter();
+  const { canGoBack, back, navigate } = useRouter();
 
   const deckId = params[paramKeys.deckId];
 
@@ -26,8 +26,8 @@ export default function DeckNewCardScene() {
     }
 
     // Default to home if we can't go back
-    push("/");
-  }, [canGoBack, back, push]);
+    navigate("/");
+  }, [canGoBack, back, navigate]);
 
   const initTarget = React.useMemo<Target>(
     () => ({

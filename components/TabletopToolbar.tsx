@@ -12,6 +12,8 @@ import { StyleSheet, View } from "react-native";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
+import EditCardModal from "./EditCardModal";
+import { Target } from "@/utils/cardTarget";
 
 export default function TabletopToolbar(): React.ReactNode {
   const { tabletopId } = useTabletopContext();
@@ -37,6 +39,19 @@ export default function TabletopToolbar(): React.ReactNode {
   const deckId = typeof params.deckId === "string" ? params.deckId : null;
   const router = useRouter();
 
+  const [editCardTarget, setEditCardTarget] = React.useState(
+    (): Target | null =>
+      deckId ? { type: "new-card-in-deck", id: deckId } : null,
+  );
+
+  const [showEditCard, setShowEditCard] = React.useState(false);
+
+  const closeEditCard = React.useCallback(() => setShowEditCard(false), []);
+  const openEditCard = React.useCallback(() => {
+    setShowEditCard(true);
+    setEditCardTarget(deckId ? { type: "new-card-in-deck", id: deckId } : null);
+  }, [deckId]);
+
   return (
     <View style={styles.container}>
       {component}
@@ -52,16 +67,21 @@ export default function TabletopToolbar(): React.ReactNode {
       {deckId && (
         <CardAction
           icon="Deck"
-          onPress={() => router.push(`/deck/${deckId}`)}
+          onPress={() => router.navigate(`/deck/${deckId}`)}
           style={styles.action}
         />
       )}
-      {deckId && (
-        <CardAction
-          icon="+"
-          onPress={() => router.push(`/deck/${deckId}/new-card`)}
-          style={styles.action}
-        />
+      {deckId && editCardTarget && (
+        <>
+          <EditCardModal
+            visible={showEditCard}
+            onRequestClose={closeEditCard}
+            target={editCardTarget}
+            onChangeTarget={setEditCardTarget}
+            onDelete={closeEditCard}
+          />
+          <CardAction icon="+" onPress={openEditCard} style={styles.action} />
+        </>
       )}
       <CardAction
         icon="Redo"

@@ -11,7 +11,7 @@ export interface DeckListItemProps {
 export default function DeckListItem(
   props: DeckListItemProps,
 ): React.ReactNode {
-  const { push } = useRouter();
+  const { navigate } = useRouter();
 
   const name = useRequiredAppSelector(
     (state) => selectDeck(state, { deckId: props.deckId })?.name,
@@ -19,12 +19,12 @@ export default function DeckListItem(
   );
 
   const edit = React.useCallback(() => {
-    push(`/deck/${props.deckId}`);
-  }, [props.deckId, push]);
+    navigate(`/deck/${props.deckId}`);
+  }, [props.deckId, navigate]);
 
   const play = React.useCallback(() => {
-    push(`/deck/${props.deckId}/play`);
-  }, [props.deckId, push]);
+    navigate(`/deck/${props.deckId}/play`);
+  }, [props.deckId, navigate]);
 
   return (
     <View style={styles.container}>

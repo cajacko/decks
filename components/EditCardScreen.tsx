@@ -12,7 +12,7 @@ export const paramKeys = {
 
 export default function EditCardScreen() {
   const params = useLocalSearchParams();
-  const { canGoBack, back, push } = useRouter();
+  const { canGoBack, back, navigate } = useRouter();
 
   const cardId = params[paramKeys.cardId];
   const side = params[paramKeys.side];
@@ -29,8 +29,8 @@ export default function EditCardScreen() {
     }
 
     // Default to home if we can't go back
-    push("/");
-  }, [canGoBack, back, push]);
+    navigate("/");
+  }, [canGoBack, back, navigate]);
 
   const target = React.useMemo<Target>(
     () => ({

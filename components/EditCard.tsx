@@ -1,4 +1,10 @@
-import { StyleSheet, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  ViewStyle,
+  View,
+  Pressable,
+} from "react-native";
 import Animated from "react-native-reanimated";
 import React from "react";
 import BottonDrawer, {
@@ -10,16 +16,26 @@ import BottonDrawer, {
 import EditCardForm from "@/components/EditCardForm";
 import CardSides, { CardSidesRef } from "@/components/CardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
-import { Pressable } from "react-native";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
   "onCreateCard" | "onChangeTarget"
-> & { target: Target; initialSide?: Cards.Side | null; onDelete?: () => void };
+> & {
+  target: Target;
+  initialSide?: Cards.Side | null;
+  onDelete?: () => void;
+  onPressBackground?: () => void;
+  backgroundStyle?: ViewStyle;
+};
 
-export default function EditCard(props: EditCardProps) {
+export default function EditCard({
+  initialSide,
+  onPressBackground,
+  backgroundStyle: backgroundStyleProp,
+  ...props
+}: EditCardProps) {
   const height = useHeight();
   const { maxHeight, onContainerLayout } = useMaxHeight();
 
@@ -29,9 +45,7 @@ export default function EditCard(props: EditCardProps) {
     bottomDrawer.current?.open();
   }, []);
 
-  const [side, setSide] = React.useState<Cards.Side>(
-    props.initialSide ?? "front",
-  );
+  const [side, setSide] = React.useState<Cards.Side>(initialSide ?? "front");
   const cardSidesRef = React.useRef<CardSidesRef>(null);
 
   const flipSide = React.useCallback(async () => {
@@ -39,6 +53,16 @@ export default function EditCard(props: EditCardProps) {
 
     setSide((side) => (side === "front" ? "back" : "front"));
   }, []);
+
+  const bufferStyle = React.useMemo(
+    () => [styles.drawerBuffer, height.heightStyle],
+    [height.heightStyle],
+  );
+
+  const backgroundStyle = React.useMemo(
+    () => [styles.scrollBackground, backgroundStyleProp],
+    [backgroundStyleProp],
+  );
 
   return (
     <EditCardProvider onChangeSide={setSide} side={side} {...props}>
@@ -51,15 +75,20 @@ export default function EditCard(props: EditCardProps) {
           scrollEnabled
           horizontal={false}
         >
-          <Pressable onPress={onPress}>
-            <CardSides ref={cardSidesRef} {...props.target} side={side} />
-          </Pressable>
-          <Animated.View style={[styles.drawerBuffer, height.heightStyle]} />
+          <View style={styles.scrollContent}>
+            <Pressable onPress={onPress}>
+              <CardSides ref={cardSidesRef} {...props.target} side={side} />
+            </Pressable>
+          </View>
+          <Animated.View style={bufferStyle} />
+          <Pressable onPress={onPressBackground} style={backgroundStyle} />
         </ScrollView>
         <BottonDrawer
           height={height.sharedValue}
           maxHeight={maxHeight}
           ref={bottomDrawer}
+          initHeight={height.initHeight}
+          animateIn
         >
           <EditCardForm
             flipSide={flipSide}
@@ -93,10 +122,20 @@ const styles = StyleSheet.create({
   drawerBuffer: {
     opacity: 0,
     width: "100%",
+    zIndex: 1,
+    position: "relative",
   },
   content: {
     backgroundColor: "white",
     flex: 1,
     marginTop: dragHeight - dragOverlap - dragBuffer,
+  },
+  scrollContent: {
+    zIndex: 3,
+    position: "relative",
+  },
+  scrollBackground: {
+    zIndex: 2,
+    position: "absolute",
   },
 });

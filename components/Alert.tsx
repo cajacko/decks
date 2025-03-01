@@ -1,5 +1,6 @@
 import React from "react";
-import { Modal, StyleSheet, Text, Pressable, View } from "react-native";
+import { StyleSheet, Text, Pressable, View } from "react-native";
+import Modal, { styles as modalStyles } from "./Modal";
 
 export interface AlertButton {
   text: string;
@@ -17,14 +18,9 @@ export interface AlertProps {
 
 export default function Alert(props: AlertProps): React.ReactNode {
   return (
-    <Modal
-      animationType="fade"
-      visible={props.visible}
-      onRequestClose={props.onRequestClose}
-      transparent
-    >
+    <Modal visible={props.visible} onRequestClose={props.onRequestClose}>
       <View style={styles.centeredView}>
-        <View style={styles.modalView}>
+        <View style={[modalStyles.content, styles.modalView]}>
           {props.title && <Text style={styles.modalText}>{props.title}</Text>}
 
           {props.message && (
@@ -48,25 +44,16 @@ export default function Alert(props: AlertProps): React.ReactNode {
             </View>
           )}
         </View>
-        <Pressable onPress={props.onRequestClose} style={styles.background} />
+        <Pressable
+          onPress={props.onRequestClose}
+          style={modalStyles.backgroundLight}
+        />
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  modal: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  background: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    zIndex: 1,
-  },
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -86,8 +73,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    position: "relative",
-    zIndex: 2,
   },
   buttons: {
     flexDirection: "row",

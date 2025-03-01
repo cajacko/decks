@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, ScrollView, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckIds } from "@/store/slices/decks";
 import DeckListItem from "@/components/DeckListItem";
@@ -7,7 +7,6 @@ import CardAction from "./CardAction";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import { ScrollView } from "react-native-gesture-handler";
 
 export interface DecksScreenProps {
   style?: ViewStyle;
@@ -15,7 +14,7 @@ export interface DecksScreenProps {
 
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const deckIds = useAppSelector(selectDeckIds);
-  const { push } = useRouter();
+  const { navigate } = useRouter();
   const dispatch = useAppDispatch();
 
   const createDeck = React.useCallback(() => {
@@ -23,8 +22,8 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 
     dispatch(createDeckHelper({ deckId }));
 
-    push(`/deck/${deckId}`);
-  }, [push, dispatch]);
+    navigate(`/deck/${deckId}`);
+  }, [navigate, dispatch]);
 
   return (
     <ScrollView style={StyleSheet.flatten([props.style, styles.container])}>

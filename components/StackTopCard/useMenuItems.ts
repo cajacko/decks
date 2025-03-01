@@ -1,14 +1,16 @@
 import React from "react";
-import { useRouter } from "expo-router";
 import { StackTopCardProps, StackTopCardMenuItem } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
-import { paramKeys } from "@/app/card/[cardId]";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
   const { buttonSize, cardWidth, cardHeight } = useTabletopContext();
-  const router = useRouter();
+  const [showEditModal, setShowEditModal] = React.useState(false);
+
+  const closeEditModal = React.useCallback(() => {
+    setShowEditModal(false);
+  }, []);
 
   const menuItems = React.useMemo(() => {
     const centerLeft = cardWidth / 2 - buttonSize / 2;
@@ -39,8 +41,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         height: buttonSize,
         width: buttonSize,
         icon: "Ed",
-        onPress: () =>
-          router.push(`/card/${state.cardId}?${paramKeys.side}=${state.side}`),
+        onPress: () => setShowEditModal(true),
       },
     ];
 
@@ -89,15 +90,16 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.handleMoveToBottom,
     state.moveRight,
     state.moveLeft,
-    router,
-    state.cardId,
-    state.side,
   ]);
 
   return {
+    cardId: state.cardId,
     menuItems,
     cardInstanceRef: state.cardInstanceRef,
     setIsAnimating: state.setIsAnimating,
     hideActions: state.hideActions,
+    showEditModal,
+    closeEditModal,
+    side: state.side,
   };
 }

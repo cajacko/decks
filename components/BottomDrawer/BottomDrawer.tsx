@@ -32,8 +32,13 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
       [state.animatedStyles.dragBarColor],
     );
 
+    const drawerStyle = React.useMemo(
+      () => [styles.drawer, state.animatedStyles.bottomStyle],
+      [],
+    );
+
     return (
-      <View style={styles.drawer}>
+      <Animated.View style={drawerStyle}>
         <Animated.View style={drawerContainerStyle}>
           <View style={styles.drawerContainer}>
             <GestureDetector gesture={state.drag}>
@@ -49,7 +54,7 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
             </ScrollView>
           </View>
         </Animated.View>
-      </View>
+      </Animated.View>
     );
   },
 );

@@ -21,6 +21,7 @@ export function useAnimatedHeightStyle(height: SharedValue<number>) {
 export default function useAnimatedStyles(props: {
   height: SharedValue<number>;
   pressed: SharedValue<boolean>;
+  bottom: SharedValue<number>;
 }) {
   const { height, pressed } = props;
 
@@ -31,6 +32,12 @@ export default function useAnimatedStyles(props: {
 
   const heightStyle = useAnimatedHeightStyle(height);
 
+  const bottomStyle = useAnimatedStyle(() => {
+    return {
+      bottom: props.bottom ? props.bottom.value : 0,
+    };
+  });
+
   const dragBarColor = useAnimatedStyle(() => {
     return {
       backgroundColor: pressed.value
@@ -40,6 +47,7 @@ export default function useAnimatedStyles(props: {
   });
 
   return {
+    bottomStyle,
     height: heightStyle,
     dragBarColor,
   };

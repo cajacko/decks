@@ -1,8 +1,0 @@
-import React from "react";
-import EditCardScreen, { paramKeys } from "@/components/EditCardScreen";
-
-export { paramKeys };
-
-export default function EditCardScene() {
-  return <EditCardScreen />;
-}

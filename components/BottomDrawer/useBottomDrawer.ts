@@ -1,10 +1,11 @@
 import React from "react";
-import { useSharedValue } from "react-native-reanimated";
+import { useSharedValue, withTiming } from "react-native-reanimated";
 import { BottomDrawerProps, BottomDrawerRef } from "./BottomDrawer.types";
 import useSetupRef from "./useOpenClose";
 import useHeightConstraints from "./useHeightConstraints";
 import useAnimatedStyles from "./useAnimatedStyles";
 import useDrag from "./useDrag";
+import { dragBuffer, dragHeight, dragOverlap } from "./bottomDrawer.style";
 
 export default function useBottomDrawer(
   props: Omit<BottomDrawerProps, "children">,
@@ -40,7 +41,17 @@ export default function useBottomDrawer(
     pressed,
   });
 
-  const animatedStyles = useAnimatedStyles({ height, pressed });
+  const bottom = useSharedValue(
+    props.animateIn ? -props.initHeight - dragHeight : 0,
+  );
+
+  React.useEffect(() => {
+    if (!props.animateIn) return;
+
+    bottom.value = withTiming(0, { duration: 500 });
+  }, [bottom, props.animateIn]);
+
+  const animatedStyles = useAnimatedStyles({ height, pressed, bottom });
 
   return {
     drag,

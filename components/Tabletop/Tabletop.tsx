@@ -27,8 +27,16 @@ export default function Tabletop({
     };
   });
 
+  const hasLayout = React.useRef(false);
+
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
+      // PRevents us updating when the keyboard comes into view, which we don't want. Maybe there's
+      // a better solution for this, that then allows window changes as well?
+      if (hasLayout.current) return;
+
+      hasLayout.current = true;
+
       const { width, height } = event.nativeEvent.layout;
 
       opacity.value = withTiming(1, {

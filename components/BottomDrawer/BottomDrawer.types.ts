@@ -9,9 +9,11 @@ export const defaultProps = {
 export interface BottomDrawerProps {
   children?: React.ReactNode;
   height: SharedValue<number>;
+  initHeight: number;
   maxHeight?: number | null;
   minHeight?: number;
   openOnMount?: boolean;
+  animateIn?: boolean;
 }
 
 export interface BottomDrawerRef {

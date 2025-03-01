@@ -8,6 +8,8 @@ import {
 } from "./types";
 import HoldMenu from "../HoldMenu";
 import useMenuItems from "./useMenuItems";
+import EditCardModal from "../EditCardModal";
+import { Target } from "@/utils/cardTarget";
 
 export * from "./types";
 
@@ -58,11 +60,25 @@ export default function StackTopCard(
     ],
   );
 
+  const target = React.useMemo(
+    (): Target => ({ id: state.cardId, type: "card" }),
+    [state.cardId],
+  );
+
   return (
-    <CardInstance
-      {...props}
-      ref={state.cardInstanceRef}
-      CardProps={cardProps}
-    />
+    <>
+      <CardInstance
+        {...props}
+        ref={state.cardInstanceRef}
+        CardProps={cardProps}
+      />
+      <EditCardModal
+        visible={state.showEditModal}
+        onRequestClose={state.closeEditModal}
+        target={target}
+        initialSide={state.side}
+        onDelete={state.closeEditModal}
+      />
+    </>
   );
 }
