@@ -3,8 +3,9 @@ import Tabletop from "@/components/Tabletop/Tabletop";
 import { useGlobalSearchParams } from "expo-router";
 import React from "react";
 import AppError from "@/classes/AppError";
-import { useRequiredAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
+import { useNavigation } from "expo-router";
 
 export const paramKeys = {
   deckId: "deckId",
@@ -12,16 +13,23 @@ export const paramKeys = {
 
 export default function DeckTabletopScreen() {
   const params = useGlobalSearchParams();
-  const deckId = params[paramKeys.deckId];
+  const deckIdParam = params[paramKeys.deckId];
+  const navigation = useNavigation();
+  const deckId = typeof deckIdParam === "string" ? deckIdParam : null;
 
-  if (typeof deckId !== "string") {
-    throw new AppError(`${DeckTabletopScreen.name}: deckId must be a string`);
-  }
-
-  const defaultTabletopId = useRequiredAppSelector(
-    (state) => selectDeck(state, { deckId })?.defaultTabletopId,
-    DeckTabletopScreen.name,
+  const defaultTabletopId = useAppSelector((state) =>
+    deckId ? selectDeck(state, { deckId })?.defaultTabletopId : undefined,
   );
+
+  if (!defaultTabletopId || !deckId) {
+    if (navigation.isFocused()) {
+      new AppError(
+        `${DeckTabletopScreen.name}: no deckId or defaultTabletopId found`,
+      ).log("error");
+    }
+
+    return null;
+  }
 
   return (
     <Tabletop
