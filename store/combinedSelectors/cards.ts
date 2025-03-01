@@ -12,7 +12,7 @@ const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
   `${props.type}:${props.id}-${props.side}`;
 
 // Is a lookup, doesn't need to be cached
-const selectDeckByCard = (
+export const selectDeckByCard = (
   state: RootState,
   props: CardIdProps,
 ): Decks.Props | null => {

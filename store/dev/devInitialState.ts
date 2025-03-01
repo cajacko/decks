@@ -1,4 +1,4 @@
-import { RootState, Templates } from "../types";
+import { RootState, Templates, Decks } from "../types";
 import templatesById from "@/config/templatesById";
 
 const state: RootState = {
@@ -87,6 +87,7 @@ const state: RootState = {
   decks: {
     decksById: {
       deck1: {
+        cardSize: Decks.CardSize.Poker,
         status: "active",
         id: "deck1",
         dataSchemaOrder: ["title", "backgroundColor"],

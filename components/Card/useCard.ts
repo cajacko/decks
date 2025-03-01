@@ -1,27 +1,38 @@
 import React from "react";
 import { Animated } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
-import { useTabletopContext } from "../Tabletop/Tabletop.context";
+// import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import {
   withAnimateOut,
   withAnimateFlipIn,
   withAnimateFlipOut,
 } from "./animations";
-import { getOffsetPositions, parseCardSize } from "./card.styles";
+// import { getOffsetPositions, parseCardSize } from "./card.styles";
+import { getOffsetPositions } from "./card.styles";
 import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
+import { useCardSizes } from "./CardSize.context";
 
 export default function useCard(
   props: Pick<
     CardProps,
-    "onAnimationChange" | "offsetPosition" | "initialRotation" | "initialScaleX"
+    | "onAnimationChange"
+    | "offsetPosition"
+    | "initialRotation"
+    | "initialScaleX"
+    | "constraints"
+    | "proportions"
   >,
   ref: React.ForwardedRef<CardRef>,
 ) {
-  const { height, width } = parseCardSize(useTabletopContext());
+  const cardSizes = useCardSizes(props);
+  const height = cardSizes.dpHeight;
+  const width = cardSizes.dpWidth;
+
+  // const { height, width } = parseCardSize(useTabletopContext());
 
   const offsetPositions = React.useMemo(
-    () => getOffsetPositions({ width, height }),
-    [width, height],
+    () => getOffsetPositions(cardSizes),
+    [cardSizes],
   );
 
   const offsetPosition = React.useMemo(
@@ -99,12 +110,11 @@ export default function useCard(
   }));
 
   return {
-    height,
-    width,
     opacity,
     translateX,
     translateY,
     scaleX,
     rotate,
+    cardSizes,
   };
 }

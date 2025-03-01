@@ -2,7 +2,6 @@ import React from "react";
 import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
 import { useTabletopToolbar } from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
-import { TabletopProvider } from "./Tabletop.context";
 import StackList from "@/components/StackList";
 import Animated, {
   useSharedValue,
@@ -10,7 +9,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useEditCardModal } from "@/components/EditCardModal";
-import CardAction from "@/components/CardAction";
+import IconButton from "@/components/IconButton";
+import { DeckTabletopProvider } from "@/context/Deck";
 
 export default function Tabletop({
   tabletopId,
@@ -58,18 +58,19 @@ export default function Tabletop({
 
   return (
     <>
-      <TabletopProvider
-        height={size.height}
-        width={size.width}
+      <DeckTabletopProvider
+        availableHeight={size.height}
+        availableWidth={size.width}
         tabletopId={tabletopId}
+        deckId={deckId}
       >
         <Animated.View style={style}>
           <StackList style={animatedStyle} handleLayout={handleLayout} />
 
           {component}
-          <CardAction icon="+" onPress={open} style={styles.action} />
+          <IconButton icon="+" onPress={open} style={styles.action} />
         </Animated.View>
-      </TabletopProvider>
+      </DeckTabletopProvider>
     </>
   );
 }

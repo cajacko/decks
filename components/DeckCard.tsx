@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import CardSide from "@/components/CardSide";
 import EditCardModal from "./EditCardModal";
 import { Target } from "@/utils/cardTarget";
@@ -43,3 +43,9 @@ export default function DeckCard({
     </>
   );
 }
+
+export const styles = StyleSheet.create({
+  constraints: {
+    maxHeight: 200,
+  },
+});

@@ -2,44 +2,70 @@ import React, { createContext } from "react";
 import { Dimensions } from "react-native";
 import { StackDimensions } from "@/components/Stack/stack.types";
 import { getStackDimensions } from "@/components/Stack/stack.style";
+import { CardMMDimensions } from "@/components/Card/Card.types";
+import AppError from "@/classes/AppError";
+import { defaultCardDimensions } from "@/components/Card/cardSizes";
 
 export type TabletopContextProps = StackDimensions & { tabletopId: string };
 
-const size = Dimensions.get("screen");
+export const Context = createContext<TabletopContextProps | undefined>(
+  undefined,
+);
 
-const initialContext = {
-  ...getStackDimensions({
-    availableHeight: size.height,
-    availableWidth: size.width,
-  }),
-  tabletopId: "",
-};
+export function useTabletopContext(): TabletopContextProps {
+  const context = React.useContext(Context);
 
-export const Context = createContext<TabletopContextProps>(initialContext);
+  return React.useMemo<TabletopContextProps>((): TabletopContextProps => {
+    if (context) return context;
 
-export function useTabletopContext() {
+    new AppError(
+      "Tabletop context not found, providing defaults, things will not be working fully",
+    ).log("error");
+
+    const dimensions = Dimensions.get("window");
+
+    return {
+      ...getStackDimensions({
+        availableHeight: dimensions.height,
+        availableWidth: dimensions.width,
+        cardProportions: defaultCardDimensions,
+      }),
+      tabletopId: "",
+    };
+  }, [context]);
+}
+
+export function useOptionalTabletopContext(): TabletopContextProps | undefined {
   return React.useContext(Context);
+}
+
+export interface TabletopProviderProps {
+  children:
+    | React.ReactNode
+    | ((context: TabletopContextProps) => React.ReactNode);
+  availableHeight: number;
+  availableWidth: number;
+  tabletopId: string;
+  cardProportions: CardMMDimensions;
 }
 
 export function TabletopProvider({
   children,
-  height,
-  width,
+  availableHeight,
+  availableWidth,
   tabletopId,
-}: {
-  children:
-    | React.ReactNode
-    | ((context: TabletopContextProps) => React.ReactNode);
-  height: number;
-  width: number;
-  tabletopId: string;
-}) {
+  cardProportions,
+}: TabletopProviderProps) {
   const value = React.useMemo(
     () => ({
-      ...getStackDimensions({ availableHeight: height, availableWidth: width }),
+      ...getStackDimensions({
+        availableHeight,
+        availableWidth,
+        cardProportions,
+      }),
       tabletopId,
     }),
-    [height, width, tabletopId],
+    [availableHeight, availableWidth, tabletopId, cardProportions],
   );
 
   const child = React.useMemo(

@@ -1,21 +1,14 @@
-interface CardDimensions {
-  mm: {
-    width: number;
-    height: number;
-    borderRadius: number;
-  };
-}
+import { CardMMDimensions } from "@/components/Card/Card.types";
+import { Decks } from "@/store/types";
 
 const cardDimensions = {
-  poker: {
-    mm: {
-      width: 63.5,
-      height: 88.9,
-      borderRadius: 3.5,
-    },
+  [Decks.CardSize.Poker]: {
+    mmBorderRadius: 3.5,
+    mmHeight: 88.9,
+    mmWidth: 63.5,
   },
-} satisfies Record<string, CardDimensions>;
+} satisfies Record<Decks.CardSize, CardMMDimensions>;
 
-export type CardTypes = keyof typeof cardDimensions;
+export const defaultCardDimensions = cardDimensions[Decks.CardSize.Poker];
 
 export default cardDimensions;

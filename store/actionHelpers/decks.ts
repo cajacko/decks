@@ -32,6 +32,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
     defaultTabletopId: tabletopId,
     name: "New Deck",
     status: "creating",
+    cardSize: Decks.CardSize.Poker,
     templates: {
       back: {
         dataTemplateMapping: {},

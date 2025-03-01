@@ -5,12 +5,23 @@ import {
   OffsetPosition,
   RequiredRefObject,
   CardSize,
+  CardMMDimensions,
+  CardSizeProps,
 } from "./Card.types";
-import cardDimensions from "@/config/cardDimensions";
 
-export function parseCardSize(cardSize: CardSize) {
-  const height = "height" in cardSize ? cardSize.height : cardSize.cardHeight;
-  const width = "width" in cardSize ? cardSize.width : cardSize.cardWidth;
+export function parseCardSize(cardSize: CardSize | CardSizeProps) {
+  const height =
+    "height" in cardSize
+      ? cardSize.height
+      : "cardHeight" in cardSize
+        ? cardSize.cardHeight
+        : cardSize.dpHeight;
+  const width =
+    "width" in cardSize
+      ? cardSize.width
+      : "cardWidth" in cardSize
+        ? cardSize.cardWidth
+        : cardSize.dpWidth;
 
   return {
     height,
@@ -24,54 +35,21 @@ export function parseCardSize(cardSize: CardSize) {
  * then scales this value based on the area of the actual card.
  */
 export function withCardStyleScaling(
-  /**
-   * Either the length of a side of the square card, or an object with height and width properties.
-   */
-  referenceCardSize: number | CardSize,
-  /**
-   * The desired value for the reference card size.
-   */
-  referenceValue: number,
+  mm: number,
+  dp: number,
   options?: {
     min?: number;
     max?: number;
     roundToNumberOfDecimals?: number;
-    scaleOff?: "shortest-side" | "longest-side" | "area";
   },
 ) {
-  const scaleOff = options?.scaleOff ?? "shortest-side";
+  const ratio = dp / mm;
 
-  const referenceCard =
-    typeof referenceCardSize === "number"
-      ? {
-          height: referenceCardSize,
-          width: referenceCardSize,
-          area: referenceCardSize ** 2,
-        }
-      : parseCardSize(referenceCardSize);
+  return (cardSizes: CardSizeProps): number => {
+    const height = cardSizes.dpHeight;
+    const width = cardSizes.dpWidth;
 
-  const areaRatio = referenceValue / referenceCard.area;
-  const shortestSideRatio =
-    referenceValue / Math.min(referenceCard.height, referenceCard.width);
-  const longestSideRatio =
-    referenceValue / Math.max(referenceCard.height, referenceCard.width);
-
-  return (cardSize: CardSize): number => {
-    const { area, height, width } = parseCardSize(cardSize);
-
-    let value: number;
-
-    switch (scaleOff) {
-      case "area":
-        value = area * areaRatio;
-        break;
-      case "shortest-side":
-        value = Math.min(height, width) * shortestSideRatio;
-        break;
-      case "longest-side":
-        value = Math.max(height, width) * longestSideRatio;
-        break;
-    }
+    let value = Math.min(height, width) * ratio;
 
     if (options?.roundToNumberOfDecimals) {
       value =
@@ -113,14 +91,15 @@ const scalingStyles = {
     y: withCardStyleScaling(369, 2, boxShadowConfig),
     blur: withCardStyleScaling(369, 3, boxShadowConfig),
   },
-  borderRadius: withCardStyleScaling(
-    cardDimensions.poker.mm.width,
-    cardDimensions.poker.mm.borderRadius,
-    {
-      min: 0,
-      roundToNumberOfDecimals: 0,
-    },
-  ),
+  borderRadius: (cardDimensions: CardMMDimensions) =>
+    withCardStyleScaling(
+      cardDimensions.mmWidth,
+      cardDimensions.mmBorderRadius,
+      {
+        min: 0,
+        roundToNumberOfDecimals: 0,
+      },
+    ),
   offsetPositions: {
     1: {
       x: withCardStyleScaling(369, offsetSpread * 1, offsetConfig),
@@ -145,7 +124,7 @@ const scalingStyles = {
  * Define the minimum amount needed for a stack to look good, so we're not rendering loads of cards
  * in stack.
  */
-export function getOffsetPositions(cardSize: CardSize): OffsetPosition[] {
+export function getOffsetPositions(cardSize: CardSizeProps): OffsetPosition[] {
   return [
     {
       rotate: 0,
@@ -175,8 +154,8 @@ export function getOffsetPositions(cardSize: CardSize): OffsetPosition[] {
   ];
 }
 
-export function getBorderRadius(cardSize: CardSize): number {
-  return scalingStyles.borderRadius(cardSize);
+export function getBorderRadius(cardSizes: CardSizeProps): number {
+  return scalingStyles.borderRadius(cardSizes)(cardSizes);
 }
 
 export const styles = StyleSheet.create({
@@ -189,11 +168,11 @@ export const styles = StyleSheet.create({
   },
 });
 
-export function getInnerStyle(props: {
-  style?: CardProps["innerStyle"];
-  width: number;
-  height: number;
-}): ViewStyle {
+export function getInnerStyle(
+  props: CardSizeProps & {
+    style?: CardProps["innerStyle"];
+  },
+): ViewStyle {
   return StyleSheet.flatten<ViewStyle>([
     styles.inner,
     {
@@ -204,18 +183,18 @@ export function getInnerStyle(props: {
   ]);
 }
 
-export function getContainerStyle(props: {
-  style?: CardProps["style"];
-  width: number;
-  height: number;
-  opacity: RequiredRefObject<Animated.Value>;
-  translateX: RequiredRefObject<Animated.Value>;
-  translateY: RequiredRefObject<Animated.Value>;
-  scaleX: RequiredRefObject<Animated.Value>;
-  zIndex?: number;
-  offsetPosition?: number;
-  rotate: RequiredRefObject<Animated.Value>;
-}): AnimatedViewStyle {
+export function getContainerStyle(
+  props: CardSizeProps & {
+    style?: CardProps["style"];
+    opacity: RequiredRefObject<Animated.Value>;
+    translateX: RequiredRefObject<Animated.Value>;
+    translateY: RequiredRefObject<Animated.Value>;
+    scaleX: RequiredRefObject<Animated.Value>;
+    zIndex?: number;
+    offsetPosition?: number;
+    rotate: RequiredRefObject<Animated.Value>;
+  },
+): AnimatedViewStyle {
   const rotate = props.rotate.current.interpolate({
     inputRange: [0, 360],
     outputRange: ["0deg", "360deg"],
@@ -234,8 +213,8 @@ export function getContainerStyle(props: {
   return StyleSheet.flatten<AnimatedViewStyle>([
     {
       zIndex: props.zIndex,
-      width: props.width,
-      height: props.height,
+      width: props.dpWidth,
+      height: props.dpHeight,
     },
     animationStyle,
     props.style,

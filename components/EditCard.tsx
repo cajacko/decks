@@ -4,6 +4,7 @@ import {
   ViewStyle,
   View,
   Pressable,
+  Dimensions,
 } from "react-native";
 import Animated from "react-native-reanimated";
 import React from "react";
@@ -18,6 +19,8 @@ import CardSides, { CardSidesRef } from "@/components/CardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
+import { DeckCardSizeProvider } from "@/context/Deck";
+import { maxStackHeight, maxStackWidth } from "@/components/Stack/stack.style";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
@@ -64,40 +67,57 @@ export default function EditCard({
     [backgroundStyleProp],
   );
 
+  const constraints = React.useMemo(
+    () => ({
+      maxHeight: Math.min(
+        maxStackHeight,
+        maxHeight ? maxHeight * (2 / 3) : maxStackHeight,
+      ),
+      maxWidth: Math.min(Dimensions.get("window").width, maxStackWidth),
+    }),
+    [maxHeight],
+  );
+
   return (
-    <EditCardProvider onChangeSide={setSide} side={side} {...props}>
-      <BottomDrawerWrapper
-        onLayout={onContainerLayout}
-        style={styles.container}
-      >
-        <ScrollView
-          contentContainerStyle={styles.contentContainer}
-          scrollEnabled
-          horizontal={false}
+    <DeckCardSizeProvider
+      id={props.target.id}
+      idType={props.target.type === "card" ? "card" : "deck"}
+      constraints={constraints}
+    >
+      <EditCardProvider onChangeSide={setSide} side={side} {...props}>
+        <BottomDrawerWrapper
+          onLayout={onContainerLayout}
+          style={styles.container}
         >
-          <View style={styles.scrollContent}>
-            <Pressable onPress={onPress}>
-              <CardSides ref={cardSidesRef} {...props.target} side={side} />
-            </Pressable>
-          </View>
-          <Animated.View style={bufferStyle} />
-          <Pressable onPress={onPressBackground} style={backgroundStyle} />
-        </ScrollView>
-        <BottonDrawer
-          height={height.sharedValue}
-          maxHeight={maxHeight}
-          ref={bottomDrawer}
-          initHeight={height.initHeight}
-          animateIn
-        >
-          <EditCardForm
-            flipSide={flipSide}
-            onDelete={props.onDelete}
-            {...props.target}
-          />
-        </BottonDrawer>
-      </BottomDrawerWrapper>
-    </EditCardProvider>
+          <ScrollView
+            contentContainerStyle={styles.contentContainer}
+            scrollEnabled
+            horizontal={false}
+          >
+            <View style={styles.scrollContent}>
+              <Pressable onPress={onPress}>
+                <CardSides ref={cardSidesRef} {...props.target} side={side} />
+              </Pressable>
+            </View>
+            <Animated.View style={bufferStyle} />
+            <Pressable onPress={onPressBackground} style={backgroundStyle} />
+          </ScrollView>
+          <BottonDrawer
+            height={height.sharedValue}
+            maxHeight={maxHeight}
+            ref={bottomDrawer}
+            initHeight={height.initHeight}
+            animateIn
+          >
+            <EditCardForm
+              flipSide={flipSide}
+              onDelete={props.onDelete}
+              {...props.target}
+            />
+          </BottonDrawer>
+        </BottomDrawerWrapper>
+      </EditCardProvider>
+    </DeckCardSizeProvider>
   );
 }
 

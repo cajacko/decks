@@ -1,9 +1,12 @@
 import { StyleSheet } from "react-native";
 import { StackDimensions } from "./stack.types";
-import cardDimensions from "@/config/cardDimensions";
+import { getCardSizes } from "@/components/Card/cardSizes";
+import { CardSizeProps, CardMMDimensions } from "@/components/Card/Card.types";
 
 function getExampleStackDimensions(
-  props: { stackWidth: number } | { stackHeight: number },
+  props: ({ stackWidth: number } | { stackHeight: number }) & {
+    cardProportions: CardMMDimensions;
+  },
 ): StackDimensions {
   const buttonSize = Math.min(
     Math.max(
@@ -33,51 +36,54 @@ function getExampleStackDimensions(
 
   let stackWidth: number;
   let stackHeight: number;
-  let cardHeight: number;
-  let cardWidth: number;
+  let cardSizeProps: CardSizeProps;
 
   // When adjusting things in one of these statements it's very important to check the logic on the
   // other side
   if ("stackWidth" in props) {
     stackWidth = props.stackWidth;
 
-    cardWidth =
+    const cardWidth =
       stackWidth - stackPadding * 2 - Math.round(spaceBetweenStacks / 2);
 
-    cardHeight = Math.round(
-      cardWidth *
-        (cardDimensions.poker.mm.height / cardDimensions.poker.mm.width),
-    );
+    cardSizeProps = getCardSizes({
+      constraints: { width: cardWidth },
+      proportions: props.cardProportions,
+    });
 
-    stackHeight = cardHeight + stackPadding * 2;
+    stackHeight = cardSizeProps.dpHeight + stackPadding * 2;
   } else {
     stackHeight = props.stackHeight;
 
-    cardHeight = stackHeight - stackPadding * 2;
+    const cardHeight = stackHeight - stackPadding * 2;
 
-    cardWidth = Math.round(
-      cardHeight *
-        (cardDimensions.poker.mm.width / cardDimensions.poker.mm.height),
-    );
+    cardSizeProps = getCardSizes({
+      constraints: { height: cardHeight },
+      proportions: props.cardProportions,
+    });
 
     stackWidth =
-      cardWidth + stackPadding * 2 + Math.round(spaceBetweenStacks / 2);
+      cardSizeProps.dpWidth +
+      stackPadding * 2 +
+      Math.round(spaceBetweenStacks / 2);
   }
 
   return {
     buttonSize,
-    cardHeight,
-    cardWidth,
+    // TODO: Remove these
+    cardHeight: cardSizeProps.dpHeight,
+    cardWidth: cardSizeProps.dpWidth,
     spaceBetweenStacks,
     stackPadding,
     stackHeight,
     stackWidth,
+    cardSizeProps,
   };
 }
 
-const maxStackWidth = 500;
+export const maxStackWidth = 500;
 const minStackWidth = 300;
-const maxStackHeight = 800;
+export const maxStackHeight = 800;
 const minStackHeight = 500;
 
 // Get dimensions at 100% availableWidth or the max width (whichever is smaller)
@@ -87,8 +93,10 @@ const minStackHeight = 500;
 export function getStackDimensions(props: {
   availableWidth: number;
   availableHeight: number;
+  cardProportions: CardMMDimensions;
 }): StackDimensions {
   let dimensions = getExampleStackDimensions({
+    cardProportions: props.cardProportions,
     stackWidth: Math.max(
       Math.min(props.availableWidth, maxStackWidth),
       minStackWidth,
@@ -103,6 +111,7 @@ export function getStackDimensions(props: {
   }
 
   return getExampleStackDimensions({
+    cardProportions: props.cardProportions,
     stackHeight: Math.max(
       Math.min(props.availableHeight, maxStackHeight),
       minStackHeight,

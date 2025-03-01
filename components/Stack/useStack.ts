@@ -9,10 +9,22 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { getOffsetPositions } from "@/components/Card/card.styles";
+import {
+  getCardSizes,
+  defaultCardDpWidth,
+  defaultCardDimensions,
+} from "../Card/cardSizes";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import { deleteStack } from "@/store/slices/tabletop";
 
-const offsetPositionsCount = getOffsetPositions({ height: 0, width: 0 }).length;
+// These dummy values aren't getting used, we just want the length and doing it this way to keep a
+// single source of truth for the number of offset positions.
+const offsetPositionsCount = getOffsetPositions(
+  getCardSizes({
+    constraints: { width: defaultCardDpWidth },
+    proportions: defaultCardDimensions,
+  }),
+).length;
 
 export default function useStack({
   stackId,

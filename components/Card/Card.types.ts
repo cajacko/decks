@@ -7,7 +7,7 @@ export type AnimatedViewStyle = Animated.WithAnimatedValue<ViewStyle>;
 
 export type RequiredRefObject<T> = { current: T };
 
-export interface CardProps {
+export interface CardProps extends Partial<CardSizeContextProps> {
   style?: StyleProp<AnimatedViewStyle>;
   innerStyle?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
@@ -46,6 +46,33 @@ export interface CardRef {
 
 export type AnimationUpdate = (key: string, isAnimating: boolean) => void;
 
+export interface CardMMDimensions {
+  mmWidth: number;
+  mmHeight: number;
+  mmBorderRadius: number;
+}
+
 export type CardSize =
   | { height: number; width: number }
   | { cardHeight: number; cardWidth: number };
+
+export type CardSizeProps = {
+  dpBorderRadius: number;
+  dpHeight: number;
+  dpWidth: number;
+  mmHeight: number;
+  mmWidth: number;
+  mmBorderRadius: number;
+};
+
+export type CardSizeConstraints = {
+  height?: number;
+  width?: number;
+  maxHeight?: number;
+  maxWidth?: number;
+};
+
+export type CardSizeContextProps = {
+  proportions: CardMMDimensions;
+  constraints: CardSizeConstraints;
+};

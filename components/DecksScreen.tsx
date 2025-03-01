@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, ScrollView, ViewStyle } from "react-native";
+import { StyleSheet, FlatList, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckIds } from "@/store/slices/decks";
 import DeckListItem from "@/components/DeckListItem";
-import CardAction from "./CardAction";
+import IconButton from "./IconButton";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
@@ -26,18 +26,30 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   }, [navigate, dispatch]);
 
   return (
-    <ScrollView style={StyleSheet.flatten([props.style, styles.container])}>
-      {deckIds.map((deckId) => (
-        <DeckListItem key={deckId} deckId={deckId} />
-      ))}
-      <CardAction icon="+" onPress={createDeck} />
-    </ScrollView>
+    <>
+      <FlatList
+        style={StyleSheet.flatten([props.style, styles.container])}
+        contentContainerStyle={styles.contentContainer}
+        data={deckIds}
+        renderItem={({ item }) => <DeckListItem deckId={item} />}
+        keyExtractor={(deckId) => deckId}
+        numColumns={2}
+      />
+      <IconButton icon="+" onPress={createDeck} style={styles.action} />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 40,
-    paddingVertical: 80,
+    paddingBottom: 200,
+  },
+  contentContainer: {
+    paddingBottom: 100,
+  },
+  action: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
   },
 });

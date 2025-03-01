@@ -5,6 +5,10 @@ export type CardSide = "front" | "back";
 export type DeckId = string;
 export type DataSchemaItemId = string;
 
+export enum CardSize {
+  Poker = "poker",
+}
+
 export interface Card {
   cardId: string;
   quantity: number;
@@ -65,6 +69,7 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
   dataSchema: DataSchema<DsId>;
   defaultTabletopId: string;
   status: "creating" | "active" | "deleting";
+  cardSize: CardSize;
 }
 
 export interface State {
