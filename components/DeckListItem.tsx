@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, Button } from "react-native";
 import { useRequiredAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
+import deckNameWithFallback from "@/utils/deckNameWithFallback";
 
 export interface DeckListItemProps {
   deckId: string;
@@ -28,7 +29,7 @@ export default function DeckListItem(
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{name}</Text>
+      <Text style={styles.text}>{deckNameWithFallback(name)}</Text>
       <View style={styles.button}>
         <Button title="Play" onPress={play} />
       </View>

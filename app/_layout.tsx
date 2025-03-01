@@ -14,6 +14,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { init as initMousePointer } from "@/utils/mousePosition";
 import { useColorScheme } from "@/expoExample/hooks/useColorScheme";
+import { getDeckName } from "@/app/deck/[deckId]/_layout";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -62,10 +63,16 @@ export default function RootLayout() {
             />
             <Stack.Screen
               name="deck/[deckId]"
-              options={{
+              options={({ route: { params } }) => ({
                 headerShown: true,
-                headerTitle: "Deck",
-              }}
+                headerTitle: getDeckName(
+                  params &&
+                    "deckId" in params &&
+                    typeof params.deckId === "string"
+                    ? params.deckId
+                    : null,
+                ),
+              })}
             />
             <Stack.Screen name="+not-found" />
           </Stack>
