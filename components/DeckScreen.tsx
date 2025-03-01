@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, View, ViewStyle, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ViewStyle,
+  FlatList,
+  Dimensions,
+} from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeckCards } from "@/store/slices/decks";
 import DeckDetails from "@/components/DeckDetails";
@@ -26,29 +32,29 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     id: props.deckId,
   });
 
-  const children = React.useMemo(
-    () =>
-      cards?.map(({ cardId, quantity }) => (
-        <DeckCard
-          key={cardId}
-          cardId={cardId}
-          deckId={props.deckId}
-          quantity={quantity}
-        />
-      )),
-    [cards, props.deckId],
-  );
-
   return (
     <DeckCardSizeProvider
       id={props.deckId}
       idType="deck"
-      constraints={deckCardStyles.constraints}
+      constraints={styles.constraints}
     >
       <View style={props.style}>
         {component}
         <DeckDetails deckId={props.deckId} />
-        <ScrollView>{children}</ScrollView>
+        <FlatList
+          data={cards}
+          numColumns={3}
+          columnWrapperStyle={styles.columnWrapperStyle}
+          renderItem={({ item }) => (
+            <DeckCard
+              style={styles.item}
+              cardId={item.cardId}
+              quantity={item.quantity}
+            />
+          )}
+          keyExtractor={(item) => item.cardId}
+          style={styles.container}
+        />
         <IconButton icon="+" onPress={open} style={styles.button} />
       </View>
     </DeckCardSizeProvider>
@@ -56,10 +62,17 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flexDirection: "row",
-    flexWrap: "wrap",
+  container: {},
+  columnWrapperStyle: {},
+  item: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+  },
+  constraints: {
+    maxWidth: Dimensions.get("window").width / 3 - 20,
+    maxHeight: 200,
   },
   button: {
     flex: 1,

@@ -1,18 +1,18 @@
 import React from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, ViewStyle } from "react-native";
 import CardSide from "@/components/CardSide";
 import EditCardModal from "./EditCardModal";
 import { Target } from "@/utils/cardTarget";
 
 export interface DeckCardProps {
   cardId: string;
-  deckId: string;
   quantity: number;
+  style?: ViewStyle;
 }
 
 export default function DeckCard({
   cardId,
-  deckId,
+  style,
 }: DeckCardProps): React.ReactNode {
   const [showEditModal, setShowEditModal] = React.useState(false);
   const target = React.useMemo(
@@ -37,15 +37,11 @@ export default function DeckCard({
         visible={showEditModal}
         onDelete={close}
       />
-      <Pressable key={cardId} onPress={open}>
+      <Pressable key={cardId} onPress={open} style={style}>
         <CardSide id={cardId} type="card" side="front" />
       </Pressable>
     </>
   );
 }
 
-export const styles = StyleSheet.create({
-  constraints: {
-    maxHeight: 200,
-  },
-});
+export const styles = StyleSheet.create({});
