@@ -28,10 +28,12 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   return (
     <>
       <FlatList
-        style={StyleSheet.flatten([props.style, styles.container])}
+        style={props.style}
         contentContainerStyle={styles.contentContainer}
         data={deckIds}
-        renderItem={({ item }) => <DeckListItem deckId={item} />}
+        renderItem={({ item }) => (
+          <DeckListItem style={styles.listItem} deckId={item} />
+        )}
         keyExtractor={(deckId) => deckId}
         numColumns={2}
       />
@@ -41,11 +43,12 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingBottom: 200,
+  listItem: {
+    paddingVertical: 20,
+    paddingHorizontal: 10,
   },
   contentContainer: {
-    paddingBottom: 100,
+    paddingBottom: 150,
   },
   action: {
     position: "absolute",

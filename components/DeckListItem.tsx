@@ -1,5 +1,13 @@
 import React from "react";
-import { Text, StyleSheet, View, Button } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  View,
+  Button,
+  Dimensions,
+  Pressable,
+  ViewStyle,
+} from "react-native";
 import { useAppSelector, useRequiredAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
 import { selectDeckCards } from "@/store/slices/decks";
@@ -11,6 +19,7 @@ import { DeckCardSizeProvider } from "@/context/Deck";
 
 export interface DeckListItemProps {
   deckId: string;
+  style?: ViewStyle;
 }
 
 export default function DeckListItem(
@@ -47,14 +56,20 @@ export default function DeckListItem(
       idType="deck"
       constraints={styles.cardConstraints}
     >
-      <View style={styles.container}>
-        <CardSideBySide maxHeight={200} maxWidth={200} {...coverTarget} />
-        <Text style={styles.text}>{deckNameWithFallback(name)}</Text>
-        <View style={styles.button}>
-          <Button title="Play" onPress={play} />
-        </View>
-        <View style={styles.button}>
-          <Button title="Edit" onPress={edit} />
+      <View style={[styles.container, props.style]}>
+        <Pressable onPress={play} style={styles.cards}>
+          <CardSideBySide {...coverTarget} />
+        </Pressable>
+        <View style={styles.details}>
+          <Text style={styles.text}>{deckNameWithFallback(name)}</Text>
+          <View style={styles.buttons}>
+            <View style={styles.button}>
+              <Button title="Play" onPress={play} />
+            </View>
+            <View style={styles.button}>
+              <Button title="Edit" onPress={edit} />
+            </View>
+          </View>
         </View>
       </View>
     </DeckCardSizeProvider>
@@ -63,19 +78,30 @@ export default function DeckListItem(
 
 const styles = StyleSheet.create({
   cardConstraints: {
-    maxHeight: 200,
+    maxHeight: Math.min(200, Dimensions.get("window").height / 3),
+    maxWidth: Dimensions.get("window").width - 30,
   },
   container: {
     flex: 1,
-    height: 300,
-    padding: 10,
+  },
+  cards: {
+    position: "relative",
+    flex: 1,
+  },
+  details: {
+    zIndex: 2,
   },
   text: {
     flex: 1,
     fontSize: 20,
     color: "white",
   },
+  buttons: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   button: {
-    marginVertical: 10,
+    flex: 1,
   },
 });

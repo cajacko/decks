@@ -94,6 +94,15 @@ export interface CardSizeProviderProps extends CardSizeContextProps {
   children: React.ReactNode | ((context: CardSizeProps) => React.ReactNode);
 }
 
+export function useScaleValue(): (value: number) => number {
+  const { dpWidth, mmWidth } = useCardSizes();
+
+  return React.useCallback(
+    (value: number) => (value / dpWidth) * mmWidth,
+    [dpWidth, mmWidth],
+  );
+}
+
 export function CardSizeProvider({
   children,
   proportions,
