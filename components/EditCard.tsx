@@ -4,7 +4,6 @@ import {
   ViewStyle,
   View,
   Pressable,
-  Dimensions,
 } from "react-native";
 import Animated from "react-native-reanimated";
 import React from "react";
@@ -19,8 +18,7 @@ import CardSides, { CardSidesRef } from "@/components/CardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
-import { DeckCardSizeProvider } from "@/context/Deck";
-import { maxStackHeight, maxStackWidth } from "@/components/Stack/stack.style";
+import { FullSizeCardProvider } from "@/context/Deck";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
@@ -67,22 +65,10 @@ export default function EditCard({
     [backgroundStyleProp],
   );
 
-  const constraints = React.useMemo(
-    () => ({
-      maxHeight: Math.min(
-        maxStackHeight,
-        maxHeight ? maxHeight * (2 / 3) : maxStackHeight,
-      ),
-      maxWidth: Math.min(Dimensions.get("window").width, maxStackWidth),
-    }),
-    [maxHeight],
-  );
-
   return (
-    <DeckCardSizeProvider
+    <FullSizeCardProvider
       id={props.target.id}
       idType={props.target.type === "card" ? "card" : "deck"}
-      constraints={constraints}
     >
       <EditCardProvider onChangeSide={setSide} side={side} {...props}>
         <BottomDrawerWrapper
@@ -117,7 +103,7 @@ export default function EditCard({
           </BottonDrawer>
         </BottomDrawerWrapper>
       </EditCardProvider>
-    </DeckCardSizeProvider>
+    </FullSizeCardProvider>
   );
 }
 

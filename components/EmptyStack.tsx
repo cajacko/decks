@@ -25,7 +25,7 @@ export default function EmptyStack({
       <View
         style={StyleSheet.flatten([
           styles.content,
-          { borderRadius: getBorderRadius(context.cardSizeProps) },
+          { borderRadius: getBorderRadius(context.cardSizes) },
         ])}
       >
         <Text style={styles.text}>Empty Stack</Text>

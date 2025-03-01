@@ -9,7 +9,7 @@ import {
 import { useAppSelector } from "@/store/hooks";
 import { selectDeckCards } from "@/store/slices/decks";
 import DeckDetails from "@/components/DeckDetails";
-import DeckCard, { styles as deckCardStyles } from "./DeckCard";
+import DeckCard from "./DeckCard";
 import { useEditCardModal } from "./EditCardModal";
 import { useDeckToolbar } from "./DeckToolbar";
 import IconButton from "./IconButton";

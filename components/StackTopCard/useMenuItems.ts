@@ -5,7 +5,10 @@ import { useTabletopContext } from "../Tabletop/Tabletop.context";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
-  const { buttonSize, cardWidth, cardHeight } = useTabletopContext();
+  const {
+    buttonSize,
+    cardSizes: { dpHeight: cardHeight, dpWidth: cardWidth },
+  } = useTabletopContext();
   const [showEditModal, setShowEditModal] = React.useState(false);
 
   const closeEditModal = React.useCallback(() => {

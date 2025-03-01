@@ -36,7 +36,7 @@ function getExampleStackDimensions(
 
   let stackWidth: number;
   let stackHeight: number;
-  let cardSizeProps: CardSizeProps;
+  let cardSizes: CardSizeProps;
 
   // When adjusting things in one of these statements it's very important to check the logic on the
   // other side
@@ -46,38 +46,33 @@ function getExampleStackDimensions(
     const cardWidth =
       stackWidth - stackPadding * 2 - Math.round(spaceBetweenStacks / 2);
 
-    cardSizeProps = getCardSizes({
+    cardSizes = getCardSizes({
       constraints: { width: cardWidth },
       proportions: props.cardProportions,
     });
 
-    stackHeight = cardSizeProps.dpHeight + stackPadding * 2;
+    stackHeight = cardSizes.dpHeight + stackPadding * 2;
   } else {
     stackHeight = props.stackHeight;
 
     const cardHeight = stackHeight - stackPadding * 2;
 
-    cardSizeProps = getCardSizes({
+    cardSizes = getCardSizes({
       constraints: { height: cardHeight },
       proportions: props.cardProportions,
     });
 
     stackWidth =
-      cardSizeProps.dpWidth +
-      stackPadding * 2 +
-      Math.round(spaceBetweenStacks / 2);
+      cardSizes.dpWidth + stackPadding * 2 + Math.round(spaceBetweenStacks / 2);
   }
 
   return {
     buttonSize,
-    // TODO: Remove these
-    cardHeight: cardSizeProps.dpHeight,
-    cardWidth: cardSizeProps.dpWidth,
     spaceBetweenStacks,
     stackPadding,
     stackHeight,
     stackWidth,
-    cardSizeProps,
+    cardSizes,
   };
 }
 

@@ -12,12 +12,10 @@ export interface StackProps {
 }
 
 export type StackDimensions = {
-  cardWidth: number;
-  cardHeight: number;
   stackWidth: number;
   stackHeight: number;
   buttonSize: number;
   stackPadding: number;
   spaceBetweenStacks: number;
-  cardSizeProps: CardSizeProps;
+  cardSizes: CardSizeProps;
 };

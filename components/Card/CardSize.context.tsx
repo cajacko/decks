@@ -20,7 +20,7 @@ export function useCardSizes({
   constraints,
   proportions,
 }: Partial<CardSizeContextProps> = {}): CardSizeProps {
-  const { cardSizeProps: tabletopCardSizeProps } =
+  const { cardSizes: tabletopCardSizeProps } =
     useOptionalTabletopContext() ?? {};
 
   const cardSizeProps = React.useContext(Context);
