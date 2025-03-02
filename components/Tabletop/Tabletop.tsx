@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
+import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
 import { useTabletopToolbar } from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
 import StackList from "@/components/StackList";
@@ -11,6 +11,7 @@ import Animated, {
 import { useEditCardModal } from "@/components/EditCardModal";
 import IconButton from "@/components/IconButton";
 import { DeckTabletopProvider } from "@/context/Deck";
+import TextureBackground from "../TextureBackground";
 
 export default function Tabletop({
   tabletopId,
@@ -40,7 +41,7 @@ export default function Tabletop({
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
-      // PRevents us updating when the keyboard comes into view, which we don't want. Maybe there's
+      // Prevents us updating when the keyboard comes into view, which we don't want. Maybe there's
       // a better solution for this, that then allows window changes as well?
       if (hasLayout.current) return;
 
@@ -64,18 +65,37 @@ export default function Tabletop({
         tabletopId={tabletopId}
         deckId={deckId}
       >
-        <Animated.View style={style}>
-          <StackList style={animatedStyle} handleLayout={handleLayout} />
+        <View style={[styles.container, style]}>
+          <Animated.View style={styles.content}>
+            <StackList style={animatedStyle} handleLayout={handleLayout} />
 
-          {component}
-          <IconButton icon="+" onPress={open} style={styles.action} />
-        </Animated.View>
+            {component}
+            <IconButton icon="+" onPress={open} style={styles.action} />
+          </Animated.View>
+          <TextureBackground style={styles.background} />
+        </View>
       </DeckTabletopProvider>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    position: "relative",
+    flex: 1,
+    zIndex: 2,
+  },
+  background: {
+    position: "absolute",
+    zIndex: 1,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   action: {
     position: "absolute",
     bottom: 20,
