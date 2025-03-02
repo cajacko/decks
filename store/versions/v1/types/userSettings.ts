@@ -1,4 +1,4 @@
 export interface State {
-  animateCardMovement: boolean;
-  holdMenuBehaviour: "hold" | "tap";
+  animateCardMovement?: boolean;
+  holdMenuBehaviour?: "hold" | "tap";
 }

@@ -1,6 +1,8 @@
 import { createCachedSelector } from "re-reselect";
 import { selectTabletop } from "../slices/tabletop";
 import { RootState, Decks, Tabletops } from "../types";
+import { builtInState } from "../utils/withBuiltInState";
+
 type TabletopProps = { tabletopId: Tabletops.TabletopId };
 
 export const selectTabletopAvailableDeckCards = createCachedSelector(
@@ -13,7 +15,7 @@ export const selectTabletopAvailableDeckCards = createCachedSelector(
     const cards: Decks.Card[] = [];
 
     availableDecks.forEach((deckId) => {
-      const deck = decksById[deckId];
+      const deck = decksById[deckId] ?? builtInState().decks.decksById[deckId];
 
       if (!deck) return;
 

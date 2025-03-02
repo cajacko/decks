@@ -50,16 +50,13 @@ export default function RootLayout() {
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ModalProvider>
-            <Stack
-              screenOptions={{
-                animation: "slide_from_right",
-              }}
-            >
+            <Stack>
               <Stack.Screen
                 name="index"
                 options={{
                   headerShown: true,
                   headerBackButtonMenuEnabled: false,
+                  animation: "slide_from_left",
                   headerTitle: "Decks",
                 }}
               />
@@ -67,6 +64,7 @@ export default function RootLayout() {
                 name="deck/[deckId]"
                 options={({ route: { params } }) => ({
                   headerShown: true,
+                  animation: "slide_from_right",
                   headerTitle: getDeckName(
                     params &&
                       "deckId" in params &&

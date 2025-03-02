@@ -7,6 +7,8 @@ import IconButton from "./IconButton";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
+// import exampleDecksToStore from "@/utils/exampleDecksToStore";
+// import { SliceName } from "@/store/types";
 
 export interface DecksScreenProps {
   style?: ViewStyle;
@@ -16,6 +18,11 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const deckIds = useAppSelector(selectDeckIds);
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
+
+  // const allDeckIds = React.useMemo(
+  //   () => [...deckIds, ...exampleDecksToStore()[SliceName.Decks].deckIds],
+  //   [deckIds],
+  // );
 
   const createDeck = React.useCallback(() => {
     const deckId = uuid();
@@ -43,6 +50,13 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginVertical: 10,
+    marginHorizontal: 20,
+    color: "white",
+  },
   listItem: {
     paddingVertical: 20,
     paddingHorizontal: 10,

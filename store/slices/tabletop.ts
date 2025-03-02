@@ -9,6 +9,7 @@ import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
+import withBuiltInState from "../utils/withBuiltInState";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -330,11 +331,10 @@ export const {
   resetTabletop,
 } = tabletopsSlice.actions;
 
-export const selectTabletop = (
-  state: RootState,
-  props: { tabletopId: string },
-): Tabletop | null =>
-  state[tabletopsSlice.name].tabletopsById[props.tabletopId] ?? null;
+export const selectTabletop = withBuiltInState(
+  (state: RootState, props: { tabletopId: string }): Tabletop | undefined =>
+    state[tabletopsSlice.name].tabletopsById[props.tabletopId],
+);
 
 export const selectPresentState = (
   state: RootState,

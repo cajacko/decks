@@ -8,6 +8,7 @@ import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { CardDataItem } from "../combinedActions/types";
+import withBuiltInState from "../utils/withBuiltInState";
 
 const initialState: Decks.State = flags.USE_DEV_INITIAL_REDUX_STATE
   ? devInitialState.decks
@@ -192,17 +193,18 @@ export const cardsSlice = createSlice({
 
 export const { setDeckCardDefaults, setDeckDetails } = cardsSlice.actions;
 
-export const selectDeck = (
-  state: RootState,
-  props: { deckId: string },
-): Decks.Props | null => state[cardsSlice.name].decksById[props.deckId] ?? null;
+export const selectDeck = withBuiltInState(
+  (state: RootState, props: { deckId: string }): Decks.Props | undefined =>
+    state[cardsSlice.name].decksById[props.deckId],
+);
 
-export const selectDeckIds = (state: RootState): Decks.DeckId[] =>
-  state[cardsSlice.name].deckIds;
+export const selectDeckIds = withBuiltInState(
+  (state: RootState): Decks.DeckId[] => state[cardsSlice.name].deckIds,
+);
 
 export const selectDeckCards = (
   state: RootState,
   props: { deckId: string },
-): Decks.Card[] | null => selectDeck(state, props)?.cards ?? null;
+): Decks.Card[] | undefined => selectDeck(state, props)?.cards;
 
 export default cardsSlice;

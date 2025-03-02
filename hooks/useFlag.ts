@@ -16,15 +16,17 @@ export default function useFlag<
 }
 
 export const useAnimateCardMovement = () =>
-  useFlag((flags, userSettings): boolean =>
-    flags.CARD_ANIMATIONS === "user-defined"
-      ? userSettings.animateCardMovement
-      : flags.CARD_ANIMATIONS === "enabled",
+  useFlag(
+    (flags, userSettings): boolean =>
+      (flags.CARD_ANIMATIONS === "user-defined"
+        ? userSettings.animateCardMovement
+        : flags.CARD_ANIMATIONS === "enabled") ?? true,
   );
 
 export const useHoldMenuBehaviour = () =>
-  useFlag((flags, userSettings): "tap" | "hold" =>
-    flags.HOLD_MENU_BEHAVIOUR === "user-defined"
-      ? userSettings.holdMenuBehaviour
-      : flags.HOLD_MENU_BEHAVIOUR,
+  useFlag(
+    (flags, userSettings): "tap" | "hold" =>
+      (flags.HOLD_MENU_BEHAVIOUR === "user-defined"
+        ? userSettings.holdMenuBehaviour
+        : flags.HOLD_MENU_BEHAVIOUR) ?? "hold",
   );

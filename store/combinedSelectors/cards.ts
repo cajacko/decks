@@ -15,10 +15,10 @@ const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
 export const selectDeckByCard = (
   state: RootState,
   props: CardIdProps,
-): Decks.Props | null => {
+): Decks.Props | undefined => {
   const deckId = selectCard(state, props)?.deckId;
 
-  if (!deckId) return null;
+  if (!deckId) return undefined;
 
   return selectDeck(state, { deckId });
 };

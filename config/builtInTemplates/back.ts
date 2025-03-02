@@ -45,6 +45,6 @@ const template: Templates.Props = {
       ],
     },
   ],
-};
+} as const satisfies Templates.Props;
 
 export default template;

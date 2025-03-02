@@ -5,6 +5,7 @@ import devInitialState from "../dev/devInitialState";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
+import withBuiltInState from "../utils/withBuiltInState";
 
 export type Card = Cards.Props;
 
@@ -131,9 +132,9 @@ export const cardsSlice = createSlice({
 
 export const { removeCard } = cardsSlice.actions;
 
-export const selectCard = (
-  state: RootState,
-  props: { cardId: string },
-): Card | null => state[cardsSlice.name].cardsById[props.cardId] ?? null;
+export const selectCard = withBuiltInState(
+  (state: RootState, props: { cardId: string }): Card | undefined =>
+    state[cardsSlice.name].cardsById[props.cardId],
+);
 
 export default cardsSlice;

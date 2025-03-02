@@ -1,9 +1,13 @@
 import { RootState, Templates, Decks } from "../types";
 import templatesById from "@/config/templatesById";
+import exampleDecksToStore from "@/utils/exampleDecksToStore";
+
+const exampleState = exampleDecksToStore();
 
 const state: RootState = {
   cards: {
     cardsById: {
+      ...exampleState.cards.cardsById,
       card1: {
         status: "active",
         cardId: "card1",
@@ -86,6 +90,7 @@ const state: RootState = {
   },
   decks: {
     decksById: {
+      ...exampleState.decks.decksById,
       deck1: {
         cardSize: Decks.CardSize.Poker,
         status: "active",
@@ -156,10 +161,11 @@ const state: RootState = {
         defaultTabletopId: "tabletop1",
       },
     },
-    deckIds: ["deck1"],
+    deckIds: ["deck1", ...exampleState.decks.deckIds],
   },
   tabletops: {
     tabletopsById: {
+      ...exampleState.tabletops.tabletopsById,
       tabletop1: {
         id: "tabletop1",
         availableDecks: ["deck1"],

@@ -10,7 +10,7 @@ const dataItemIds = {
   backgroundColor: dataItemId("backgroundColor"),
 };
 
-const template: Templates.Props = {
+const template = {
   templateId,
   name: "Front Template",
   schemaOrder: [
@@ -71,6 +71,6 @@ const template: Templates.Props = {
       ],
     },
   ],
-};
+} as const satisfies Templates.Props;
 
 export default template;
