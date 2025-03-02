@@ -60,16 +60,18 @@ export default function EditCardForm({
       </View>
       {frontTemplate && (
         <EditCardSideForm
+          id={id}
+          type={type}
           side="front"
-          schemaOrder={frontTemplate.schemaOrder}
           templateId={frontTemplate.templateId}
           title={!!backTemplate ? "Front Side" : null}
         />
       )}
       {backTemplate && (
         <EditCardSideForm
+          id={id}
+          type={type}
           side="back"
-          schemaOrder={backTemplate.schemaOrder}
           templateId={backTemplate.templateId}
           title={!!frontTemplate ? "Back Side" : null}
         />

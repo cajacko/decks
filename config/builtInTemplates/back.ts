@@ -5,6 +5,8 @@ import builtInTemplateIds from "@/utils/builtInTemplateIds";
 const { dataItemId, templateId } = builtInTemplateIds("back");
 
 const dataItemIds = {
+  text: dataItemId("text"),
+  textColor: dataItemId("textColor"),
   backgroundColor: dataItemId("backgroundColor"),
 };
 
@@ -13,6 +15,20 @@ const template: Templates.Props = {
   name: "Back Template",
   schemaOrder: [dataItemIds.backgroundColor],
   schema: {
+    [dataItemIds.text]: {
+      id: dataItemIds.text,
+      name: "Text",
+      type: Templates.DataType.Text,
+    },
+    [dataItemIds.textColor]: {
+      id: dataItemIds.textColor,
+      name: "Text Colour",
+      type: Templates.DataType.Color,
+      defaultValidatedValue: {
+        value: "black",
+        type: Templates.DataType.Color,
+      },
+    },
     [dataItemIds.backgroundColor]: {
       id: dataItemIds.backgroundColor,
       name: "Background Colour",
@@ -36,8 +52,9 @@ const template: Templates.Props = {
       children: [
         {
           type: "text",
-          text: "BACK TEMPLATE",
+          text: `{{${dataItemIds.text}}}`,
           style: {
+            color: `{{${dataItemIds.textColor}}}`,
             fontSize: 8,
             textAlign: "center",
           },

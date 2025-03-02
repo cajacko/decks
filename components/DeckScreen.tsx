@@ -21,7 +21,7 @@ export interface DeckScreenProps {
 }
 
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
-  useDeckToolbar({ deckId: props.deckId });
+  const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
 
   const cards = useAppSelector((state) =>
     selectDeckCards(state, { deckId: props.deckId }),
@@ -40,6 +40,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     >
       <View style={props.style}>
         {component}
+        {defaultCard.component}
         <DeckDetails deckId={props.deckId} />
         <FlatList
           data={cards}

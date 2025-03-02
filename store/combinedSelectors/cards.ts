@@ -27,7 +27,7 @@ export const selectDeckByCard = (
 const selectCardSideTemplate = (
   state: RootState,
   props: DeckOrCardSideProps,
-): Cards.SideTemplate | null => {
+): Cards.SideTemplate | undefined => {
   if (getIsCardId(props)) {
     const card = selectCard(state, { cardId: props.id });
     const deck = selectDeckByCard(state, { cardId: props.id });
@@ -36,12 +36,10 @@ const selectCardSideTemplate = (
 
     if (cardTemplate) return cardTemplate;
 
-    return deck?.templates?.[props.side] ?? null;
+    return deck?.templates?.[props.side];
   }
 
-  return (
-    selectDeck(state, { deckId: props.id })?.templates?.[props.side] ?? null
-  );
+  return selectDeck(state, { deckId: props.id })?.templates?.[props.side];
 };
 
 // Is a lookup, doesn't need to be cached
@@ -51,8 +49,25 @@ export const selectCardTemplate = (
 ) => {
   const templateId = selectCardSideTemplate(state, props)?.templateId;
 
-  return templateId ? selectTemplate(state, { templateId }) : null;
+  return templateId ? selectTemplate(state, { templateId }) : undefined;
 };
+
+export const selectTemplateSchemaOrder = createCachedSelector(
+  selectCardTemplate,
+  (template) => {
+    if (!template) return undefined;
+
+    const schemaOrder = template.schemaOrder;
+
+    Object.keys(template.schema).forEach((key) => {
+      if (!schemaOrder.includes(key)) {
+        schemaOrder.push(key);
+      }
+    });
+
+    return schemaOrder;
+  },
+)(cardOrDeckKey);
 
 /**
  * Selects the data for a card by merging the card data with the deck defaults.

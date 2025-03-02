@@ -8,6 +8,10 @@ const dataItemIds = {
   title: dataItemId("title"),
   description: dataItemId("description"),
   backgroundColor: dataItemId("backgroundColor"),
+  titleColor: dataItemId("titleColor"),
+  descriptionColor: dataItemId("descriptionColor"),
+  // titleSize: dataItemId("titleSize"),
+  // descriptionSize: dataItemId("descriptionSize"),
 };
 
 const template = {
@@ -23,12 +27,56 @@ const template = {
       id: dataItemIds.title,
       name: "Title",
       type: Templates.DataType.Text,
+      defaultValidatedValue: {
+        value: "Title",
+        type: Templates.DataType.Text,
+      },
     },
     [dataItemIds.description]: {
       id: dataItemIds.description,
       name: "Description",
       type: Templates.DataType.Text,
+      defaultValidatedValue: {
+        value: "Description",
+        type: Templates.DataType.Text,
+      },
     },
+    [dataItemIds.titleColor]: {
+      id: dataItemIds.titleColor,
+      name: "Title Colour",
+      type: Templates.DataType.Color,
+      defaultValidatedValue: {
+        value: "black",
+        type: Templates.DataType.Color,
+      },
+    },
+    [dataItemIds.descriptionColor]: {
+      id: dataItemIds.descriptionColor,
+      name: "Description Colour",
+      type: Templates.DataType.Color,
+      defaultValidatedValue: {
+        value: "black",
+        type: Templates.DataType.Color,
+      },
+    },
+    // [dataItemIds.titleSize]: {
+    //   id: dataItemIds.titleSize,
+    //   name: "Title Size",
+    //   type: Templates.DataType.Number,
+    //   defaultValidatedValue: {
+    //     value: 8,
+    //     type: Templates.DataType.Number,
+    //   },
+    // },
+    // [dataItemIds.descriptionSize]: {
+    //   id: dataItemIds.descriptionSize,
+    //   name: "Description Size",
+    //   type: Templates.DataType.Number,
+    //   defaultValidatedValue: {
+    //     value: 4,
+    //     type: Templates.DataType.Number,
+    //   },
+    // },
     [dataItemIds.backgroundColor]: {
       id: dataItemIds.backgroundColor,
       name: "Background Colour",
@@ -56,16 +104,18 @@ const template = {
           style: {
             fontSize: 8,
             textAlign: "center",
+            color: `{{${dataItemIds.titleColor}}}`,
           },
         },
         {
           type: "text",
-          text: `Description: {{${dataItemIds.description}}}`,
+          text: `{{${dataItemIds.description}}}`,
           conditional: dataItemIds.description,
           style: {
             marginTop: 2,
             fontSize: 4,
             textAlign: "center",
+            color: `{{${dataItemIds.descriptionColor}}}`,
           },
         },
       ],
