@@ -44,7 +44,7 @@ export default function DeckLayout() {
     <Tabs
       backBehavior="history"
       screenOptions={{
-        animation: "shift",
+        animation: "none",
         tabBarLabelPosition: "beside-icon",
       }}
     >

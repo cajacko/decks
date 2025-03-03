@@ -5,13 +5,16 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
 export interface TextureBackgroundProps {
   style?: ViewStyle;
+  children?: React.ReactNode;
 }
 
 export default function TextureBackground({
   style,
+  children,
 }: TextureBackgroundProps): React.ReactNode {
   return (
     <View style={React.useMemo(() => [styles.container, style], [style])}>
+      {children && <View style={styles.content}>{children}</View>}
       <View style={styles.background}>
         <Svg height="100%" width="100%">
           <Defs>
@@ -49,12 +52,18 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
+  content: {
+    position: "relative",
+    flex: 1,
+    zIndex: 2,
+  },
   background: {
     position: "absolute",
     top: offset,
     left: offset,
     right: offset,
     bottom: offset,
+    zIndex: 1,
   },
   noise: {
     position: "absolute",

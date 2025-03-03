@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, FlatList, ViewStyle } from "react-native";
+import { StyleSheet, FlatList, ViewStyle, View } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckIds } from "@/store/slices/decks";
 import DeckListItem from "@/components/DeckListItem";
@@ -34,17 +34,18 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 
   return (
     <>
-      <FlatList
-        style={props.style}
-        contentContainerStyle={styles.contentContainer}
-        data={deckIds}
-        renderItem={({ item }) => (
-          <DeckListItem style={styles.listItem} deckId={item} />
-        )}
-        keyExtractor={(deckId) => deckId}
-        numColumns={2}
-      />
-      <IconButton icon="add" onPress={createDeck} style={styles.action} />
+      <View style={props.style}>
+        <FlatList
+          contentContainerStyle={styles.contentContainer}
+          data={deckIds}
+          renderItem={({ item }) => (
+            <DeckListItem style={styles.listItem} deckId={item} />
+          )}
+          keyExtractor={(deckId) => deckId}
+          numColumns={2}
+        />
+        <IconButton icon="add" onPress={createDeck} style={styles.action} />
+      </View>
     </>
   );
 }
