@@ -51,20 +51,18 @@ export default function Tabletop({
   );
 
   return (
-    <>
-      <DeckTabletopProvider
-        availableHeight={size.height}
-        availableWidth={size.width}
-        tabletopId={tabletopId}
-        deckId={deckId}
-      >
-        <View style={[styles.container, style]}>
-          <Animated.View style={styles.content}>
-            <StackList style={animatedStyle} handleLayout={handleLayout} />
-          </Animated.View>
-        </View>
-      </DeckTabletopProvider>
-    </>
+    <DeckTabletopProvider
+      availableHeight={size.height}
+      availableWidth={size.width}
+      tabletopId={tabletopId}
+      deckId={deckId}
+    >
+      <View style={[styles.container, style]}>
+        <Animated.View style={styles.content}>
+          <StackList style={animatedStyle} handleLayout={handleLayout} />
+        </Animated.View>
+      </View>
+    </DeckTabletopProvider>
   );
 }
 

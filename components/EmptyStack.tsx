@@ -4,7 +4,7 @@ import Card, { CardProps, getBorderRadius } from "./Card";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
 import text from "@/constants/text";
 import Button from "./Button";
-import { emptyStackBorder } from "@/constants/colors";
+import { fixed } from "@/constants/colors";
 import { defaultOpacity } from "./CardAction";
 
 export type EmptyStackProps = {
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     right: "2%",
     bottom: "2%",
     borderWidth: 2,
-    borderColor: emptyStackBorder,
+    borderColor: fixed.emptyStackBorder,
     borderStyle: "dashed",
     verticalAlign: "middle",
     justifyContent: "center",

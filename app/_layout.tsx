@@ -40,7 +40,7 @@ function useNavigationTheme(): NavigationTheme {
     }
 
     return {
-      dark: false,
+      dark: true,
       fonts: navigationFonts,
       colors: navigationColors.dark,
     };

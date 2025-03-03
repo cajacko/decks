@@ -26,6 +26,21 @@ export const themes = {
   },
 };
 
+export const fixed = {
+  shadow: Color(colors.black).alpha(0.5).rgb().string(),
+  emptyStackBorder: colors.white,
+  cardPresets: {
+    black: colors.black,
+    white: colors.white,
+    grey: colors.grey,
+  },
+  textureBackground: {
+    stop1: "#b0bfdb",
+    stop2: "#5d6683",
+    stop3: "#3b4258",
+  },
+};
+
 export type Theme = keyof typeof themes;
 
 export const navigationColors: Record<Theme, NavigationTheme["colors"]> = {
@@ -45,14 +60,4 @@ export const navigationColors: Record<Theme, NavigationTheme["colors"]> = {
     primary: "rgb(10, 126, 164)",
     text: themes.dark.text,
   },
-};
-
-export const shadowColor = Color(colors.black).alpha(0.5).rgb().string();
-
-export const emptyStackBorder = colors.white;
-
-export const cardPresets = {
-  black: colors.black,
-  white: colors.white,
-  grey: colors.grey,
 };

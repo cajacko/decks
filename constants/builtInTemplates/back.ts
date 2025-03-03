@@ -1,7 +1,7 @@
 import { Templates } from "@/store/types";
 import builtInTemplateIds from "@/utils/builtInTemplateIds";
 import text from "@/constants/text";
-import { cardPresets } from "@/constants/colors";
+import { fixed } from "@/constants/colors";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
@@ -27,7 +27,7 @@ const template: Templates.Props = {
       name: text["template.built_in.back.text_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: cardPresets.black,
+        value: fixed.cardPresets.black,
         type: Templates.DataType.Color,
       },
     },
@@ -36,7 +36,7 @@ const template: Templates.Props = {
       name: text["template.built_in.back.background_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: cardPresets.grey,
+        value: fixed.cardPresets.grey,
         type: Templates.DataType.Color,
       },
     },

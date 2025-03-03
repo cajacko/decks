@@ -8,7 +8,7 @@ import {
   CardMMDimensions,
   CardSizeProps,
 } from "./Card.types";
-import { cardPresets, shadowColor } from "@/constants/colors";
+import { fixed } from "@/constants/colors";
 
 export function parseCardSize(cardSize: CardSize | CardSizeProps) {
   const height =
@@ -164,7 +164,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     width: "100%",
-    backgroundColor: cardPresets.white,
+    backgroundColor: fixed.cardPresets.white,
     overflow: "hidden",
   },
 });
@@ -177,7 +177,7 @@ export function getInnerStyle(
   return StyleSheet.flatten<ViewStyle>([
     styles.inner,
     {
-      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px ${shadowColor}`,
+      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px ${fixed.shadow}`,
       borderRadius: getBorderRadius(props),
     },
     props.style,
