@@ -1,6 +1,6 @@
 import { Templates } from "@/store/types";
 import builtInTemplateIds from "@/utils/builtInTemplateIds";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("front");

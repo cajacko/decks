@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View, TouchableHighlight, Text } from "react-native";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 interface TabletopToolbarProps {
   tabletopId: string;

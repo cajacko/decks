@@ -16,7 +16,7 @@ import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "./CardSideBySide";
 import { DeckCardSizeProvider } from "@/context/Deck";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export interface DeckListItemProps {
   deckId: string;

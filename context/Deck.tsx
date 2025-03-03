@@ -10,7 +10,9 @@ import {
 import { useAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
 import { selectDeckByCard } from "@/store/combinedSelectors/cards";
-import cardDimensions, { defaultCardDimensions } from "@/config/cardDimensions";
+import cardDimensions, {
+  defaultCardDimensions,
+} from "@/constants/cardDimensions";
 import { getStackDimensions } from "@/components/Stack/stack.style";
 import { Dimensions } from "react-native";
 

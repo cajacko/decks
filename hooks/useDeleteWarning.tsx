@@ -1,6 +1,6 @@
 import React from "react";
 import Alert, { AlertButton } from "@/components/Alert";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export interface UseDeleteWarningProps {
   handleDelete: () => void;

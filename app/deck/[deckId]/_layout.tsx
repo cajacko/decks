@@ -3,7 +3,7 @@ import { Tabs, useNavigation, useLocalSearchParams } from "expo-router";
 import { selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export function getDeckName(deckId?: string | null) {
   return deckNameWithFallback(

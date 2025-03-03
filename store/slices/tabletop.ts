@@ -3,7 +3,7 @@ import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
 import { RootState, Tabletops, SliceName, Cards, Decks } from "../types";
-import flags from "@/config/flags";
+import flags from "@/constants/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";

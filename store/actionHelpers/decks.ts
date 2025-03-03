@@ -3,9 +3,9 @@ import { store } from "../store";
 import { selectDeck } from "../slices/decks";
 import { Cards, Decks, Tabletops } from "../types";
 import uuid from "@/utils/uuid";
-import builtInTemplates from "@/config/builtInTemplates";
+import builtInTemplates from "@/constants/builtInTemplates";
 import { createInitStacks } from "@/utils/minStacks";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.DeckId;

@@ -1,5 +1,5 @@
 import AppError from "@/classes/AppError";
-import { defaultCardDimensions } from "@/config/cardDimensions";
+import { defaultCardDimensions } from "@/constants/cardDimensions";
 import {
   CardSizeProps,
   CardSizeContextProps,

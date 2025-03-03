@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Templates, RootState, SliceName } from "../types";
-import flags from "@/config/flags";
+import flags from "@/constants/flags";
 import devInitialState from "../dev/devInitialState";
 import withBuiltInState from "../utils/withBuiltInState";
 

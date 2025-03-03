@@ -4,7 +4,7 @@ import TextInput from "./TextInput";
 import { selectDeck, setDeckDetails } from "@/store/slices/decks";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import useAutoSave from "@/hooks/useAutoSave";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export interface DeckDetailsProps {
   deckId: string;

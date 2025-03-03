@@ -1,4 +1,4 @@
-import exampleDecks from "@/config/exampleDecks";
+import exampleDecks from "@/constants/exampleDecks";
 import {
   RootState,
   SliceName,
@@ -7,7 +7,7 @@ import {
   Cards,
   Templates,
 } from "@/store/types";
-import builtInTemplates from "@/config/builtInTemplates";
+import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 
 type State = Pick<

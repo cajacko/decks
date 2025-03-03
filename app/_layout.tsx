@@ -18,7 +18,7 @@ import { getDeckName } from "@/app/deck/[deckId]/_layout";
 import { ModalProvider } from "@/context/Modal";
 import TextureBackground from "@/components/TextureBackground";
 import { StyleSheet, View } from "react-native";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

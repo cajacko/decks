@@ -7,7 +7,7 @@ import { Target } from "@/utils/cardTarget";
 import EditCardSideForm from "@/components/EditCardSideForm";
 import { deleteCardHelper } from "@/store/actionHelpers/cards";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;

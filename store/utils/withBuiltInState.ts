@@ -1,5 +1,5 @@
 import exampleDecksToStore from "@/utils/exampleDecksToStore";
-import { builtInTemplatesById } from "@/config/builtInTemplates";
+import { builtInTemplatesById } from "@/constants/builtInTemplates";
 import { RootState, SliceName } from "../types";
 
 let cache: RootState | null = null;

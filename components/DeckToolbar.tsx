@@ -6,7 +6,7 @@ import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { deleteDeckHelper } from "@/store/actionHelpers/decks";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import { useEditCardModal } from "./EditCardModal";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 interface DeckToolbarProps {
   deckId: string;

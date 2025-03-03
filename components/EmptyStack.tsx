@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet, Button } from "react-native";
 import Card, { CardProps, getBorderRadius } from "./Card";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
-import text from "@/config/text";
+import text from "@/constants/text";
 
 export type EmptyStackProps = {
   style?: CardProps["style"];

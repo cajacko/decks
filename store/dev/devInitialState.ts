@@ -1,6 +1,6 @@
 import { RootState, Templates, Decks } from "../types";
 import exampleDecksToStore from "@/utils/exampleDecksToStore";
-import builtInTemplates from "@/config/builtInTemplates";
+import builtInTemplates from "@/constants/builtInTemplates";
 
 const exampleState = exampleDecksToStore();
 

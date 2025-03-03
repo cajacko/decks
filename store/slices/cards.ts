@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
-import flags from "@/config/flags";
+import flags from "@/constants/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";

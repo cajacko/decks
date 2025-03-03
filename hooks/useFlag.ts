@@ -3,7 +3,7 @@ import {
   selectUserSettings,
   UserSettingsState,
 } from "@/store/slices/userSettings";
-import flags, { Flags } from "@/config/flags";
+import flags, { Flags } from "@/constants/flags";
 
 export default function useFlag<
   // This is okay in this generic, it is still strongly typed when used

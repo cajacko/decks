@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { Decks, RootState, SliceName } from "../types";
-import flags from "@/config/flags";
+import flags from "@/constants/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
