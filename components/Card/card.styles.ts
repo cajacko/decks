@@ -8,7 +8,7 @@ import {
   CardMMDimensions,
   CardSizeProps,
 } from "./Card.types";
-import { cardPresets } from "@/constants/colors";
+import { cardPresets, shadowColor } from "@/constants/colors";
 
 export function parseCardSize(cardSize: CardSize | CardSizeProps) {
   const height =
@@ -177,7 +177,7 @@ export function getInnerStyle(
   return StyleSheet.flatten<ViewStyle>([
     styles.inner,
     {
-      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.5)`,
+      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px ${shadowColor}`,
       borderRadius: getBorderRadius(props),
     },
     props.style,

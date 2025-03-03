@@ -17,6 +17,8 @@ export interface CardActionProps {
   active?: boolean;
 }
 
+export const defaultOpacity = 0.5;
+
 export default function CardAction({
   icon,
   style: styleProp,
@@ -35,7 +37,7 @@ export default function CardAction({
           width: buttonSize,
           borderRadius: buttonSize / 2,
           backgroundColor: background,
-          opacity: active ? 1 : 0.5,
+          opacity: active ? 1 : defaultOpacity,
         },
         styleProp,
       ]),

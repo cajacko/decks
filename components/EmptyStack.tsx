@@ -1,8 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Button } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Card, { CardProps, getBorderRadius } from "./Card";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
 import text from "@/constants/text";
+import Button from "./Button";
+import { emptyStackBorder } from "@/constants/colors";
+import { defaultOpacity } from "./CardAction";
 
 export type EmptyStackProps = {
   style?: CardProps["style"];
@@ -30,12 +33,11 @@ export default function EmptyStack({
         ])}
       >
         {handleDeleteStack && (
-          <View style={styles.delete}>
-            <Button
-              title={text["stack.actions.delete"]}
-              onPress={handleDeleteStack}
-            />
-          </View>
+          <Button
+            style={styles.delete}
+            title={text["stack.actions.delete"]}
+            onPress={handleDeleteStack}
+          />
         )}
       </View>
     </Card>
@@ -53,6 +55,7 @@ const styles = StyleSheet.create({
   },
   delete: {
     marginTop: 20,
+    opacity: defaultOpacity,
   },
   // Slightly smaller so it doesn't poke out of the cards when in a stack
   content: {
@@ -62,7 +65,7 @@ const styles = StyleSheet.create({
     right: "2%",
     bottom: "2%",
     borderWidth: 2,
-    borderColor: "#f0f0f0",
+    borderColor: emptyStackBorder,
     borderStyle: "dashed",
     verticalAlign: "middle",
     justifyContent: "center",
