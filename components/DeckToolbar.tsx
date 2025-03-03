@@ -6,6 +6,7 @@ import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { deleteDeckHelper } from "@/store/actionHelpers/decks";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import { useEditCardModal } from "./EditCardModal";
+import text from "@/config/text";
 
 interface DeckToolbarProps {
   deckId: string;
@@ -46,9 +47,8 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
 
   const deleteDeckModal = useDeleteWarning({
     handleDelete: deleteDeck,
-    title: "Delete Deck",
-    message:
-      "Are you sure you want to delete this deck? If you delete this deck, all cards in this deck will be deleted as well.",
+    title: text["deck.delete.title"],
+    message: text["deck.delete.message"],
   });
 
   return (
@@ -58,13 +58,13 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
         onPressOut={props.openDefaultCardModal}
         style={styles.action}
       >
-        <Text style={styles.actionText}>Defaults</Text>
+        <Text style={styles.actionText}>{text["deck.actions.default"]}</Text>
       </TouchableHighlight>
       <TouchableHighlight
         onPressOut={deleteDeckModal.open}
         style={styles.action}
       >
-        <Text style={styles.actionText}>Delete</Text>
+        <Text style={styles.actionText}>{text["general.delete"]}</Text>
       </TouchableHighlight>
     </View>
   );

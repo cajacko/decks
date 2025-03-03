@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, StyleSheet, Button } from "react-native";
 import Card, { CardProps, getBorderRadius } from "./Card";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
+import text from "@/config/text";
 
 export type EmptyStackProps = {
   style?: CardProps["style"];
@@ -30,7 +31,10 @@ export default function EmptyStack({
       >
         {handleDeleteStack && (
           <View style={styles.delete}>
-            <Button title="Delete stack" onPress={handleDeleteStack} />
+            <Button
+              title={text["stack.actions.delete"]}
+              onPress={handleDeleteStack}
+            />
           </View>
         )}
       </View>

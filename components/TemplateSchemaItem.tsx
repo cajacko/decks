@@ -83,6 +83,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     <View>
       <Text style={styles.label}>
         {fieldLabel}
+        {/* TODO: No text indicator here, something else */}
         {hasChanges && !isNewCard ? " (changed)" : ""}
       </Text>
       {input}

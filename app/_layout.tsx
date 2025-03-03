@@ -18,6 +18,7 @@ import { getDeckName } from "@/app/deck/[deckId]/_layout";
 import { ModalProvider } from "@/context/Modal";
 import TextureBackground from "@/components/TextureBackground";
 import { StyleSheet, View } from "react-native";
+import text from "@/config/text";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -78,7 +79,7 @@ export default function RootLayout() {
                     headerShown: true,
                     headerBackButtonMenuEnabled: false,
                     animation: "slide_from_left",
-                    headerTitle: "Decks",
+                    headerTitle: text["screen.decks.title"],
                   }}
                 />
                 <Stack.Screen

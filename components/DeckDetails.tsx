@@ -4,6 +4,7 @@ import TextInput from "./TextInput";
 import { selectDeck, setDeckDetails } from "@/store/slices/decks";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import useAutoSave from "@/hooks/useAutoSave";
+import text from "@/config/text";
 
 export interface DeckDetailsProps {
   deckId: string;
@@ -37,13 +38,13 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
       <TextInput
         value={title}
         onChangeText={setTitle}
-        placeholder="Deck Name"
+        placeholder={text["deck.edit.title.placeholder"]}
         style={styles.name}
       />
       <TextInput
         value={description}
         onChangeText={setDescription}
-        placeholder="Description"
+        placeholder={text["deck.edit.description.placeholder"]}
         style={styles.description}
       />
     </View>

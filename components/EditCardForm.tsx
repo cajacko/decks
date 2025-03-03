@@ -7,6 +7,7 @@ import { Target } from "@/utils/cardTarget";
 import EditCardSideForm from "@/components/EditCardSideForm";
 import { deleteCardHelper } from "@/store/actionHelpers/cards";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
+import text from "@/config/text";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
@@ -43,8 +44,8 @@ export default function EditCardForm({
 
   const { open, component } = useDeleteWarning({
     handleDelete: deleteCard,
-    title: "Delete Card",
-    message: "Are you sure you want to delete this card?",
+    title: text["card.delete.title"],
+    message: text["card.delete.message"],
   });
 
   return (
@@ -52,10 +53,10 @@ export default function EditCardForm({
       {component}
       <View style={styles.buttonContainer}>
         <View style={styles.buttonLeft}>
-          <Button title="Flip Card" onPress={flipSide} />
+          <Button title={text["card.action.flip"]} onPress={flipSide} />
         </View>
         <View style={styles.buttonRight}>
-          <Button title="Delete" onPress={open} />
+          <Button title={text["general.delete"]} onPress={open} />
         </View>
       </View>
       {frontTemplate && (
@@ -64,7 +65,7 @@ export default function EditCardForm({
           type={type}
           side="front"
           templateId={frontTemplate.templateId}
-          title={!!backTemplate ? "Front Side" : null}
+          title={!!backTemplate ? text["card.templates.front.title"] : null}
         />
       )}
       {backTemplate && (
@@ -73,7 +74,7 @@ export default function EditCardForm({
           type={type}
           side="back"
           templateId={backTemplate.templateId}
-          title={!!frontTemplate ? "Back Side" : null}
+          title={!!frontTemplate ? text["card.templates.back.title"] : null}
         />
       )}
     </View>

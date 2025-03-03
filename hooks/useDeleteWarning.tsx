@@ -1,5 +1,6 @@
 import React from "react";
 import Alert, { AlertButton } from "@/components/Alert";
+import text from "@/config/text";
 
 export interface UseDeleteWarningProps {
   handleDelete: () => void;
@@ -28,9 +29,9 @@ export default function useDeleteWarning({
 
   const deleteButtons = React.useMemo<AlertButton[]>(
     () => [
-      { text: "Cancel", onPress: close, style: "cancel" },
+      { text: text["general.cancel"], onPress: close, style: "cancel" },
       {
-        text: deleteButtonText ?? "Delete",
+        text: deleteButtonText ?? text["general.delete"],
         onPress: () => {
           handleDelete();
           close();
@@ -49,8 +50,8 @@ export default function useDeleteWarning({
       <Alert
         visible={showDeleteConfirm}
         onRequestClose={close}
-        title={title ?? "Delete"}
-        message={message ?? "Are you sure you want to delete this item?"}
+        title={title ?? text["general.delete"]}
+        message={message ?? text["delete_warning.message.default"]}
         buttons={buttons ?? deleteButtons}
       />
     ),

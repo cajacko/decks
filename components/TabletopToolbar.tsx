@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet, View, TouchableHighlight, Text } from "react-native";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
+import text from "@/config/text";
 
 interface TabletopToolbarProps {
   tabletopId: string;
@@ -67,10 +68,9 @@ export default function TabletopToolbar(
     handleDelete: () => {
       dispatch(resetTabletopHelper({ tabletopId: props.tabletopId }));
     },
-    title: "Reset Play Area",
-    message:
-      "This will move all cards back into the first stack and deck order",
-    deleteButtonText: "Reset",
+    title: text["tabletop.reset.title"],
+    message: text["tabletop.reset.message"],
+    deleteButtonText: text["tabletop.reset.button"],
   });
 
   return (
@@ -83,7 +83,7 @@ export default function TabletopToolbar(
           { opacity: props.hasPast ? 1 : 0.5 },
         ])}
       >
-        <Text style={styles.actionText}>Undo</Text>
+        <Text style={styles.actionText}>{text["general.undo"]}</Text>
       </TouchableHighlight>
       <TouchableHighlight
         onPressOut={props.hasFuture ? handleRedo : undefined}
@@ -92,10 +92,10 @@ export default function TabletopToolbar(
           { opacity: props.hasFuture ? 1 : 0.5 },
         ])}
       >
-        <Text style={styles.actionText}>Redo</Text>
+        <Text style={styles.actionText}>{text["general.redo"]}</Text>
       </TouchableHighlight>
       <TouchableHighlight onPressOut={open} style={styles.action}>
-        <Text style={styles.actionText}>Reset</Text>
+        <Text style={styles.actionText}>{text["tabletop.reset.button"]}</Text>
       </TouchableHighlight>
     </View>
   );

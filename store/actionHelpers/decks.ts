@@ -5,6 +5,7 @@ import { Cards, Decks, Tabletops } from "../types";
 import uuid from "@/utils/uuid";
 import builtInTemplates from "@/config/builtInTemplates";
 import { createInitStacks } from "@/utils/minStacks";
+import text from "@/config/text";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.DeckId;
@@ -30,7 +31,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
     dataSchema: {},
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
-    name: "New Deck",
+    name: text["deck.new.title"],
     status: "creating",
     cardSize: Decks.CardSize.Poker,
     templates: {

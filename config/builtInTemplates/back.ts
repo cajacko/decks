@@ -1,5 +1,6 @@
 import { Templates } from "@/store/types";
 import builtInTemplateIds from "@/utils/builtInTemplateIds";
+import text from "@/config/text";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
@@ -12,17 +13,17 @@ const dataItemIds = {
 
 const template: Templates.Props = {
   templateId,
-  name: "Back Template",
+  name: text["template.built_in.back.title"],
   schemaOrder: [dataItemIds.backgroundColor],
   schema: {
     [dataItemIds.text]: {
       id: dataItemIds.text,
-      name: "Text",
+      name: text["template.built_in.back.text"],
       type: Templates.DataType.Text,
     },
     [dataItemIds.textColor]: {
       id: dataItemIds.textColor,
-      name: "Text Colour",
+      name: text["template.built_in.back.text_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
         value: "black",
@@ -31,7 +32,7 @@ const template: Templates.Props = {
     },
     [dataItemIds.backgroundColor]: {
       id: dataItemIds.backgroundColor,
-      name: "Background Colour",
+      name: text["template.built_in.back.background_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
         value: "grey",

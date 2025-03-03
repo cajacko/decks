@@ -1,5 +1,6 @@
 import { Templates } from "@/store/types";
 import builtInTemplateIds from "@/utils/builtInTemplateIds";
+import text from "@/config/text";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("front");
@@ -16,7 +17,7 @@ const dataItemIds = {
 
 const template = {
   templateId,
-  name: "Front Template",
+  name: text["template.built_in.front.name"],
   schemaOrder: [
     dataItemIds.title,
     dataItemIds.description,
@@ -25,25 +26,25 @@ const template = {
   schema: {
     [dataItemIds.title]: {
       id: dataItemIds.title,
-      name: "Title",
+      name: text["template.built_in.front.title"],
       type: Templates.DataType.Text,
       defaultValidatedValue: {
-        value: "Title",
+        value: text["template.built_in.front.title.default"],
         type: Templates.DataType.Text,
       },
     },
     [dataItemIds.description]: {
       id: dataItemIds.description,
-      name: "Description",
+      name: text["template.built_in.front.description"],
       type: Templates.DataType.Text,
       defaultValidatedValue: {
-        value: "Description",
+        value: text["template.built_in.front.description.default"],
         type: Templates.DataType.Text,
       },
     },
     [dataItemIds.titleColor]: {
       id: dataItemIds.titleColor,
-      name: "Title Colour",
+      name: text["template.built_in.front.title_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
         value: "black",
@@ -52,7 +53,7 @@ const template = {
     },
     [dataItemIds.descriptionColor]: {
       id: dataItemIds.descriptionColor,
-      name: "Description Colour",
+      name: text["template.built_in.front.description_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
         value: "black",
@@ -79,7 +80,7 @@ const template = {
     // },
     [dataItemIds.backgroundColor]: {
       id: dataItemIds.backgroundColor,
-      name: "Background Colour",
+      name: text["template.built_in.front.background_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
         value: "white",

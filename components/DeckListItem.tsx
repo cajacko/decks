@@ -16,6 +16,7 @@ import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "./CardSideBySide";
 import { DeckCardSizeProvider } from "@/context/Deck";
+import text from "@/config/text";
 
 export interface DeckListItemProps {
   deckId: string;
@@ -64,10 +65,10 @@ export default function DeckListItem(
           <Text style={styles.text}>{deckNameWithFallback(name)}</Text>
           <View style={styles.buttons}>
             <View style={styles.button}>
-              <Button title="Play" onPress={play} />
+              <Button title={text["deck.actions.play"]} onPress={play} />
             </View>
             <View style={styles.button}>
-              <Button title="Edit" onPress={edit} />
+              <Button title={text["deck.actions.edit"]} onPress={edit} />
             </View>
           </View>
         </View>

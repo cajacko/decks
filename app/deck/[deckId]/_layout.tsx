@@ -3,6 +3,7 @@ import { Tabs, useNavigation, useLocalSearchParams } from "expo-router";
 import { selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
+import text from "@/config/text";
 
 export function getDeckName(deckId?: string | null) {
   return deckNameWithFallback(
@@ -50,7 +51,7 @@ export default function DeckLayout() {
         options={{
           headerShown: false,
           animation: "none",
-          tabBarLabel: "Edit",
+          tabBarLabel: text["screen.deck.index.title"],
         }}
       />
       <Tabs.Screen
@@ -58,7 +59,7 @@ export default function DeckLayout() {
         options={{
           headerShown: false,
           animation: "none",
-          tabBarLabel: "Play",
+          tabBarLabel: text["screen.deck.play.title"],
         }}
       />
     </Tabs>

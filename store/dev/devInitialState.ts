@@ -1,6 +1,6 @@
 import { RootState, Templates, Decks } from "../types";
-import templatesById from "@/config/templatesById";
 import exampleDecksToStore from "@/utils/exampleDecksToStore";
+import builtInTemplates from "@/config/builtInTemplates";
 
 const exampleState = exampleDecksToStore();
 
@@ -17,10 +17,6 @@ const state: RootState = {
             value: "Card 1",
             type: Templates.DataType.Text,
           },
-          // description: {
-          //   value: "This is card 1",
-          //   type: Templates.DataType.Text,
-          // },
         },
       },
       card2: {
@@ -86,7 +82,7 @@ const state: RootState = {
     },
   },
   templates: {
-    templatesById,
+    templatesById: {},
   },
   decks: {
     decksById: {
@@ -114,24 +110,21 @@ const state: RootState = {
         name: "Deck 1",
         templates: {
           front: {
-            templateId: templatesById.basicText.templateId,
+            templateId: builtInTemplates.front.templateId,
             dataTemplateMapping: {
-              "template1-title": {
+              [builtInTemplates.front.schema.title.id]: {
                 dataSchemaItemId: "title",
-                templateSchemaItemId: "template1-title",
+                templateSchemaItemId: builtInTemplates.front.schema.title.id,
               },
-              // "template1-description": {
-              //   dataSchemaItemId: "description",
-              //   templateSchemaItemId: "template1-description",
-              // },
-              "template1-backgroundColor": {
+              [builtInTemplates.front.schema.backgroundColor.id]: {
                 dataSchemaItemId: "backgroundColor",
-                templateSchemaItemId: "template1-backgroundColor",
+                templateSchemaItemId:
+                  builtInTemplates.front.schema.backgroundColor.id,
               },
             },
           },
           back: {
-            templateId: templatesById.plainBack.templateId,
+            templateId: builtInTemplates.back.templateId,
             dataTemplateMapping: {},
           },
         },
