@@ -1,8 +1,9 @@
 import { CardInstanceProps } from "@/components/CardInstance";
 import { MenuItem, RenderItemMenuItem } from "../HoldMenu";
+import { IconSymbolName } from "../IconSymbol";
 
 export type StackTopCardMenuItem = MenuItem<{
-  icon: string;
+  icon: IconSymbolName;
   onPress: () => void;
 }>;
 

@@ -82,7 +82,7 @@ export default function Stack(props: StackProps): React.ReactNode {
 
             {cardInstances.length > 1 && showActions && (
               <CardAction
-                icon="Sh"
+                icon="shuffle"
                 style={shuffleStyle}
                 onPress={handleShuffle}
               />

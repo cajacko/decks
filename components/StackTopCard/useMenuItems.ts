@@ -34,7 +34,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         left: verticalLeft,
         height: buttonSize,
         width: buttonSize,
-        icon: "Fl",
+        icon: "flip",
         onPress: state.handleFlipCard,
       },
       {
@@ -43,7 +43,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         left: verticalRight,
         height: buttonSize,
         width: buttonSize,
-        icon: "Ed",
+        icon: "edit-document",
         onPress: () => setShowEditModal(true),
       },
     ];
@@ -55,7 +55,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         left: centerLeft,
         height: buttonSize,
         width: buttonSize,
-        icon: "B",
+        icon: "vertical-align-bottom",
         onPress: state.handleMoveToBottom,
       });
     }
@@ -67,7 +67,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         left: right,
         height: buttonSize,
         width: buttonSize,
-        icon: "Rt",
+        icon: "chevron-right",
         onPress: state.moveRight.top,
       });
     }
@@ -79,7 +79,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         left: left,
         height: buttonSize,
         width: buttonSize,
-        icon: "Lt",
+        icon: "chevron-left",
         onPress: state.moveLeft.top,
       });
     }

@@ -29,7 +29,7 @@ function getExampleStackDimensions(
   // get absolutely positioned around the card/ stack
   const stackPadding = Math.max(
     // The shuffle/ stack actions are a bit further out than card actions
-    Math.round(buttonSize / 1.75),
+    Math.round(buttonSize / 1.5),
     // Card actions are half on/ half off the card
     Math.round(buttonSize / 2),
   );
