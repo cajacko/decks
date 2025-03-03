@@ -4,6 +4,7 @@ import { selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
 import text from "@/constants/text";
+import IconSymbol from "@/components/IconSymbol";
 
 export function getDeckName(deckId?: string | null) {
   return deckNameWithFallback(
@@ -44,22 +45,27 @@ export default function DeckLayout() {
       backBehavior="history"
       screenOptions={{
         animation: "shift",
+        tabBarLabelPosition: "beside-icon",
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           headerShown: false,
-          animation: "none",
           tabBarLabel: text["screen.deck.index.title"],
+          tabBarIcon: ({ size }) => (
+            <IconSymbol name="edit-document" size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="play"
         options={{
           headerShown: false,
-          animation: "none",
           tabBarLabel: text["screen.deck.play.title"],
+          tabBarIcon: ({ size }) => (
+            <IconSymbol name="play-arrow" size={size} />
+          ),
         }}
       />
     </Tabs>
