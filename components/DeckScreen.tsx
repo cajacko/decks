@@ -41,11 +41,11 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       <View style={props.style}>
         {component}
         {defaultCard.component}
-        <DeckDetails deckId={props.deckId} />
         <FlatList
           data={cards}
           numColumns={3}
           columnWrapperStyle={styles.columnWrapperStyle}
+          ListHeaderComponent={<DeckDetails deckId={props.deckId} />}
           renderItem={({ item }) => (
             <DeckCard
               style={styles.item}

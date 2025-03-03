@@ -87,9 +87,9 @@ const scalingStyles = {
     roundToNumberOfDecimals: 0,
   }),
   boxShadow: {
-    x: withCardStyleScaling(369, 2, boxShadowConfig),
-    y: withCardStyleScaling(369, 2, boxShadowConfig),
-    blur: withCardStyleScaling(369, 3, boxShadowConfig),
+    x: withCardStyleScaling(369, 1, boxShadowConfig),
+    y: withCardStyleScaling(369, 1, boxShadowConfig),
+    blur: withCardStyleScaling(369, 7, boxShadowConfig),
   },
   borderRadius: (cardDimensions: CardMMDimensions) =>
     withCardStyleScaling(
@@ -176,7 +176,7 @@ export function getInnerStyle(
   return StyleSheet.flatten<ViewStyle>([
     styles.inner,
     {
-      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.2)`,
+      boxShadow: `${scalingStyles.boxShadow.x(props)}px ${scalingStyles.boxShadow.y(props)}px ${scalingStyles.boxShadow.blur(props)}px rgba(0, 0, 0, 0.5)`,
       borderRadius: getBorderRadius(props),
     },
     props.style,

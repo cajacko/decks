@@ -11,7 +11,7 @@ export default function TextureBackground({
   style,
 }: TextureBackgroundProps): React.ReactNode {
   return (
-    <View style={[styles.container, style]}>
+    <View style={React.useMemo(() => [styles.container, style], [style])}>
       <View style={styles.background}>
         <Svg height="100%" width="100%">
           <Defs>
@@ -25,7 +25,7 @@ export default function TextureBackground({
               fy="50%"
             >
               <Stop offset="0%" stopColor="#b0bfdb" stopOpacity="1" />
-              {/* <Stop offset="90%" stopColor="#f6c7a5" stopOpacity="1" /> */}
+              <Stop offset="70%" stopColor="#5d6683" stopOpacity="1" />
               <Stop offset="100%" stopColor="#3b4258" stopOpacity="1" />
             </RadialGradient>
           </Defs>
@@ -34,13 +34,15 @@ export default function TextureBackground({
         <Image
           source={require("@/assets/images/moroccan-flower.png")}
           style={styles.noise}
-          contentFit="contain"
+          contentFit="cover"
           cachePolicy="memory-disk"
         />
       </View>
     </View>
   );
 }
+
+const offset = "-30%";
 
 const styles = StyleSheet.create({
   container: {
@@ -49,10 +51,10 @@ const styles = StyleSheet.create({
   },
   background: {
     position: "absolute",
-    top: "-50%",
-    left: "-50%",
-    right: "-50%",
-    bottom: "-50%",
+    top: offset,
+    left: offset,
+    right: offset,
+    bottom: offset,
   },
   noise: {
     position: "absolute",

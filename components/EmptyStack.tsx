@@ -28,7 +28,6 @@ export default function EmptyStack({
           { borderRadius: getBorderRadius(context.cardSizes) },
         ])}
       >
-        <Text style={styles.text}>Empty Stack</Text>
         {handleDeleteStack && (
           <View style={styles.delete}>
             <Button title="Delete stack" onPress={handleDeleteStack} />
@@ -46,6 +45,7 @@ const styles = StyleSheet.create({
   inner: {
     borderWidth: 0,
     backgroundColor: "transparent",
+    boxShadow: "none",
   },
   delete: {
     marginTop: 20,
@@ -60,12 +60,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#f0f0f0",
     borderStyle: "dashed",
-    backgroundColor: "#ffffff2b",
     verticalAlign: "middle",
     justifyContent: "center",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
   },
 });

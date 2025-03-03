@@ -11,7 +11,6 @@ import Animated, {
 import { useEditCardModal } from "@/components/EditCardModal";
 import IconButton from "@/components/IconButton";
 import { DeckTabletopProvider } from "@/context/Deck";
-import TextureBackground from "../TextureBackground";
 
 export default function Tabletop({
   tabletopId,
@@ -72,7 +71,6 @@ export default function Tabletop({
             {component}
             <IconButton icon="+" onPress={open} style={styles.action} />
           </Animated.View>
-          <TextureBackground style={styles.background} />
         </View>
       </DeckTabletopProvider>
     </>
