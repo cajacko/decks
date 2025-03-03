@@ -56,7 +56,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           keyExtractor={(item) => item.cardId}
           style={styles.container}
         />
-        <IconButton icon="+" onPress={open} style={styles.button} />
+        <IconButton icon="add" onPress={open} style={styles.button} />
       </View>
     </DeckCardSizeProvider>
   );

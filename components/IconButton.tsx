@@ -1,44 +1,48 @@
 import React from "react";
 import {
-  TouchableHighlight,
-  Text,
+  TouchableOpacity,
   StyleSheet,
   StyleProp,
   ViewStyle,
-  TouchableHighlightProps,
+  TouchableOpacityProps,
 } from "react-native";
+import IconSymbol, { IconSymbolName } from "@/components/IconSymbol";
+import { useThemeColors } from "@/hooks/useThemeColor";
 
 export interface CardActionProps {
-  icon: string;
+  icon: IconSymbolName;
   style?: StyleProp<ViewStyle>;
-  onPress?: TouchableHighlightProps["onPress"];
-  active?: boolean;
+  onPress?: TouchableOpacityProps["onPress"];
   size?: number;
 }
 
-export default function IconButton({
+export default function CardAction({
   icon,
-  style,
+  style: styleProp,
   onPress,
-  active,
-  size = 100,
+  size = 80,
 }: CardActionProps): React.ReactNode {
-  return (
-    <TouchableHighlight
-      onPress={onPress}
-      style={StyleSheet.flatten([
+  const { background, text } = useThemeColors();
+
+  const style = React.useMemo(
+    () =>
+      StyleSheet.flatten([
         styles.container,
         {
-          backgroundColor: active ? "lightgray" : "white",
           height: size,
           width: size,
-          borderRadius: Math.round(size / 2),
+          borderRadius: size / 2,
+          backgroundColor: background,
         },
-        style,
-      ])}
-    >
-      <Text style={styles.text}>{icon}</Text>
-    </TouchableHighlight>
+        styleProp,
+      ]),
+    [styleProp, size, background],
+  );
+
+  return (
+    <TouchableOpacity onPress={onPress} style={style}>
+      <IconSymbol name={icon} color={text} size={(size * 2) / 3} />
+    </TouchableOpacity>
   );
 }
 
@@ -46,11 +50,6 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "black",
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
+    overflow: "hidden",
   },
 });

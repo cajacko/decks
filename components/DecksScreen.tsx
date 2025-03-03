@@ -44,7 +44,7 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
         keyExtractor={(deckId) => deckId}
         numColumns={2}
       />
-      <IconButton icon="+" onPress={createDeck} style={styles.action} />
+      <IconButton icon="add" onPress={createDeck} style={styles.action} />
     </>
   );
 }

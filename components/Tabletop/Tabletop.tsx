@@ -8,8 +8,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { useEditCardModal } from "@/components/EditCardModal";
-import IconButton from "@/components/IconButton";
 import { DeckTabletopProvider } from "@/context/Deck";
 
 export default function Tabletop({
@@ -18,10 +16,6 @@ export default function Tabletop({
   deckId,
 }: TabletopProps): React.ReactNode {
   useTabletopToolbar({ tabletopId });
-  const { component, open } = useEditCardModal({
-    type: "new-card-in-deck",
-    id: deckId,
-  });
 
   const [size, setSize] = React.useState<{ height: number; width: number }>(
     Dimensions.get("screen"),
@@ -67,9 +61,6 @@ export default function Tabletop({
         <View style={[styles.container, style]}>
           <Animated.View style={styles.content}>
             <StackList style={animatedStyle} handleLayout={handleLayout} />
-
-            {component}
-            <IconButton icon="+" onPress={open} style={styles.action} />
           </Animated.View>
         </View>
       </DeckTabletopProvider>
