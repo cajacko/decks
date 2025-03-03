@@ -15,6 +15,7 @@ import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 // import exampleDecksToStore from "@/utils/exampleDecksToStore";
 // import { SliceName } from "@/store/types";
+import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 export interface DecksScreenProps {
   style?: ViewStyle;
@@ -27,7 +28,7 @@ const extractKey: (item: FlatListItem) => string = (item) => item;
 const initialRows = 4;
 
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
-  let skeleton = true;
+  const skeleton = useScreenSkeleton(DecksScreen.name);
   const numColumns = 2;
   const deckIdsState = useAppSelector(selectDeckIds);
   const { navigate } = useRouter();
@@ -63,17 +64,19 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 
   return (
     <>
-      <View style={props.style}>
-        <FlatList<FlatListItem>
-          contentContainerStyle={styles.contentContainer}
-          data={deckIds}
-          renderItem={renderItem}
-          keyExtractor={extractKey}
-          numColumns={numColumns}
-          initialNumToRender={initialRows * numColumns}
-        />
-        <IconButton icon="add" onPress={createDeck} style={styles.action} />
-      </View>
+      {!skeleton && (
+        <View style={props.style}>
+          <FlatList<FlatListItem>
+            contentContainerStyle={styles.contentContainer}
+            data={deckIds}
+            renderItem={renderItem}
+            keyExtractor={extractKey}
+            numColumns={numColumns}
+            initialNumToRender={initialRows * numColumns}
+          />
+          <IconButton icon="add" onPress={createDeck} style={styles.action} />
+        </View>
+      )}
     </>
   );
 }

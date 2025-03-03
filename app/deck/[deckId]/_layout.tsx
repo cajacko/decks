@@ -43,7 +43,7 @@ export default function DeckLayout() {
   return (
     <Tabs
       backBehavior="history"
-      detachInactiveScreens={false}
+      detachInactiveScreens={true}
       screenOptions={{
         animation: "shift",
         tabBarLabelPosition: "beside-icon",

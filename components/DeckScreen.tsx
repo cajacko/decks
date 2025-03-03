@@ -15,6 +15,7 @@ import { useEditCardModal } from "./EditCardModal";
 import { useDeckToolbar } from "./DeckToolbar";
 import IconButton from "./IconButton";
 import { DeckCardSizeProvider } from "@/context/Deck";
+import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -32,7 +33,7 @@ const keyExtractor: FlatListProps<FlatListData>["keyExtractor"] = (item) =>
 const initialRows = 4;
 
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
-  let skeleton = true;
+  const skeleton = useScreenSkeleton(DeckScreen.name);
   const numColumns = 3;
   const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
 
@@ -72,24 +73,34 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       idType="deck"
       constraints={styles.constraints}
     >
-      <View style={props.style}>
-        {component}
-        {defaultCard.component}
-        <FlatList<FlatListData>
-          data={cards}
-          numColumns={numColumns}
-          initialNumToRender={numColumns * initialRows}
-          columnWrapperStyle={styles.columnWrapperStyle}
-          extraData={skeleton}
-          ListHeaderComponent={
-            <DeckDetails deckId={props.deckId} skeleton={skeleton} />
-          }
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          style={styles.container}
-        />
-        <IconButton icon="add" onPress={open} style={styles.button} />
-      </View>
+      {!skeleton && (
+        <View style={props.style}>
+          {component}
+          {defaultCard.component}
+          <FlatList<FlatListData>
+            data={cards}
+            numColumns={numColumns}
+            initialNumToRender={numColumns * initialRows}
+            columnWrapperStyle={styles.columnWrapperStyle}
+            windowSize={5}
+            maxToRenderPerBatch={numColumns * 2}
+            removeClippedSubviews={true}
+            ListHeaderComponent={
+              <DeckDetails deckId={props.deckId} skeleton={skeleton} />
+            }
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            style={styles.container}
+            // TODO: Can calculate this once and improve performance
+            // getItemLayout={(data, index) => ({
+            //   length: ITEM_HEIGHT,
+            //   offset: ITEM_HEIGHT * index,
+            //   index,
+            // })}
+          />
+          <IconButton icon="add" onPress={open} style={styles.button} />
+        </View>
+      )}
     </DeckCardSizeProvider>
   );
 }

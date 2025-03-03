@@ -9,14 +9,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { DeckTabletopProvider } from "@/context/Deck";
+import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 export default function Tabletop({
   tabletopId,
   style,
   deckId,
 }: TabletopProps): React.ReactNode {
-  let skeleton = true;
-
   useTabletopToolbar({ tabletopId });
 
   const [size, setSize] = React.useState<{ height: number; width: number }>(
@@ -31,6 +30,9 @@ export default function Tabletop({
       opacity: opacity.value,
     };
   });
+
+  const skeleton = useScreenSkeleton(Tabletop.name) && false;
+  // const skeleton = false;
 
   const hasLayout = React.useRef(false);
 
@@ -59,15 +61,17 @@ export default function Tabletop({
       tabletopId={tabletopId}
       deckId={deckId}
     >
-      <View style={[styles.container, style]}>
-        <Animated.View style={styles.content}>
-          <StackList
-            style={animatedStyle}
-            handleLayout={handleLayout}
-            skeleton={skeleton}
-          />
-        </Animated.View>
-      </View>
+      {!skeleton && (
+        <View style={[styles.container, style]}>
+          <Animated.View style={styles.content}>
+            <StackList
+              style={animatedStyle}
+              handleLayout={handleLayout}
+              skeleton={skeleton}
+            />
+          </Animated.View>
+        </View>
+      )}
     </DeckTabletopProvider>
   );
 }
