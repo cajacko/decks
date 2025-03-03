@@ -7,10 +7,12 @@ import {
 } from "@/store/slices/tabletop";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { StyleSheet, View, TouchableHighlight, Text } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import text from "@/constants/text";
+import IconSymbol from "./IconSymbol";
+import ThemedText from "./ThemedText";
 
 interface TabletopToolbarProps {
   tabletopId: string;
@@ -50,6 +52,8 @@ export function useTabletopToolbar({
   };
 }
 
+const iconSize = 30;
+
 export default function TabletopToolbar(
   props: TabletopToolbarProps,
 ): React.ReactNode {
@@ -76,43 +80,46 @@ export default function TabletopToolbar(
   return (
     <View style={styles.container}>
       {component}
-      <TouchableHighlight
+      <TouchableOpacity
         onPressOut={props.hasPast ? handleUndo : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: props.hasPast ? 1 : 0.5 },
         ])}
       >
-        <Text style={styles.actionText}>{text["general.undo"]}</Text>
-      </TouchableHighlight>
-      <TouchableHighlight
+        <IconSymbol name="undo" size={iconSize} />
+      </TouchableOpacity>
+      <TouchableOpacity
         onPressOut={props.hasFuture ? handleRedo : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: props.hasFuture ? 1 : 0.5 },
         ])}
       >
-        <Text style={styles.actionText}>{text["general.redo"]}</Text>
-      </TouchableHighlight>
-      <TouchableHighlight onPressOut={open} style={styles.action}>
-        <Text style={styles.actionText}>{text["tabletop.reset.button"]}</Text>
-      </TouchableHighlight>
+        <IconSymbol name="redo" size={iconSize} />
+      </TouchableOpacity>
+      <TouchableOpacity onPressOut={open} style={styles.action}>
+        <ThemedText style={styles.actionText} type="button">
+          {text["tabletop.reset.button"]}
+        </ThemedText>
+      </TouchableOpacity>
     </View>
   );
 }
+
+const horizontalPadding = 16;
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
   },
   action: {
-    marginLeft: 10,
-    backgroundColor: "blue",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: horizontalPadding,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   actionText: {
-    color: "white",
     textAlign: "center",
   },
 });

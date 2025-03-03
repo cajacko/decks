@@ -6,12 +6,18 @@ import {
 } from "@react-navigation/native";
 
 export type ThemedTextProps = TextProps & {
-  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
+  type?:
+    | "default"
+    | "title"
+    | "defaultSemiBold"
+    | "subtitle"
+    | "link"
+    | "button";
 };
 
 export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
 
-export function ThemedText({
+export default function ThemedText({
   style,
   type = "default",
   ...rest
@@ -27,6 +33,7 @@ export function ThemedText({
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
+        type === "button" ? styles.button : undefined,
         style,
       ]}
       {...rest}
@@ -56,6 +63,10 @@ const styles = StyleSheet.create({
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: "#0a7ea4",
+  },
+  button: {
+    lineHeight: 30,
+    fontSize: 16,
+    textTransform: "uppercase",
   },
 });

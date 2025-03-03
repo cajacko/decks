@@ -8,6 +8,7 @@ import {
   CardMMDimensions,
   CardSizeProps,
 } from "./Card.types";
+import { cardPresets } from "@/constants/colors";
 
 export function parseCardSize(cardSize: CardSize | CardSizeProps) {
   const height =
@@ -79,7 +80,7 @@ const boxShadowConfig = {
   roundToNumberOfDecimals: 1,
 };
 
-const offsetSpread = 3;
+const offsetSpread = 5;
 
 const scalingStyles = {
   borderWidth: withCardStyleScaling(371, 2, {
@@ -163,7 +164,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: cardPresets.white,
     overflow: "hidden",
   },
 });
