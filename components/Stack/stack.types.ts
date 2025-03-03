@@ -9,6 +9,7 @@ export interface StackProps {
   rightStackId?: string;
   stackListRef: React.RefObject<StackListRef>;
   canDelete?: boolean;
+  skeleton?: boolean;
 }
 
 export type StackDimensions = {

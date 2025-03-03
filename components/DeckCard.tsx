@@ -8,11 +8,13 @@ export interface DeckCardProps {
   cardId: string;
   quantity: number;
   style?: ViewStyle;
+  skeleton?: boolean;
 }
 
 export default function DeckCard({
   cardId,
   style,
+  skeleton,
 }: DeckCardProps): React.ReactNode {
   const [showEditModal, setShowEditModal] = React.useState(false);
   const target = React.useMemo(
@@ -30,15 +32,21 @@ export default function DeckCard({
 
   return (
     <>
-      <EditCardModal
-        target={target}
-        initialSide="front"
-        onRequestClose={close}
-        visible={showEditModal}
-        onDelete={close}
-      />
-      <Pressable key={cardId} onPress={open} style={style}>
-        <CardSide id={cardId} type="card" side="front" />
+      {!skeleton && (
+        <EditCardModal
+          target={target}
+          initialSide="front"
+          onRequestClose={close}
+          visible={showEditModal}
+          onDelete={close}
+        />
+      )}
+      <Pressable
+        key={cardId}
+        onPress={skeleton ? undefined : open}
+        style={style}
+      >
+        <CardSide id={cardId} type="card" side="front" skeleton={skeleton} />
       </Pressable>
     </>
   );

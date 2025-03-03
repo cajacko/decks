@@ -18,6 +18,10 @@ import { ModalProvider } from "@/context/Modal";
 import text from "@/constants/text";
 import { navigationColors } from "@/constants/colors";
 import { navigationFonts } from "@/components/ThemedText";
+import TextureBackground from "@/components/TextureBackground";
+import { enableFreeze } from "react-native-screens";
+
+enableFreeze();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -72,35 +76,41 @@ export default function RootLayout() {
     <NavigationThemeProvider value={navigationTheme}>
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <ModalProvider>
-            <Stack>
-              <Stack.Screen
-                name="index"
-                options={{
-                  headerShown: true,
-                  headerBackButtonMenuEnabled: false,
-                  animation: "slide_from_left",
-                  headerTitle: text["screen.decks.title"],
+          <TextureBackground>
+            <ModalProvider>
+              <Stack
+                screenOptions={{
+                  freezeOnBlur: true,
                 }}
-              />
-              <Stack.Screen
-                name="deck/[deckId]"
-                options={({ route: { params } }) => ({
-                  headerShown: true,
-                  animation: "slide_from_right",
-                  headerTitle: getDeckName(
-                    params &&
-                      "deckId" in params &&
-                      typeof params.deckId === "string"
-                      ? params.deckId
-                      : null,
-                  ),
-                })}
-              />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-          </ModalProvider>
+              >
+                <Stack.Screen
+                  name="index"
+                  options={{
+                    headerShown: true,
+                    headerBackButtonMenuEnabled: false,
+                    animation: "slide_from_left",
+                    headerTitle: text["screen.decks.title"],
+                  }}
+                />
+                <Stack.Screen
+                  name="deck/[deckId]"
+                  options={({ route: { params } }) => ({
+                    headerShown: true,
+                    animation: "slide_from_right",
+                    headerTitle: getDeckName(
+                      params &&
+                        "deckId" in params &&
+                        typeof params.deckId === "string"
+                        ? params.deckId
+                        : null,
+                    ),
+                  })}
+                />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <StatusBar style="auto" />
+            </ModalProvider>
+          </TextureBackground>
         </PersistGate>
       </ReduxProvider>
     </NavigationThemeProvider>

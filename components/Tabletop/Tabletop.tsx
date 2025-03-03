@@ -15,6 +15,8 @@ export default function Tabletop({
   style,
   deckId,
 }: TabletopProps): React.ReactNode {
+  let skeleton = true;
+
   useTabletopToolbar({ tabletopId });
 
   const [size, setSize] = React.useState<{ height: number; width: number }>(
@@ -59,7 +61,11 @@ export default function Tabletop({
     >
       <View style={[styles.container, style]}>
         <Animated.View style={styles.content}>
-          <StackList style={animatedStyle} handleLayout={handleLayout} />
+          <StackList
+            style={animatedStyle}
+            handleLayout={handleLayout}
+            skeleton={skeleton}
+          />
         </Animated.View>
       </View>
     </DeckTabletopProvider>

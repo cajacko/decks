@@ -4,7 +4,6 @@ import DeckScreen from "@/components/DeckScreen";
 import AppError from "@/classes/AppError";
 import { StyleSheet } from "react-native";
 import { useNavigation } from "expo-router";
-import TextureBackground from "@/components/TextureBackground";
 
 export const paramKeys = {
   deckId: "deckId",
@@ -23,11 +22,7 @@ export default function DeckRoute() {
     return null;
   }
 
-  return (
-    <TextureBackground>
-      <DeckScreen deckId={deckId} style={styles.container} />
-    </TextureBackground>
-  );
+  return <DeckScreen deckId={deckId} style={styles.container} />;
 }
 
 const styles = StyleSheet.create({

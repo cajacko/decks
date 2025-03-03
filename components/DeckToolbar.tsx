@@ -1,12 +1,15 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { StyleSheet, View, TouchableHighlight, Text } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { deleteDeckHelper } from "@/store/actionHelpers/decks";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import { useEditCardModal } from "./EditCardModal";
 import text from "@/constants/text";
+import IconSymbol from "./IconSymbol";
+import ThemedText from "./ThemedText";
+import { iconSize, horizontalPadding } from "./TabletopToolbar";
 
 interface DeckToolbarProps {
   deckId: string;
@@ -54,18 +57,18 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   return (
     <View style={styles.container}>
       {deleteDeckModal.component}
-      <TouchableHighlight
+      <TouchableOpacity
         onPressOut={props.openDefaultCardModal}
         style={styles.action}
       >
-        <Text style={styles.actionText}>{text["deck.actions.default"]}</Text>
-      </TouchableHighlight>
-      <TouchableHighlight
-        onPressOut={deleteDeckModal.open}
-        style={styles.action}
-      >
-        <Text style={styles.actionText}>{text["general.delete"]}</Text>
-      </TouchableHighlight>
+        <ThemedText style={styles.actionText} type="button">
+          {text["deck.actions.default"]}
+        </ThemedText>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPressOut={deleteDeckModal.open} style={styles.action}>
+        <IconSymbol name="delete" size={iconSize} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -75,13 +78,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   action: {
-    marginLeft: 10,
-    backgroundColor: "blue",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: horizontalPadding,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   actionText: {
-    color: "white",
     textAlign: "center",
   },
 });

@@ -52,7 +52,7 @@ export function useTabletopToolbar({
   };
 }
 
-const iconSize = 30;
+export const iconSize = 30;
 
 export default function TabletopToolbar(
   props: TabletopToolbarProps,
@@ -107,7 +107,7 @@ export default function TabletopToolbar(
   );
 }
 
-const horizontalPadding = 16;
+export const horizontalPadding = 16;
 
 const styles = StyleSheet.create({
   container: {

@@ -49,7 +49,8 @@ export default function Stack(props: StackProps): React.ReactNode {
   );
 
   const cardInstances = React.useMemo(() => {
-    if (!cardInstancesIds || cardInstancesIds.length === 0) return undefined;
+    if (props.skeleton) return null;
+    if (!cardInstancesIds || cardInstancesIds.length === 0) return null;
 
     return cardInstancesIds.map((cardInstanceId, i) => (
       <StackListItem
@@ -70,6 +71,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     props.rightStackId,
     cardInstancesIds,
     getCardOffsetPosition,
+    props.skeleton,
   ]);
 
   return (
@@ -92,7 +94,7 @@ export default function Stack(props: StackProps): React.ReactNode {
 
         <EmptyStack
           style={styles.empty}
-          handleDeleteStack={handleDeleteStack}
+          handleDeleteStack={props.skeleton ? undefined : handleDeleteStack}
         />
       </Animated.View>
     </Animated.View>

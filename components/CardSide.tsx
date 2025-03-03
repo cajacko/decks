@@ -4,17 +4,18 @@ import CardTemplate, { CardTemplateProps } from "./CardTemplate";
 
 export type CardSideProps = CardTemplateProps & {
   CardProps?: CardProps;
+  skeleton?: boolean;
 };
 
 export default React.forwardRef<CardRef, CardSideProps>(function CardFront(
-  { CardProps, ...cardTemplateProps },
+  { CardProps, skeleton, ...cardTemplateProps },
   ref,
 ) {
   const { children, ...rest } = CardProps ?? {};
 
   return (
     <Card {...rest} ref={ref}>
-      <CardTemplate {...cardTemplateProps} />
+      {!skeleton && <CardTemplate {...cardTemplateProps} />}
       {children}
     </Card>
   );

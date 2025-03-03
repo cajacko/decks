@@ -5,6 +5,7 @@ import {
   ViewStyle,
   FlatList,
   Dimensions,
+  FlatListProps,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeckCards } from "@/store/slices/decks";
@@ -20,11 +21,44 @@ export interface DeckScreenProps {
   style?: ViewStyle;
 }
 
+interface FlatListData {
+  cardId: string;
+  quantity: number;
+}
+
+const keyExtractor: FlatListProps<FlatListData>["keyExtractor"] = (item) =>
+  item.cardId;
+
+const initialRows = 4;
+
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
+  let skeleton = true;
+  const numColumns = 3;
   const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
 
-  const cards = useAppSelector((state) =>
+  const cardsState = useAppSelector((state) =>
     selectDeckCards(state, { deckId: props.deckId }),
+  );
+
+  const cards = React.useMemo(
+    () =>
+      skeleton ? cardsState?.slice(0, numColumns * initialRows) : cardsState,
+    [cardsState, skeleton, numColumns],
+  );
+
+  // Memoized renderItem to prevent unnecessary re-renders
+  const renderItem = React.useCallback<
+    NonNullable<FlatListProps<FlatListData>["renderItem"]>
+  >(
+    ({ item }) => (
+      <DeckCard
+        style={styles.item}
+        cardId={item.cardId}
+        quantity={item.quantity}
+        skeleton={skeleton}
+      />
+    ),
+    [skeleton],
   );
 
   const { open, component } = useEditCardModal({
@@ -41,19 +75,17 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       <View style={props.style}>
         {component}
         {defaultCard.component}
-        <FlatList
+        <FlatList<FlatListData>
           data={cards}
-          numColumns={3}
+          numColumns={numColumns}
+          initialNumToRender={numColumns * initialRows}
           columnWrapperStyle={styles.columnWrapperStyle}
-          ListHeaderComponent={<DeckDetails deckId={props.deckId} />}
-          renderItem={({ item }) => (
-            <DeckCard
-              style={styles.item}
-              cardId={item.cardId}
-              quantity={item.quantity}
-            />
-          )}
-          keyExtractor={(item) => item.cardId}
+          extraData={skeleton}
+          ListHeaderComponent={
+            <DeckDetails deckId={props.deckId} skeleton={skeleton} />
+          }
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
           style={styles.container}
         />
         <IconButton icon="add" onPress={open} style={styles.button} />

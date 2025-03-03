@@ -45,8 +45,9 @@ export default function DeckLayout() {
       backBehavior="history"
       detachInactiveScreens={false}
       screenOptions={{
-        animation: "none",
+        animation: "shift",
         tabBarLabelPosition: "beside-icon",
+        freezeOnBlur: true,
       }}
     >
       <Tabs.Screen

@@ -8,6 +8,7 @@ import text from "@/constants/text";
 
 export interface DeckDetailsProps {
   deckId: string;
+  skeleton?: boolean;
 }
 
 export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
@@ -30,7 +31,7 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
   useAutoSave({
     hasChanges,
     save,
-    autoSave: true,
+    autoSave: props.skeleton ? false : true,
   });
 
   return (

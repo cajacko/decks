@@ -21,6 +21,7 @@ import text from "@/constants/text";
 export interface DeckListItemProps {
   deckId: string;
   style?: ViewStyle;
+  skeleton?: boolean;
 }
 
 export default function DeckListItem(
@@ -59,7 +60,7 @@ export default function DeckListItem(
     >
       <View style={[styles.container, props.style]}>
         <Pressable onPress={play} style={styles.cards}>
-          <CardSideBySide {...coverTarget} />
+          <CardSideBySide skeleton={props.skeleton} {...coverTarget} />
         </Pressable>
         <View style={styles.details}>
           <Text style={styles.text}>{deckNameWithFallback(name)}</Text>
