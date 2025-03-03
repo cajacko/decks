@@ -61,20 +61,26 @@ export function ModalProvider(props: { children: React.ReactNode }) {
 
   return (
     <Context.Provider value={value}>
-      {props.children}
+      <View style={styles.content}>{props.children}</View>
       {modalState?.props.visible && (
-        <View style={styles.container}>{modalState.props.children}</View>
+        <View style={styles.modal}>{modalState.props.children}</View>
       )}
     </Context.Provider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
+    flex: 1,
+    position: "relative",
+    zIndex: 1,
+  },
+  modal: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
+    zIndex: 2,
   },
 });

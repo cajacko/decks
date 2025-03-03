@@ -5,7 +5,7 @@ import useSetupRef from "./useOpenClose";
 import useHeightConstraints from "./useHeightConstraints";
 import useAnimatedStyles from "./useAnimatedStyles";
 import useDrag from "./useDrag";
-import { dragBuffer, dragHeight, dragOverlap } from "./bottomDrawer.style";
+import { dragHeight } from "./bottomDrawer.style";
 
 export default function useBottomDrawer(
   props: Omit<BottomDrawerProps, "children">,

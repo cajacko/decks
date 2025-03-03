@@ -58,11 +58,15 @@ export default function useOpenClose(
     // to the default max height before we've got the available content
     if (!hasGotMaxHeight) return;
 
-    debugLog(`Check if should open on mount`);
-
     checkOpenOnMount.current = false;
 
-    if (!props.openOnMount) return;
+    if (!props.openOnMount) {
+      debugLog(`Check if should open on mount - no`);
+
+      return;
+    }
+
+    debugLog(`Check if should open on mount - yes`);
 
     const timeout = setTimeout(open, 500);
 

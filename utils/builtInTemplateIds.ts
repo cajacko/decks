@@ -1,4 +1,5 @@
-const builtInTemplateKey = "BUILT_IN_TEMPLATE";
+// NOTE: All id's need to be safe for urls, they may be visible
+const builtInTemplateKey = "default-template";
 
 type BuiltInTemplateKey = typeof builtInTemplateKey;
 
@@ -6,11 +7,11 @@ type BuiltInTemplateKey = typeof builtInTemplateKey;
 export default function builtInTemplateIds<T extends string>(
   templateId: T,
 ): {
-  templateId: `${BuiltInTemplateKey}:${T}`;
+  templateId: `${BuiltInTemplateKey}-${T}`;
   dataItemId: <D extends string>(dataItemId: D) => D;
 } {
   return {
-    templateId: `${builtInTemplateKey}:${templateId}`,
+    templateId: `${builtInTemplateKey}-${templateId}`,
     // This is always scoped to the template anyway so can keep simple
     dataItemId: <D extends string>(dataItemId: D): D => dataItemId,
   };
@@ -20,14 +21,14 @@ export default function builtInTemplateIds<T extends string>(
 export function exampleDeckIds<T extends string>(
   deckIdProp: T,
 ): {
-  deckId: `EXAMPLE_DECK:${T}`;
+  deckId: `example-deck-${T}`;
   tabletopId: string;
   dataItemId: <D extends string>(dataItemId: D) => D;
   stackId: (stackId: string) => string;
   cardId: (cardId: string) => string;
   cardInstanceId: (cardInstanceId: string) => string;
 } {
-  const deckId: `EXAMPLE_DECK:${T}` = `EXAMPLE_DECK:${deckIdProp}`;
+  const deckId: `example-deck-${T}` = `example-deck-${deckIdProp}`;
 
   return {
     deckId,
