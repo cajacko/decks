@@ -7,12 +7,14 @@ import {
 } from "@/store/slices/tabletop";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import text from "@/constants/text";
 import IconSymbol from "./IconSymbol";
 import ThemedText from "./ThemedText";
+import Animated from "react-native-reanimated";
+import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 
 interface TabletopToolbarProps {
   tabletopId: string;
@@ -57,6 +59,8 @@ export const iconSize = 30;
 export default function TabletopToolbar(
   props: TabletopToolbarProps,
 ): React.ReactNode {
+  const { entering, exiting } = useLayoutAnimations();
+
   // NOTE: This component will only re-render on prop changes, no state changes
   const dispatch = useAppDispatch();
 
@@ -78,7 +82,11 @@ export default function TabletopToolbar(
   });
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      entering={entering}
+      exiting={exiting}
+      style={styles.container}
+    >
       {component}
       <TouchableOpacity
         onPressOut={props.hasPast ? handleUndo : undefined}
@@ -103,7 +111,7 @@ export default function TabletopToolbar(
           {text["tabletop.reset.button"]}
         </ThemedText>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 }
 

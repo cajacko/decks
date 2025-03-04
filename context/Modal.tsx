@@ -1,6 +1,8 @@
 import AppError from "@/classes/AppError";
 import React from "react";
 import { ModalProps, StyleSheet, View } from "react-native";
+import Animated from "react-native-reanimated";
+import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import uuid from "@/utils/uuid";
 
 export type { ModalProps };
@@ -59,11 +61,19 @@ export function ModalProvider(props: { children: React.ReactNode }) {
     [],
   );
 
+  const { entering, exiting } = useLayoutAnimations();
+
   return (
     <Context.Provider value={value}>
       <View style={styles.content}>{props.children}</View>
       {modalState?.props.visible && (
-        <View style={styles.modal}>{modalState.props.children}</View>
+        <Animated.View
+          entering={entering}
+          exiting={exiting}
+          style={styles.modal}
+        >
+          {modalState.props.children}
+        </Animated.View>
       )}
     </Context.Provider>
   );

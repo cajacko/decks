@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { deleteDeckHelper } from "@/store/actionHelpers/decks";
@@ -10,6 +10,8 @@ import text from "@/constants/text";
 import IconSymbol from "./IconSymbol";
 import ThemedText from "./ThemedText";
 import { iconSize, horizontalPadding } from "./TabletopToolbar";
+import Animated from "react-native-reanimated";
+import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 
 interface DeckToolbarProps {
   deckId: string;
@@ -41,6 +43,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   // NOTE: This component will only re-render on prop changes, no state changes
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
+  const { entering, exiting } = useLayoutAnimations();
 
   const deleteDeck = React.useCallback(() => {
     navigate("/");
@@ -55,7 +58,11 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   });
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      entering={entering}
+      exiting={exiting}
+      style={styles.container}
+    >
       {deleteDeckModal.component}
       <TouchableOpacity
         onPressOut={props.openDefaultCardModal}
@@ -69,7 +76,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
       <TouchableOpacity onPressOut={deleteDeckModal.open} style={styles.action}>
         <IconSymbol name="delete" size={iconSize} />
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 }
 

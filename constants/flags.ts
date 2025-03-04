@@ -15,9 +15,21 @@ export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 // circular dependencies though
 export const flagRelationships: FlagRelationships = {
   NAVIGATION_TAB_ANIMATIONS: (value, getFlag) =>
-    getFlag("SCREEN_ANIMATIONS") === "disabled" ? "disabled" : value,
+    getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   NAVIGATION_STACK_ANIMATIONS: (value, getFlag) =>
-    getFlag("SCREEN_ANIMATIONS") === "disabled" ? "disabled" : value,
+    getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
+  SCREEN_ANIMATIONS: (value, getValue) => {
+    switch (value) {
+      case "custom-fade-in-content":
+      case "custom-fade-out-top-background": {
+        return getValue("GENERAL_LAYOUT_ANIMATIONS") === "enabled"
+          ? value
+          : "disabled";
+      }
+      default:
+        return value;
+    }
+  },
 };
 
 // Final fallback values
@@ -33,6 +45,7 @@ export const defaultFlags: UserSettings.FlagMap = {
   // and then back to tabletop, the stacks wouldn't show. The reanimated opacity value seems to have
   // reset and wouldn't set back to 1
   SCREENS_FREEZE_ON_BLUR: false,
+  GENERAL_LAYOUT_ANIMATIONS: "enabled",
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(

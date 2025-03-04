@@ -6,6 +6,7 @@ import { useAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
 import { useNavigation } from "expo-router";
 import TextureBackground from "@/components/TextureBackground";
+import Screen from "@/components/Screen";
 
 export const paramKeys = {
   deckId: "deckId",
@@ -32,8 +33,8 @@ export default function DeckTabletopScreen() {
   }
 
   return (
-    <TextureBackground>
+    <Screen background={<TextureBackground />}>
       <Tabletop tabletopId={defaultTabletopId} deckId={deckId} />
-    </TextureBackground>
+    </Screen>
   );
 }

@@ -7,10 +7,15 @@ export type FlagMap = {
   HOLD_MENU_BEHAVIOUR: "tap" | "hold";
   CARD_ANIMATIONS: "enabled" | "disabled";
   SKELETON_LOADER: "enabled" | "disabled";
-  SCREEN_ANIMATIONS: "enabled" | "disabled";
+  SCREEN_ANIMATIONS:
+    | "react-navigation"
+    | "custom-fade-in-content"
+    | "custom-fade-out-top-background"
+    | "disabled";
   NAVIGATION_STACK_ANIMATIONS: "slide" | "disabled";
   NAVIGATION_TAB_ANIMATIONS: "shift" | "fade" | "disabled";
   SCREENS_FREEZE_ON_BLUR: boolean;
+  GENERAL_LAYOUT_ANIMATIONS: "enabled" | "disabled";
 };
 
 export type FlagKey = keyof FlagMap;
