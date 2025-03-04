@@ -21,12 +21,10 @@ export default function getUpdateCardData(
 
       if (!editingValue) continue;
 
-      const value: Templates.ValidatedValue | null = editingValue.editValue
-        ? ({
-            type: editingValue.type,
-            value: editingValue.editValue,
-          } as Templates.ValidatedValue) // FIXME:
-        : null;
+      const value: Templates.ValidatedValue = {
+        type: editingValue.type,
+        value: editingValue.editValue,
+      } as Templates.ValidatedValue; // FIXME:
 
       if (editingValue.cardDataItemId) {
         data.push({
