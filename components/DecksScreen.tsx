@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 10,
     marginHorizontal: 20,
-    color: "white",
   },
   listItem: {
     paddingVertical: 20,
