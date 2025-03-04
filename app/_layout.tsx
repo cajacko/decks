@@ -17,12 +17,13 @@ type NavOptions = {
 };
 
 function RootLayout() {
+  const freezeOnBlur = useFlag("SCREENS_FREEZE_ON_BLUR");
   const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
 
   const navOptions = React.useMemo(
     (): NavOptions => ({
       default: {
-        freezeOnBlur: true,
+        freezeOnBlur,
       },
       index: {
         headerShown: true,
@@ -40,7 +41,7 @@ function RootLayout() {
         animation: animateStack ? "slide_from_right" : "none",
       }),
     }),
-    [animateStack],
+    [animateStack, freezeOnBlur],
   );
 
   return (

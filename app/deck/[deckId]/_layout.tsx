@@ -53,6 +53,8 @@ export default function DeckLayout() {
 
   useSetDeckName(deckId ?? null);
 
+  const freezeOnBlur = useFlag("SCREENS_FREEZE_ON_BLUR");
+
   let animation: TabAnimationName = "none";
 
   switch (useFlag("NAVIGATION_TAB_ANIMATIONS")) {
@@ -69,7 +71,7 @@ export default function DeckLayout() {
       default: {
         animation,
         tabBarLabelPosition: "beside-icon",
-        freezeOnBlur: true,
+        freezeOnBlur,
       },
       index: {
         headerShown: false,
@@ -84,7 +86,7 @@ export default function DeckLayout() {
         tabBarIcon: ({ size }) => <IconSymbol name="play-arrow" size={size} />,
       },
     }),
-    [animation],
+    [animation, freezeOnBlur],
   );
 
   return (

@@ -2,7 +2,7 @@ import { ScrollViewProps } from "react-native";
 import { StyleProps } from "react-native-reanimated";
 
 export interface StackListProps {
-  handleLayout: Required<ScrollViewProps>["onLayout"];
+  handleLayout?: Required<ScrollViewProps>["onLayout"];
   style?: StyleProps;
   skeleton?: boolean;
 }

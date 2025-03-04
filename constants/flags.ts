@@ -28,7 +28,11 @@ export const defaultFlags: UserSettings.FlagMap = {
   SKELETON_LOADER: "enabled",
   NAVIGATION_STACK_ANIMATIONS: "slide",
   NAVIGATION_TAB_ANIMATIONS: "shift",
-  SCREEN_ANIMATIONS: "enabled",
+  SCREEN_ANIMATIONS: "disabled",
+  // Does not play nicely with reanimated effects. When we navigated to tabletop, then to deck edit
+  // and then back to tabletop, the stacks wouldn't show. The reanimated opacity value seems to have
+  // reset and wouldn't set back to 1
+  SCREENS_FREEZE_ON_BLUR: false,
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(

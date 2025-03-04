@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
+import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
 import { useTabletopToolbar } from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
 import StackList from "@/components/StackList";
@@ -13,7 +13,6 @@ import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 export default function Tabletop({
   tabletopId,
-  style,
   deckId,
 }: TabletopProps): React.ReactNode {
   useTabletopToolbar({ tabletopId });
@@ -24,6 +23,7 @@ export default function Tabletop({
 
   // Prevents janky layout reorganising when we get the initial layout
   const opacity = useSharedValue(0);
+  const hasLayout = React.useRef(false);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -32,9 +32,6 @@ export default function Tabletop({
   });
 
   const skeleton = useScreenSkeleton(Tabletop.name) && false;
-  // const skeleton = false;
-
-  const hasLayout = React.useRef(false);
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
@@ -49,6 +46,7 @@ export default function Tabletop({
       opacity.value = withTiming(1, {
         duration: 200,
       });
+
       setSize({ width, height });
     },
     [opacity],
@@ -61,25 +59,14 @@ export default function Tabletop({
       tabletopId={tabletopId}
       deckId={deckId}
     >
-      {!skeleton && (
-        <View style={[styles.container, style]}>
-          <Animated.View style={styles.content}>
-            <StackList
-              style={animatedStyle}
-              handleLayout={handleLayout}
-              skeleton={skeleton}
-            />
-          </Animated.View>
-        </View>
-      )}
+      <Animated.View style={styles.content} onLayout={handleLayout}>
+        {!skeleton && <StackList style={animatedStyle} skeleton={skeleton} />}
+      </Animated.View>
     </DeckTabletopProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   content: {
     position: "relative",
     flex: 1,

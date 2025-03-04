@@ -1,4 +1,3 @@
-import { StyleSheet } from "react-native";
 import Tabletop from "@/components/Tabletop/Tabletop";
 import { useGlobalSearchParams } from "expo-router";
 import React from "react";
@@ -34,17 +33,7 @@ export default function DeckTabletopScreen() {
 
   return (
     <TextureBackground>
-      <Tabletop
-        tabletopId={defaultTabletopId}
-        deckId={deckId}
-        style={styles.tabletop}
-      />
+      <Tabletop tabletopId={defaultTabletopId} deckId={deckId} />
     </TextureBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  tabletop: {
-    flex: 1,
-  },
-});

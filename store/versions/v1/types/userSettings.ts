@@ -10,6 +10,7 @@ export type FlagMap = {
   SCREEN_ANIMATIONS: "enabled" | "disabled";
   NAVIGATION_STACK_ANIMATIONS: "slide" | "disabled";
   NAVIGATION_TAB_ANIMATIONS: "shift" | "fade" | "disabled";
+  SCREENS_FREEZE_ON_BLUR: boolean;
 };
 
 export type FlagKey = keyof FlagMap;
