@@ -15,7 +15,7 @@ export default function useMaxHeight() {
       // Update maxHeight with the max height of the inner scroll content when layout occurs
       const { height } = event.nativeEvent.layout;
 
-      debugLog(`useMaxHeight - onContainerLayout: ${height}`);
+      debugLog(`useMaxHeight - onContainerLayout: ${Math.round(height)}`);
 
       setMaxHeight(height);
     }, []),

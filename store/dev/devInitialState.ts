@@ -39,14 +39,6 @@ const state: RootState = {
             value: "Card 3",
             type: Templates.DataType.Text,
           },
-          // description: {
-          //   value: "Blue background",
-          //   type: Templates.DataType.Text,
-          // },
-          backgroundColor: {
-            value: "blue",
-            type: Templates.DataType.Color,
-          },
         },
       },
       card4: {
@@ -58,10 +50,6 @@ const state: RootState = {
             value: "Card 4",
             type: Templates.DataType.Text,
           },
-          // description: {
-          //   value: "This is card 4",
-          //   type: Templates.DataType.Text,
-          // },
         },
       },
       card5: {

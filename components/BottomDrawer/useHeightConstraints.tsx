@@ -1,4 +1,8 @@
-import { useSharedValue, useDerivedValue } from "react-native-reanimated";
+import {
+  useSharedValue,
+  useDerivedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { defaultProps, BottomDrawerProps } from "./BottomDrawer.types";
 import { dragBuffer, dragHeight, dragOverlap } from "./bottomDrawer.style";
 import React from "react";
@@ -11,9 +15,9 @@ import debugLog from "./debugLog";
  * Handles the height constraints for the drawer
  */
 export default function useHeightConstraints(
-  props: Pick<BottomDrawerProps, "maxHeight" | "minHeight">,
+  props: Pick<BottomDrawerProps, "maxHeight" | "minHeight" | "height">,
 ) {
-  const { maxHeight: maxHeightProp, minHeight: minHeightProp } = props;
+  const { maxHeight: maxHeightProp, minHeight: minHeightProp, height } = props;
 
   /**
    * If the max height prop is null, it means we're pending setting the max height (normally waiting
@@ -35,6 +39,7 @@ export default function useHeightConstraints(
 
   const drawerContentHeight = useSharedValue(0);
 
+  // NOTE: If you change this, also change the logic in the effect below it
   const maxHeight = useDerivedValue<number>(() => {
     const maxAvailableSpace =
       customMaxHeight.value -
@@ -44,8 +49,54 @@ export default function useHeightConstraints(
     const maxHeightForContent =
       drawerContentHeight.value + sharedStyles.value.dragHeight;
 
-    return Math.min(maxAvailableSpace, maxHeightForContent);
+    // We still want people to be able to tap out of the bottom container
+    const maxHeightBuffer = 100;
+
+    return Math.min(maxAvailableSpace - maxHeightBuffer, maxHeightForContent);
   });
+
+  // NOTE: If you change this, also change the logic in the useDerivedValueAbove
+  React.useEffect(() => {
+    const newMaxHeight = maxHeightProp ?? defaultProps.maxHeight;
+
+    if (customMaxHeight.value === newMaxHeight) return;
+
+    customMaxHeight.value = newMaxHeight;
+
+    debugLog(
+      `useHeightConstraints new customMaxHeight: ${Math.round(newMaxHeight)}, height is: ${Math.round(height.value)}`,
+    );
+
+    const maxAvailableSpace =
+      newMaxHeight -
+      sharedStyles.value.dragOverlap -
+      sharedStyles.value.dragBuffer;
+
+    const maxHeightForContent =
+      drawerContentHeight.value + sharedStyles.value.dragHeight;
+
+    // We still want people to be able to tap out of the bottom container
+    const maxHeightBuffer = 100;
+
+    const maxHeight = Math.min(
+      maxAvailableSpace - maxHeightBuffer,
+      maxHeightForContent,
+    );
+
+    if (height.value < maxHeight) return;
+
+    debugLog(
+      `useHeightConstraints height is bigger than max height, shrinking to ${maxHeight}`,
+    );
+
+    height.value = withTiming(maxHeight, { duration: 200 });
+  }, [
+    maxHeightProp,
+    customMaxHeight,
+    height,
+    sharedStyles,
+    drawerContentHeight,
+  ]);
 
   const maxAutoHeight = useDerivedValue<number>(() => {
     return Math.min(maxHeight.value, customMaxHeight.value / 2);
@@ -68,19 +119,15 @@ export default function useHeightConstraints(
   // Update the min/ max values when the prop changes from the parent
 
   React.useEffect(() => {
-    const newMaxHeight = maxHeightProp ?? defaultProps.maxHeight;
-
-    if (customMaxHeight.value !== newMaxHeight) {
-      customMaxHeight.value = newMaxHeight;
-    }
-  }, [maxHeightProp, customMaxHeight]);
-
-  React.useEffect(() => {
     const newMinHeight = minHeightProp ?? defaultProps.minHeight;
 
-    if (minHeight.value !== newMinHeight) {
-      minHeight.value = newMinHeight;
-    }
+    if (minHeight.value === newMinHeight) return;
+
+    minHeight.value = newMinHeight;
+
+    debugLog(
+      `useHeightConstraints new minHeight - ${Math.round(newMinHeight)}`,
+    );
   }, [minHeightProp, minHeight]);
 
   return {

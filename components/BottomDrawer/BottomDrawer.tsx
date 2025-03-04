@@ -1,8 +1,9 @@
-import { View, ScrollView } from "react-native";
+import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import {
   GestureDetector,
   GestureHandlerRootView,
+  ScrollView,
 } from "react-native-gesture-handler";
 import React from "react";
 import { BottomDrawerProps, BottomDrawerRef } from "./BottomDrawer.types";
@@ -50,16 +51,20 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
         <Animated.View style={drawerContainerStyle}>
           <View style={styles.drawerContainer}>
             <GestureDetector gesture={state.drag}>
-              <View style={styles.dragBar}>
+              <View style={styles.dragBar} pointerEvents="box-none">
                 <Animated.View style={dragBoxStyle}>
                   <ThemedText style={styles.dragIcon}>====</ThemedText>
                 </Animated.View>
                 <Animated.View style={dragHeaderStyle} />
               </View>
             </GestureDetector>
-            <ScrollView style={contentStyle}>
-              <View onLayout={state.onContentLayout}>{children}</View>
-            </ScrollView>
+            {/* NOTE: This fixes an issue with not being able to tap inputs inside the scroll view due to the gesture detector playing silly buggers
+            https://chatgpt.com/g/g-p-67b5e925ea4881918dabd87d2acc4eb1-decks/c/67c75846-7134-8004-b0c9-014f2277aa83 */}
+            <GestureHandlerRootView>
+              <ScrollView style={contentStyle}>
+                <View onLayout={state.onContentLayout}>{children}</View>
+              </ScrollView>
+            </GestureHandlerRootView>
           </View>
         </Animated.View>
       </Animated.View>
