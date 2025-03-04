@@ -9,26 +9,27 @@ import {
 import IconSymbol, { IconSymbolName } from "@/components/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
 
-export interface CardActionProps {
+export interface CardActionProps extends TouchableOpacityProps {
   icon: IconSymbolName;
   style?: StyleProp<ViewStyle>;
-  onPress?: TouchableOpacityProps["onPress"];
   size?: number;
+  variant?: "filled" | "transparent";
 }
 
 export default function CardAction({
   icon,
   style: styleProp,
-  onPress,
   size = 80,
+  variant = "filled",
+  ...props
 }: CardActionProps): React.ReactNode {
   const { background, text } = useThemeColors();
 
   const style = React.useMemo(
     () =>
       StyleSheet.flatten([
-        styles.container,
-        {
+        variant === "filled" && styles.filled,
+        variant === "filled" && {
           height: size,
           width: size,
           borderRadius: size / 2,
@@ -36,18 +37,22 @@ export default function CardAction({
         },
         styleProp,
       ]),
-    [styleProp, size, background],
+    [styleProp, size, background, variant],
   );
 
   return (
-    <TouchableOpacity onPress={onPress} style={style}>
-      <IconSymbol name={icon} color={text} size={(size * 2) / 3} />
+    <TouchableOpacity {...props} style={style}>
+      <IconSymbol
+        name={icon}
+        color={text}
+        size={variant === "filled" ? (size * 2) / 3 : size}
+      />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  filled: {
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",

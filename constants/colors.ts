@@ -14,12 +14,14 @@ const colors = {
 export const themes = {
   light: {
     text: "#11181C",
+    link: "#0a7ea4",
     background: colors.white,
     buttonBackground: "#0a7ea4",
     buttonText: colors.white,
   },
   dark: {
     text: "#ECEDEE",
+    link: "#0a7ea4",
     background: "#151718",
     buttonBackground: colors.black,
     buttonText: colors.white,
@@ -38,6 +40,10 @@ export const fixed = {
     stop1: "#b0bfdb",
     stop2: "#5d6683",
     stop3: "#3b4258",
+  },
+  modalBackground: {
+    default: Color(colors.black).alpha(0.5).rgb().string(),
+    darker: Color(colors.black).alpha(0.75).rgb().string(),
   },
 };
 

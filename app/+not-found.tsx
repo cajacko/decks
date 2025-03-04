@@ -1,7 +1,7 @@
 import { Link, Stack } from "expo-router";
 import { StyleSheet } from "react-native";
 import ThemedText from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import ThemedView from "@/components/ThemedView";
 import text from "@/constants/text";
 
 export default function NotFoundScreen() {
@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
     <>
       <Stack.Screen options={{ title: text["screen.404.title"] }} />
       <ThemedView style={styles.container}>
-        <ThemedText type="title">{text["404.title"]}</ThemedText>
+        <ThemedText type="h3">{text["404.title"]}</ThemedText>
         <Link href="/" style={styles.link}>
           <ThemedText type="link">{text["404.link"]}</ThemedText>
         </Link>

@@ -4,6 +4,7 @@ import {
   Modal as ContextModal,
   ModalProps as ContextModalProps,
 } from "@/context/Modal";
+import { fixed } from "@/constants/colors";
 
 export type ModalProps = ContextModalProps;
 
@@ -36,7 +37,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: fixed.modalBackground.default,
     zIndex: 1,
   },
   backgroundDark: {
@@ -45,7 +46,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    backgroundColor: fixed.modalBackground.darker,
     zIndex: 1,
   },
 });

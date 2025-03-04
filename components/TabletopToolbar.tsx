@@ -7,14 +7,14 @@ import {
 } from "@/store/slices/tabletop";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import text from "@/constants/text";
-import IconSymbol from "./IconSymbol";
-import ThemedText from "./ThemedText";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
+import Button from "./Button";
+import IconButton from "./IconButton";
 
 interface TabletopToolbarProps {
   tabletopId: string;
@@ -88,29 +88,32 @@ export default function TabletopToolbar(
       style={styles.container}
     >
       {component}
-      <TouchableOpacity
+      <IconButton
+        icon="undo"
+        size={iconSize}
+        variant="transparent"
         onPressOut={props.hasPast ? handleUndo : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: props.hasPast ? 1 : 0.5 },
         ])}
-      >
-        <IconSymbol name="undo" size={iconSize} />
-      </TouchableOpacity>
-      <TouchableOpacity
+      />
+      <IconButton
+        icon="redo"
+        size={iconSize}
+        variant="transparent"
         onPressOut={props.hasFuture ? handleRedo : undefined}
         style={StyleSheet.flatten([
           styles.action,
           { opacity: props.hasFuture ? 1 : 0.5 },
         ])}
-      >
-        <IconSymbol name="redo" size={iconSize} />
-      </TouchableOpacity>
-      <TouchableOpacity onPressOut={open} style={styles.action}>
-        <ThemedText style={styles.actionText} type="button">
-          {text["tabletop.reset.button"]}
-        </ThemedText>
-      </TouchableOpacity>
+      />
+      <Button
+        onPressOut={open}
+        style={styles.action}
+        title={text["tabletop.reset.button"]}
+        variant="transparent"
+      />
     </Animated.View>
   );
 }
@@ -126,8 +129,5 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
-  },
-  actionText: {
-    textAlign: "center",
   },
 });

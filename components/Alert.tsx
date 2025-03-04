@@ -1,6 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, Pressable, View } from "react-native";
+import { StyleSheet, Pressable, View } from "react-native";
 import Modal, { styles as modalStyles } from "./Modal";
+import ThemedView from "./ThemedView";
+import ThemedText from "./ThemedText";
+import Button from "./Button";
 
 export interface AlertButton {
   text: string;
@@ -17,33 +20,53 @@ export interface AlertProps {
 }
 
 export default function Alert(props: AlertProps): React.ReactNode {
+  const modalStyle = React.useMemo(
+    () => [modalStyles.content, styles.modalView],
+    [],
+  );
+
+  const buttons = React.useMemo(
+    () =>
+      props.buttons &&
+      props.buttons.length > 0 && (
+        <View style={styles.buttons}>
+          {props.buttons.map((button, index) => (
+            <Button
+              key={index}
+              color={
+                button.style === "cancel"
+                  ? "secondary"
+                  : button.style === "destructive"
+                    ? "danger"
+                    : "primary"
+              }
+              style={styles.button}
+              onPress={button.onPress}
+              title={button.text}
+              variant="transparent"
+            />
+          ))}
+        </View>
+      ),
+    [props.buttons],
+  );
+
   return (
     <Modal visible={props.visible} onRequestClose={props.onRequestClose}>
       <View style={styles.centeredView}>
-        <View style={[modalStyles.content, styles.modalView]}>
-          {props.title && <Text style={styles.modalText}>{props.title}</Text>}
+        <ThemedView style={modalStyle}>
+          {props.title && (
+            <ThemedText type="h3" style={styles.title}>
+              {props.title}
+            </ThemedText>
+          )}
 
           {props.message && (
-            <Text style={styles.modalText}>{props.message}</Text>
+            <ThemedText style={styles.message}>{props.message}</ThemedText>
           )}
 
-          {props.buttons && props.buttons.length > 0 && (
-            <View style={styles.buttons}>
-              {props.buttons.map((button, index) => (
-                <Pressable
-                  key={index}
-                  style={[
-                    styles.button,
-                    button.style === "cancel" && styles.buttonClose,
-                  ]}
-                  onPress={button.onPress}
-                >
-                  <Text style={styles.textStyle}>{button.text}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
-        </View>
+          {buttons}
+        </ThemedView>
         <Pressable
           onPress={props.onRequestClose}
           style={modalStyles.backgroundLight}
@@ -60,34 +83,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalView: {
+    maxWidth: 400,
+    width: "100%",
     margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
+    borderRadius: 5,
+    padding: 20,
   },
   buttons: {
     flexDirection: "row",
+    justifyContent: "flex-end",
   },
   button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    marginHorizontal: 10,
+    marginLeft: 40,
   },
-  buttonOpen: {
-    backgroundColor: "#F194FF",
+  title: {
+    marginBottom: 20,
   },
-  buttonClose: {
-    backgroundColor: "#2196F3",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
+  message: {
+    marginBottom: 20,
   },
 });

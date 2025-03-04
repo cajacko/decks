@@ -9,11 +9,15 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 
 export interface ButtonProps extends TouchableOpacityProps {
   title: string;
+  color?: "primary" | "secondary" | "danger";
+  variant?: "filled" | "transparent";
 }
 
 export default function Button({
   title,
   style,
+  color = "primary",
+  variant = "filled",
   ...props
 }: ButtonProps): React.ReactNode {
   const { buttonBackground, buttonText } = useThemeColors();
@@ -21,8 +25,9 @@ export default function Button({
   const { button, text } = React.useMemo(
     () => ({
       button: [
-        styles.button,
-        {
+        variant === "transparent" && styles.transparent,
+        variant === "filled" && styles.filled,
+        variant === "filled" && {
           backgroundColor: buttonBackground,
         },
         style,
@@ -31,7 +36,7 @@ export default function Button({
         color: buttonText,
       },
     }),
-    [buttonText, buttonBackground, style],
+    [buttonText, buttonBackground, style, variant],
   );
 
   return (
@@ -44,10 +49,8 @@ export default function Button({
 }
 
 const styles = StyleSheet.create({
-  button: {
+  filled: {
     padding: 10,
-    backgroundColor: "blue",
-    borderRadius: 5,
-    elevation: 5,
   },
+  transparent: {},
 });

@@ -4,65 +4,44 @@ import {
   Theme as NavigationTheme,
   DefaultTheme,
 } from "@react-navigation/native";
+import React from "react";
 
 export type ThemedTextProps = TextProps & {
-  type?:
-    | "default"
-    | "title"
-    | "defaultSemiBold"
-    | "subtitle"
-    | "link"
-    | "button";
+  type?: "h3" | "body1" | "button" | "link";
 };
 
 export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
 
 export default function ThemedText({
-  style,
-  type = "default",
+  style: styleProp,
+  type = "body1",
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor("text");
+  const color = useThemeColor(type === "link" ? "link" : "text");
 
-  return (
-    <Text
-      style={[
-        { color },
-        type === "default" ? styles.default : undefined,
-        type === "title" ? styles.title : undefined,
-        type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
-        type === "subtitle" ? styles.subtitle : undefined,
-        type === "link" ? styles.link : undefined,
-        type === "button" ? styles.button : undefined,
-        style,
-      ]}
-      {...rest}
-    />
+  const style = React.useMemo(
+    () => [
+      { color },
+      type === "body1" ? styles.body1 : undefined,
+      type === "h3" ? styles.h3 : undefined,
+      type === "button" ? styles.button : undefined,
+      styleProp,
+    ],
+    [styleProp, type, color],
   );
+
+  return <Text style={style} {...rest} />;
 }
 
 const styles = StyleSheet.create({
-  default: {
+  body1: {
     fontSize: 16,
     lineHeight: 24,
   },
-  defaultSemiBold: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    lineHeight: 32,
-  },
-  subtitle: {
+  h3: {
     fontSize: 20,
+    lineHeight: 24,
     fontWeight: "bold",
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
   },
   button: {
     lineHeight: 30,

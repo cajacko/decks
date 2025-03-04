@@ -4,7 +4,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 
 export type ThemedViewProps = ViewProps;
 
-export function ThemedView({
+export default function ThemedView({
   style: styleProp,
   ...otherProps
 }: ThemedViewProps) {

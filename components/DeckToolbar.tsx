@@ -1,17 +1,17 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { deleteDeckHelper } from "@/store/actionHelpers/decks";
 import useParentHeaderRight from "@/hooks/useParentHeaderRight";
 import { useEditCardModal } from "./EditCardModal";
 import text from "@/constants/text";
-import IconSymbol from "./IconSymbol";
-import ThemedText from "./ThemedText";
 import { iconSize, horizontalPadding } from "./TabletopToolbar";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
+import Button from "./Button";
+import IconButton from "./IconButton";
 
 interface DeckToolbarProps {
   deckId: string;
@@ -64,18 +64,19 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
       style={styles.container}
     >
       {deleteDeckModal.component}
-      <TouchableOpacity
+      <Button
         onPressOut={props.openDefaultCardModal}
         style={styles.action}
-      >
-        <ThemedText style={styles.actionText} type="button">
-          {text["deck.actions.default"]}
-        </ThemedText>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPressOut={deleteDeckModal.open} style={styles.action}>
-        <IconSymbol name="delete" size={iconSize} />
-      </TouchableOpacity>
+        title={text["deck.actions.default"]}
+        variant="transparent"
+      />
+      <IconButton
+        icon="delete"
+        size={iconSize}
+        variant="transparent"
+        onPressOut={deleteDeckModal.open}
+        style={styles.action}
+      />
     </Animated.View>
   );
 }
@@ -89,8 +90,5 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
-  },
-  actionText: {
-    textAlign: "center",
   },
 });
