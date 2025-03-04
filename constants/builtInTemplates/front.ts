@@ -49,7 +49,7 @@ const template = {
       name: text["template.built_in.front.title_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: fixed.cardPresets.black,
+        value: "#987315",
         type: Templates.DataType.Color,
       },
     },
@@ -58,7 +58,7 @@ const template = {
       name: text["template.built_in.front.description_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: fixed.cardPresets.black,
+        value: "#987315",
         type: Templates.DataType.Color,
       },
     },
@@ -85,7 +85,7 @@ const template = {
       name: text["template.built_in.front.background_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: fixed.cardPresets.white,
+        value: "#fff8e6",
         type: Templates.DataType.Color,
       },
     },
@@ -94,7 +94,7 @@ const template = {
       name: text["template.built_in.front.border_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: fixed.cardPresets.red,
+        value: fixed.cardPresets.yellow,
         type: Templates.DataType.Color,
       },
     },

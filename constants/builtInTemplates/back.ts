@@ -29,7 +29,7 @@ const template: Templates.Props = {
       name: text["template.built_in.back.text_color"],
       type: Templates.DataType.Color,
       defaultValidatedValue: {
-        value: fixed.cardPresets.black,
+        value: "#765804",
         type: Templates.DataType.Color,
       },
     },
@@ -48,10 +48,12 @@ const template: Templates.Props = {
       type: "view",
       style: {
         flex: 1,
-        backgroundColor: `{{${dataItemIds.backgroundColor}}}`,
+        // backgroundColor: `{{${dataItemIds.backgroundColor}}}`,
         justifyContent: "center",
         alignItems: "center",
         padding: 5,
+        position: "relative",
+        overflow: "hidden",
       },
       children: [
         {
@@ -59,9 +61,56 @@ const template: Templates.Props = {
           text: `{{${deckTemplateIds.name}}}`,
           style: {
             color: `{{${dataItemIds.textColor}}}`,
-            fontSize: 8,
+            fontSize: 10,
             textAlign: "center",
+            zIndex: 2,
+            position: "relative",
+            fontFamily: "Zain",
           },
+        },
+        {
+          type: "view",
+          style: {
+            position: "absolute",
+            top: "-100%",
+            left: "-100%",
+            right: "-100%",
+            bottom: "-100%",
+            zIndex: 1,
+            backgroundColor: "#ffd151",
+            transform: [{ rotate: "-45deg" }, { translateX: "-10%" }],
+          },
+          children: [
+            {
+              type: "view",
+              style: {
+                flex: 1,
+                flexDirection: "row",
+                backgroundColor: "#f8c537",
+              },
+              children: [
+                {
+                  type: "view",
+                  style: {
+                    flex: 1,
+                    backgroundColor: "#edb230",
+                  },
+                },
+                {
+                  type: "view",
+                  style: {
+                    flex: 1,
+                  },
+                },
+              ],
+            },
+            {
+              type: "view",
+              style: {
+                flex: 1,
+              },
+            },
+          ],
         },
       ],
     },

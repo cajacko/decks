@@ -39,7 +39,7 @@ export const fixed = {
     black: colors.black,
     white: colors.white,
     grey: colors.grey,
-    red: "rgb(233, 98, 98)",
+    yellow: "#ffd151",
   },
   textureBackground: {
     stop1: "#b0bfdb",

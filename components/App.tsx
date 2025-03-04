@@ -16,6 +16,7 @@ import { ModalProvider } from "@/context/Modal";
 import { navigationColors } from "@/constants/colors";
 import { navigationFonts } from "@/components/ThemedText";
 import { enableFreeze } from "react-native-screens";
+import { AbrilFatface_400Regular } from "@expo-google-fonts/abril-fatface";
 
 enableFreeze();
 
@@ -60,7 +61,9 @@ export function withApp(Component: React.ComponentType) {
 export default function App({ children }: { children: React.ReactNode }) {
   const [loadedFonts] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Zain: AbrilFatface_400Regular,
   });
+
   const [loadedRedux, setLoadedRedux] = React.useState(false);
 
   const loaded = loadedFonts && loadedRedux;
