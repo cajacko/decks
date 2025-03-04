@@ -3,28 +3,32 @@ import { View, StyleSheet, ViewStyle } from "react-native";
 import CardSide, { CardSideProps } from "./CardSide";
 import CardSpacer from "./CardSpacer";
 import { useScaleValue } from "@/components/Card/CardSize.context";
+import { Cards } from "@/store/types";
 
-export type CardSideBySideProps = Omit<CardSideProps, "side">;
+export type CardSideBySideProps = Omit<CardSideProps, "side"> & {
+  topSide?: Cards.Side;
+};
 
 const sideOffset = 19;
 const topOffset = 100;
 
-export default function CardSideBySide(
-  props: CardSideBySideProps,
-): React.ReactNode {
+export default function CardSideBySide({
+  topSide = "front",
+  ...props
+}: CardSideBySideProps): React.ReactNode {
   const scaleValue = useScaleValue();
 
   // TODO: These aren't accurate, need to do trigonometry to get the correct
   // offsets based off the rotation of the cards
-  const { front, back, inner } = React.useMemo<
-    Record<"front" | "back" | "inner", ViewStyle>
+  const { top, bottom, inner } = React.useMemo<
+    Record<"top" | "bottom" | "inner", ViewStyle>
   >(
     () => ({
-      front: {
+      top: {
         left: scaleValue(sideOffset),
         top: scaleValue(topOffset),
       },
-      back: {
+      bottom: {
         top: 6,
         right: scaleValue(sideOffset),
       },
@@ -48,12 +52,12 @@ export default function CardSideBySide(
               styles.frontCard,
               {
                 transform: [{ rotate: "-5deg" }],
-                ...front,
+                ...top,
               },
               props.CardProps?.style,
             ],
           }}
-          side="front"
+          side={topSide}
         />
         <CardSide
           {...props}
@@ -64,12 +68,12 @@ export default function CardSideBySide(
               styles.backCard,
               {
                 transform: [{ rotate: "5deg" }],
-                ...back,
+                ...bottom,
               },
               props.CardProps?.style,
             ],
           }}
-          side="back"
+          side={topSide === "front" ? "back" : "front"}
         />
         <CardSpacer />
       </View>

@@ -1,6 +1,6 @@
 import { createCachedSelector } from "re-reselect";
 import { selectCard } from "../slices/cards";
-import { selectDeck } from "../slices/decks";
+import { selectDeck as selectDeckByDeckId } from "../slices/decks";
 import { selectTemplate } from "../slices/templates";
 import { RootState, Decks, Cards, Templates } from "../types";
 import { getIsCardId, Target } from "@/utils/cardTarget";
@@ -20,7 +20,18 @@ export const selectDeckByCard = (
 
   if (!deckId) return undefined;
 
-  return selectDeck(state, { deckId });
+  return selectDeckByDeckId(state, { deckId });
+};
+
+export const selectDeck = (
+  state: RootState,
+  props: Target,
+): Decks.Props | undefined => {
+  if (getIsCardId(props)) {
+    return selectDeckByCard(state, { cardId: props.id });
+  }
+
+  return selectDeckByDeckId(state, { deckId: props.id });
 };
 
 // Is a lookup, doesn't need to be cached
@@ -39,7 +50,9 @@ const selectCardSideTemplate = (
     return deck?.templates?.[props.side];
   }
 
-  return selectDeck(state, { deckId: props.id })?.templates?.[props.side];
+  return selectDeckByDeckId(state, { deckId: props.id })?.templates?.[
+    props.side
+  ];
 };
 
 // Is a lookup, doesn't need to be cached
@@ -81,9 +94,7 @@ const selectMergedCardData = createCachedSelector(
   (state: RootState, props: DeckOrCardSideProps) =>
     getIsCardId(props) ? selectCard(state, { cardId: props.id })?.data : null,
   (state: RootState, props: DeckOrCardSideProps) =>
-    getIsCardId(props)
-      ? selectDeckByCard(state, { cardId: props.id })?.dataSchema
-      : selectDeck(state, { deckId: props.id })?.dataSchema,
+    selectDeck(state, props)?.dataSchema,
   (cardData, deckDataSchema): Cards.Data | null => {
     // If there's no deck schema then there's no defaults to find, so just return the card data or null
     if (!deckDataSchema) return cardData ?? null;

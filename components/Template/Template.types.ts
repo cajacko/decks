@@ -15,9 +15,12 @@ export interface MarkupChildrenProps {
   elements: Templates.MarkupElement<Data>[];
 }
 
-export type Values = Record<
-  string,
-  string | number | boolean | undefined | null
->;
+export type DeckValues = null | {
+  name: string;
+};
+
+export type Values = {
+  [Key: string]: string | number | boolean | undefined | null | Values;
+};
 
 export type TemplateContext = Values;

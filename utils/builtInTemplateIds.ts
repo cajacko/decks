@@ -3,6 +3,10 @@ const builtInTemplateKey = "default-template";
 
 type BuiltInTemplateKey = typeof builtInTemplateKey;
 
+export const deckTemplateIds = {
+  name: "deck.name",
+};
+
 // NOTE: Do not change these ID's as people's existing mappings will break
 export default function builtInTemplateIds<T extends string>(
   templateId: T,

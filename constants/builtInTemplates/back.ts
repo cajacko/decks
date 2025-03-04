@@ -1,5 +1,7 @@
 import { Templates } from "@/store/types";
-import builtInTemplateIds from "@/utils/builtInTemplateIds";
+import builtInTemplateIds, {
+  deckTemplateIds,
+} from "@/utils/builtInTemplateIds";
 import text from "@/constants/text";
 import { fixed } from "@/constants/colors";
 
@@ -54,7 +56,7 @@ const template: Templates.Props = {
       children: [
         {
           type: "text",
-          text: `{{${dataItemIds.text}}}`,
+          text: `{{${deckTemplateIds.name}}}`,
           style: {
             color: `{{${dataItemIds.textColor}}}`,
             fontSize: 8,
