@@ -45,7 +45,7 @@ export type Theme = keyof typeof themes;
 
 export const navigationColors: Record<Theme, NavigationTheme["colors"]> = {
   light: {
-    background: "transparent",
+    background: themes.light.background,
     border: "rgb(199, 199, 204)",
     card: themes.light.background,
     notification: "rgb(255, 69, 58)",
@@ -53,7 +53,7 @@ export const navigationColors: Record<Theme, NavigationTheme["colors"]> = {
     text: themes.light.text,
   },
   dark: {
-    background: "transparent",
+    background: themes.dark.background,
     border: "rgb(199, 199, 204)",
     card: themes.dark.background,
     notification: "rgb(255, 69, 58)",

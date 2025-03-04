@@ -1,118 +1,55 @@
-import {
-  ThemeProvider as NavigationThemeProvider,
-  Theme as NavigationTheme,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import "react-native-reanimated";
-import { store, persistor } from "@/store/store";
-import { Provider as ReduxProvider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { init as initMousePointer } from "@/utils/mousePosition";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import React from "react";
 import { getDeckName } from "@/app/deck/[deckId]/_layout";
-import { ModalProvider } from "@/context/Modal";
 import text from "@/constants/text";
-import { navigationColors } from "@/constants/colors";
-import { navigationFonts } from "@/components/ThemedText";
-import TextureBackground from "@/components/TextureBackground";
-import { enableFreeze } from "react-native-screens";
-
-enableFreeze();
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { withApp } from "@/components/App";
+import useFlag from "@/hooks/useFlag";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
   initialRouteName: "index",
 };
 
-function useNavigationTheme(): NavigationTheme {
-  const colorScheme = useColorScheme();
+type NavOptions = {
+  default?: React.ComponentProps<typeof Stack>["screenOptions"];
+  index?: React.ComponentProps<typeof Stack.Screen>["options"];
+  deck?: React.ComponentProps<typeof Stack.Screen>["options"];
+};
 
-  return React.useMemo((): NavigationTheme => {
-    if (colorScheme === "light") {
-      return {
-        dark: false,
-        fonts: navigationFonts,
-        colors: navigationColors.light,
-      };
-    }
+function RootLayout() {
+  const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
 
-    return {
-      dark: true,
-      fonts: navigationFonts,
-      colors: navigationColors.dark,
-    };
-  }, [colorScheme]);
-}
-
-export default function RootLayout() {
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-
-  useEffect(() => {
-    initMousePointer();
-  }, []);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  const navigationTheme = useNavigationTheme();
-
-  if (!loaded) {
-    return null;
-  }
+  const navOptions = React.useMemo(
+    (): NavOptions => ({
+      default: {
+        freezeOnBlur: true,
+      },
+      index: {
+        headerShown: true,
+        headerBackButtonMenuEnabled: false,
+        headerTitle: text["screen.decks.title"],
+        animation: animateStack ? "slide_from_left" : "none",
+      },
+      deck: ({ route: { params } }) => ({
+        headerShown: true,
+        headerTitle: getDeckName(
+          params && "deckId" in params && typeof params.deckId === "string"
+            ? params.deckId
+            : null,
+        ),
+        animation: animateStack ? "slide_from_right" : "none",
+      }),
+    }),
+    [animateStack],
+  );
 
   return (
-    <NavigationThemeProvider value={navigationTheme}>
-      <ReduxProvider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <TextureBackground>
-            <ModalProvider>
-              <Stack
-                screenOptions={{
-                  freezeOnBlur: true,
-                }}
-              >
-                <Stack.Screen
-                  name="index"
-                  options={{
-                    headerShown: true,
-                    headerBackButtonMenuEnabled: false,
-                    animation: "slide_from_left",
-                    headerTitle: text["screen.decks.title"],
-                  }}
-                />
-                <Stack.Screen
-                  name="deck/[deckId]"
-                  options={({ route: { params } }) => ({
-                    headerShown: true,
-                    animation: "slide_from_right",
-                    headerTitle: getDeckName(
-                      params &&
-                        "deckId" in params &&
-                        typeof params.deckId === "string"
-                        ? params.deckId
-                        : null,
-                    ),
-                  })}
-                />
-                <Stack.Screen name="+not-found" />
-              </Stack>
-              <StatusBar style="auto" />
-            </ModalProvider>
-          </TextureBackground>
-        </PersistGate>
-      </ReduxProvider>
-    </NavigationThemeProvider>
+    <Stack screenOptions={navOptions.default}>
+      <Stack.Screen name="index" options={navOptions.index} />
+      <Stack.Screen name="deck/[deckId]" options={navOptions.deck} />
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }
+
+export default withApp(RootLayout);

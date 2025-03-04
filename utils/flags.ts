@@ -1,21 +1,22 @@
-import { defaultFlags, flagOverrides } from "@/constants/flags";
-import { UserSettings, RootState } from "@/store/types";
-import { selectUserSettingsFlag } from "@/store/slices/userSettings";
+import {
+  defaultFlags,
+  flagOverrides,
+  GetFlag,
+  flagRelationships,
+} from "@/constants/flags";
+import { UserSettings } from "@/store/types";
 
-export type Flags<FlagKeys extends UserSettings.FlagKey[]> = {
-  [MapKey in FlagKeys[number]]: UserSettings.FlagValue<MapKey>;
-};
-
-export function getFlag<FlagKey extends UserSettings.FlagKey>(
+function _getFlag<FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,
-  state: RootState | null,
+  state: UserSettings.FlagsState | undefined | null,
 ): UserSettings.FlagValue<FlagKey> {
   const devOverrideValue = flagOverrides[key];
 
   if (devOverrideValue !== undefined) return devOverrideValue;
 
   if (state !== null) {
-    const userSettingsValue = selectUserSettingsFlag(state, { key });
+    // NOTE: We can't use our selector here because it would create a circular dependency
+    const userSettingsValue = state?.[key];
 
     if (userSettingsValue !== undefined) return userSettingsValue;
   }
@@ -23,9 +24,24 @@ export function getFlag<FlagKey extends UserSettings.FlagKey>(
   return defaultFlags[key];
 }
 
+export function getFlag<FlagKey extends UserSettings.FlagKey>(
+  key: FlagKey,
+  state: UserSettings.FlagsState | undefined | null,
+): UserSettings.FlagValue<FlagKey> {
+  const getFlag: GetFlag = (k) => _getFlag(k, state);
+
+  const value = getFlag(key);
+
+  const transform = flagRelationships[key];
+
+  if (!transform) return value;
+
+  return transform(value, getFlag);
+}
+
 export function getFlags<FlagKeys extends UserSettings.FlagKey[]>(
   keys: FlagKeys,
-  state: RootState | null,
+  state: UserSettings.FlagsState | undefined | null,
 ): Flags<FlagKeys> {
   return keys.reduce((acc, key) => {
     // This does work so yay
@@ -35,3 +51,7 @@ export function getFlags<FlagKeys extends UserSettings.FlagKey[]>(
     return acc;
   }, {} as Flags<FlagKeys>);
 }
+
+export type Flags<FlagKeys extends UserSettings.FlagKey[]> = {
+  [MapKey in FlagKeys[number]]: UserSettings.FlagValue<MapKey>;
+};

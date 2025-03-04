@@ -10,16 +10,29 @@ export default function useParentHeaderRight(
   const navigation = useNavigation();
 
   React.useEffect(() => {
-    // Multiple routes can load when animating/ performance optimisations, so we need to check here
-    if (!isFocused) return;
+    function setHeaderRight(component: null | (() => React.ReactNode)) {
+      // NOTE: headerRight on re-renders when this effect changes, so we can't dynamically get redux
+      // state inside the header component
+      navigation.getParent()?.setOptions({
+        headerRight: component,
+      });
+    }
 
-    // NOTE: headerRight on re-renders when this effect changes, so we can't dynamically get redux
-    // state inside the header component
-    navigation.getParent()?.setOptions({
-      headerRight: headerRight ? headerRight : undefined,
+    if (navigation.isFocused()) {
+      setHeaderRight(headerRight);
+    }
+
+    const blur = navigation.addListener("blur", (state) => {
+      setHeaderRight(null);
     });
 
-    // Do not unset on cleanup, there can be a race condition here, so just let the new route
-    // override this. This means all routes need to call this
+    const focus = navigation.addListener("focus", (state) => {
+      setHeaderRight(headerRight);
+    });
+
+    return () => {
+      blur();
+      focus();
+    };
   }, [navigation, headerRight, isFocused]);
 }

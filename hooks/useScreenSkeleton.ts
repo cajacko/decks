@@ -1,19 +1,19 @@
 import React from "react";
 import { InteractionManager } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
-// let interaction;
+import useFlag from "./useFlag";
 
 export default function useScreenSkeleton(key: string) {
   const navigation = useNavigation();
+  const featureDisabled = useFlag("SKELETON_LOADER") === "disabled";
   const [skeleton, setSkeleton] = React.useState(true);
 
   React.useEffect(() => {
-    function waitToSetSkeleton(newValue: boolean) {
-      InteractionManager.runAfterInteractions(() => {
-        if (navigation.isFocused() === newValue) return;
+    if (featureDisabled) return;
 
-        setSkeleton(newValue);
+    function waitToSetSkeleton(showSkeleton: boolean) {
+      InteractionManager.runAfterInteractions(() => {
+        setSkeleton(showSkeleton);
       });
     }
 
@@ -31,7 +31,7 @@ export default function useScreenSkeleton(key: string) {
       unsubscribeFocus();
       unsubscribeBlur();
     };
-  }, [navigation, key]);
+  }, [navigation, key, featureDisabled]);
 
-  return skeleton;
+  return featureDisabled ? false : skeleton;
 }
