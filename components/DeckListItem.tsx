@@ -1,9 +1,7 @@
 import React from "react";
 import {
-  Text,
   StyleSheet,
   View,
-  Button,
   Dimensions,
   Pressable,
   ViewStyle,
@@ -16,13 +14,16 @@ import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "./CardSideBySide";
 import { DeckCardSizeProvider } from "@/context/Deck";
-import text from "@/constants/text";
+import IconButton from "./IconButton";
+import ThemedText from "./ThemedText";
 
 export interface DeckListItemProps {
   deckId: string;
   style?: ViewStyle;
   skeleton?: boolean;
 }
+
+const iconSize = 30;
 
 export default function DeckListItem(
   props: DeckListItemProps,
@@ -52,26 +53,32 @@ export default function DeckListItem(
     navigate(`/deck/${props.deckId}/play`);
   }, [props.deckId, navigate]);
 
+  const containerStyle = React.useMemo(
+    () => [styles.container, props.style],
+    [props.style],
+  );
+
   return (
     <DeckCardSizeProvider
       id={props.deckId}
       idType="deck"
       constraints={styles.cardConstraints}
     >
-      <View style={[styles.container, props.style]}>
+      <View style={containerStyle}>
         <Pressable onPress={play} style={styles.cards}>
           <CardSideBySide skeleton={props.skeleton} {...coverTarget} />
         </Pressable>
         <View style={styles.details}>
-          <Text style={styles.text}>{deckNameWithFallback(name)}</Text>
-          <View style={styles.buttons}>
-            <View style={styles.button}>
-              <Button title={text["deck.actions.play"]} onPress={play} />
-            </View>
-            <View style={styles.button}>
-              <Button title={text["deck.actions.edit"]} onPress={edit} />
-            </View>
-          </View>
+          <ThemedText type="h3" style={styles.text}>
+            {deckNameWithFallback(name)}
+          </ThemedText>
+
+          <IconButton
+            icon="edit"
+            onPress={edit}
+            size={iconSize}
+            variant="transparent"
+          />
         </View>
       </View>
     </DeckCardSizeProvider>
@@ -85,6 +92,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    maxWidth: 300,
   },
   cards: {
     position: "relative",
@@ -92,18 +100,12 @@ const styles = StyleSheet.create({
   },
   details: {
     zIndex: 2,
+    flexDirection: "row",
+    marginTop: 15,
+    paddingHorizontal: 10,
   },
   text: {
-    flex: 1,
-    fontSize: 20,
-    color: "white",
-  },
-  buttons: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  button: {
+    marginRight: 20,
     flex: 1,
   },
 });

@@ -9,20 +9,20 @@ import {
 import IconSymbol, { IconSymbolName } from "@/components/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
 
-export interface CardActionProps extends TouchableOpacityProps {
+export interface IconButtonProps extends TouchableOpacityProps {
   icon: IconSymbolName;
   style?: StyleProp<ViewStyle>;
   size?: number;
   variant?: "filled" | "transparent";
 }
 
-export default function CardAction({
+export default function IconButton({
   icon,
   style: styleProp,
   size = 80,
   variant = "filled",
   ...props
-}: CardActionProps): React.ReactNode {
+}: IconButtonProps): React.ReactNode {
   const { background, text } = useThemeColors();
 
   const style = React.useMemo(

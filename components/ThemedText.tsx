@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   h3: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "bold",
+    fontWeight: "normal",
   },
   button: {
     lineHeight: 30,

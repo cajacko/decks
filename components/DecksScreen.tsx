@@ -5,6 +5,7 @@ import {
   ViewStyle,
   View,
   FlatListProps,
+  Dimensions,
 } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckIds } from "@/store/slices/decks";
@@ -13,8 +14,6 @@ import IconButton from "./IconButton";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-// import exampleDecksToStore from "@/utils/exampleDecksToStore";
-// import { SliceName } from "@/store/types";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 export interface DecksScreenProps {
@@ -26,24 +25,28 @@ type FlatListItem = string;
 const extractKey: (item: FlatListItem) => string = (item) => item;
 
 const initialRows = 4;
+const maxWidth = 1000;
 
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DecksScreen.name);
-  const numColumns = 2;
   const deckIdsState = useAppSelector(selectDeckIds);
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
 
-  const deckIds = React.useMemo(
-    () =>
-      skeleton ? deckIdsState.slice(0, initialRows * numColumns) : deckIdsState,
-    [deckIdsState, skeleton, numColumns],
+  const numColumns = React.useRef(
+    Math.max(
+      Math.round(Math.min(Dimensions.get("window").width, maxWidth) / 400),
+      2,
+    ),
   );
 
-  // const allDeckIds = React.useMemo(
-  //   () => [...deckIds, ...exampleDecksToStore()[SliceName.Decks].deckIds],
-  //   [deckIds],
-  // );
+  const deckIds = React.useMemo(
+    () =>
+      skeleton
+        ? deckIdsState.slice(0, initialRows * numColumns.current)
+        : deckIdsState,
+    [deckIdsState, skeleton, numColumns],
+  );
 
   const createDeck = React.useCallback(() => {
     const deckId = uuid();
@@ -62,17 +65,24 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
     [skeleton],
   );
 
+  const containerStyle = React.useMemo(
+    () => [styles.container, props.style],
+    [props.style],
+  );
+
   return (
     <>
       {!skeleton && (
-        <View style={props.style}>
+        <View style={containerStyle}>
           <FlatList<FlatListItem>
             contentContainerStyle={styles.contentContainer}
+            style={styles.list}
             data={deckIds}
             renderItem={renderItem}
             keyExtractor={extractKey}
-            numColumns={numColumns}
-            initialNumToRender={initialRows * numColumns}
+            numColumns={numColumns.current}
+            initialNumToRender={initialRows * numColumns.current}
+            columnWrapperStyle={styles.columnWrapper}
           />
           <IconButton icon="add" onPress={createDeck} style={styles.action} />
         </View>
@@ -82,6 +92,17 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
+  columnWrapper: {
+    justifyContent: "center",
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+  },
+  list: {
+    maxWidth: maxWidth,
+    width: "100%",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -92,9 +113,12 @@ const styles = StyleSheet.create({
   listItem: {
     paddingVertical: 20,
     paddingHorizontal: 10,
+    width: "100%",
+    flex: 1,
   },
   contentContainer: {
     paddingBottom: 150,
+    // alignItems: "center",
   },
   action: {
     position: "absolute",

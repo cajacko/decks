@@ -37,7 +37,7 @@ const distanceProperties: string[] = [
 export const variableRegex = /{{(.*?)}}/;
 
 export function replaceVariables(text: string, values: Values): string {
-  const template = Handlebars.compile(text);
+  const template = Handlebars.compile(text, { noEscape: true });
 
   return template(values);
 }
