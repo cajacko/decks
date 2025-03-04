@@ -6,7 +6,13 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
-export type ThemedTextVariant = "h1" | "h3" | "body1" | "button" | "link";
+export type ThemedTextVariant =
+  | "h1"
+  | "h3"
+  | "h4"
+  | "body1"
+  | "button"
+  | "link";
 
 export type ThemedTextProps = TextProps & {
   type?: ThemedTextVariant;
@@ -26,6 +32,7 @@ export function useThemedTextStyle({
       type === "body1" ? styles.body1 : undefined,
       type === "h1" ? styles.h1 : undefined,
       type === "h3" ? styles.h3 : undefined,
+      type === "h4" ? styles.h4 : undefined,
       type === "button" ? styles.button : undefined,
       styleProp,
     ],
@@ -62,6 +69,11 @@ const styles = StyleSheet.create({
   h3: {
     fontSize: 20,
     lineHeight: 24,
+    fontWeight: "normal",
+  },
+  h4: {
+    fontSize: 18,
+    lineHeight: 20,
     fontWeight: "normal",
   },
   button: {

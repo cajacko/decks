@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import Animated from "react-native-reanimated";
 import {
   GestureDetector,
@@ -8,12 +8,20 @@ import React from "react";
 import { BottomDrawerProps, BottomDrawerRef } from "./BottomDrawer.types";
 import styles from "./bottomDrawer.style";
 import useBottomDrawer from "./useBottomDrawer";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import ThemedText from "../ThemedText";
 
 export const BottomDrawerWrapper = GestureHandlerRootView;
 
 export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
   function BottonDrawer({ children, ...props }, ref) {
+    const backgroundColor = useThemeColor("background");
     const state = useBottomDrawer(props, ref);
+
+    const contentStyle = React.useMemo(
+      () => [styles.content, { backgroundColor }],
+      [backgroundColor],
+    );
 
     const drawerContainerStyle = React.useMemo(
       () => [styles.drawerContainer, state.animatedStyles.height],
@@ -34,7 +42,7 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
 
     const drawerStyle = React.useMemo(
       () => [styles.drawer, state.animatedStyles.bottomStyle],
-      [],
+      [state.animatedStyles.bottomStyle],
     );
 
     return (
@@ -44,12 +52,12 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
             <GestureDetector gesture={state.drag}>
               <View style={styles.dragBar}>
                 <Animated.View style={dragBoxStyle}>
-                  <Text style={styles.dragIcon}>====</Text>
+                  <ThemedText style={styles.dragIcon}>====</ThemedText>
                 </Animated.View>
                 <Animated.View style={dragHeaderStyle} />
               </View>
             </GestureDetector>
-            <ScrollView style={styles.content}>
+            <ScrollView style={contentStyle}>
               <View onLayout={state.onContentLayout}>{children}</View>
             </ScrollView>
           </View>

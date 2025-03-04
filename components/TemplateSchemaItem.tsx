@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet, ViewStyle } from "react-native";
 import TextInput from "@/components/TextInput";
 import { useAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
@@ -9,11 +9,13 @@ import {
 } from "@/context/EditCard";
 import { Templates } from "@/store/types";
 import AppError from "@/classes/AppError";
+import ThemedText from "./ThemedText";
 
 export interface TemplateSchemaItemProps {
   side: "front" | "back";
   templateId: string;
   templateSchemaItemId: string;
+  style?: ViewStyle;
 }
 
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
@@ -80,12 +82,12 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   }
 
   return (
-    <View>
-      <Text style={styles.label}>
+    <View style={props.style}>
+      <ThemedText type="h4" style={styles.label}>
         {fieldLabel}
         {/* TODO: No text indicator here, something else */}
         {hasChanges && !isNewCard ? " (changed)" : ""}
-      </Text>
+      </ThemedText>
       {input}
     </View>
   );
@@ -93,8 +95,6 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 16,
-    fontWeight: "bold",
     marginBottom: 8,
   },
   input: {

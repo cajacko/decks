@@ -7,9 +7,6 @@ export const dragBuffer = 10;
 const dragHeaderHeight = Math.max(30, borderRadius);
 export const dragHeight = dragHeaderHeight + dragOverlap + dragBuffer;
 
-export const dragBarBackgroundColorPressed = "#c5c5c5";
-export const dragBarBackgroundColorDefault = "#e5e5e5";
-
 export const autoAnimateConfig: WithSpringConfig = {
   damping: 20,
   stiffness: 100,
@@ -59,7 +56,6 @@ export default StyleSheet.create({
     width: "100%",
   },
   content: {
-    backgroundColor: "white",
     flex: 1,
     marginTop: dragHeight - dragOverlap - dragBuffer,
   },

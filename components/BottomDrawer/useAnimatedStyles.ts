@@ -3,10 +3,7 @@ import {
   SharedValue,
   useSharedValue,
 } from "react-native-reanimated";
-import {
-  dragBarBackgroundColorDefault,
-  dragBarBackgroundColorPressed,
-} from "./bottomDrawer.style";
+import { useThemeColors } from "@/hooks/useThemeColor";
 
 export function useAnimatedHeightStyle(height: SharedValue<number>) {
   return useAnimatedStyle(() => {
@@ -23,11 +20,12 @@ export default function useAnimatedStyles(props: {
   pressed: SharedValue<boolean>;
   bottom: SharedValue<number>;
 }) {
+  const { drawerDragBarActive, drawerDragBarPassive } = useThemeColors();
   const { height, pressed } = props;
 
   const sharedStyles = useSharedValue({
-    dragBarBackgroundColorPressed,
-    dragBarBackgroundColorDefault,
+    dragBarBackgroundColorPressed: drawerDragBarActive,
+    dragBarBackgroundColorDefault: drawerDragBarPassive,
   });
 
   const heightStyle = useAnimatedHeightStyle(height);

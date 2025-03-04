@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Button, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectCardTemplate } from "@/store/combinedSelectors/cards";
 import { useSaveEditCard } from "@/context/EditCard";
@@ -8,11 +8,14 @@ import EditCardSideForm from "@/components/EditCardSideForm";
 import { deleteCardHelper } from "@/store/actionHelpers/cards";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import text from "@/constants/text";
+import IconButton from "./IconButton";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
   onDelete?: () => void;
 };
+
+const iconSize = 30;
 
 export default function EditCardForm({
   flipSide,
@@ -52,12 +55,20 @@ export default function EditCardForm({
     <View style={styles.container}>
       {component}
       <View style={styles.buttonContainer}>
-        <View style={styles.buttonLeft}>
-          <Button title={text["card.action.flip"]} onPress={flipSide} />
-        </View>
-        <View style={styles.buttonRight}>
-          <Button title={text["general.delete"]} onPress={open} />
-        </View>
+        <IconButton
+          icon="flip"
+          size={iconSize}
+          style={styles.iconButton}
+          onPress={flipSide}
+          variant="transparent"
+        />
+        <IconButton
+          icon="delete"
+          size={iconSize}
+          style={styles.iconButton}
+          onPress={open}
+          variant="transparent"
+        />
       </View>
       {frontTemplate && (
         <EditCardSideForm
@@ -89,12 +100,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     flexDirection: "row",
   },
-  buttonLeft: {
+  iconButton: {
     flex: 1,
-    marginRight: 10,
-  },
-  buttonRight: {
-    flex: 1,
-    marginLeft: 10,
+    alignItems: "center",
   },
 });

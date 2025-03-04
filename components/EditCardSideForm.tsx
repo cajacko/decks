@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 import TemplateSchemaItem from "@/components/TemplateSchemaItem";
 import { Cards, Templates } from "@/store/types";
 import { useAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaOrder } from "@/store/combinedSelectors/cards";
 import { Target } from "@/utils/cardTarget";
+import ThemedText from "./ThemedText";
 
 export default function EditCardSideForm(
   props: Target & {
@@ -21,13 +22,18 @@ export default function EditCardSideForm(
 
   return (
     <>
-      {props.title !== null && <Text style={styles.title}>{props.title}</Text>}
+      {props.title !== null && (
+        <ThemedText type="h3" style={styles.title}>
+          {props.title}
+        </ThemedText>
+      )}
       {schemaOrder.map((templateSchemaItemId) => (
         <TemplateSchemaItem
           key={templateSchemaItemId}
           templateSchemaItemId={templateSchemaItemId}
           templateId={props.templateId}
           side={props.side}
+          style={styles.item}
         />
       ))}
     </>
@@ -36,7 +42,9 @@ export default function EditCardSideForm(
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 20,
+    marginBottom: 20,
+  },
+  item: {
     marginBottom: 10,
   },
 });

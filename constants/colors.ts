@@ -18,6 +18,8 @@ export const themes = {
     background: colors.white,
     buttonBackground: "#0a7ea4",
     buttonText: colors.white,
+    drawerDragBarPassive: "#e5e5e5",
+    drawerDragBarActive: "#c5c5c5",
   },
   dark: {
     text: "#ECEDEE",
@@ -25,6 +27,8 @@ export const themes = {
     background: "#151718",
     buttonBackground: colors.black,
     buttonText: colors.white,
+    drawerDragBarPassive: "#404040",
+    drawerDragBarActive: "#6e6e6e",
   },
 };
 
