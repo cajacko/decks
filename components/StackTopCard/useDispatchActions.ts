@@ -8,7 +8,7 @@ import {
 } from "@/store/slices/tabletop";
 import { CardSidesRef } from "@/components/CardSides";
 import { StackTopCardProps } from "./types";
-import { useAnimateCardMovement } from "@/hooks/useFlag";
+import useFlag from "@/hooks/useFlag";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import uuid from "@/utils/uuid";
 
@@ -26,7 +26,7 @@ export default function useDispatchActions({
     useDispatchActions.name,
   );
 
-  const animateCardMovement = useAnimateCardMovement();
+  const animateCardMovement = useFlag("CARD_ANIMATIONS") === "enabled";
   const dispatch = useAppDispatch();
   const cardInstanceRef = React.useRef<CardSidesRef>(null);
   const [isAnimating, setIsAnimating] = React.useState(

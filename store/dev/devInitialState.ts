@@ -215,10 +215,7 @@ const state: RootState = {
       },
     },
   },
-  userSettings: {
-    animateCardMovement: true,
-    holdMenuBehaviour: "hold",
-  },
+  userSettings: {},
 };
 
 export default state;

@@ -6,7 +6,7 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import { MenuItem, HoldMenuProps } from "./types";
-import { useHoldMenuBehaviour } from "@/hooks/useFlag";
+import useFlag from "@/hooks/useFlag";
 import usePointer from "@/hooks/usePointer";
 
 export const DEV_INDICATOR = false;
@@ -66,7 +66,7 @@ export default function useHoldMenu<I extends MenuItem>({
   touchBuffer = 20,
   ...props
 }: HoldMenuProps<I>) {
-  let holdMenuBehaviour = useHoldMenuBehaviour();
+  let holdMenuBehaviour: "tap" | "hold" = useFlag("HOLD_MENU_BEHAVIOUR");
   const menuRef = React.useRef<View>(null);
   const opacity = React.useRef(new Animated.Value(1)).current;
   const hoverIndicatorOpacity = React.useRef(new Animated.Value(0)).current;

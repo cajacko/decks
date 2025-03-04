@@ -1,32 +1,15 @@
 import { useAppSelector } from "@/store/hooks";
-import {
-  selectUserSettings,
-  UserSettingsState,
-} from "@/store/slices/userSettings";
-import flags, { Flags } from "@/constants/flags";
+import { UserSettings } from "@/store/types";
+import { getFlag, getFlags, Flags } from "@/utils/flags";
 
-export default function useFlag<
-  // This is okay in this generic, it is still strongly typed when used
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  L extends (flags: Flags, userSettings: UserSettingsState) => any,
->(logic: L): ReturnType<L> {
-  const userSettings = useAppSelector(selectUserSettings);
-
-  return logic(flags, userSettings);
+export default function useFlag<FlagKey extends UserSettings.FlagKey>(
+  key: FlagKey,
+): UserSettings.FlagValue<FlagKey> {
+  return useAppSelector((state) => getFlag(key, state));
 }
 
-export const useAnimateCardMovement = () =>
-  useFlag(
-    (flags, userSettings): boolean =>
-      (flags.CARD_ANIMATIONS === "user-defined"
-        ? userSettings.animateCardMovement
-        : flags.CARD_ANIMATIONS === "enabled") ?? true,
-  );
-
-export const useHoldMenuBehaviour = () =>
-  useFlag(
-    (flags, userSettings): "tap" | "hold" =>
-      (flags.HOLD_MENU_BEHAVIOUR === "user-defined"
-        ? userSettings.holdMenuBehaviour
-        : flags.HOLD_MENU_BEHAVIOUR) ?? "hold",
-  );
+export function useFlags<FlagKeys extends UserSettings.FlagKey[]>(
+  ...keys: FlagKeys
+): Flags<FlagKeys> {
+  return useAppSelector((state) => getFlags(keys, state));
+}

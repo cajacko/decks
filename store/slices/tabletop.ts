@@ -3,7 +3,7 @@ import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
 import { RootState, Tabletops, SliceName, Cards, Decks } from "../types";
-import flags from "@/constants/flags";
+import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
@@ -19,7 +19,7 @@ export type CardInstance = Tabletops.CardInstance;
 
 export const MoveCardInstanceMethod = Tabletops.MoveCardInstanceMethod;
 
-const initialState: TabletopState = flags.USE_DEV_INITIAL_REDUX_STATE
+const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.tabletops
   : {
       tabletopsById: {},

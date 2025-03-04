@@ -1,11 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Templates, RootState, SliceName } from "../types";
-import flags from "@/constants/flags";
+import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
 import withBuiltInState from "../utils/withBuiltInState";
 import { builtInTemplatesById } from "@/constants/builtInTemplates";
 
-const initialState: Templates.State = flags.USE_DEV_INITIAL_REDUX_STATE
+const initialState: Templates.State = getFlag(
+  "USE_DEV_INITIAL_REDUX_STATE",
+  null,
+)
   ? devInitialState.templates
   : {
       templatesById: {},

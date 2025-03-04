@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
-import flags from "@/constants/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import withBuiltInState from "../utils/withBuiltInState";
+import { getFlag } from "@/utils/flags";
 
 export type Card = Cards.Props;
 
 export { updateCard };
 
-const initialState: Cards.State = flags.USE_DEV_INITIAL_REDUX_STATE
+const initialState: Cards.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.cards
   : {
       cardsById: {},

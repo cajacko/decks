@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { Decks, RootState, SliceName } from "../types";
-import flags from "@/constants/flags";
+import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
@@ -10,7 +10,7 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { CardDataItem } from "../combinedActions/types";
 import withBuiltInState from "../utils/withBuiltInState";
 
-const initialState: Decks.State = flags.USE_DEV_INITIAL_REDUX_STATE
+const initialState: Decks.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.decks
   : {
       decksById: {},
