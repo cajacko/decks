@@ -12,6 +12,7 @@ const dataItemIds = {
   backgroundColor: dataItemId("backgroundColor"),
   titleColor: dataItemId("titleColor"),
   descriptionColor: dataItemId("descriptionColor"),
+  borderColor: dataItemId("borderColor"),
   // titleSize: dataItemId("titleSize"),
   // descriptionSize: dataItemId("descriptionSize"),
 };
@@ -88,37 +89,57 @@ const template = {
         type: Templates.DataType.Color,
       },
     },
+    [dataItemIds.borderColor]: {
+      id: dataItemIds.borderColor,
+      name: text["template.built_in.front.border_color"],
+      type: Templates.DataType.Color,
+      defaultValidatedValue: {
+        value: fixed.cardPresets.red,
+        type: Templates.DataType.Color,
+      },
+    },
   },
   markup: [
     {
       type: "view",
       style: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 5,
-        backgroundColor: `{{${dataItemIds.backgroundColor}}}`,
+        backgroundColor: `{{${dataItemIds.borderColor}}}`,
       },
       children: [
         {
-          type: "text",
-          text: `{{${dataItemIds.title}}}`,
+          type: "view",
           style: {
-            fontSize: 8,
-            textAlign: "center",
-            color: `{{${dataItemIds.titleColor}}}`,
+            margin: 2,
+            flex: 1,
+            padding: 5,
+            borderRadius: 2,
+            backgroundColor: `{{${dataItemIds.backgroundColor}}}`,
+            justifyContent: "center",
+            alignItems: "center",
           },
-        },
-        {
-          type: "text",
-          text: `{{${dataItemIds.description}}}`,
-          conditional: dataItemIds.description,
-          style: {
-            marginTop: 2,
-            fontSize: 4,
-            textAlign: "center",
-            color: `{{${dataItemIds.descriptionColor}}}`,
-          },
+          children: [
+            {
+              type: "text",
+              text: `{{${dataItemIds.title}}}`,
+              style: {
+                fontSize: 8,
+                textAlign: "center",
+                color: `{{${dataItemIds.titleColor}}}`,
+              },
+            },
+            {
+              type: "text",
+              text: `{{${dataItemIds.description}}}`,
+              conditional: dataItemIds.description,
+              style: {
+                marginTop: 2,
+                fontSize: 4,
+                textAlign: "center",
+                color: `{{${dataItemIds.descriptionColor}}}`,
+              },
+            },
+          ],
         },
       ],
     },

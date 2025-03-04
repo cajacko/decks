@@ -31,6 +31,7 @@
   "template.built_in.back.text": "Text",
   "template.built_in.back.title": "Back Template",
   "template.built_in.front.background_color": "Background Colour",
+  "template.built_in.front.border_color": "Border Colour",
   "template.built_in.front.description_color": "Description Colour",
   "template.built_in.front.description.default": "Description",
   "template.built_in.front.description": "Description",
