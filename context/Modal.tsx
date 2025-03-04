@@ -13,8 +13,7 @@ type ModalState = {
 };
 
 type ContextState = {
-  getActiveModalId: () => string | null;
-  setModalState: React.Dispatch<React.SetStateAction<ModalState | null>>;
+  setModalProps: (id: string, props: ModalProps | null) => void;
 };
 
 const Context = React.createContext<ContextState | undefined>(undefined);
@@ -35,12 +34,10 @@ export function Modal(props: ModalProps) {
 
     const id = uuid();
 
-    context.setModalState({ id, props });
+    context.setModalProps(id, props);
 
     return () => {
-      if (id !== context.getActiveModalId()) return;
-
-      context.setModalState(null);
+      context.setModalProps(id, null);
     };
   }, [context, props]);
 
@@ -48,33 +45,65 @@ export function Modal(props: ModalProps) {
 }
 
 export function ModalProvider(props: { children: React.ReactNode }) {
-  const [modalState, setModalState] = React.useState<ModalState | null>(null);
-
-  const modalStateRef = React.useRef(modalState);
-  modalStateRef.current = modalState;
+  const [modals, setModals] = React.useState<ModalState[]>([]);
 
   const value = React.useMemo<ContextState>(
     () => ({
-      setModalState,
-      getActiveModalId: () => modalStateRef.current?.id ?? null,
+      setModalProps: (id, props) => {
+        setModals((prev): ModalState[] => {
+          // If existing, update, if new add, if null props remove
+          const index = prev.findIndex((modal) => modal.id === id);
+
+          if (index === -1 && props) {
+            return [...prev, { id, props }];
+          }
+
+          if (index !== -1 && !props) {
+            return prev.filter((modal) => modal.id !== id);
+          }
+
+          if (!props) {
+            return prev;
+          }
+
+          return prev.map((modal, i): ModalState => {
+            if (i === index) {
+              return { id, props };
+            }
+
+            return modal;
+          });
+        });
+      },
     }),
     [],
   );
 
   const { entering, exiting } = useLayoutAnimations();
 
+  const modalChildren = React.useMemo(
+    () =>
+      modals.map(({ id, props }, i) => {
+        if (!props.visible) return null;
+
+        return (
+          <Animated.View
+            key={id}
+            entering={entering}
+            exiting={exiting}
+            style={[styles.modal, { zIndex: 2 + i }]}
+          >
+            {props.children}
+          </Animated.View>
+        );
+      }),
+    [modals, entering, exiting],
+  );
+
   return (
     <Context.Provider value={value}>
       <View style={styles.content}>{props.children}</View>
-      {modalState?.props.visible && (
-        <Animated.View
-          entering={entering}
-          exiting={exiting}
-          style={styles.modal}
-        >
-          {modalState.props.children}
-        </Animated.View>
-      )}
+      {modalChildren}
     </Context.Provider>
   );
 }
@@ -91,6 +120,5 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 2,
   },
 });

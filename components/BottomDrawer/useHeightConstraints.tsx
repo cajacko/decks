@@ -9,8 +9,6 @@ import React from "react";
 import { ScrollViewProps } from "react-native";
 import debugLog from "./debugLog";
 
-// TODO: When we update the constraints, then check if the drawer height needs to change
-
 /**
  * Handles the height constraints for the drawer
  */
