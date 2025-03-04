@@ -6,23 +6,25 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
+export type ThemedTextVariant = "h1" | "h3" | "body1" | "button" | "link";
+
 export type ThemedTextProps = TextProps & {
-  type?: "h3" | "body1" | "button" | "link";
+  type?: ThemedTextVariant;
 };
 
 export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
 
-export default function ThemedText({
-  style: styleProp,
+export function useThemedTextStyle({
   type = "body1",
-  ...rest
-}: ThemedTextProps) {
+  style: styleProp,
+}: Partial<ThemedTextProps>) {
   const color = useThemeColor(type === "link" ? "link" : "text");
 
   const style = React.useMemo(
     () => [
       { color },
       type === "body1" ? styles.body1 : undefined,
+      type === "h1" ? styles.h1 : undefined,
       type === "h3" ? styles.h3 : undefined,
       type === "button" ? styles.button : undefined,
       styleProp,
@@ -30,13 +32,32 @@ export default function ThemedText({
     [styleProp, type, color],
   );
 
-  return <Text style={style} {...rest} />;
+  return style;
+}
+
+export default function ThemedText({
+  style: styleProp,
+  type,
+  ...rest
+}: ThemedTextProps) {
+  const style = useThemedTextStyle({
+    type,
+    style: styleProp,
+    ...rest,
+  });
+
+  return <Text {...rest} style={style} />;
 }
 
 const styles = StyleSheet.create({
   body1: {
     fontSize: 16,
     lineHeight: 24,
+  },
+  h1: {
+    fontSize: 30,
+    lineHeight: 24,
+    fontWeight: "normal",
   },
   h3: {
     fontSize: 20,

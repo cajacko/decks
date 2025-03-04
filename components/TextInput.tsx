@@ -3,12 +3,10 @@ import {
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
 } from "react-native";
+import { ThemedTextVariant, useThemedTextStyle } from "./ThemedText";
 
-export interface TemplateSchemaItemProps {
-  cardId: string;
-  side: "front" | "back";
-  templateId: string;
-  templateSchemaItemId: string;
+export interface TextInputProps extends RNTextInputProps {
+  textVariant?: ThemedTextVariant;
 }
 
 /**
@@ -19,8 +17,11 @@ export interface TemplateSchemaItemProps {
 export default function TextInput({
   value: valueProp,
   onChangeText: onChangeTextProp,
+  style: styleProp,
+  textVariant = "body1",
   ...props
-}: RNTextInputProps) {
+}: TextInputProps) {
+  const style = useThemedTextStyle({ type: textVariant, style: styleProp });
   const [value, setValue] = React.useState(valueProp);
 
   const onChangeText = React.useCallback(
@@ -39,6 +40,11 @@ export default function TextInput({
   }, [valueProp]);
 
   return (
-    <RNTextInput {...props} value={value ?? ""} onChangeText={onChangeText} />
+    <RNTextInput
+      {...props}
+      style={style}
+      value={value ?? ""}
+      onChangeText={onChangeText}
+    />
   );
 }

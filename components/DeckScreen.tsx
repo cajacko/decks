@@ -16,6 +16,7 @@ import { useDeckToolbar } from "./DeckToolbar";
 import IconButton from "./IconButton";
 import { DeckCardSizeProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
+import { maxWidth } from "./DecksScreen";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -34,8 +35,14 @@ const initialRows = 4;
 
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DeckScreen.name);
-  const numColumns = 3;
   const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
+
+  const numColumns = React.useRef(
+    Math.max(
+      Math.round(Math.min(Dimensions.get("window").width, maxWidth) / 160),
+      2,
+    ),
+  );
 
   const cardsState = useAppSelector((state) =>
     selectDeckCards(state, { deckId: props.deckId }),
@@ -43,7 +50,9 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
 
   const cards = React.useMemo(
     () =>
-      skeleton ? cardsState?.slice(0, numColumns * initialRows) : cardsState,
+      skeleton
+        ? cardsState?.slice(0, numColumns.current * initialRows)
+        : cardsState,
     [cardsState, skeleton, numColumns],
   );
 
@@ -67,6 +76,11 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     id: props.deckId,
   });
 
+  const containerStyle = React.useMemo(
+    () => [styles.container, props.style],
+    [props.style],
+  );
+
   return (
     <DeckCardSizeProvider
       id={props.deckId}
@@ -74,23 +88,23 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       constraints={styles.constraints}
     >
       {!skeleton && (
-        <View style={props.style}>
+        <View style={containerStyle}>
           {component}
           {defaultCard.component}
           <FlatList<FlatListData>
             data={cards}
-            numColumns={numColumns}
-            initialNumToRender={numColumns * initialRows}
+            numColumns={numColumns.current}
+            initialNumToRender={numColumns.current * initialRows}
             columnWrapperStyle={styles.columnWrapperStyle}
             windowSize={5}
-            maxToRenderPerBatch={numColumns * 2}
+            maxToRenderPerBatch={numColumns.current * 2}
             removeClippedSubviews={true}
             ListHeaderComponent={
               <DeckDetails deckId={props.deckId} skeleton={skeleton} />
             }
             renderItem={renderItem}
             keyExtractor={keyExtractor}
-            style={styles.container}
+            style={styles.list}
             // TODO: Can calculate this once and improve performance
             // getItemLayout={(data, index) => ({
             //   length: ITEM_HEIGHT,
@@ -106,7 +120,14 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
-  container: {},
+  list: {
+    maxWidth,
+    width: "100%",
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+  },
   columnWrapperStyle: {},
   item: {
     flex: 1,

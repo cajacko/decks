@@ -25,7 +25,7 @@ type FlatListItem = string;
 const extractKey: (item: FlatListItem) => string = (item) => item;
 
 const initialRows = 4;
-const maxWidth = 1000;
+export const maxWidth = 1000;
 
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DecksScreen.name);

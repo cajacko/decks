@@ -41,12 +41,15 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
         onChangeText={setTitle}
         placeholder={text["deck.edit.title.placeholder"]}
         style={styles.name}
+        textVariant="h1"
       />
       <TextInput
         value={description}
         onChangeText={setDescription}
         placeholder={text["deck.edit.description.placeholder"]}
         style={styles.description}
+        textVariant="body1"
+        multiline
       />
     </View>
   );
@@ -54,14 +57,12 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
     padding: 10,
     marginBottom: 10,
   },
   name: {
-    fontSize: 24,
+    marginBottom: 20,
+    marginTop: 20,
   },
-  description: {
-    fontSize: 20,
-  },
+  description: {},
 });
