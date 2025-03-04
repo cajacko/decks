@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
-import { selectDeckCards } from "@/store/slices/decks";
+import { selectDeckCards, selectDeckLastScreen } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "./CardSideBySide";
@@ -26,6 +26,9 @@ export default function DeckListItem(
   const firstDeckCardId = useAppSelector(
     (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
   );
+  const lastScreen = useAppSelector((state) =>
+    selectDeckLastScreen(state, { deckId: props.deckId }),
+  );
 
   const coverTarget = React.useMemo(
     (): Target =>
@@ -36,8 +39,12 @@ export default function DeckListItem(
   );
 
   const play = React.useCallback(() => {
-    navigate(`/deck/${props.deckId}/play`);
-  }, [props.deckId, navigate]);
+    navigate(
+      lastScreen === "deck"
+        ? `/deck/${props.deckId}`
+        : `/deck/${props.deckId}/play`,
+    );
+  }, [props.deckId, navigate, lastScreen]);
 
   const containerStyle = React.useMemo(
     () => [styles.container, props.style],

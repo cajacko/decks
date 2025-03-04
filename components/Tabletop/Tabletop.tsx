@@ -10,12 +10,18 @@ import Animated, {
 } from "react-native-reanimated";
 import { DeckTabletopProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
+import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 
 export default function Tabletop({
   tabletopId,
   deckId,
 }: TabletopProps): React.ReactNode {
   useTabletopToolbar({ tabletopId });
+
+  useDeckLastScreen({
+    deckId,
+    screen: "play",
+  });
 
   const [size, setSize] = React.useState<{ height: number; width: number }>(
     Dimensions.get("screen"),

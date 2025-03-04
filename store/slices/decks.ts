@@ -60,6 +60,16 @@ export const cardsSlice = createSlice({
   name: SliceName.Decks,
   initialState,
   reducers: {
+    setLastScreen: (
+      state,
+      actions: PayloadAction<{ deckId: Decks.DeckId; screen: "deck" | "play" }>,
+    ) => {
+      const deck = state.decksById[actions.payload.deckId];
+
+      if (!deck) return;
+
+      deck.lastScreen = actions.payload.screen;
+    },
     setDeckDetails: (
       state,
       actions: PayloadAction<{
@@ -191,7 +201,8 @@ export const cardsSlice = createSlice({
   },
 });
 
-export const { setDeckCardDefaults, setDeckDetails } = cardsSlice.actions;
+export const { setDeckCardDefaults, setDeckDetails, setLastScreen } =
+  cardsSlice.actions;
 
 export const selectDeck = withBuiltInState(
   (state: RootState, props: { deckId: string }): Decks.Props | undefined =>
@@ -206,5 +217,10 @@ export const selectDeckCards = (
   state: RootState,
   props: { deckId: string },
 ): Decks.Card[] | undefined => selectDeck(state, props)?.cards;
+
+export const selectDeckLastScreen = (
+  state: RootState,
+  props: { deckId: string },
+): "deck" | "play" | undefined => selectDeck(state, props)?.lastScreen;
 
 export default cardsSlice;

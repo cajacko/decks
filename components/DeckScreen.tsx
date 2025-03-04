@@ -17,6 +17,7 @@ import IconButton from "./IconButton";
 import { DeckCardSizeProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import { maxWidth } from "./DecksScreen";
+import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -36,6 +37,11 @@ const initialRows = 4;
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DeckScreen.name);
   const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
+
+  useDeckLastScreen({
+    deckId: props.deckId,
+    screen: "deck",
+  });
 
   const numColumns = React.useRef(
     Math.max(

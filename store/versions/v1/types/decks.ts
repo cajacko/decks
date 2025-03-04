@@ -70,6 +70,7 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
   defaultTabletopId: string;
   status: "creating" | "active" | "deleting";
   cardSize: CardSize;
+  lastScreen?: "deck" | "play";
 }
 
 export interface State {
