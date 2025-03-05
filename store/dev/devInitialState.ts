@@ -79,20 +79,11 @@ const state: RootState = {
         cardSize: Decks.CardSize.Poker,
         status: "active",
         id: "deck1",
-        dataSchemaOrder: ["title", "backgroundColor"],
+        dataSchemaOrder: [builtInTemplates.front.schema.title.id],
         dataSchema: {
-          title: {
-            id: "title",
+          [builtInTemplates.front.schema.title.id]: {
+            id: builtInTemplates.front.schema.title.id,
             type: Templates.DataType.Text,
-          },
-          // description: {
-          //   id: "description",
-          //   title: "Subtitle",
-          //   type: Templates.DataType.Text,
-          // },
-          backgroundColor: {
-            id: "backgroundColor",
-            type: Templates.DataType.Color,
           },
         },
         name: "Deck 1",
@@ -101,13 +92,8 @@ const state: RootState = {
             templateId: builtInTemplates.front.templateId,
             dataTemplateMapping: {
               [builtInTemplates.front.schema.title.id]: {
-                dataSchemaItemId: "title",
+                dataSchemaItemId: builtInTemplates.front.schema.title.id,
                 templateSchemaItemId: builtInTemplates.front.schema.title.id,
-              },
-              [builtInTemplates.front.schema.backgroundColor.id]: {
-                dataSchemaItemId: "backgroundColor",
-                templateSchemaItemId:
-                  builtInTemplates.front.schema.backgroundColor.id,
               },
             },
           },

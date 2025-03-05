@@ -1,7 +1,8 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { MarkupElementProps, MarkupChildrenProps } from "./Template.types";
-import useConvertStyles, { replaceVariables } from "./useConvertStyles";
+import useConvertStyles from "./useConvertStyles";
+import { replaceVariables } from "./handlebars";
 import { useTemplateDataItem } from "./TemplateContext";
 import AppError from "@/classes/AppError";
 

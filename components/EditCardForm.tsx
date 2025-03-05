@@ -9,11 +9,13 @@ import { deleteCardHelper } from "@/store/actionHelpers/cards";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import text from "@/constants/text";
 import IconButton from "./IconButton";
+import { Cards } from "@/store/types";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
   onDelete?: () => void;
   handleClose?: () => void;
+  activeSide: Cards.Side;
 };
 
 const iconSize = 30;
@@ -24,6 +26,7 @@ export default function EditCardForm({
   type,
   onDelete,
   handleClose,
+  activeSide,
 }: EditCardFormProps): React.ReactNode {
   const dispatch = useAppDispatch();
 
@@ -84,7 +87,7 @@ export default function EditCardForm({
           variant="transparent"
         />
       </View>
-      {frontTemplate && (
+      {frontTemplate && activeSide === "front" && (
         <EditCardSideForm
           id={id}
           type={type}
@@ -93,7 +96,7 @@ export default function EditCardForm({
           title={!!backTemplate ? text["card.templates.front.title"] : null}
         />
       )}
-      {backTemplate && (
+      {backTemplate && activeSide === "back" && (
         <EditCardSideForm
           id={id}
           type={type}

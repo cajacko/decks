@@ -100,6 +100,7 @@ export default function EditCard({
               flipSide={flipSide}
               onDelete={props.onDelete}
               handleClose={onPressBackground}
+              activeSide={side}
               {...props.target}
             />
           </BottonDrawer>

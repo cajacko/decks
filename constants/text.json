@@ -26,17 +26,15 @@
   "tabletop.reset.button": "Reset",
   "tabletop.reset.message": "This will move all cards back into the first stack and deck order.",
   "tabletop.reset.title": "Reset Tabletop",
-  "template.built_in.back.background_color": "Background Colour",
-  "template.built_in.back.text_color": "Text Colour",
   "template.built_in.back.text": "Text",
   "template.built_in.back.title": "Back Template",
-  "template.built_in.front.background_color": "Background Colour",
-  "template.built_in.front.border_color": "Border Colour",
-  "template.built_in.front.description_color": "Description Colour",
   "template.built_in.front.description.default": "Description",
-  "template.built_in.front.description": "Description",
   "template.built_in.front.name": "Front Template",
-  "template.built_in.front.title_color": "Title Colour",
   "template.built_in.front.title.default": "Title",
-  "template.built_in.front.title": "Title"
+  "template.reserved_data_item.title.name": "Title",
+  "template.reserved_data_item.title.description": "The main title for the card",
+  "template.reserved_data_item.description.name": "Description",
+  "template.reserved_data_item.description.description": "Additional text for the card",
+  "template.reserved_data_item.color.name": "Colour",
+  "template.reserved_data_item.color.description": "The main colour for the card, templates may use this to style the card"
 }

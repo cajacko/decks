@@ -9,6 +9,7 @@ import {
 } from "@/store/types";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
+import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
 
 type State = Pick<
   RootState,
@@ -91,8 +92,8 @@ export default function exampleDecksToStore() {
     exampleDeck.cards.forEach(({ title, description }, index) => {
       const cardId = ids.cardId(`${index + 1}`);
       const cardInstanceId = ids.cardInstanceId(cardId);
-      const titleId = "title";
-      const descriptionId = "description";
+      const titleId = ReservedDataSchemaIds.Title;
+      const descriptionId = ReservedDataSchemaIds.Description;
 
       const card: Cards.Props = {
         cardId,

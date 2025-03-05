@@ -4,41 +4,34 @@ import builtInTemplateIds, {
 } from "@/utils/builtInTemplateIds";
 import text from "@/constants/text";
 import { fixed } from "@/constants/colors";
+import {
+  ReservedDataSchemaIds,
+  reservedDataSchemaItems,
+} from "@/constants/reservedDataSchemaItems";
+import { colorFunction } from "@/components/Template/handlebars";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
 
 const dataItemIds = {
   text: dataItemId("text"),
-  textColor: dataItemId("textColor"),
-  backgroundColor: dataItemId("backgroundColor"),
+  color: ReservedDataSchemaIds.Color,
 };
 
 const template: Templates.Props = {
   templateId,
   name: text["template.built_in.back.title"],
-  schemaOrder: [dataItemIds.backgroundColor],
+  schemaOrder: [dataItemIds.text, dataItemIds.color],
   schema: {
     [dataItemIds.text]: {
       id: dataItemIds.text,
       name: text["template.built_in.back.text"],
       type: Templates.DataType.Text,
     },
-    [dataItemIds.textColor]: {
-      id: dataItemIds.textColor,
-      name: text["template.built_in.back.text_color"],
-      type: Templates.DataType.Color,
+    [dataItemIds.color]: {
+      ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
-        value: "#765804",
-        type: Templates.DataType.Color,
-      },
-    },
-    [dataItemIds.backgroundColor]: {
-      id: dataItemIds.backgroundColor,
-      name: text["template.built_in.back.background_color"],
-      type: Templates.DataType.Color,
-      defaultValidatedValue: {
-        value: fixed.cardPresets.grey,
+        value: fixed.cardPresets.yellow,
         type: Templates.DataType.Color,
       },
     },
@@ -48,7 +41,6 @@ const template: Templates.Props = {
       type: "view",
       style: {
         flex: 1,
-        // backgroundColor: `{{${dataItemIds.backgroundColor}}}`,
         justifyContent: "center",
         alignItems: "center",
         padding: 5,
@@ -60,7 +52,7 @@ const template: Templates.Props = {
           type: "text",
           text: `{{${deckTemplateIds.name}}}`,
           style: {
-            color: `{{${dataItemIds.textColor}}}`,
+            color: colorFunction("lightness", dataItemIds.color, 15),
             fontSize: 10,
             textAlign: "center",
             zIndex: 2,
@@ -77,7 +69,7 @@ const template: Templates.Props = {
             right: "-100%",
             bottom: "-100%",
             zIndex: 1,
-            backgroundColor: "#ffd151",
+            backgroundColor: colorFunction("lightness", dataItemIds.color, 70),
             transform: [{ rotate: "-45deg" }, { translateX: "-10%" }],
           },
           children: [
@@ -86,14 +78,22 @@ const template: Templates.Props = {
               style: {
                 flex: 1,
                 flexDirection: "row",
-                backgroundColor: "#f8c537",
+                backgroundColor: colorFunction(
+                  "lightness",
+                  dataItemIds.color,
+                  80,
+                ),
               },
               children: [
                 {
                   type: "view",
                   style: {
                     flex: 1,
-                    backgroundColor: "#edb230",
+                    backgroundColor: colorFunction(
+                      "lightness",
+                      dataItemIds.color,
+                      65,
+                    ),
                   },
                 },
                 {

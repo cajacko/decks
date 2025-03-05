@@ -1,8 +1,8 @@
 import React from "react";
 import { Templates } from "@/store/types";
 import { usePhysicalMeasures } from "@/context/PhysicalMeasures";
-import Handlebars from "handlebars";
 import { Values } from "./Template.types";
+import { replaceVariables } from "./handlebars";
 
 const distanceProperties: string[] = [
   "width",
@@ -35,12 +35,6 @@ const distanceProperties: string[] = [
 ] satisfies (keyof Templates.AllStyles)[];
 
 export const variableRegex = /{{(.*?)}}/;
-
-export function replaceVariables(text: string, values: Values): string {
-  const template = Handlebars.compile(text, { noEscape: true });
-
-  return template(values);
-}
 
 export default function useConvertStyles(values?: Values | null) {
   const { mmToDp } = usePhysicalMeasures();
