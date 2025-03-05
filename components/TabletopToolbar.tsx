@@ -45,7 +45,7 @@ export function useTabletopToolbar({
     [tabletopId, hasFuture, hasPast],
   );
 
-  useParentHeaderRight(headerRight, "tabletop");
+  useParentHeaderRight(headerRight);
 
   return {
     tabletopId,

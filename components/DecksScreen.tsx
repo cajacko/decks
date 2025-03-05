@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
+import { useDecksToolbarProps } from "@/components/DecksToolbar";
 
 export interface DecksScreenProps {
   style?: ViewStyle;
@@ -32,6 +33,7 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const deckIdsState = useAppSelector(selectDeckIds);
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
+  useDecksToolbarProps();
 
   const numColumns = React.useRef(
     Math.max(

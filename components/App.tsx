@@ -17,6 +17,7 @@ import { navigationColors } from "@/constants/colors";
 import { navigationFonts } from "@/components/ThemedText";
 import { enableFreeze } from "react-native-screens";
 import { AbrilFatface_400Regular } from "@expo-google-fonts/abril-fatface";
+import { DrawerProvider } from "@/context/Drawer";
 
 enableFreeze();
 
@@ -97,8 +98,10 @@ export default function App({ children }: { children: React.ReactNode }) {
           persistor={persistor}
         >
           <ModalProvider>
-            {children}
-            <StatusBar style="auto" />
+            <DrawerProvider>
+              {children}
+              <StatusBar style="auto" />
+            </DrawerProvider>
           </ModalProvider>
         </PersistGate>
       </ReduxProvider>

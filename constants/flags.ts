@@ -48,6 +48,7 @@ export const defaultFlags: UserSettings.FlagMap = {
   GENERAL_LAYOUT_ANIMATIONS: "enabled",
   DEBUG_AUTO_SAVE: false,
   DEBUG_BOTTOM_DRAWER: false,
+  DEV_MODE: false,
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(

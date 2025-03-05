@@ -31,7 +31,7 @@ export function useDeckToolbar({ deckId }: { deckId: string }) {
     [deckId, defaultCard.open],
   );
 
-  useParentHeaderRight(headerRight, "deck");
+  useParentHeaderRight(headerRight);
 
   return {
     deckId,

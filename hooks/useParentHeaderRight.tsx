@@ -2,18 +2,26 @@ import React from "react";
 import { useNavigation } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
 
-export default function useParentHeaderRight(
-  headerRight: null | (() => React.ReactNode),
-  key: string,
-) {
+export function useHeaderRight({
+  headerRight,
+  useParent,
+}: {
+  headerRight: null | (() => React.ReactNode);
+  useParent?: boolean;
+}) {
   const isFocused = useIsFocused();
-  const navigation = useNavigation();
+  let navigation = useNavigation();
+
+  const headerNavigation = React.useMemo(
+    () => (useParent ? navigation.getParent() : navigation),
+    [navigation, useParent],
+  );
 
   React.useEffect(() => {
     function setHeaderRight(component: null | (() => React.ReactNode)) {
       // NOTE: headerRight on re-renders when this effect changes, so we can't dynamically get redux
       // state inside the header component
-      navigation.getParent()?.setOptions({
+      headerNavigation?.setOptions({
         headerRight: component,
       });
     }
@@ -34,5 +42,14 @@ export default function useParentHeaderRight(
       blur();
       focus();
     };
-  }, [navigation, headerRight, isFocused]);
+  }, [navigation, headerRight, isFocused, headerNavigation]);
+}
+
+export default function useParentHeaderRight(
+  headerRight: null | (() => React.ReactNode),
+) {
+  return useHeaderRight({
+    headerRight,
+    useParent: true,
+  });
 }

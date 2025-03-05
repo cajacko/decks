@@ -33,8 +33,8 @@ const persistedReducer = persistReducer(
       tabletopsSlice.name,
       decksSlice.name,
       cardsSlice.name,
+      userSettingsSlice.name,
       // TODO: Add these when we're done in dev
-      // userSettingsSlice.name,
       // templatesSlice.name,
     ],
     // Enable to not persist history, currently we're invalidating it during migration instead,

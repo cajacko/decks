@@ -15,8 +15,32 @@ const initialState: UserSettingsState = getFlag(
 export const userSettingsSlice = createSlice({
   name: SliceName.UserSettings,
   initialState,
-  reducers: {},
+  reducers: {
+    setUserFlag: <FlagKey extends UserSettings.FlagKey>(
+      state: UserSettingsState,
+      action: {
+        type: string;
+        payload: {
+          key: FlagKey;
+          value: UserSettings.FlagValue<FlagKey> | null;
+        };
+      },
+    ) => {
+      state.flags = state.flags || {};
+
+      if (action.payload.value === null) {
+        delete state.flags[action.payload.key];
+
+        return;
+      }
+
+      // @ts-ignore
+      state.flags[action.payload.key] = action.payload.value;
+    },
+  },
 });
+
+export const { setUserFlag } = userSettingsSlice.actions;
 
 export const selectUserSettings = (state: RootState): UserSettingsState =>
   state[userSettingsSlice.name];
