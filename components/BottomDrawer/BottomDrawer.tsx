@@ -61,7 +61,10 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
             {/* NOTE: This fixes an issue with not being able to tap inputs inside the scroll view due to the gesture detector playing silly buggers
             https://chatgpt.com/g/g-p-67b5e925ea4881918dabd87d2acc4eb1-decks/c/67c75846-7134-8004-b0c9-014f2277aa83 */}
             <GestureHandlerRootView>
-              <ScrollView style={contentStyle}>
+              <ScrollView
+                style={contentStyle}
+                keyboardShouldPersistTaps="handled"
+              >
                 <View onLayout={state.onContentLayout}>{children}</View>
               </ScrollView>
             </GestureHandlerRootView>

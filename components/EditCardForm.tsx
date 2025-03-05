@@ -13,6 +13,7 @@ import IconButton from "./IconButton";
 export type EditCardFormProps = Target & {
   flipSide: () => void;
   onDelete?: () => void;
+  handleClose?: () => void;
 };
 
 const iconSize = 30;
@@ -22,6 +23,7 @@ export default function EditCardForm({
   id,
   type,
   onDelete,
+  handleClose,
 }: EditCardFormProps): React.ReactNode {
   const dispatch = useAppDispatch();
 
@@ -33,7 +35,7 @@ export default function EditCardForm({
     selectCardTemplate(state, { id, type, side: "front" }),
   );
 
-  useSaveEditCard(true);
+  const { save } = useSaveEditCard(true);
 
   const cardId = type === "card" ? id : null;
 
@@ -51,6 +53,11 @@ export default function EditCardForm({
     message: text["card.delete.message"],
   });
 
+  const onSave = React.useCallback(() => {
+    save();
+    handleClose?.();
+  }, [save, handleClose]);
+
   return (
     <View style={styles.container}>
       {component}
@@ -67,6 +74,13 @@ export default function EditCardForm({
           size={iconSize}
           style={styles.iconButton}
           onPress={open}
+          variant="transparent"
+        />
+        <IconButton
+          icon="save"
+          size={iconSize}
+          style={styles.iconButton}
+          onPress={onSave}
           variant="transparent"
         />
       </View>

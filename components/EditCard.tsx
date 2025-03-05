@@ -99,6 +99,7 @@ export default function EditCard({
             <EditCardForm
               flipSide={flipSide}
               onDelete={props.onDelete}
+              handleClose={onPressBackground}
               {...props.target}
             />
           </BottonDrawer>
