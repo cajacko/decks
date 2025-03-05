@@ -42,6 +42,7 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
         placeholder={text["deck.edit.title.placeholder"]}
         style={styles.name}
         textVariant="h1"
+        variant="display"
       />
       <TextInput
         value={description}
@@ -49,6 +50,7 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
         placeholder={text["deck.edit.description.placeholder"]}
         style={styles.description}
         textVariant="body1"
+        variant="display"
         multiline
       />
     </View>

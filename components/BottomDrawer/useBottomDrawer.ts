@@ -1,18 +1,24 @@
 import React from "react";
-import { useSharedValue, withTiming } from "react-native-reanimated";
 import { BottomDrawerProps, BottomDrawerRef } from "./BottomDrawer.types";
-import useSetupRef from "./useOpenClose";
+import useOpenClose from "./useOpenClose";
 import useHeightConstraints from "./useHeightConstraints";
 import useAnimatedStyles from "./useAnimatedStyles";
 import useDrag from "./useDrag";
-import { dragHeight } from "./bottomDrawer.style";
+import debugLog from "./debugLog";
 
 export default function useBottomDrawer(
   props: Omit<BottomDrawerProps, "children">,
   ref: React.Ref<BottomDrawerRef>,
 ) {
-  const { height, openOnMount = false } = props;
-  const pressed = useSharedValue<boolean>(false);
+  const { height, openOnMount = false, animateIn = false, initHeight } = props;
+
+  React.useEffect(() => {
+    debugLog("mounted");
+
+    return () => {
+      debugLog("unmounted");
+    };
+  }, []);
 
   const {
     maxAutoHeight,
@@ -22,34 +28,25 @@ export default function useBottomDrawer(
     hasGotMaxHeight,
   } = useHeightConstraints(props);
 
-  useSetupRef(
+  const { bottom } = useOpenClose(
     {
       height,
       maxAutoHeight,
       minHeight,
       hasGotMaxHeight,
       openOnMount,
+      animateIn,
+      initHeight,
     },
     ref,
   );
 
-  const drag = useDrag({
+  const { drag, pressed } = useDrag({
     height,
     maxAutoHeight,
     maxHeight,
     minHeight,
-    pressed,
   });
-
-  const bottom = useSharedValue(
-    props.animateIn ? -props.initHeight - dragHeight : 0,
-  );
-
-  React.useEffect(() => {
-    if (!props.animateIn) return;
-
-    bottom.value = withTiming(0, { duration: 500 });
-  }, [bottom, props.animateIn]);
 
   const animatedStyles = useAnimatedStyles({ height, pressed, bottom });
 

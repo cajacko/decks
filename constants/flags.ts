@@ -46,6 +46,8 @@ export const defaultFlags: UserSettings.FlagMap = {
   // reset and wouldn't set back to 1
   SCREENS_FREEZE_ON_BLUR: false,
   GENERAL_LAYOUT_ANIMATIONS: "enabled",
+  DEBUG_AUTO_SAVE: false,
+  DEBUG_BOTTOM_DRAWER: false,
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(

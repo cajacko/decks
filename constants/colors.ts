@@ -20,6 +20,7 @@ export const themes = {
     buttonText: colors.white,
     drawerDragBarPassive: "#e5e5e5",
     drawerDragBarActive: "#c5c5c5",
+    inputOutline: "#c5c5c5",
   },
   dark: {
     text: "#ECEDEE",
@@ -29,6 +30,7 @@ export const themes = {
     buttonText: colors.white,
     drawerDragBarPassive: "#404040",
     drawerDragBarActive: "#6e6e6e",
+    inputOutline: "#ccc",
   },
 };
 

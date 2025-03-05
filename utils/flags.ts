@@ -6,17 +6,25 @@ import {
 } from "@/constants/flags";
 import { UserSettings } from "@/store/types";
 
+type State =
+  | (() => UserSettings.FlagsState)
+  | UserSettings.FlagsState
+  | undefined
+  | null;
+
 function _getFlag<FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,
-  state: UserSettings.FlagsState | undefined | null,
+  state: State,
 ): UserSettings.FlagValue<FlagKey> {
   const devOverrideValue = flagOverrides[key];
 
   if (devOverrideValue !== undefined) return devOverrideValue;
 
   if (state !== null) {
+    const finalState = typeof state === "function" ? state() : state;
+
     // NOTE: We can't use our selector here because it would create a circular dependency
-    const userSettingsValue = state?.[key];
+    const userSettingsValue = finalState?.[key];
 
     if (userSettingsValue !== undefined) return userSettingsValue;
   }
@@ -26,7 +34,7 @@ function _getFlag<FlagKey extends UserSettings.FlagKey>(
 
 export function getFlag<FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,
-  state: UserSettings.FlagsState | undefined | null,
+  state: State,
 ): UserSettings.FlagValue<FlagKey> {
   const getFlag: GetFlag = (k) => _getFlag(k, state);
 
@@ -41,7 +49,7 @@ export function getFlag<FlagKey extends UserSettings.FlagKey>(
 
 export function getFlags<FlagKeys extends UserSettings.FlagKey[]>(
   keys: FlagKeys,
-  state: UserSettings.FlagsState | undefined | null,
+  state: State,
 ): Flags<FlagKeys> {
   return keys.reduce((acc, key) => {
     // This does work so yay

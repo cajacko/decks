@@ -94,6 +94,7 @@ export default function EditCard({
             ref={bottomDrawer}
             initHeight={height.initHeight}
             animateIn
+            openOnMount
           >
             <EditCardForm
               flipSide={flipSide}

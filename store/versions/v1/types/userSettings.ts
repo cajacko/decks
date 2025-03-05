@@ -3,8 +3,11 @@
 // from boolean to having some different states we may miss some conditional checks that were just
 // doing a truthy check.
 export type FlagMap = {
-  USE_DEV_INITIAL_REDUX_STATE: boolean;
+  // User control flags go here
   HOLD_MENU_BEHAVIOUR: "tap" | "hold";
+
+  // Dev flags
+  USE_DEV_INITIAL_REDUX_STATE: boolean;
   CARD_ANIMATIONS: "enabled" | "disabled";
   SKELETON_LOADER: "enabled" | "disabled";
   SCREEN_ANIMATIONS:
@@ -16,6 +19,10 @@ export type FlagMap = {
   NAVIGATION_TAB_ANIMATIONS: "shift" | "fade" | "disabled";
   SCREENS_FREEZE_ON_BLUR: boolean;
   GENERAL_LAYOUT_ANIMATIONS: "enabled" | "disabled";
+
+  // Debug logs
+  DEBUG_BOTTOM_DRAWER: boolean;
+  DEBUG_AUTO_SAVE: boolean;
 };
 
 export type FlagKey = keyof FlagMap;

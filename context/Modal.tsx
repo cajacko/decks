@@ -1,6 +1,12 @@
 import AppError from "@/classes/AppError";
 import React from "react";
-import { ModalProps, StyleSheet, View } from "react-native";
+import {
+  ModalProps,
+  StyleSheet,
+  View,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import uuid from "@/utils/uuid";
@@ -18,9 +24,18 @@ type ContextState = {
 
 const Context = React.createContext<ContextState | undefined>(undefined);
 
-export function Modal(props: ModalProps) {
+export const Modal = React.memo<ModalProps>(function Modal(props) {
   const context = React.useContext(Context);
+  const idRef = React.useRef(uuid());
 
+  const clearModal = () => {
+    context?.setModalProps(idRef.current, null);
+  };
+
+  const clearRef = React.useRef(clearModal);
+  clearRef.current = clearModal;
+
+  // Update the modal props when they change
   React.useEffect(() => {
     if (!context) {
       new AppError(
@@ -30,19 +45,38 @@ export function Modal(props: ModalProps) {
       return;
     }
 
-    if (!props.visible) return;
-
-    const id = uuid();
-
-    context.setModalProps(id, props);
-
-    return () => {
-      context.setModalProps(id, null);
-    };
+    context.setModalProps(idRef.current, props);
   }, [context, props]);
 
+  // Clear up safely on unmount
+  React.useEffect(
+    () => () => {
+      clearRef.current();
+    },
+    [],
+  );
+
   return null;
-}
+});
+
+const ModalItem = React.memo<ModalProps & { zIndex: number }>(
+  function ModalItem({ zIndex, ...props }) {
+    const { entering, exiting } = useLayoutAnimations();
+
+    const style = React.useMemo<StyleProp<ViewStyle>>(
+      () => [styles.modal, { zIndex }],
+      [zIndex],
+    );
+
+    if (!props.visible) return null;
+
+    return (
+      <Animated.View entering={entering} exiting={exiting} style={style}>
+        {props.children}
+      </Animated.View>
+    );
+  },
+);
 
 export function ModalProvider(props: { children: React.ReactNode }) {
   const [modals, setModals] = React.useState<ModalState[]>([]);
@@ -79,25 +113,12 @@ export function ModalProvider(props: { children: React.ReactNode }) {
     [],
   );
 
-  const { entering, exiting } = useLayoutAnimations();
-
   const modalChildren = React.useMemo(
     () =>
-      modals.map(({ id, props }, i) => {
-        if (!props.visible) return null;
-
-        return (
-          <Animated.View
-            key={id}
-            entering={entering}
-            exiting={exiting}
-            style={[styles.modal, { zIndex: 2 + i }]}
-          >
-            {props.children}
-          </Animated.View>
-        );
-      }),
-    [modals, entering, exiting],
+      modals.map(({ id, props }, i) => (
+        <ModalItem key={id} {...props} zIndex={2 + i} />
+      )),
+    [modals],
   );
 
   return (

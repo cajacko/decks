@@ -2,11 +2,11 @@ import React from "react";
 import {
   withSpring,
   SharedValue,
-  DerivedValue,
   runOnJS,
+  useSharedValue,
 } from "react-native-reanimated";
 import { BottomDrawerRef } from "./BottomDrawer.types";
-import { autoAnimateConfig } from "./bottomDrawer.style";
+import { autoAnimateConfig, dragHeight } from "./bottomDrawer.style";
 import debugLog from "./debugLog";
 
 /**
@@ -16,30 +16,32 @@ import debugLog from "./debugLog";
 export default function useOpenClose(
   props: {
     height: SharedValue<number>;
-    maxAutoHeight: DerivedValue<number>;
-    minHeight: SharedValue<number>;
+    maxAutoHeight: number;
+    minHeight: number;
     hasGotMaxHeight: boolean;
     openOnMount: boolean;
+    animateIn: boolean;
+    initHeight: number;
   },
   ref: React.Ref<BottomDrawerRef>,
 ) {
   const { height, maxAutoHeight, minHeight, hasGotMaxHeight } = props;
 
   const open = React.useCallback((): Promise<void> => {
-    debugLog(`open - ${Math.round(maxAutoHeight.value)}`);
+    debugLog(`set height.value:${Math.round(maxAutoHeight)} (open)`);
 
     return new Promise((resolve) => {
-      height.value = withSpring(maxAutoHeight.value, autoAnimateConfig, () => {
+      height.value = withSpring(maxAutoHeight, autoAnimateConfig, () => {
         runOnJS(resolve)();
       });
     });
   }, [height, maxAutoHeight]);
 
   const close = React.useCallback((): Promise<void> => {
-    debugLog(`close - ${Math.round(minHeight.value)}`);
+    debugLog(`set height.value:${Math.round(minHeight)} (close)`);
 
     return new Promise((resolve) => {
-      height.value = withSpring(minHeight.value, autoAnimateConfig, () => {
+      height.value = withSpring(minHeight, autoAnimateConfig, () => {
         runOnJS(resolve)();
       });
     });
@@ -50,30 +52,44 @@ export default function useOpenClose(
     close,
   }));
 
-  const checkOpenOnMount = React.useRef(true);
+  const haveCheckedInitAnimations = React.useRef(false);
+  const bottom = useSharedValue(
+    props.animateIn ? -props.initHeight - dragHeight : 0,
+  );
 
+  // Animate open if necessary. Will sync the bottom and open animations if both exist
   React.useEffect(() => {
-    if (!checkOpenOnMount.current) return;
+    if (haveCheckedInitAnimations.current) return;
+
+    const animateBottom = () => {
+      const bottomValue = 0;
+
+      debugLog(`set bottom.value: ${bottomValue} (animateIn)`);
+
+      bottom.value = withSpring(bottomValue, autoAnimateConfig);
+    };
+
+    if (!props.openOnMount) {
+      haveCheckedInitAnimations.current = true;
+
+      if (!props.animateIn) return;
+
+      return animateBottom();
+    }
+
     // We want to wait until we have a max height we can open to. We need this prop so we don't open
     // to the default max height before we've got the available content
     if (!hasGotMaxHeight) return;
 
-    checkOpenOnMount.current = false;
+    haveCheckedInitAnimations.current = true;
 
-    if (!props.openOnMount) {
-      debugLog(`Check if should open on mount - no`);
-
-      return;
+    if (props.animateIn) {
+      animateBottom();
     }
 
-    debugLog(`Check if should open on mount - yes`);
+    debugLog(`call open (openOnMount)`);
+    open();
+  }, [open, props.openOnMount, hasGotMaxHeight, props.animateIn, bottom]);
 
-    const timeout = setTimeout(open, 500);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [open, props.openOnMount, hasGotMaxHeight]);
-
-  return { open, close };
+  return { open, close, bottom };
 }

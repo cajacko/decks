@@ -2,11 +2,18 @@ import React from "react";
 import {
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
+  StyleSheet,
 } from "react-native";
 import { ThemedTextVariant, useThemedTextStyle } from "./ThemedText";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export interface TextInputProps extends RNTextInputProps {
   textVariant?: ThemedTextVariant;
+  /**
+   * display - Shows like it's normal text but can be edited
+   * outline - Shows like a normal input field
+   */
+  variant?: "display" | "outline";
 }
 
 /**
@@ -19,10 +26,22 @@ export default function TextInput({
   onChangeText: onChangeTextProp,
   style: styleProp,
   textVariant = "body1",
+  variant = "outline",
   ...props
 }: TextInputProps) {
-  const style = useThemedTextStyle({ type: textVariant, style: styleProp });
+  const borderColor = useThemeColor("inputOutline");
+  const textStyle = useThemedTextStyle({ type: textVariant });
   const [value, setValue] = React.useState(valueProp);
+
+  const style = React.useMemo(
+    () => [
+      styles[variant],
+      textStyle,
+      variant === "outline" && { borderColor },
+      styleProp,
+    ],
+    [styleProp, textStyle, variant, borderColor],
+  );
 
   const onChangeText = React.useCallback(
     (newText: string) => {
@@ -48,3 +67,12 @@ export default function TextInput({
     />
   );
 }
+
+const styles = StyleSheet.create({
+  display: {},
+  outline: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 4,
+  },
+});

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   withSpring,
   withClamp,
@@ -7,19 +8,38 @@ import {
 import { Gesture } from "react-native-gesture-handler";
 import { autoAnimateConfig } from "./bottomDrawer.style";
 
+// NOTE: Debug logs don't work inside the pan events, even with runOnJs
 export default function useDrag(props: {
   height: SharedValue<number>;
-  maxHeight: SharedValue<number>;
-  maxAutoHeight: SharedValue<number>;
-  minHeight: SharedValue<number>;
-  pressed: SharedValue<boolean>;
+  maxHeight: number;
+  maxAutoHeight: number;
+  minHeight: number;
 }) {
-  const { pressed, height, maxAutoHeight, maxHeight, minHeight } = props;
+  const { height } = props;
+
+  const pressed = useSharedValue<boolean>(false);
+  const maxHeight = useSharedValue<number>(props.maxHeight);
+  const maxAutoHeight = useSharedValue<number>(props.maxAutoHeight);
+  const minHeight = useSharedValue<number>(props.minHeight);
+
+  // Keep our shared values in sync with the props
+  React.useEffect(() => {
+    maxHeight.value = props.maxHeight;
+    maxAutoHeight.value = props.maxAutoHeight;
+    minHeight.value = props.minHeight;
+  }, [
+    props.maxHeight,
+    props.maxAutoHeight,
+    props.minHeight,
+    maxHeight,
+    maxAutoHeight,
+    minHeight,
+  ]);
 
   // Used to decide whether we have pressed or dragged
   const draggedDistance = useSharedValue(0);
 
-  return Gesture.Pan()
+  const drag = Gesture.Pan()
     .onBegin(() => {
       pressed.value = true;
       draggedDistance.value = 0;
@@ -43,7 +63,9 @@ export default function useDrag(props: {
     .onFinalize(() => {
       pressed.value = false;
 
-      if (Math.abs(draggedDistance.value) > 10) return;
+      if (Math.abs(draggedDistance.value) > 10) {
+        return;
+      }
 
       // This is a press
 
@@ -65,4 +87,9 @@ export default function useDrag(props: {
         autoAnimateConfig,
       );
     });
+
+  return {
+    pressed,
+    drag,
+  };
 }

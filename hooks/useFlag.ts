@@ -1,16 +1,8 @@
 import { useAppSelector } from "@/store/hooks";
 import { UserSettings, RootState } from "@/store/types";
-import { getFlag, getFlags, Flags } from "@/utils/flags";
+import { getFlags, Flags } from "@/utils/flags";
 import { createCachedSelector } from "re-reselect";
-
-const selectFlag = createCachedSelector(
-  (_: RootState, props: { key: UserSettings.FlagKey }): UserSettings.FlagKey =>
-    props.key,
-  (state: RootState): UserSettings.FlagsState | undefined =>
-    state.userSettings.flags,
-  (key: UserSettings.FlagKey, state?: UserSettings.FlagsState) =>
-    getFlag(key, state),
-)((_, props) => props.key);
+import { selectFlag } from "@/store/combinedSelectors/flags";
 
 export default function useFlag<FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,

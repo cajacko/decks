@@ -15,9 +15,13 @@ export default function useMaxHeight() {
       // Update maxHeight with the max height of the inner scroll content when layout occurs
       const { height } = event.nativeEvent.layout;
 
-      debugLog(`useMaxHeight - onContainerLayout: ${Math.round(height)}`);
+      debugLog(
+        `set props.maxHeight: ${Math.round(height)} (onContainerLayout)`,
+      );
 
-      setMaxHeight(height);
+      // We still want people to be able to tap out of the bottom container so lets take off a
+      // buffer
+      setMaxHeight(height - 100);
     }, []),
   };
 }

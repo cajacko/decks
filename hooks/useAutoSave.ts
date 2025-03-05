@@ -1,18 +1,12 @@
 import AppError from "@/classes/AppError";
 import React from "react";
 import { AppState } from "react-native";
-import logger from "@/utils/logger";
+import withDebugLog from "@/utils/withDebugLog";
 
-function debugLog(log: string, props?: unknown) {
-  if (process.env.EXPO_PUBLIC_DEBUG_AUTO_SAVE !== "true") return;
-
-  const logTitle = `useAutoSave: ${log}`;
-
-  logger.debug(logTitle);
-
-  // eslint-disable-next-line no-console
-  console.log(logTitle, props);
-}
+const debugLog = withDebugLog(
+  ({ getFlag }) => getFlag("DEBUG_AUTO_SAVE"),
+  useAutoSave.name,
+);
 
 interface UseAutoSaveProps {
   autoSave?: boolean;

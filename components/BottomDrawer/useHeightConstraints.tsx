@@ -1,13 +1,11 @@
-import {
-  useSharedValue,
-  useDerivedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { withSpring } from "react-native-reanimated";
 import { defaultProps, BottomDrawerProps } from "./BottomDrawer.types";
 import { dragBuffer, dragHeight, dragOverlap } from "./bottomDrawer.style";
 import React from "react";
 import { ScrollViewProps } from "react-native";
 import debugLog from "./debugLog";
+import AppError from "@/classes/AppError";
+import { autoAnimateConfig } from "./bottomDrawer.style";
 
 /**
  * Handles the height constraints for the drawer
@@ -16,117 +14,132 @@ export default function useHeightConstraints(
   props: Pick<BottomDrawerProps, "maxHeight" | "minHeight" | "height">,
 ) {
   const { maxHeight: maxHeightProp, minHeight: minHeightProp, height } = props;
+  // Null means we're waiting on it
+  const [drawerContentHeight, setDrawerContentHeight] = React.useState<
+    number | null
+  >(null);
 
   /**
-   * If the max height prop is null, it means we're pending setting the max height (normally waiting
-   * for an onLayoutChange event in the parent)
+   * If the max customMaxHeight is null, it means we're pending setting the max height (normally
+   * waiting for an onLayoutChange event in the parent)
    */
-  const hasGotMaxHeight = maxHeightProp !== null;
+  const customMaxHeight: number | null =
+    maxHeightProp === undefined ? defaultProps.maxHeight : maxHeightProp;
 
-  const sharedStyles = useSharedValue({
-    dragBuffer,
-    dragHeight,
-    dragOverlap,
-  });
+  const { minHeight, maxHeight, maxAutoHeight, hasGotMaxHeight } =
+    React.useMemo(() => {
+      const minHeight: number = minHeightProp ?? defaultProps.minHeight;
+      let maxHeight: number;
+      let maxAvailableSpace: number | null;
+      let maxHeightForContent: number | null;
+      let maxAutoHeight: number;
+      let hasGotMaxHeight: boolean;
 
-  const minHeight = useSharedValue(minHeightProp ?? defaultProps.minHeight);
+      if (customMaxHeight === null) {
+        maxAvailableSpace = null;
+      } else {
+        maxAvailableSpace = customMaxHeight - dragOverlap - dragBuffer;
+      }
 
-  const customMaxHeight = useSharedValue(
-    maxHeightProp ?? defaultProps.maxHeight,
-  );
+      if (drawerContentHeight === null) {
+        maxHeightForContent = null;
 
-  const drawerContentHeight = useSharedValue(0);
+        if (maxAvailableSpace === null) {
+          // We have nothing to go off, so just use the default
+          maxHeight = defaultProps.maxHeight;
+          hasGotMaxHeight = false;
+        } else {
+          // We have a max height, but no content height, so just use the max height
+          maxHeight = maxAvailableSpace;
+          hasGotMaxHeight = false;
+        }
+      } else {
+        maxHeightForContent = drawerContentHeight + dragHeight;
 
-  // NOTE: If you change this, also change the logic in the effect below it
-  const maxHeight = useDerivedValue<number>(() => {
-    const maxAvailableSpace =
-      customMaxHeight.value -
-      sharedStyles.value.dragOverlap -
-      sharedStyles.value.dragBuffer;
+        if (maxAvailableSpace === null) {
+          // We have content, but no max height, so just use the content height
+          maxHeight = maxHeightForContent;
+          hasGotMaxHeight = false;
+        } else {
+          // We have both, so use the smallest of the two
+          maxHeight = Math.min(maxAvailableSpace, maxHeightForContent);
+          hasGotMaxHeight = true;
+        }
+      }
 
-    const maxHeightForContent =
-      drawerContentHeight.value + sharedStyles.value.dragHeight;
+      if (maxHeight < minHeight) {
+        new AppError(
+          `BottomDrawer ${useHeightConstraints.name} maxHeight is smaller than minHeight, how did this happen?`,
+          {
+            maxAvailableSpace,
+            maxHeightForContent,
+            maxHeight,
+            minHeight,
+          },
+        ).log("error");
 
-    // We still want people to be able to tap out of the bottom container
-    const maxHeightBuffer = 100;
+        maxHeight = minHeight;
+      }
 
-    return Math.min(maxAvailableSpace - maxHeightBuffer, maxHeightForContent);
-  });
+      if (maxAvailableSpace !== null) {
+        maxAutoHeight = maxAvailableSpace / 2;
+      } else if (maxHeightForContent !== null) {
+        maxAutoHeight = maxHeightForContent;
+      } else {
+        maxAutoHeight = maxHeight;
+      }
 
-  // NOTE: If you change this, also change the logic in the useDerivedValueAbove
-  React.useEffect(() => {
-    const newMaxHeight = maxHeightProp ?? defaultProps.maxHeight;
+      // Just double check it's not out of bounds
+      if (maxAutoHeight > maxHeight) {
+        maxAutoHeight = maxHeight;
+      }
 
-    if (customMaxHeight.value === newMaxHeight) return;
+      if (maxAutoHeight < minHeight) {
+        maxAutoHeight = maxHeight;
+      }
 
-    customMaxHeight.value = newMaxHeight;
+      debugLog(`calculate height constraints:
+maxHeight: ${Math.round(maxHeight)}
+minHeight: ${Math.round(minHeight)}
+maxAutoHeight: ${Math.round(maxAutoHeight)}`);
 
-    debugLog(
-      `useHeightConstraints new customMaxHeight: ${Math.round(newMaxHeight)}, height is: ${Math.round(height.value)}`,
-    );
-
-    const maxAvailableSpace =
-      newMaxHeight -
-      sharedStyles.value.dragOverlap -
-      sharedStyles.value.dragBuffer;
-
-    const maxHeightForContent =
-      drawerContentHeight.value + sharedStyles.value.dragHeight;
-
-    // We still want people to be able to tap out of the bottom container
-    const maxHeightBuffer = 100;
-
-    const maxHeight = Math.min(
-      maxAvailableSpace - maxHeightBuffer,
-      maxHeightForContent,
-    );
-
-    if (height.value < maxHeight) return;
-
-    debugLog(
-      `useHeightConstraints height is bigger than max height, shrinking to ${maxHeight}`,
-    );
-
-    height.value = withTiming(maxHeight, { duration: 200 });
-  }, [
-    maxHeightProp,
-    customMaxHeight,
-    height,
-    sharedStyles,
-    drawerContentHeight,
-  ]);
-
-  const maxAutoHeight = useDerivedValue<number>(() => {
-    return Math.min(maxHeight.value, customMaxHeight.value / 2);
-  });
+      return {
+        maxHeight,
+        minHeight,
+        maxAutoHeight,
+        hasGotMaxHeight,
+      };
+    }, [customMaxHeight, drawerContentHeight, minHeightProp]);
 
   // Gets the drawer content size, as we don't need to show a bottom drawer higher than this
   const onContentLayout = React.useCallback<
     Required<ScrollViewProps>["onLayout"]
-  >(
-    (event) => {
-      debugLog(
-        `onContentLayout (Drawer Scroll Content) - ${Math.round(event.nativeEvent.layout.height)}`,
-      );
+  >((event) => {
+    debugLog(
+      `set state.drawerContentHeight: ${Math.round(event.nativeEvent.layout.height)} (onContentLayout)`,
+    );
 
-      drawerContentHeight.value = event.nativeEvent.layout.height;
-    },
-    [drawerContentHeight],
-  );
+    setDrawerContentHeight(event.nativeEvent.layout.height);
+  }, []);
 
-  // Update the min/ max values when the prop changes from the parent
-
+  // Sync our shared values with the props
   React.useEffect(() => {
-    const newMinHeight = minHeightProp ?? defaultProps.minHeight;
+    const changeHeight = (newHeight: number, reason: string) => {
+      debugLog(`set height.value: ${Math.round(newHeight)} (${reason})`);
 
-    if (minHeight.value === newMinHeight) return;
-
-    minHeight.value = newMinHeight;
+      height.value = withSpring(newHeight, autoAnimateConfig);
+    };
 
     debugLog(
-      `useHeightConstraints new minHeight - ${Math.round(newMinHeight)}`,
+      `constraints changed, checking height: ${Math.round(height.value)} (useEffect)`,
     );
-  }, [minHeightProp, minHeight]);
+
+    if (height.value > maxHeight) {
+      changeHeight(maxHeight, "height.value > maxHeight");
+    } else if (height.value < minHeight) {
+      changeHeight(minHeight, "height.value < minHeight");
+    }
+  }, [minHeight, maxHeight, maxAutoHeight, height]);
 
   return {
     hasGotMaxHeight,
