@@ -10,6 +10,7 @@ import {
 import { Templates } from "@/store/types";
 import AppError from "@/classes/AppError";
 import ThemedText from "./ThemedText";
+import ColorInput from "./ColorInput";
 
 export interface TemplateSchemaItemProps {
   side: "front" | "back";
@@ -56,10 +57,19 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
 
   const input = React.useMemo(() => {
     switch (validatedValue.type) {
-      case Templates.DataType.Text:
-      case Templates.DataType.Color: {
+      case Templates.DataType.Text: {
         return (
           <TextInput
+            style={styles.input}
+            value={validatedValue.value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+          />
+        );
+      }
+      case Templates.DataType.Color: {
+        return (
+          <ColorInput
             style={styles.input}
             value={validatedValue.value}
             onChangeText={onChangeText}
@@ -98,11 +108,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    fontSize: 16,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
     marginBottom: 16,
   },
 });

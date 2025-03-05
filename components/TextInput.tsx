@@ -3,17 +3,25 @@ import {
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
   StyleSheet,
+  View,
+  ViewProps,
 } from "react-native";
 import { ThemedTextVariant, useThemedTextStyle } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
-export interface TextInputProps extends RNTextInputProps {
+type Variant = "display" | "outline";
+
+export interface TextInputProps
+  extends Omit<RNTextInputProps, "style">,
+    Pick<ViewProps, "style"> {
+  textInputStyle?: RNTextInputProps["style"];
   textVariant?: ThemedTextVariant;
   /**
    * display - Shows like it's normal text but can be edited
    * outline - Shows like a normal input field
    */
-  variant?: "display" | "outline";
+  variant?: Variant;
+  rightAdornment?: React.ReactNode;
 }
 
 /**
@@ -27,6 +35,8 @@ export default function TextInput({
   style: styleProp,
   textVariant = "body1",
   variant = "outline",
+  rightAdornment,
+  textInputStyle: textInputStyleProp,
   ...props
 }: TextInputProps) {
   const borderColor = useThemeColor("inputOutline");
@@ -35,12 +45,20 @@ export default function TextInput({
 
   const style = React.useMemo(
     () => [
+      styles.container,
       styles[variant],
       textStyle,
       variant === "outline" && { borderColor },
       styleProp,
     ],
     [styleProp, textStyle, variant, borderColor],
+  );
+
+  const inputVariant: `${Variant}Input` = `${variant}Input`;
+
+  const textInputStyle = React.useMemo(
+    () => [textStyle, styles.input, styles[inputVariant], textInputStyleProp],
+    [textInputStyleProp, inputVariant, textStyle],
   );
 
   const onChangeText = React.useCallback(
@@ -59,20 +77,33 @@ export default function TextInput({
   }, [valueProp]);
 
   return (
-    <RNTextInput
-      {...props}
-      style={style}
-      value={value ?? ""}
-      onChangeText={onChangeText}
-    />
+    <View style={style}>
+      <RNTextInput
+        {...props}
+        style={textInputStyle}
+        value={value ?? ""}
+        onChangeText={onChangeText}
+      />
+      {rightAdornment}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+  },
+  input: {
+    flex: 1,
+  },
   display: {},
   outline: {
-    padding: 8,
     borderWidth: 1,
     borderRadius: 4,
+    overflow: "hidden",
   },
+  outlineInput: {
+    padding: 8,
+  },
+  displayInput: {},
 });
