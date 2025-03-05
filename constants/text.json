@@ -27,6 +27,7 @@
   "tabletop.reset.message": "This will move all cards back into the first stack and deck order.",
   "tabletop.reset.title": "Reset Tabletop",
   "template.built_in.back.text": "Text",
+  "template.built_in.back.emoji": "Emoji",
   "template.built_in.back.title": "Back Template",
   "template.built_in.front.description.default": "Description",
   "template.built_in.front.name": "Front Template",
@@ -36,5 +37,7 @@
   "template.reserved_data_item.description.name": "Description",
   "template.reserved_data_item.description.description": "Additional text for the card",
   "template.reserved_data_item.color.name": "Colour",
-  "template.reserved_data_item.color.description": "The main colour for the card, templates may use this to style the card"
+  "template.reserved_data_item.color.description": "The main colour for the card, templates may use this to style the card",
+  "template.reserved_data_item.emoji.name": "Emoji",
+  "template.reserved_data_item.emoji.description": "An emoji to represent the card"
 }

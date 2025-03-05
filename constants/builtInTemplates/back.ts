@@ -16,6 +16,7 @@ const { dataItemId, templateId } = builtInTemplateIds("back");
 const dataItemIds = {
   text: dataItemId("text"),
   color: ReservedDataSchemaIds.Color,
+  emoji: dataItemId("emoji"),
 };
 
 const template: Templates.Props = {
@@ -26,6 +27,11 @@ const template: Templates.Props = {
     [dataItemIds.text]: {
       id: dataItemIds.text,
       name: text["template.built_in.back.text"],
+      type: Templates.DataType.Text,
+    },
+    [dataItemIds.emoji]: {
+      id: dataItemIds.emoji,
+      name: text["template.built_in.back.emoji"],
       type: Templates.DataType.Text,
     },
     [dataItemIds.color]: {
@@ -48,6 +54,18 @@ const template: Templates.Props = {
         overflow: "hidden",
       },
       children: [
+        {
+          type: "text",
+          text: `{{${dataItemIds.emoji}}}`,
+          conditional: dataItemIds.emoji,
+          style: {
+            fontSize: 24,
+            textAlign: "center",
+            zIndex: 2,
+            position: "relative",
+            opacity: 0.5,
+          },
+        },
         {
           type: "text",
           text: `{{${deckTemplateIds.name}}}`,

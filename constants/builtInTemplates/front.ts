@@ -15,6 +15,7 @@ const dataItemIds = {
   title: ReservedDataSchemaIds.Title,
   description: ReservedDataSchemaIds.Description,
   color: ReservedDataSchemaIds.Color,
+  emoji: ReservedDataSchemaIds.Emoji,
 };
 
 const template = {
@@ -35,6 +36,9 @@ const template = {
         value: text["template.built_in.front.description.default"],
         type: Templates.DataType.Text,
       },
+    },
+    [dataItemIds.emoji]: {
+      ...reservedDataSchemaItems[ReservedDataSchemaIds.Emoji],
     },
     [dataItemIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
@@ -64,6 +68,18 @@ const template = {
             alignItems: "center",
           },
           children: [
+            {
+              type: "text",
+              text: `{{${dataItemIds.emoji}}}`,
+              conditional: dataItemIds.emoji,
+              style: {
+                fontSize: 24,
+                textAlign: "center",
+                zIndex: 2,
+                position: "relative",
+                opacity: 0.5,
+              },
+            },
             {
               type: "text",
               text: `{{${dataItemIds.title}}}`,
