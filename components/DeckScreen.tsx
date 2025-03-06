@@ -8,7 +8,7 @@ import {
   FlatListProps,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
-import { selectDeckCards } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeckCards } from "@/store/slices/decks";
 import DeckDetails from "@/components/DeckDetails";
 import DeckCard from "./DeckCard";
 import { useEditCardModal } from "./EditCardModal";
@@ -37,6 +37,9 @@ const initialRows = 4;
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DeckScreen.name);
   const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
+  const canEditDeck = useAppSelector((state) =>
+    selectCanEditDeck(state, { deckId: props.deckId }),
+  );
 
   useDeckLastScreen({
     deckId: props.deckId,
@@ -118,7 +121,9 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
             //   index,
             // })}
           />
-          <IconButton icon="add" onPress={open} style={styles.button} />
+          {canEditDeck && (
+            <IconButton icon="add" onPress={open} style={styles.button} />
+          )}
         </View>
       )}
     </DeckCardSizeProvider>

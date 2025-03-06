@@ -21,6 +21,7 @@ const dataSchemaIds = {
 
 export const newDeckCard: Cards.Props = {
   cardId: newDeckCardTarget.id,
+  canEdit: false,
   data: {
     [dataSchemaIds.title]: {
       type: Templates.DataType.Text,

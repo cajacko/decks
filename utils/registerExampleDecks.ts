@@ -48,6 +48,7 @@ export default function registerExampleDecks() {
       dataSchemaOrder: [],
       defaultTabletopId: tabletopId,
       status: "active",
+      canEdit: false,
       templates: {
         back: {
           dataTemplateMapping: {},
@@ -91,6 +92,7 @@ export default function registerExampleDecks() {
 
       const card: Cards.Props = {
         cardId,
+        canEdit: false,
         deckId,
         data: {},
         status: "active",

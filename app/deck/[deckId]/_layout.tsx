@@ -1,12 +1,13 @@
 import React from "react";
 import { Tabs, useNavigation, useLocalSearchParams } from "expo-router";
-import { selectDeck } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
 import text from "@/constants/text";
 import IconSymbol from "@/components/IconSymbol";
 import useFlag from "@/hooks/useFlag";
 import { TabAnimationName } from "@react-navigation/bottom-tabs/lib/typescript/commonjs/src/types";
+import { useAppSelector } from "@/store/hooks";
 
 type NavOptions = {
   default?: React.ComponentProps<typeof Tabs>["screenOptions"];
@@ -50,6 +51,9 @@ function useSetDeckName(deckId: string | null) {
 export default function DeckLayout() {
   const params = useLocalSearchParams();
   const deckId = typeof params.deckId === "string" ? params.deckId : undefined;
+  const canEditDeck = useAppSelector((state) =>
+    deckId ? selectCanEditDeck(state, { deckId }) : false,
+  );
 
   useSetDeckName(deckId ?? null);
 
@@ -75,9 +79,14 @@ export default function DeckLayout() {
       },
       index: {
         headerShown: false,
-        tabBarLabel: text["screen.deck.index.title"],
+        tabBarLabel: canEditDeck
+          ? text["screen.deck.index.title"]
+          : text["screen.deck.view.title"],
         tabBarIcon: ({ size }) => (
-          <IconSymbol name="edit-document" size={size} />
+          <IconSymbol
+            name={canEditDeck ? "edit-document" : "remove-red-eye"}
+            size={size}
+          />
         ),
       },
       play: {
@@ -86,7 +95,7 @@ export default function DeckLayout() {
         tabBarIcon: ({ size }) => <IconSymbol name="play-arrow" size={size} />,
       },
     }),
-    [animation, freezeOnBlur],
+    [animation, freezeOnBlur, canEditDeck],
   );
 
   return (

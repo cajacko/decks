@@ -11,11 +11,13 @@ import Animated, {
 import { DeckTabletopProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
+import useEnsureTabletop from "@/hooks/useEnsureTabletop";
 
 export default function Tabletop({
   tabletopId,
   deckId,
 }: TabletopProps): React.ReactNode {
+  const { hasTabletop } = useEnsureTabletop({ tabletopId });
   useTabletopToolbar({ tabletopId });
 
   useDeckLastScreen({
@@ -37,7 +39,7 @@ export default function Tabletop({
     };
   });
 
-  const skeleton = useScreenSkeleton(Tabletop.name) && false;
+  const skeleton = useScreenSkeleton(Tabletop.name) || !hasTabletop;
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {

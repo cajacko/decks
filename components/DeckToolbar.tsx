@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
@@ -12,6 +12,7 @@ import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import Button from "./Button";
 import IconButton from "./IconButton";
+import { selectCanEditDeck } from "@/store/slices/decks";
 
 interface DeckToolbarProps {
   deckId: string;
@@ -43,6 +44,9 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   // NOTE: This component will only re-render on prop changes, no state changes
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
+  const canEditDeck = useAppSelector((state) =>
+    selectCanEditDeck(state, { deckId: props.deckId }),
+  );
   const { entering, exiting } = useLayoutAnimations();
 
   const deleteDeck = React.useCallback(() => {
@@ -56,6 +60,8 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     title: text["deck.delete.title"],
     message: text["deck.delete.message"],
   });
+
+  if (!canEditDeck) return null;
 
   return (
     <Animated.View

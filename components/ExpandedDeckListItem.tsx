@@ -7,11 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
-import {
-  selectDeck,
-  selectDeckCards,
-  selectDeckLastScreen,
-} from "@/store/slices/decks";
+import { selectDeck, selectDeckCards } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "./CardSideBySide";
@@ -32,9 +28,6 @@ export default function ExpandedDeckListItem(
   const firstDeckCardId = useAppSelector(
     (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
   );
-  const lastScreen = useAppSelector((state) =>
-    selectDeckLastScreen(state, { deckId: props.deckId }),
-  );
   const { name, description } =
     useAppSelector((state) => selectDeck(state, props)) ?? {};
 
@@ -44,13 +37,13 @@ export default function ExpandedDeckListItem(
       : { id: props.deckId, type: "deck-defaults" };
   }, [firstDeckCardId, props.deckId]);
 
-  const onPress = React.useCallback(() => {
-    navigate(
-      lastScreen === "deck"
-        ? `/deck/${props.deckId}`
-        : `/deck/${props.deckId}/play`,
-    );
-  }, [props.deckId, navigate, lastScreen]);
+  const play = React.useCallback(() => {
+    navigate(`/deck/${props.deckId}/play`);
+  }, [props.deckId, navigate]);
+
+  const view = React.useCallback(() => {
+    navigate(`/deck/${props.deckId}`);
+  }, [props.deckId, navigate]);
 
   const containerStyle = React.useMemo(
     () => [styles.container, props.style],
@@ -64,7 +57,7 @@ export default function ExpandedDeckListItem(
       constraints={styles.cardConstraints}
     >
       <View style={containerStyle}>
-        <Pressable onPress={onPress} style={styles.cards}>
+        <Pressable onPress={play} style={styles.cards}>
           <CardSideBySide
             skeleton={props.skeleton}
             topSide="front"
@@ -85,8 +78,18 @@ export default function ExpandedDeckListItem(
             )}
           </View>
           <View style={styles.actions}>
-            <IconButton icon="remove-red-eye" size={40} variant="transparent" />
-            <IconButton icon="play-arrow" size={40} variant="transparent" />
+            <IconButton
+              icon="remove-red-eye"
+              onPress={view}
+              size={40}
+              variant="transparent"
+            />
+            <IconButton
+              icon="play-arrow"
+              onPress={play}
+              size={40}
+              variant="transparent"
+            />
             <IconButton icon="content-copy" size={40} variant="transparent" />
           </View>
         </View>

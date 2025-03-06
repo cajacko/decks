@@ -27,7 +27,7 @@ function RootLayout() {
       },
       index: {
         headerShown: true,
-        headerBackButtonMenuEnabled: false,
+        headerBackVisible: false,
         headerTitle: text["screen.decks.title"],
         animation: animateStack ? "slide_from_left" : "none",
       },

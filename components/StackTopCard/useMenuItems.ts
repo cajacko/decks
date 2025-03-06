@@ -2,9 +2,14 @@ import React from "react";
 import { StackTopCardProps, StackTopCardMenuItem } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
+import { selectCanEditCard } from "@/store/combinedSelectors/cards";
+import { useAppSelector } from "@/store/hooks";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
+  const canEditCard = useAppSelector((_state) =>
+    selectCanEditCard(_state, { cardId: state.cardId }),
+  );
   const {
     buttonSize,
     cardSizes: { dpHeight: cardHeight, dpWidth: cardWidth },
@@ -31,13 +36,16 @@ export default function useMenuItems(props: StackTopCardProps) {
       {
         key: "flip",
         top: bottom,
-        left: verticalLeft,
+        left: canEditCard ? verticalLeft : centerLeft,
         height: buttonSize,
         width: buttonSize,
         icon: "flip",
         onPress: state.handleFlipCard,
       },
-      {
+    ];
+
+    if (canEditCard) {
+      items.push({
         key: "edit",
         top: bottom,
         left: verticalRight,
@@ -45,8 +53,8 @@ export default function useMenuItems(props: StackTopCardProps) {
         width: buttonSize,
         icon: "edit-document",
         onPress: () => setShowEditModal(true),
-      },
-    ];
+      });
+    }
 
     if (state.handleMoveToBottom) {
       items.push({

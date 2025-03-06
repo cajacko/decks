@@ -49,6 +49,7 @@ export const cardsSlice = createSlice({
     builder.addCase(createCard, (state, actions) => {
       const card: Card = {
         status: "active",
+        canEdit: true,
         cardId: actions.payload.cardId,
         deckId: actions.payload.deckId,
         data: {},

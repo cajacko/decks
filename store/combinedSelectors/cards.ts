@@ -197,3 +197,8 @@ export const selectCardTemplateData = createCachedSelector(
     return data;
   },
 )(cardOrDeckKey);
+
+export const selectCanEditCard = (state: RootState, props: CardIdProps) =>
+  selectCard(state, props)?.canEdit ??
+  selectDeckByCard(state, props)?.canEdit ??
+  false;

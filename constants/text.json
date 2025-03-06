@@ -21,6 +21,7 @@
   "general.enable": "Enable",
   "screen.404.title": "Oops!",
   "screen.deck.index.title": "Edit Deck",
+  "screen.deck.view.title": "View Deck",
   "screen.deck.play.title": "Play Deck",
   "screen.decks.title": "Decks",
   "stack.actions.delete": "Delete Stack",

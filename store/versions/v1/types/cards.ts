@@ -11,6 +11,7 @@ export type Data = Record<string, TemplatesType.ValidatedValue | undefined>;
 
 export interface Props {
   cardId: CardId;
+  canEdit: boolean;
   deckId: Decks.DeckId | null;
   data: Data;
   templates?: Partial<Decks.Templates>;

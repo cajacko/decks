@@ -224,4 +224,9 @@ export const selectDeckLastScreen = (
 
 export const selectBuiltInDeckIds = () => selectDeckIds(getBuiltInState());
 
+export const selectCanEditDeck = (
+  state: RootState,
+  props: { deckId: string },
+): boolean => selectDeck(state, props)?.canEdit ?? false;
+
 export default cardsSlice;

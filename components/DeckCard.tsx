@@ -1,8 +1,10 @@
 import React from "react";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, ViewStyle, View } from "react-native";
 import CardSide from "@/components/CardSide";
 import EditCardModal from "./EditCardModal";
 import { Target } from "@/utils/cardTarget";
+import { selectCanEditCard } from "@/store/combinedSelectors/cards";
+import { useAppSelector } from "@/store/hooks";
 
 export interface DeckCardProps {
   cardId: string;
@@ -17,6 +19,11 @@ export default function DeckCard({
   skeleton,
 }: DeckCardProps): React.ReactNode {
   const [showEditModal, setShowEditModal] = React.useState(false);
+
+  const canEditCard = useAppSelector((state) =>
+    selectCanEditCard(state, { cardId }),
+  );
+
   const target = React.useMemo(
     (): Target => ({ type: "card", id: cardId }),
     [cardId],
@@ -30,6 +37,10 @@ export default function DeckCard({
     setShowEditModal(true);
   }, []);
 
+  const cardSide = (
+    <CardSide id={cardId} type="card" side="front" skeleton={skeleton} />
+  );
+
   return (
     <>
       {!skeleton && (
@@ -41,13 +52,17 @@ export default function DeckCard({
           onDelete={close}
         />
       )}
-      <Pressable
-        key={cardId}
-        onPress={skeleton ? undefined : open}
-        style={style}
-      >
-        <CardSide id={cardId} type="card" side="front" skeleton={skeleton} />
-      </Pressable>
+      {canEditCard ? (
+        <Pressable
+          key={cardId}
+          onPress={skeleton ? undefined : open}
+          style={style}
+        >
+          {cardSide}
+        </Pressable>
+      ) : (
+        <View style={style}>{cardSide}</View>
+      )}
     </>
   );
 }

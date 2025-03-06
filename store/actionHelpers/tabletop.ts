@@ -1,13 +1,23 @@
 import { Tabletops } from "../types";
-import { resetTabletop } from "../slices/tabletop";
+import { resetTabletop, selectTabletop, setTabletop } from "../slices/tabletop";
 import { store } from "../store";
 import { selectTabletopAvailableDeckCards } from "../combinedSelectors/tabletops";
 import { createInitStacks } from "@/utils/minStacks";
 import uuid from "@/utils/uuid";
+import { getBuiltInState } from "../utils/withBuiltInState";
 
 export function resetTabletopHelper(props: {
   tabletopId: Tabletops.TabletopId;
 }) {
+  const builtInTabletop = selectTabletop(getBuiltInState(), props);
+
+  if (builtInTabletop) {
+    return setTabletop({
+      tabletopId: props.tabletopId,
+      tabletop: builtInTabletop,
+    });
+  }
+
   const cardInstanceIds: string[] = [];
   const cardInstancesById: Tabletops.HistoryState["cardInstancesById"] = {};
 
