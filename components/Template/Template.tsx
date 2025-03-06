@@ -1,15 +1,29 @@
 import React from "react";
-import { TemplateProps, Data } from "./Template.types";
+import { TemplateProps } from "./Template.types";
 import { MarkupChildren } from "./MarkupElement";
 import { TemplateProvider } from "./TemplateContext";
+import uuid from "@/utils/uuid";
 
-export default function Template<D extends Data>({
-  values,
-  markup,
-}: TemplateProps<D>): React.ReactNode {
+const objectIdMap = new WeakMap<object, string>();
+
+function getObjectId(obj: object): string {
+  if (!objectIdMap.has(obj)) {
+    objectIdMap.set(obj, uuid());
+  }
+
+  return objectIdMap.get(obj)!;
+}
+
+function getCacheKey(objA?: object | null, objB?: object | null): string {
+  return `${objA ? getObjectId(objA) : ""}-${objB ? getObjectId(objB) : ""}`;
+}
+
+export default React.memo<TemplateProps>(function Template({ values, markup }) {
+  const cacheKey = getCacheKey(values, markup);
+
   return (
     <TemplateProvider values={values ?? null}>
-      <MarkupChildren elements={markup} />
+      <MarkupChildren elements={markup} cacheKey={cacheKey} />
     </TemplateProvider>
   );
-}
+});

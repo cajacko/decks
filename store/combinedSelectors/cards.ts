@@ -8,7 +8,7 @@ import { getIsCardId, Target } from "@/utils/cardTarget";
 type CardIdProps = { cardId: string };
 export type DeckOrCardSideProps = Target & { side: Cards.Side };
 
-const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
+export const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
   `${props.type}:${props.id}-${props.side}`;
 
 // Is a lookup, doesn't need to be cached

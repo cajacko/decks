@@ -61,10 +61,37 @@ function init() {
 
 init();
 
-export function replaceVariables(text: string, values: Values): string {
-  const template = Handlebars.compile(text, { noEscape: true });
+const handlebarsCache = new Map<string, string>();
 
-  return template(values);
+function compileTemplate(props: {
+  text: string;
+  values: object;
+  cacheKey: string;
+}): string {
+  const cacheKey = `${props.cacheKey}/${props.text}`;
+
+  const cached = handlebarsCache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const template = Handlebars.compile(props.text, { noEscape: true });
+  const value = template(props.values);
+
+  if (cacheKey) {
+    handlebarsCache.set(cacheKey, value);
+  }
+
+  return value;
+}
+
+export function replaceVariables(props: {
+  text: string;
+  values: Values;
+  cacheKey: string;
+}): string {
+  return compileTemplate(props);
 }
 
 function isConditionTrue(condition: unknown): boolean {
@@ -81,12 +108,13 @@ function isConditionTrue(condition: unknown): boolean {
   return true;
 }
 
-export function conditional(
-  conditional: string,
-  values: Values | null,
-): boolean {
+export function conditional(props: {
+  conditional: string;
+  values: Values | null;
+  cacheKey: string;
+}): boolean {
   // Check if we just passed a data value id. If so check if that's truthy
-  const conditionalDataValue = values?.[conditional];
+  const conditionalDataValue = props.values?.[props.conditional];
 
   if (conditionalDataValue !== undefined) {
     return isConditionTrue(conditionalDataValue);
@@ -95,7 +123,11 @@ export function conditional(
   // If the conditional is a string, we need to check if it's a truthy value when ran through
   // handlebars
 
-  const template = Handlebars.compile(conditional, { noEscape: true });
-
-  return isConditionTrue(template(values));
+  return isConditionTrue(
+    compileTemplate({
+      text: props.conditional,
+      values: props.values ?? {},
+      cacheKey: props.values ? props.cacheKey : "no-values",
+    }),
+  );
 }

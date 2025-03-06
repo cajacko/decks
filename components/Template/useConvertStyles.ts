@@ -37,7 +37,10 @@ const distanceProperties: string[] = [
 
 export const variableRegex = /{{(.*?)}}/;
 
-export default function useConvertStyles(values?: Values | null) {
+export default function useConvertStyles(props: {
+  values?: Values | null;
+  cacheKey: string;
+}) {
   const { mmToDp } = usePhysicalMeasures();
 
   /**
@@ -60,11 +63,15 @@ export default function useConvertStyles(values?: Values | null) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           newStyle[key] = newValue as any;
         } else if (typeof value === "string") {
-          if (values) {
+          if (props.values) {
             const match = value.match(variableRegex);
 
             if (match) {
-              const newValue: string = replaceVariables(value, values);
+              const newValue: string = replaceVariables({
+                text: value,
+                values: props.values,
+                cacheKey: props.cacheKey,
+              });
 
               // This is been a bit annoying so ignoring
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,6 +83,6 @@ export default function useConvertStyles(values?: Values | null) {
 
       return newStyle;
     },
-    [mmToDp, values],
+    [mmToDp, props.values, props.cacheKey],
   );
 }
