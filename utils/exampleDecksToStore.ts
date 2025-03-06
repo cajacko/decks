@@ -9,7 +9,6 @@ import {
 } from "@/store/types";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
-import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
 
 type State = Pick<
   RootState,
@@ -57,11 +56,11 @@ export default function exampleDecksToStore() {
       templates: {
         back: {
           dataTemplateMapping: {},
-          templateId: builtInTemplates.back.templateId,
+          templateId: exampleDeck.backTemplateId,
         },
         front: {
           dataTemplateMapping: {},
-          templateId: builtInTemplates.front.templateId,
+          templateId: exampleDeck.frontTemplateId,
         },
       },
     };
@@ -89,11 +88,11 @@ export default function exampleDecksToStore() {
       },
     };
 
-    exampleDeck.cards.forEach(({ title, description }, index) => {
+    exampleDeck.cards.forEach((cardProps, index) => {
       const cardId = ids.cardId(`${index + 1}`);
       const cardInstanceId = ids.cardInstanceId(cardId);
-      const titleId = ReservedDataSchemaIds.Title;
-      const descriptionId = ReservedDataSchemaIds.Description;
+      // const titleId = ReservedDataSchemaIds.Title;
+      // const descriptionId = ReservedDataSchemaIds.Description;
 
       const card: Cards.Props = {
         cardId,
@@ -102,29 +101,24 @@ export default function exampleDecksToStore() {
         status: "active",
       };
 
-      if (title) {
-        card.data[titleId] = {
-          value: title,
-          type: Templates.DataType.Text,
-        };
+      Object.entries(cardProps).forEach(([dataSchemaId, value]) => {
+        // TODO: Validate the card types here.
+        card.data[dataSchemaId] =
+          typeof value === "string"
+            ? {
+                value: value,
+                type: Templates.DataType.Text,
+              }
+            : {
+                value: value,
+                type: Templates.DataType.Boolean,
+              };
 
-        deck.templates.front.dataTemplateMapping[titleId] = {
-          dataSchemaItemId: titleId,
+        deck.templates.front.dataTemplateMapping[dataSchemaId] = {
+          dataSchemaItemId: dataSchemaId,
           templateSchemaItemId: builtInTemplates.front.schema.title.id,
         };
-      }
-
-      if (description) {
-        card.data[descriptionId] = {
-          value: description,
-          type: Templates.DataType.Text,
-        };
-
-        deck.templates.front.dataTemplateMapping[descriptionId] = {
-          dataSchemaItemId: descriptionId,
-          templateSchemaItemId: builtInTemplates.front.schema.description.id,
-        };
-      }
+      });
 
       deck.cards.push({
         cardId,

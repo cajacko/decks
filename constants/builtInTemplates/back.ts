@@ -57,7 +57,7 @@ const template: Templates.Props = {
         {
           type: "text",
           text: `{{${dataItemIds.emoji}}}`,
-          conditional: dataItemIds.emoji,
+          conditional: `{{${dataItemIds.emoji}}}`,
           style: {
             fontSize: 24,
             textAlign: "center",

@@ -1,9 +1,13 @@
 import { ExampleDeck } from "./types";
+import front from "@/constants/builtInTemplates/front";
+import back from "@/constants/builtInTemplates/back";
 
 const deck: ExampleDeck = {
   name: "Charades",
   description:
     "A fun game where players act out a word or phrase without speaking.",
+  backTemplateId: back.templateId,
+  frontTemplateId: front.templateId,
   cards: [
     { title: "Elephant" },
     { title: "Cupcake" },

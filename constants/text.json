@@ -43,5 +43,8 @@
   "template.reserved_data_item.emoji.description": "An emoji to represent the card",
   "settings.dev_mode.enable.title": "Enable Dev Mode",
   "settings.dev_mode.enable.description": "Confirming will give you access to unstable features and debug tools. This could cause the app to behave unexpectedly or lose data.",
-  "settings.flags.title": "Flags"
+  "settings.flags.title": "Flags",
+  "template.built_in.playing-cards.name": "Playing Cards Template",
+  "template.built_in.playing-cards.value.name": "Card Value (A,2-10,J,Q,K)",
+  "template.built_in.playing-cards.suit.name": "Card Suit (Emoji)"
 }

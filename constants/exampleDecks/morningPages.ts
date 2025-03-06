@@ -1,9 +1,13 @@
 import { ExampleDeck } from "./types";
+import front from "@/constants/builtInTemplates/front";
+import back from "@/constants/builtInTemplates/back";
 
 const deck: ExampleDeck = {
   name: "Morning Pages Prompts",
   description:
     "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started.",
+  backTemplateId: back.templateId,
+  frontTemplateId: front.templateId,
   cards: [
     {
       title: "What's on your mind?",

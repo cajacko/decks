@@ -67,6 +67,8 @@ export type Data<DataItemIds extends DataItemId = DataItemId> = {
 
 type MarkupElementType = "view" | "text";
 
+export type { ViewStyle, TextStyle };
+
 export type ValidStyles = TextStyle | ViewStyle;
 export type AllStyles = TextStyle & ViewStyle;
 

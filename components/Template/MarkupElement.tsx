@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { MarkupElementProps, MarkupChildrenProps } from "./Template.types";
 import useConvertStyles from "./useConvertStyles";
-import { replaceVariables } from "./handlebars";
+import { replaceVariables, conditional } from "./handlebars";
 import { useTemplateDataItem } from "./TemplateContext";
 import AppError from "@/classes/AppError";
 
@@ -18,11 +18,8 @@ export default function MarkupElement({
   const values = useTemplateDataItem();
   const convertStyles = useConvertStyles(values);
 
-  if (element.conditional) {
-    const conditionalValue = values?.[element.conditional];
-
-    // Any falsy value will not render the element
-    if (!conditionalValue) return null;
+  if (element.conditional && !conditional(element.conditional, values)) {
+    return null;
   }
 
   switch (element.type) {

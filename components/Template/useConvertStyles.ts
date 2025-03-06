@@ -32,6 +32,7 @@ const distanceProperties: string[] = [
   "borderBottomWidth",
   "borderLeftWidth",
   "fontSize",
+  "lineHeight",
 ] satisfies (keyof Templates.AllStyles)[];
 
 export const variableRegex = /{{(.*?)}}/;
