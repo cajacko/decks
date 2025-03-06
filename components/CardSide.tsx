@@ -7,7 +7,7 @@ export type CardSideProps = CardTemplateProps & {
   skeleton?: boolean;
 };
 
-export default React.forwardRef<CardRef, CardSideProps>(function CardFront(
+export default React.forwardRef<CardRef, CardSideProps>(function CardSide(
   { CardProps, skeleton, ...cardTemplateProps },
   ref,
 ) {

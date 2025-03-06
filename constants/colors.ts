@@ -42,6 +42,8 @@ export const fixed = {
     white: colors.white,
     grey: colors.grey,
     yellow: "#ffd151",
+    // Kinda want this to stand out against the other preset options
+    newDeck: "#D1F8EF",
   },
   textureBackground: {
     stop1: "#b0bfdb",

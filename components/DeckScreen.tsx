@@ -16,7 +16,7 @@ import { useDeckToolbar } from "./DeckToolbar";
 import IconButton from "./IconButton";
 import { DeckCardSizeProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
-import { maxWidth } from "./DecksScreen";
+import { maxWidth } from "./MyDecks";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 
 export interface DeckScreenProps {

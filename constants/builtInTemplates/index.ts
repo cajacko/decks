@@ -2,6 +2,7 @@ import { Templates } from "@/store/types";
 import front from "./front";
 import back from "./back";
 import playingCards from "./playingCards";
+import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 
 const builtInTemplates = {
   front,
@@ -18,5 +19,11 @@ export const builtInTemplatesById: Templates.State["templatesById"] =
       template,
     ]),
   );
+
+registerBuiltInState({
+  templates: {
+    templatesById: builtInTemplatesById,
+  },
+});
 
 export default builtInTemplates;

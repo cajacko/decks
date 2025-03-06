@@ -1,25 +1,36 @@
-import exampleDecksToStore from "@/utils/exampleDecksToStore";
-import { builtInTemplatesById } from "@/constants/builtInTemplates";
 import { RootState, SliceName } from "../types";
+import merge from "lodash/merge";
 
-let cache: RootState | null = null;
+/**
+ * Built in state is used to provide a consistent experience in consuming data from selectors, but
+ * without having to fill the store with data for examples and then having to manage that being
+ * persisted/ cleared/ etc. Redux is for dynamic data that might change, not for static data that
+ * will never change. So we do it this way.
+ */
+let builtInState: RootState = {
+  [SliceName.Templates]: {
+    templatesById: {},
+  },
+  [SliceName.Cards]: {
+    cardsById: {},
+  },
+  [SliceName.Decks]: {
+    deckIds: [],
+    decksById: {},
+  },
+  [SliceName.Tabletops]: {
+    tabletopsById: {},
+  },
+  [SliceName.UserSettings]: {},
+};
 
-export function builtInState(): RootState {
-  if (cache) {
-    return cache;
-  }
+export type BuiltInState = Partial<RootState>;
 
-  const state: RootState = {
-    ...exampleDecksToStore(),
-    [SliceName.Templates]: {
-      templatesById: builtInTemplatesById,
-    },
-    [SliceName.UserSettings]: {},
-  };
-
-  cache = state;
-
-  return state;
+/**
+ * Add stuff to the built in state
+ */
+export function registerBuiltInState(state: BuiltInState) {
+  builtInState = merge(builtInState, state);
 }
 
 export default function withBuiltInState<
@@ -43,20 +54,6 @@ export default function withBuiltInState(
       return storeValue;
     }
 
-    return selector(
-      {
-        ...state,
-        templates: {
-          ...state.templates,
-          templatesById: {
-            ...state.templates.templatesById,
-            ...builtInTemplatesById,
-          },
-        },
-      },
-      props,
-    );
-
-    // return selector(builtInState(), props);
+    return selector(builtInState, props);
   };
 }

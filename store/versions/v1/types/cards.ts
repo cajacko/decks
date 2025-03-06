@@ -11,7 +11,7 @@ export type Data = Record<string, TemplatesType.ValidatedValue | undefined>;
 
 export interface Props {
   cardId: CardId;
-  deckId: Decks.DeckId;
+  deckId: Decks.DeckId | null;
   data: Data;
   templates?: Partial<Decks.Templates>;
   status: "creating" | "active" | "deleting";

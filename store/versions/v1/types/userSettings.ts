@@ -9,7 +9,7 @@ export const flagMap = {
   HOLD_MENU_BEHAVIOUR: ["hold", "tap"],
 
   // Dev flags
-  USE_DEV_INITIAL_REDUX_STATE: [true, false],
+  USE_DEV_INITIAL_REDUX_STATE: [false, true],
   CARD_ANIMATIONS: ["enabled", "disabled"],
   SKELETON_LOADER: ["enabled", "disabled"],
   SCREEN_ANIMATIONS: [

@@ -68,7 +68,7 @@ const template: Templates.Props = {
         },
         {
           type: "text",
-          text: `{{${deckTemplateIds.name}}}`,
+          text: `{{#if ${dataItemIds.text}}}{{${dataItemIds.text}}}{{else}}{{${deckTemplateIds.name}}}{{/if}}`,
           style: {
             color: colorFunction("lightness", dataItemIds.color, 15),
             fontSize: 10,

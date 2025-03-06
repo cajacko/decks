@@ -46,5 +46,7 @@
   "settings.flags.title": "Flags",
   "template.built_in.playing-cards.name": "Playing Cards Template",
   "template.built_in.playing-cards.value.name": "Card Value (A,2-10,J,Q,K)",
-  "template.built_in.playing-cards.suit.name": "Card Suit (Emoji)"
+  "template.built_in.playing-cards.suit.name": "Card Suit (Emoji)",
+  "decks_screen.my_decks.title": "My Decks",
+  "decks_screen.my_decks.new": "Create a New Deck"
 }

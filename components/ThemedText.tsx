@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
   },
   h1: {
     fontSize: 30,
-    lineHeight: 24,
     fontWeight: "normal",
   },
   h3: {
