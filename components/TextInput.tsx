@@ -39,6 +39,7 @@ export default function TextInput({
   textInputStyle: textInputStyleProp,
   ...props
 }: TextInputProps) {
+  const placeholderColor = useThemeColor("placeholder");
   const borderColor = useThemeColor("inputOutline");
   const textStyle = useThemedTextStyle({ type: textVariant });
   const [value, setValue] = React.useState(valueProp);
@@ -83,6 +84,7 @@ export default function TextInput({
         style={textInputStyle}
         value={value ?? ""}
         onChangeText={onChangeText}
+        placeholderTextColor={placeholderColor}
       />
       {rightAdornment}
     </View>
