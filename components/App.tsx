@@ -20,8 +20,10 @@ import { AbrilFatface_400Regular } from "@expo-google-fonts/abril-fatface";
 import { DrawerProvider } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
 import { useHasRehydrated } from "@/store/hooks";
+import registerExampleDecks from "@/utils/registerExampleDecks";
 
 enableFreeze();
+registerExampleDecks();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

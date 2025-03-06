@@ -1,0 +1,128 @@
+import React from "react";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  Pressable,
+  ViewStyle,
+} from "react-native";
+import { useAppSelector } from "@/store/hooks";
+import {
+  selectDeck,
+  selectDeckCards,
+  selectDeckLastScreen,
+} from "@/store/slices/decks";
+import { useRouter } from "expo-router";
+import { Target } from "@/utils/cardTarget";
+import CardSideBySide from "./CardSideBySide";
+import { DeckCardSizeProvider } from "@/context/Deck";
+import ThemedText from "./ThemedText";
+import IconButton from "./IconButton";
+
+export interface ExpandedDeckListItemProps {
+  deckId: string;
+  style?: ViewStyle;
+  skeleton?: boolean;
+}
+
+export default function ExpandedDeckListItem(
+  props: ExpandedDeckListItemProps,
+): React.ReactNode {
+  const { navigate } = useRouter();
+  const firstDeckCardId = useAppSelector(
+    (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
+  );
+  const lastScreen = useAppSelector((state) =>
+    selectDeckLastScreen(state, { deckId: props.deckId }),
+  );
+  const { name, description } =
+    useAppSelector((state) => selectDeck(state, props)) ?? {};
+
+  const coverTarget = React.useMemo((): Target => {
+    return firstDeckCardId
+      ? { id: firstDeckCardId, type: "card" }
+      : { id: props.deckId, type: "deck-defaults" };
+  }, [firstDeckCardId, props.deckId]);
+
+  const onPress = React.useCallback(() => {
+    navigate(
+      lastScreen === "deck"
+        ? `/deck/${props.deckId}`
+        : `/deck/${props.deckId}/play`,
+    );
+  }, [props.deckId, navigate, lastScreen]);
+
+  const containerStyle = React.useMemo(
+    () => [styles.container, props.style],
+    [props.style],
+  );
+
+  return (
+    <DeckCardSizeProvider
+      id={props.deckId}
+      idType="deck"
+      constraints={styles.cardConstraints}
+    >
+      <View style={containerStyle}>
+        <Pressable onPress={onPress} style={styles.cards}>
+          <CardSideBySide
+            skeleton={props.skeleton}
+            topSide="front"
+            {...coverTarget}
+          />
+        </Pressable>
+        <View style={styles.details}>
+          <View style={styles.text}>
+            {name && (
+              <ThemedText type="h3" style={styles.title}>
+                {name}
+              </ThemedText>
+            )}
+            {description && (
+              <ThemedText type="body1" numberOfLines={4}>
+                {description}
+              </ThemedText>
+            )}
+          </View>
+          <View style={styles.actions}>
+            <IconButton icon="remove-red-eye" size={40} variant="transparent" />
+            <IconButton icon="play-arrow" size={40} variant="transparent" />
+            <IconButton icon="content-copy" size={40} variant="transparent" />
+          </View>
+        </View>
+      </View>
+    </DeckCardSizeProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  cardConstraints: {
+    maxHeight: Math.min(200, Dimensions.get("window").height / 3),
+    maxWidth: Dimensions.get("window").width - 30,
+  },
+  container: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  title: {
+    marginBottom: 10,
+  },
+  text: {
+    flex: 1,
+  },
+  details: {
+    flex: 1,
+    height: "100%",
+    marginLeft: 20,
+    paddingVertical: 40,
+  },
+  cards: {
+    position: "relative",
+    flex: 1,
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+});

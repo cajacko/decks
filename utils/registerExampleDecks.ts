@@ -9,19 +9,14 @@ import {
 } from "@/store/types";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
+import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 
 type State = Pick<
   RootState,
   SliceName.Decks | SliceName.Cards | SliceName.Tabletops
 >;
 
-let cache: State | null = null;
-
-export default function exampleDecksToStore() {
-  if (cache) {
-    return cache;
-  }
-
+export default function registerExampleDecks() {
   const state: State = {
     decks: {
       deckIds: [],
@@ -145,7 +140,7 @@ export default function exampleDecksToStore() {
     state.tabletops.tabletopsById[tabletopId] = tabletop;
   });
 
-  cache = state;
+  registerBuiltInState(state);
 
   return state;
 }

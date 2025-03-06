@@ -4,8 +4,8 @@ import morningPages from "./morningPages";
 import playingCards from "./playingCards";
 
 export default {
-  charades,
-  jugglingPractice,
-  morningPages,
   playingCards,
+  charades,
+  morningPages,
+  jugglingPractice,
 };

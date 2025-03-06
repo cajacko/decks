@@ -26,6 +26,10 @@ let builtInState: RootState = {
 
 export type BuiltInState = Partial<RootState>;
 
+export function getBuiltInState() {
+  return builtInState;
+}
+
 /**
  * Add stuff to the built in state
  */

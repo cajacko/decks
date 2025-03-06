@@ -1,25 +1,21 @@
 import React from "react";
 import { StyleSheet, ViewStyle, View, ScrollView } from "react-native";
-import { useAppSelector } from "@/store/hooks";
+import { useBuiltInStateSelector } from "@/store/hooks";
 import { selectDeckIds } from "@/store/slices/decks";
-import DeckListItem from "@/components/DeckListItem";
+import ExpandedDeckListItem from "@/components/ExpandedDeckListItem";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import ThemedText from "./ThemedText";
 import text from "@/constants/text";
 
-export interface MyDecksProps {
+export interface PreBuiltDecksProps {
   style?: ViewStyle;
 }
 
-type FlatListItem = string | null;
-
-export default function MyDecks(props: MyDecksProps): React.ReactNode {
-  const skeleton = useScreenSkeleton(MyDecks.name);
-  const deckIdsState = useAppSelector(selectDeckIds);
-
-  const deckIds = React.useMemo((): FlatListItem[] => {
-    return [...deckIdsState, null];
-  }, [deckIdsState]);
+export default function PreBuiltDecks(
+  props: PreBuiltDecksProps,
+): React.ReactNode {
+  const skeleton = useScreenSkeleton(PreBuiltDecks.name);
+  const deckIds = useBuiltInStateSelector(selectDeckIds);
 
   const containerStyle = React.useMemo(
     () => [styles.container, props.style],
@@ -29,7 +25,7 @@ export default function MyDecks(props: MyDecksProps): React.ReactNode {
   const children = React.useMemo(
     () =>
       deckIds.map((deckId) => (
-        <DeckListItem
+        <ExpandedDeckListItem
           key={deckId}
           style={styles.listItem}
           deckId={deckId}
@@ -42,14 +38,10 @@ export default function MyDecks(props: MyDecksProps): React.ReactNode {
   return (
     <View style={containerStyle}>
       <ThemedText type="h1" style={styles.title}>
-        {text["decks_screen.my_decks.title"]}
+        {text["decks_screen.pre_built_decks.title"]}
       </ThemedText>
       {!skeleton && (
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          style={styles.list}
-          horizontal
-        >
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
           {children}
         </ScrollView>
       )}
@@ -59,7 +51,9 @@ export default function MyDecks(props: MyDecksProps): React.ReactNode {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
+    flex: 1,
+    maxWidth: 600,
+    width: "100%",
   },
   list: {},
   title: {
