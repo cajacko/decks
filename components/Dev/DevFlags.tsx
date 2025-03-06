@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { UserSettings } from "@/store/types";
-import ThemedText from "./ThemedText";
+import ThemedText from "../ThemedText";
 import { Picker } from "@react-native-picker/picker";
 import {
   selectUserSettingsFlag,

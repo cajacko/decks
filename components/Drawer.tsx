@@ -14,9 +14,9 @@ import { expo } from "@/app.json";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectFlag } from "@/store/combinedSelectors/flags";
 import { setUserFlag } from "@/store/slices/userSettings";
-import Flags from "./Flags";
 import Alert from "./Alert";
 import text from "@/constants/text";
+import DevMenu from "./Dev/DevMenu";
 
 const version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`
@@ -62,7 +62,7 @@ export default function Drawer(): React.ReactNode {
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.container}>
           <View style={styles.content}>
-            <View style={styles.main}>{devMode && <Flags />}</View>
+            <View style={styles.main}>{devMode && <DevMenu />}</View>
             <Alert
               visible={showDevModeAlert}
               onRequestClose={() => setShowDevModeAlert(false)}

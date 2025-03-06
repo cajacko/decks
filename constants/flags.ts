@@ -32,24 +32,16 @@ export const flagRelationships: FlagRelationships = {
   },
 };
 
-// Final fallback values
-export const defaultFlags: UserSettings.FlagMap = {
-  USE_DEV_INITIAL_REDUX_STATE: true,
-  HOLD_MENU_BEHAVIOUR: "hold",
-  CARD_ANIMATIONS: "enabled",
-  SKELETON_LOADER: "enabled",
-  NAVIGATION_STACK_ANIMATIONS: "slide",
-  NAVIGATION_TAB_ANIMATIONS: "shift",
-  SCREEN_ANIMATIONS: "disabled",
-  // Does not play nicely with reanimated effects. When we navigated to tabletop, then to deck edit
-  // and then back to tabletop, the stacks wouldn't show. The reanimated opacity value seems to have
-  // reset and wouldn't set back to 1
-  SCREENS_FREEZE_ON_BLUR: false,
-  GENERAL_LAYOUT_ANIMATIONS: "enabled",
-  DEBUG_AUTO_SAVE: false,
-  DEBUG_BOTTOM_DRAWER: false,
-  DEV_MODE: false,
-};
+// The default value is the first defined option
+export const defaultFlags: UserSettings.FlagMap = Object.entries(
+  UserSettings.flagMap,
+).reduce(
+  (acc, [key, [defaultValue]]) => ({
+    ...acc,
+    [key]: defaultValue,
+  }),
+  {} as UserSettings.FlagMap,
+);
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,

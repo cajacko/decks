@@ -18,6 +18,8 @@ import { navigationFonts } from "@/components/ThemedText";
 import { enableFreeze } from "react-native-screens";
 import { AbrilFatface_400Regular } from "@expo-google-fonts/abril-fatface";
 import { DrawerProvider } from "@/context/Drawer";
+import useFlag from "@/hooks/useFlag";
+import { useHasRehydrated } from "@/store/hooks";
 
 enableFreeze();
 
@@ -49,29 +51,31 @@ function useNavigationTheme(): NavigationTheme {
   }, [colorScheme]);
 }
 
-export function withApp(Component: React.ComponentType) {
-  return function WithApp() {
-    return (
-      <App>
-        <Component />
-      </App>
-    );
-  };
-}
-
-export default function App({ children }: { children: React.ReactNode }) {
+function HasStore({ children }: { children: React.ReactNode }) {
   const [loadedFonts] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Zain: AbrilFatface_400Regular,
   });
 
-  const [loadedRedux, setLoadedRedux] = React.useState(false);
+  const [isStoreReady, setIsStoreReady] = React.useState(false);
+  const hasRehydrated = useHasRehydrated();
+  const shouldPurgeStoreOnStart = useFlag("PURGE_STORE_ON_START");
 
-  const loaded = loadedFonts && loadedRedux;
+  React.useEffect(() => {
+    if (!hasRehydrated) return;
 
-  const onBeforeLift = React.useCallback(() => {
-    setLoadedRedux(true);
-  }, []);
+    if (shouldPurgeStoreOnStart) {
+      persistor.purge().finally(() => {
+        setIsStoreReady(true);
+      });
+
+      return;
+    }
+
+    setIsStoreReady(true);
+  }, [hasRehydrated, shouldPurgeStoreOnStart]);
+
+  const loaded = loadedFonts && isStoreReady;
 
   useEffect(() => {
     initMousePointer();
@@ -83,28 +87,40 @@ export default function App({ children }: { children: React.ReactNode }) {
     SplashScreen.hideAsync();
   }, [loaded]);
 
-  const navigationTheme = useNavigationTheme();
-
   if (!loadedFonts) {
     return null;
   }
 
   return (
+    <PersistGate loading={null} persistor={persistor}>
+      <ModalProvider>
+        <DrawerProvider>
+          {children}
+          <StatusBar style="auto" />
+        </DrawerProvider>
+      </ModalProvider>
+    </PersistGate>
+  );
+}
+
+export default function App({ children }: { children: React.ReactNode }) {
+  const navigationTheme = useNavigationTheme();
+
+  return (
     <NavigationThemeProvider value={navigationTheme}>
       <ReduxProvider store={store}>
-        <PersistGate
-          loading={null}
-          onBeforeLift={onBeforeLift}
-          persistor={persistor}
-        >
-          <ModalProvider>
-            <DrawerProvider>
-              {children}
-              <StatusBar style="auto" />
-            </DrawerProvider>
-          </ModalProvider>
-        </PersistGate>
+        <HasStore>{children}</HasStore>
       </ReduxProvider>
     </NavigationThemeProvider>
   );
+}
+
+export function withApp(Component: React.ComponentType) {
+  return function WithApp() {
+    return (
+      <App>
+        <Component />
+      </App>
+    );
+  };
 }

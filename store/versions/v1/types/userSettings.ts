@@ -3,29 +3,34 @@
 // from boolean to having some different states we may miss some conditional checks that were just
 // doing a truthy check.
 
+// NOTE: First option is the default
 export const flagMap = {
   // User control flags go here
-  HOLD_MENU_BEHAVIOUR: ["tap", "hold"],
+  HOLD_MENU_BEHAVIOUR: ["hold", "tap"],
 
   // Dev flags
   USE_DEV_INITIAL_REDUX_STATE: [true, false],
   CARD_ANIMATIONS: ["enabled", "disabled"],
   SKELETON_LOADER: ["enabled", "disabled"],
   SCREEN_ANIMATIONS: [
+    "disabled",
     "react-navigation",
     "custom-fade-in-content",
     "custom-fade-out-top-background",
-    "disabled",
   ],
-  NAVIGATION_STACK_ANIMATIONS: ["slide", "disabled"],
-  NAVIGATION_TAB_ANIMATIONS: ["shift", "fade", "disabled"],
-  SCREENS_FREEZE_ON_BLUR: [true, false],
+  NAVIGATION_STACK_ANIMATIONS: ["disabled", "slide"],
+  NAVIGATION_TAB_ANIMATIONS: ["disabled", "shift", "fade"],
+  // Does not play nicely with reanimated effects. When we navigated to tabletop, then to deck edit
+  // and then back to tabletop, the stacks wouldn't show. The reanimated opacity value seems to have
+  // reset and wouldn't set back to 1
+  SCREENS_FREEZE_ON_BLUR: [false, true],
   GENERAL_LAYOUT_ANIMATIONS: ["enabled", "disabled"],
-  DEV_MODE: [true, false],
+  DEV_MODE: [false, true],
+  PURGE_STORE_ON_START: [false, true],
 
   // Debug logs
-  DEBUG_BOTTOM_DRAWER: [true, false],
-  DEBUG_AUTO_SAVE: [true, false],
+  DEBUG_BOTTOM_DRAWER: [false, true],
+  DEBUG_AUTO_SAVE: [false, true],
 } as const;
 
 type _FlagMap = typeof flagMap;

@@ -22,3 +22,7 @@ export const useRequiredAppSelector = <T>(
 
   return value as NonNullable<T>;
 };
+
+export function useHasRehydrated() {
+  return useAppSelector((state) => state._persist.rehydrated);
+}

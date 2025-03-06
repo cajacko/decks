@@ -56,9 +56,6 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-// Quickly reset the store to initial values and remove persisted data
-// persistor.purge();
-
 // Infer the `RootState`,  `AppDispatch`, and `AppStore` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
