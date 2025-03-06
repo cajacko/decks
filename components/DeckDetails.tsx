@@ -25,8 +25,20 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
     selectDeck(state, { deckId: props.deckId }),
   );
 
+  const titleRef = React.useRef(deck?.name);
+  const descriptionRef = React.useRef(deck?.description);
+
+  titleRef.current = deck?.name;
+  descriptionRef.current = deck?.description;
+
   const [title, setTitle] = React.useState(deck?.name ?? "");
   const [description, setDescription] = React.useState(deck?.description ?? "");
+
+  // Reset on deck id change
+  React.useEffect(() => {
+    setTitle(titleRef.current ?? "");
+    setDescription(descriptionRef.current ?? "");
+  }, [props.deckId]);
 
   const hasChanges = deck?.name !== title || deck?.description !== description;
 

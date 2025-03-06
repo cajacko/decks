@@ -64,7 +64,7 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
   cards: Card[];
   templates: Templates;
   name: string;
-  description?: string;
+  description: string | null | undefined;
   dataSchemaOrder: DsId[];
   dataSchema: DataSchema<DsId>;
   defaultTabletopId: string;

@@ -6,6 +6,9 @@ import uuid from "@/utils/uuid";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { createInitStacks } from "@/utils/minStacks";
 import text from "@/constants/text";
+import { selectTabletop } from "../slices/tabletop";
+import { getBuiltInState } from "../utils/withBuiltInState";
+import { selectCard } from "../slices/cards";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.DeckId;
@@ -32,6 +35,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
     name: text["deck.new.title"],
+    description: text["deck.new.description"],
     status: "creating",
     canEdit: true,
     cardSize: Decks.CardSize.Poker,
@@ -63,6 +67,151 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
         stacksIds,
       },
     },
+  };
+
+  return createDeck({
+    cards,
+    deck,
+    defaultTabletop,
+  });
+}
+
+export function copyDeckHelper(props: {
+  deckId: Decks.DeckId;
+  newDeckId: string;
+}) {
+  const deckToCopy = selectDeck(store.getState(), props);
+
+  const deckId = props.newDeckId;
+
+  if (!deckToCopy) {
+    return createDeckHelper({ deckId });
+  }
+
+  const tabletopId = uuid();
+  const cardIdMap = new Map<Cards.CardId, Cards.CardId>();
+
+  const cards: Cards.Props[] = [];
+  const deckCards: Decks.Card[] = [];
+
+  function copyCard(existingCardId: Cards.CardId): string | null {
+    const existingCard = selectCard(store.getState(), {
+      cardId: existingCardId,
+    });
+
+    if (!existingCard) return null;
+
+    const newCardId = uuid();
+
+    cardIdMap.set(existingCardId, newCardId);
+
+    cards.push({
+      templates: existingCard.templates,
+      cardId: newCardId,
+      data: existingCard.data,
+      canEdit: true,
+      deckId,
+      status: "creating",
+    });
+
+    return newCardId;
+  }
+
+  deckToCopy.cards.forEach(({ cardId, quantity }) => {
+    const newCardId = copyCard(cardId);
+
+    if (!newCardId) return;
+
+    deckCards.push({
+      cardId: newCardId,
+      quantity,
+    });
+  });
+
+  const existingTabletop = deckToCopy.defaultTabletopId
+    ? selectTabletop(store.getState(), {
+        tabletopId: deckToCopy.defaultTabletopId,
+      })
+    : selectTabletop(getBuiltInState(), {
+        tabletopId: deckToCopy.defaultTabletopId,
+      });
+
+  let defaultTabletop: Tabletops.Props;
+
+  if (existingTabletop) {
+    const cardInstancesById: Tabletops.CardInstancesById = {};
+
+    Object.entries(existingTabletop.history.present.cardInstancesById).forEach(
+      ([cardInstanceId, cardInstance]) => {
+        if (!cardInstance) return;
+
+        let newCardId: string;
+
+        const mappedCardId = cardIdMap.get(cardInstance.cardId);
+
+        if (mappedCardId) {
+          newCardId = mappedCardId;
+        } else {
+          const _newCardId = copyCard(cardInstance.cardId);
+
+          if (!_newCardId) return;
+
+          newCardId = _newCardId;
+        }
+
+        cardInstancesById[cardInstanceId] = {
+          cardId: newCardId,
+          side: cardInstance.side,
+          // The id is local to the tabletop, so we don't need to change it
+          cardInstanceId,
+        };
+      },
+    );
+
+    defaultTabletop = {
+      history: {
+        future: [],
+        past: [],
+        present: {
+          cardInstancesById,
+          stacksById: existingTabletop.history.present.stacksById,
+          stacksIds: existingTabletop.history.present.stacksIds,
+        },
+      },
+      id: tabletopId,
+      availableDecks: [deckId],
+    };
+  } else {
+    const { stacksIds, stacksById } = createInitStacks();
+
+    defaultTabletop = {
+      id: tabletopId,
+      availableDecks: [deckId],
+      history: {
+        future: [],
+        past: [],
+        present: {
+          cardInstancesById: {},
+          stacksById,
+          stacksIds,
+        },
+      },
+    };
+  }
+
+  // NOTE: Don't spread, it will force us to add in all new props and choose what we need
+  const deck: Decks.Props = {
+    cards: deckCards,
+    cardSize: deckToCopy.cardSize,
+    dataSchema: deckToCopy.dataSchema,
+    dataSchemaOrder: deckToCopy.dataSchemaOrder,
+    templates: deckToCopy.templates,
+    name: `${deckToCopy.name}${text["deck.copied.append"]}`,
+    description: deckToCopy.description,
+    id: deckId,
+    defaultTabletopId: tabletopId,
+    status: "creating",
+    canEdit: true,
   };
 
   return createDeck({

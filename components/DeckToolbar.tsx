@@ -13,23 +13,47 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import Button from "./Button";
 import IconButton from "./IconButton";
 import { selectCanEditDeck } from "@/store/slices/decks";
+import { copyDeckHelper } from "@/store/actionHelpers/decks";
+import uuid from "@/utils/uuid";
 
 interface DeckToolbarProps {
   deckId: string;
   openDefaultCardModal: () => void;
+  copyDeck: () => void;
+  canEditDeck: boolean;
 }
 
 export function useDeckToolbar({ deckId }: { deckId: string }) {
+  const { navigate } = useRouter();
+  const dispatch = useAppDispatch();
+
   const defaultCard = useEditCardModal({
     type: "deck-defaults",
     id: deckId,
   });
 
+  const canEditDeck = useAppSelector((state) =>
+    selectCanEditDeck(state, { deckId }),
+  );
+
+  const copyDeck = React.useCallback(() => {
+    const newDeckId = uuid();
+
+    dispatch(copyDeckHelper({ deckId, newDeckId }));
+
+    navigate(`/deck/${newDeckId}`);
+  }, [deckId, dispatch, navigate]);
+
   const headerRight = React.useCallback(
     () => (
-      <DeckToolbar deckId={deckId} openDefaultCardModal={defaultCard.open} />
+      <DeckToolbar
+        deckId={deckId}
+        openDefaultCardModal={defaultCard.open}
+        copyDeck={copyDeck}
+        canEditDeck={canEditDeck}
+      />
     ),
-    [deckId, defaultCard.open],
+    [deckId, defaultCard.open, copyDeck, canEditDeck],
   );
 
   useParentHeaderRight(headerRight);
@@ -44,9 +68,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   // NOTE: This component will only re-render on prop changes, no state changes
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
-  const canEditDeck = useAppSelector((state) =>
-    selectCanEditDeck(state, { deckId: props.deckId }),
-  );
+
   const { entering, exiting } = useLayoutAnimations();
 
   const deleteDeck = React.useCallback(() => {
@@ -61,28 +83,37 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     message: text["deck.delete.message"],
   });
 
-  if (!canEditDeck) return null;
-
   return (
     <Animated.View
       entering={entering}
       exiting={exiting}
       style={styles.container}
     >
-      {deleteDeckModal.component}
-      <Button
-        onPressOut={props.openDefaultCardModal}
-        style={styles.action}
-        title={text["deck.actions.default"]}
-        variant="transparent"
-      />
-      <IconButton
-        icon="delete"
-        size={iconSize}
-        variant="transparent"
-        onPressOut={deleteDeckModal.open}
-        style={styles.action}
-      />
+      {props.canEditDeck ? (
+        <>
+          {deleteDeckModal.component}
+          <Button
+            onPressOut={props.openDefaultCardModal}
+            style={styles.action}
+            title={text["deck.actions.default"]}
+            variant="transparent"
+          />
+          <IconButton
+            icon="delete"
+            size={iconSize}
+            variant="transparent"
+            onPressOut={deleteDeckModal.open}
+            style={styles.action}
+          />
+        </>
+      ) : (
+        <Button
+          title="Copy/ Edit Deck"
+          onPressOut={props.copyDeck}
+          variant="transparent"
+          style={styles.action}
+        />
+      )}
     </Animated.View>
   );
 }

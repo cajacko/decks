@@ -6,7 +6,7 @@ import {
   Pressable,
   ViewStyle,
 } from "react-native";
-import { useAppSelector } from "@/store/hooks";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
@@ -14,6 +14,8 @@ import CardSideBySide from "./CardSideBySide";
 import { DeckCardSizeProvider } from "@/context/Deck";
 import ThemedText from "./ThemedText";
 import IconButton from "./IconButton";
+import { copyDeckHelper } from "@/store/actionHelpers/decks";
+import uuid from "@/utils/uuid";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -21,10 +23,13 @@ export interface ExpandedDeckListItemProps {
   skeleton?: boolean;
 }
 
+const iconSize = 40;
+
 export default function ExpandedDeckListItem(
   props: ExpandedDeckListItemProps,
 ): React.ReactNode {
   const { navigate } = useRouter();
+  const dispatch = useAppDispatch();
   const firstDeckCardId = useAppSelector(
     (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
   );
@@ -49,6 +54,14 @@ export default function ExpandedDeckListItem(
     () => [styles.container, props.style],
     [props.style],
   );
+
+  const copyDeck = React.useCallback(() => {
+    const newDeckId = uuid();
+
+    dispatch(copyDeckHelper({ deckId: props.deckId, newDeckId }));
+
+    navigate(`/deck/${newDeckId}`);
+  }, [dispatch, props.deckId, navigate]);
 
   return (
     <DeckCardSizeProvider
@@ -81,16 +94,21 @@ export default function ExpandedDeckListItem(
             <IconButton
               icon="remove-red-eye"
               onPress={view}
-              size={40}
+              size={iconSize}
               variant="transparent"
             />
             <IconButton
               icon="play-arrow"
               onPress={play}
-              size={40}
+              size={iconSize}
               variant="transparent"
             />
-            <IconButton icon="content-copy" size={40} variant="transparent" />
+            <IconButton
+              icon="content-copy"
+              size={iconSize}
+              onPress={copyDeck}
+              variant="transparent"
+            />
           </View>
         </View>
       </View>
