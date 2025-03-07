@@ -25,5 +25,5 @@ jobs:
       - name: Run ${{ matrix.task }}
         run: |
           if [ "${{ matrix.task }}" == "lint" ]; then yarn lint; fi
-          if [ "${{ matrix.task }}" == "test" ]; then yarn test; fi
+          if [ "${{ matrix.task }}" == "test" ]; then yarn test:ci; fi
           if [ "${{ matrix.task }}" == "type-check" ]; then npx tsc; fi
