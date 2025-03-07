@@ -23,7 +23,7 @@ export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
 export function useThemedTextStyle({
   type = "body1",
   style: styleProp,
-}: Partial<ThemedTextProps> & { color: string }) {
+}: Partial<ThemedTextProps>) {
   const color = useThemeColor(type === "link" ? "link" : "text");
 
   const style = React.useMemo(
