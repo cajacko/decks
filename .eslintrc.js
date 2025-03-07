@@ -23,7 +23,8 @@ module.exports = {
           "Use AppError from '@/classes/AppError' instead of the Error class.",
       },
     ],
-    // // Lets keep our code lean
+    "react-hooks/exhaustive-deps": "error",
+    // Lets keep our code lean
     "@typescript-eslint/no-unused-vars": "error",
     // Come on, we're better than that
     "@typescript-eslint/no-explicit-any": "error",

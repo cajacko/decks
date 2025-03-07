@@ -101,6 +101,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.handleMoveToBottom,
     state.moveRight,
     state.moveLeft,
+    canEditCard,
   ]);
 
   return {
