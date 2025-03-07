@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { ViewStyle } from "react-native";
 import TextInput from "@/components/TextInput";
 import { useAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
@@ -9,8 +9,8 @@ import {
 } from "@/context/EditCard";
 import { Templates } from "@/store/types";
 import AppError from "@/classes/AppError";
-import ThemedText from "./ThemedText";
 import ColorInput from "./ColorInput";
+import Field from "./Field";
 
 export interface TemplateSchemaItemProps {
   side: "front" | "back";
@@ -60,7 +60,6 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       case Templates.DataType.Text: {
         return (
           <TextInput
-            style={styles.input}
             value={validatedValue.value}
             onChangeText={onChangeText}
             placeholder={placeholder}
@@ -70,7 +69,6 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       case Templates.DataType.Color: {
         return (
           <ColorInput
-            style={styles.input}
             value={validatedValue.value}
             onChangeText={onChangeText}
             placeholder={placeholder}
@@ -92,22 +90,11 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   }
 
   return (
-    <View style={props.style}>
-      <ThemedText type="h4" style={styles.label}>
-        {fieldLabel}
-        {/* TODO: No text indicator here, something else */}
-        {hasChanges && !isNewCard ? " (changed)" : ""}
-      </ThemedText>
+    <Field
+      label={`${fieldLabel}${hasChanges && !isNewCard ? " (changed)" : ""}`}
+      style={props.style}
+    >
       {input}
-    </View>
+    </Field>
   );
 }
-
-const styles = StyleSheet.create({
-  label: {
-    marginBottom: 8,
-  },
-  input: {
-    marginBottom: 16,
-  },
-});

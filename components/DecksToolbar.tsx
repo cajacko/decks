@@ -62,7 +62,5 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
-    // Hidden until we have non dev mode stuff to show
-    opacity: 0,
   },
 });

@@ -37,13 +37,36 @@ export const userSettingsSlice = createSlice({
       // @ts-ignore
       state.flags[action.payload.key] = action.payload.value;
     },
+    setUserSetting: <K extends UserSettings.UserSettingKey>(
+      state: UserSettingsState,
+      action: {
+        type: string;
+        payload: {
+          key: K;
+          value: UserSettings.UserSettingValue<K> | null;
+        };
+      },
+    ) => {
+      if (action.payload.value === null) {
+        delete state[action.payload.key];
+
+        return;
+      }
+
+      state[action.payload.key] = action.payload.value;
+    },
   },
 });
 
-export const { setUserFlag } = userSettingsSlice.actions;
+export const { setUserFlag, setUserSetting } = userSettingsSlice.actions;
 
 export const selectUserSettings = (state: RootState): UserSettingsState =>
   state[userSettingsSlice.name];
+
+export const selectUserSetting = <K extends UserSettings.UserSettingKey>(
+  state: RootState,
+  props: { key: K },
+): UserSettings.UserSettingValue<K> => selectUserSettings(state)[props.key];
 
 export const selectUserSettingsFlags = (
   state: RootState,

@@ -1,9 +1,11 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import Flags from "./DevFlags";
 import Button from "@/components/Button";
 import { persistor } from "@/store/store";
 import AppError from "@/classes/AppError";
+import ThemedText from "../ThemedText";
+import text from "@/constants/text";
 
 export interface DevMenuProps {
   children?: React.ReactNode;
@@ -33,19 +35,23 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
   }, []);
 
   return (
-    <View>
+    <>
+      <ThemedText type="h2" style={styles.margin}>
+        {text["settings.dev_mode.title"]}
+      </ThemedText>
       <Button
         title={`Purge Store${purgeStatus ? ` (${purgeStatus})` : ""}`}
-        style={styles.action}
+        style={styles.margin}
         onPress={purgeStore}
+        variant="outline"
       />
       <Flags />
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  action: {
+  margin: {
     marginBottom: 20,
   },
 });

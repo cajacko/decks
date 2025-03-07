@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { ThemedTextVariant, useThemedTextStyle } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { styles as buttonStyles } from "@/components/Button";
 
 type Variant = "display" | "outline";
 
@@ -100,8 +101,8 @@ const styles = StyleSheet.create({
   },
   display: {},
   outline: {
-    borderWidth: 1,
-    borderRadius: 4,
+    borderWidth: buttonStyles.outline.borderWidth,
+    borderRadius: buttonStyles.button.borderRadius,
     overflow: "hidden",
   },
   outlineInput: {

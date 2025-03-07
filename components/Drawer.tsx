@@ -1,58 +1,36 @@
 import React from "react";
-import {
-  StyleSheet,
-  Pressable,
-  Platform,
-  ScrollView,
-  View,
-} from "react-native";
-import { nativeApplicationVersion, nativeBuildVersion } from "expo-application";
-import ThemedText from "./ThemedText";
+import { StyleSheet, ScrollView, View } from "react-native";
 import ThemedView from "./ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { expo } from "@/app.json";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectFlag } from "@/store/combinedSelectors/flags";
-import { setUserFlag } from "@/store/slices/userSettings";
-import Alert from "./Alert";
-import text from "@/constants/text";
+import { selectUserSetting, setUserSetting } from "@/store/slices/userSettings";
 import DevMenu from "./Dev/DevMenu";
+import Version from "./Version";
+import Field from "./Field";
+import Picker, { PickerItem } from "./Picker";
+import { UserSettings } from "@/store/types";
+import FieldSet from "./FieldSet";
+import text from "@/constants/text";
 
-const version = nativeApplicationVersion
-  ? `${nativeApplicationVersion} (${nativeBuildVersion})`
-  : expo.version;
+type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
+
+const titleProps = { type: "h2" } as const;
 
 export default function Drawer(): React.ReactNode {
   const dispatch = useAppDispatch();
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
+  const theme =
+    useAppSelector((state) => selectUserSetting(state, { key: "theme" })) ??
+    "system";
 
-  // If we tap the version number 5 times, we enable dev mode
-
-  const taps = React.useRef(0);
-  const lastTap = React.useRef(0);
-
-  const onVersionPress = React.useCallback(() => {
-    const now = Date.now();
-
-    if (now - lastTap.current < 3000) {
-      taps.current += 1;
-    }
-
-    lastTap.current = now;
-
-    if (taps.current >= 5) {
-      if (devMode) {
-        dispatch(setUserFlag({ key: "DEV_MODE", value: false }));
-      } else {
-        setShowDevModeAlert(true);
-      }
-
-      taps.current = 0;
-    }
-  }, [devMode, dispatch]);
-
-  const [showDevModeAlert, setShowDevModeAlert] = React.useState(false);
+  const onChangeTheme = React.useCallback(
+    (value: Theme) => {
+      dispatch(setUserSetting({ key: "theme", value }));
+    },
+    [dispatch],
+  );
 
   return (
     <ScrollView
@@ -62,33 +40,31 @@ export default function Drawer(): React.ReactNode {
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.container}>
           <View style={styles.content}>
-            <View style={styles.main}>{devMode && <DevMenu />}</View>
-            <Alert
-              visible={showDevModeAlert}
-              onRequestClose={() => setShowDevModeAlert(false)}
-              title={text["settings.dev_mode.enable.title"]}
-              message={text["settings.dev_mode.enable.description"]}
-              buttons={[
-                {
-                  text: text["general.cancel"],
-                  onPress: () => setShowDevModeAlert(false),
-                  style: "cancel",
-                },
-                {
-                  text: text["general.enable"],
-                  onPress: () => {
-                    setShowDevModeAlert(false);
-                    dispatch(setUserFlag({ key: "DEV_MODE", value: !devMode }));
-                  },
-                  style: "default",
-                },
-              ]}
-            />
-            <Pressable style={styles.version} onPress={onVersionPress}>
-              <ThemedText>
-                v{version} - {Platform.OS}
-              </ThemedText>
-            </Pressable>
+            <View style={styles.settings}>
+              <FieldSet title={text["settings.title"]} titleProps={titleProps}>
+                <Field label={text["settings.theme"]}>
+                  <Picker<Theme>
+                    onValueChange={onChangeTheme}
+                    selectedValue={theme}
+                  >
+                    <PickerItem<Theme>
+                      label={text["settings.theme.system"]}
+                      value="system"
+                    />
+                    <PickerItem<Theme>
+                      label={text["settings.theme.light"]}
+                      value="light"
+                    />
+                    <PickerItem<Theme>
+                      label={text["settings.theme.dark"]}
+                      value="dark"
+                    />
+                  </Picker>
+                </Field>
+                {devMode && <DevMenu />}
+              </FieldSet>
+            </View>
+            <Version />
           </View>
         </SafeAreaView>
       </ThemedView>
@@ -102,7 +78,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 10,
+    padding: 20,
   },
   scroll: {
     flex: 1,
@@ -110,13 +86,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     minHeight: "100%",
   },
-  main: {
+  settings: {
     flex: 1,
-  },
-  version: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: "100%",
-    alignItems: "center",
   },
 });

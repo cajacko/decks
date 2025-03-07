@@ -47,5 +47,10 @@ export type FlagsState = {
 };
 
 export interface State {
+  theme?: "system" | "light" | "dark";
   flags?: FlagsState;
 }
+
+export type UserSettingKey = keyof State;
+export type UserSettingValue<K extends UserSettingKey = UserSettingKey> =
+  State[K];
