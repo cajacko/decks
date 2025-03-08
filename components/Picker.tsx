@@ -8,6 +8,7 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { styles as buttonStyles } from "./Button";
 import { useThemedTextStyle } from "./ThemedText";
+import { styles as inputStyles } from "./TextInput";
 
 export type PickerProps<T> = Omit<RNPickerProps<T>, "style"> & {
   style?: ViewStyle;
@@ -97,7 +98,6 @@ export default function Picker<T>({
         styles.picker,
         textStyle,
         {
-          borderColor: colors.inputOutline,
           backgroundColor: colors.background,
         },
         pickerStyleProp,
@@ -152,7 +152,8 @@ const styles = StyleSheet.create({
   },
   picker: {
     padding: 0,
-    margin: 0,
+    margin: inputStyles.outlineInput.padding,
+    borderColor: "transparent",
   },
   item: {
     padding: 0,

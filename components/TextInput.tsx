@@ -92,7 +92,7 @@ export default function TextInput({
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
   },
