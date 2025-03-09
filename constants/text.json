@@ -14,6 +14,7 @@
   "deck.delete.title": "Delete Deck",
   "deck.edit.description.placeholder": "Description",
   "deck.edit.title.placeholder": "Deck Name",
+  "deck.copy.title": "Copy/ Edit Deck",
   "deck.name.unnamed": "Unnamed Deck",
   "deck.new.description": "Add some more details here, like how to play or how to use this deck.",
   "deck.new.title": "New Deck",

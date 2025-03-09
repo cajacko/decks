@@ -11,7 +11,9 @@ type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
 const titleProps = { type: "h2" } as const;
 
-export type SettingsAppProps = FieldSetProps;
+export interface SettingsAppProps extends FieldSetProps {
+  closeDrawer: () => void;
+}
 
 export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
   const dispatch = useAppDispatch();

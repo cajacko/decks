@@ -15,6 +15,7 @@ export interface DrawerProps {
   deckId?: string | null;
   tabletopId?: string | null;
   isOpen?: boolean;
+  closeDrawer: () => void;
   // stackId?: string | null;
   // cardId?: string | null;
   // cardInstanceId?: string | null;
@@ -69,6 +70,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                     deckId={props.deckId}
                     collapsed={collapsed.tabletop !== false}
                     collapsible
+                    closeDrawer={props.closeDrawer}
                     onCollapse={(collapsed) =>
                       setCollapsed((prev) => ({ ...prev, tabletop: collapsed }))
                     }
@@ -79,6 +81,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                     deckId={props.deckId}
                     collapsible
                     collapsed={collapsed.deck !== false}
+                    closeDrawer={props.closeDrawer}
                     onCollapse={(collapsed) =>
                       setCollapsed((prev) => ({ ...prev, deck: collapsed }))
                     }
@@ -87,6 +90,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 <SettingsApp
                   collapsible
                   collapsed={collapsed.app !== false}
+                  closeDrawer={props.closeDrawer}
                   onCollapse={(collapsed) =>
                     setCollapsed((prev) => ({ ...prev, app: collapsed }))
                   }
@@ -94,6 +98,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 {devMode && (
                   <DevMenu
                     collapsed={collapsed.dev !== false}
+                    closeDrawer={props.closeDrawer}
                     onCollapse={(collapsed) =>
                       setCollapsed((prev) => ({ ...prev, dev: collapsed }))
                     }

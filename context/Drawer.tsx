@@ -6,7 +6,7 @@ import DrawerContent, {
 import AppError from "@/classes/AppError";
 import { useFocusEffect } from "expo-router";
 
-export type DrawerProps = Omit<_DrawerProps, "isOpen">;
+export type DrawerProps = Omit<_DrawerProps, "isOpen" | "closeDrawer">;
 
 interface ContextValue {
   isOpen: boolean;
@@ -64,8 +64,10 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
   );
 
   const renderDrawerContent = React.useCallback(
-    () => <DrawerContent isOpen={isOpen} {...drawerProps} />,
-    [drawerProps, isOpen],
+    () => (
+      <DrawerContent isOpen={isOpen} closeDrawer={close} {...drawerProps} />
+    ),
+    [drawerProps, isOpen, close],
   );
 
   return (

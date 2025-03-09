@@ -4,19 +4,22 @@ import FieldSet, { FieldSetProps } from "./FieldSet";
 import text from "@/constants/text";
 import Button from "@/components/Button";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
-import { deleteDeckHelper } from "@/store/actionHelpers/decks";
+import { copyDeckHelper, deleteDeckHelper } from "@/store/actionHelpers/decks";
 import { useRouter } from "expo-router";
-import { selectDeck } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
+import uuid from "@/utils/uuid";
 
 const titleProps = { type: "h2" } as const;
 
 export interface SettingsDeckProps extends FieldSetProps {
   deckId: string;
+  closeDrawer: () => void;
 }
 
 export default function SettingsDeck({
   deckId,
+  closeDrawer,
   ...props
 }: SettingsDeckProps): React.ReactNode {
   const dispatch = useAppDispatch();
@@ -26,16 +29,30 @@ export default function SettingsDeck({
   );
 
   const deleteDeck = React.useCallback(() => {
+    closeDrawer();
     navigate("/");
 
     dispatch(deleteDeckHelper({ deckId }));
-  }, [deckId, dispatch, navigate]);
+  }, [deckId, dispatch, navigate, closeDrawer]);
 
   const deleteDeckModal = useDeleteWarning({
     handleDelete: deleteDeck,
     title: text["deck.delete.title"],
     message: text["deck.delete.message"],
   });
+
+  const canEditDeck = useAppSelector((state) =>
+    selectCanEditDeck(state, { deckId }),
+  );
+
+  const copyDeck = React.useCallback(() => {
+    closeDrawer();
+    const newDeckId = uuid();
+
+    dispatch(copyDeckHelper({ deckId, newDeckId }));
+
+    navigate(`/deck/${newDeckId}`);
+  }, [deckId, dispatch, navigate, closeDrawer]);
 
   return (
     <>
@@ -47,10 +64,17 @@ export default function SettingsDeck({
         {...props}
       >
         <Button
-          title={text["deck.delete.title"]}
-          onPress={deleteDeckModal.open}
+          title={text["deck.copy.title"]}
+          onPress={copyDeck}
           variant="outline"
         />
+        {canEditDeck && (
+          <Button
+            title={text["deck.delete.title"]}
+            onPress={deleteDeckModal.open}
+            variant="outline"
+          />
+        )}
       </FieldSet>
     </>
   );

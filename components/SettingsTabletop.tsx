@@ -13,6 +13,7 @@ const titleProps = { type: "h2" } as const;
 export interface SettingsTabletopProps extends FieldSetProps {
   deckId: string;
   tabletopId: string;
+  closeDrawer: () => void;
 }
 
 export default function SettingsTabletop({

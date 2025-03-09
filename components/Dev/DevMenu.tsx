@@ -6,7 +6,9 @@ import AppError from "@/classes/AppError";
 import text from "@/constants/text";
 import FieldSet, { FieldSetProps } from "@/components/FieldSet";
 
-export type DevMenuProps = FieldSetProps;
+export interface DevMenuProps extends FieldSetProps {
+  closeDrawer: () => void;
+}
 
 const titleProps = { type: "h2" } as const;
 

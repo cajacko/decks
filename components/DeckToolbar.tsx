@@ -50,7 +50,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
         </>
       ) : (
         <Button
-          title="Copy/ Edit Deck"
+          title={text["deck.copy.title"]}
           onPressOut={copyDeck}
           variant="transparent"
           style={styles.action}
