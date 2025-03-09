@@ -18,6 +18,7 @@ export type ThemedTextVariant =
   | "h3"
   | "h4"
   | "body1"
+  | "body2"
   | "button"
   | "link";
 
@@ -37,6 +38,7 @@ export function useThemedTextStyle({
     () => [
       { color },
       type === "body1" ? styles.body1 : undefined,
+      type === "body2" ? styles.body2 : undefined,
       type === "h1" ? styles.h1 : undefined,
       type === "h2" ? styles.h2 : undefined,
       type === "h3" ? styles.h3 : undefined,
@@ -68,6 +70,10 @@ export const styles = StyleSheet.create({
   body1: {
     fontSize: 16,
     lineHeight: 24,
+  },
+  body2: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   h1: {
     fontSize: 30,

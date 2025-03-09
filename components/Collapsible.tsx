@@ -10,6 +10,7 @@ import ThemedText, { ThemedTextProps } from "./ThemedText";
 
 export interface CollapsibleProps {
   title?: string | null;
+  subTitle?: string | null;
   children?: React.ReactNode;
   style?: ViewStyle;
   collapsible?: boolean;
@@ -17,6 +18,8 @@ export interface CollapsibleProps {
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
   titleProps?: Partial<ThemedTextProps>;
+  subTitleProps?: Partial<ThemedTextProps>;
+  headerStyle?: ViewStyle;
 }
 
 export default function Collapsible({
@@ -28,24 +31,26 @@ export default function Collapsible({
   collapsed: controlledCollapsed,
   onCollapse,
   titleProps,
+  subTitleProps,
+  subTitle,
+  headerStyle,
 }: CollapsibleProps): React.ReactNode {
-  const isControlled = controlledCollapsed !== undefined;
-  const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
+  const [isCollapsed, setIsCollapsed] = useState(
+    controlledCollapsed === undefined ? initialCollapsed : controlledCollapsed,
+  );
 
   // Manage internal state when uncontrolled
   const toggleCollapse = useCallback(() => {
-    if (collapsible) {
-      const newState = !isCollapsed;
-      setIsCollapsed(newState);
-      onCollapse?.(newState);
-    }
-  }, [isCollapsed, collapsible, onCollapse]);
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    onCollapse?.(newState);
+  }, [isCollapsed, onCollapse]);
 
   useEffect(() => {
-    if (isControlled) {
-      setIsCollapsed(controlledCollapsed);
-    }
-  }, [controlledCollapsed, isControlled]);
+    if (controlledCollapsed === undefined) return;
+
+    setIsCollapsed(controlledCollapsed);
+  }, [controlledCollapsed]);
 
   const height = useSharedValue(isCollapsed ? 0 : 1);
 
@@ -63,17 +68,44 @@ export default function Collapsible({
     [styleProp],
   );
 
+  const headerStyleProp = React.useMemo(
+    () => StyleSheet.flatten([styles.header, headerStyle]),
+    [headerStyle],
+  );
+
+  const contentStyle = React.useMemo(
+    () => [styles.content, collapsible && animatedStyle],
+    [collapsible, animatedStyle],
+  );
+
   return (
     <View style={style}>
-      {title && (
+      {(title || subTitle) && (
         <TouchableOpacity
           onPress={toggleCollapse}
           disabled={!collapsible}
-          style={styles.header}
+          style={headerStyleProp}
         >
-          <ThemedText type="body1" {...titleProps} style={titleProps?.style}>
-            {title}
-          </ThemedText>
+          <View style={styles.headerText}>
+            {title && (
+              <ThemedText
+                type="body1"
+                {...titleProps}
+                style={titleProps?.style}
+              >
+                {title}
+              </ThemedText>
+            )}
+            {subTitle && (
+              <ThemedText
+                type="body2"
+                {...subTitleProps}
+                style={subTitleProps?.style}
+              >
+                {subTitle}
+              </ThemedText>
+            )}
+          </View>
           {collapsible && (
             <IconSymbol
               name={isCollapsed ? "expand-more" : "expand-less"}
@@ -82,22 +114,24 @@ export default function Collapsible({
           )}
         </TouchableOpacity>
       )}
-      <Animated.View style={[styles.content, collapsible && animatedStyle]}>
-        {children}
-      </Animated.View>
+      <Animated.View style={contentStyle}>{children}</Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
     overflow: "hidden",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  headerText: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   content: {
     overflow: "hidden",

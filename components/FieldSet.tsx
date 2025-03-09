@@ -13,6 +13,9 @@ export interface FieldSetProps
   children?: React.ReactNode;
   style?: ViewStyle;
   titleProps?: Partial<ThemedTextProps>;
+  subTitleProps?: Partial<ThemedTextProps>;
+  subTitle?: string;
+  itemSpacing?: number;
 }
 
 export default function FieldSet({
@@ -21,30 +24,50 @@ export default function FieldSet({
   style,
   collapsible = false,
   titleProps: titlePropsProp,
+  subTitle,
+  subTitleProps: subTitlePropsProp,
+  itemSpacing = 30,
   ...props
 }: FieldSetProps): React.ReactNode {
-  const children = React.useMemo(
-    () =>
-      React.Children.map(childrenProp, (child, i) => (
+  const children = React.useMemo(() => {
+    let hasProcessedFirst = false;
+
+    return React.Children.map(childrenProp, (child) => {
+      if (!child) return;
+
+      const isFirst = !hasProcessedFirst;
+
+      if (isFirst) {
+        hasProcessedFirst = true;
+      }
+
+      return (
         <View
           style={StyleSheet.flatten([
             styles.field,
-            i !== 0 && styles.fieldSpacing,
+            !isFirst && { marginTop: itemSpacing },
           ])}
         >
           {child}
         </View>
-      )),
-    [childrenProp],
-  );
+      );
+    });
+  }, [childrenProp, itemSpacing]);
 
   const titleProps = React.useMemo(
     (): Partial<ThemedTextProps> => ({
       type: "h3",
-      style: styles.title,
       ...titlePropsProp,
     }),
     [titlePropsProp],
+  );
+
+  const subTitleProps = React.useMemo(
+    (): Partial<ThemedTextProps> => ({
+      type: "h4",
+      ...subTitlePropsProp,
+    }),
+    [subTitlePropsProp],
   );
 
   return (
@@ -52,7 +75,10 @@ export default function FieldSet({
       title={title}
       style={style}
       collapsible={collapsible}
+      headerStyle={styles.title}
+      subTitle={subTitle}
       {...props}
+      subTitleProps={subTitleProps}
       titleProps={titleProps}
     >
       {children}
@@ -65,7 +91,4 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   field: {},
-  fieldSpacing: {
-    marginTop: 16,
-  },
 });

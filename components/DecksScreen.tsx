@@ -5,7 +5,7 @@ import IconButton from "./IconButton";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import { useDecksToolbarProps } from "@/components/DecksToolbar";
+import DecksToolbar from "@/components/DecksToolbar";
 import MyDecks from "./MyDecks";
 import PreBuiltDecks from "./PreBuiltDecks";
 
@@ -18,7 +18,6 @@ export const maxWidth = 1000;
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
-  useDecksToolbarProps();
 
   const createDeck = React.useCallback(() => {
     const deckId = uuid();
@@ -35,6 +34,7 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 
   return (
     <>
+      <DecksToolbar />
       <ScrollView style={containerStyle}>
         <MyDecks style={styles.myDecks} />
         <View style={styles.preBuiltContainer}>

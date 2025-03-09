@@ -1,6 +1,6 @@
 import React from "react";
 import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
-import { useTabletopToolbar } from "@/components/TabletopToolbar";
+import TabletopToolbar from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
 import StackList from "@/components/StackList";
 import Animated, {
@@ -18,7 +18,6 @@ export default function Tabletop({
   deckId,
 }: TabletopProps): React.ReactNode {
   const { hasTabletop } = useEnsureTabletop({ tabletopId });
-  useTabletopToolbar({ tabletopId });
 
   useDeckLastScreen({
     deckId,
@@ -67,6 +66,7 @@ export default function Tabletop({
       tabletopId={tabletopId}
       deckId={deckId}
     >
+      <TabletopToolbar tabletopId={tabletopId} deckId={deckId} />
       <Animated.View style={styles.content} onLayout={handleLayout}>
         {!skeleton && <StackList style={animatedStyle} skeleton={skeleton} />}
       </Animated.View>

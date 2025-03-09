@@ -2,35 +2,56 @@ import React from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
 import ThemedView from "./ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { selectFlag } from "@/store/combinedSelectors/flags";
-import { selectUserSetting, setUserSetting } from "@/store/slices/userSettings";
 import DevMenu from "./Dev/DevMenu";
 import Version from "./Version";
-import Field from "./Field";
-import Picker, { PickerItem } from "./Picker";
-import { UserSettings } from "@/store/types";
+import SettingsApp from "./SettingsApp";
+import SettingsDeck from "./SettingsDeck";
 import FieldSet from "./FieldSet";
-import text from "@/constants/text";
+import SettingsTabletop from "./SettingsTabletop";
 
-type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
+export interface DrawerProps {
+  deckId?: string | null;
+  tabletopId?: string | null;
+  isOpen?: boolean;
+  // stackId?: string | null;
+  // cardId?: string | null;
+  // cardInstanceId?: string | null;
+}
 
-const titleProps = { type: "h2" } as const;
+type Collapsed = {
+  deck?: boolean;
+  tabletop?: boolean;
+  app?: boolean;
+  dev?: boolean;
+};
 
-export default function Drawer(): React.ReactNode {
-  const dispatch = useAppDispatch();
+export default function Drawer(props: DrawerProps): React.ReactNode {
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
-  const theme =
-    useAppSelector((state) => selectUserSetting(state, { key: "theme" })) ??
-    "system";
 
-  const onChangeTheme = React.useCallback(
-    (value: Theme) => {
-      dispatch(setUserSetting({ key: "theme", value }));
-    },
-    [dispatch],
+  const initialCollapsed = React.useMemo(
+    (): Collapsed => ({
+      tabletop: false,
+      deck: !!props.tabletopId,
+      app: !!props.deckId || !!props.tabletopId,
+      dev: true,
+    }),
+    [props.deckId, props.tabletopId],
   );
+
+  const [collapsed, setCollapsed] = React.useState<Collapsed>(initialCollapsed);
+  const isOpenRef = React.useRef(props.isOpen);
+  isOpenRef.current = props.isOpen;
+
+  React.useEffect(() => {
+    // Don't reset when we're open, it feels janky, but we also don't want to reset when isOpen
+    // changes, as it animates and we'd see it
+    if (isOpenRef.current) return;
+
+    setCollapsed(initialCollapsed);
+  }, [initialCollapsed]);
 
   return (
     <ScrollView
@@ -41,27 +62,43 @@ export default function Drawer(): React.ReactNode {
         <SafeAreaView style={styles.container}>
           <View style={styles.content}>
             <View style={styles.settings}>
-              <FieldSet title={text["settings.title"]} titleProps={titleProps}>
-                <Field label={text["settings.theme"]}>
-                  <Picker<Theme>
-                    onValueChange={onChangeTheme}
-                    selectedValue={theme}
-                  >
-                    <PickerItem<Theme>
-                      label={text["settings.theme.system"]}
-                      value="system"
-                    />
-                    <PickerItem<Theme>
-                      label={text["settings.theme.light"]}
-                      value="light"
-                    />
-                    <PickerItem<Theme>
-                      label={text["settings.theme.dark"]}
-                      value="dark"
-                    />
-                  </Picker>
-                </Field>
-                {devMode && <DevMenu />}
+              <FieldSet itemSpacing={30}>
+                {props.tabletopId && props.deckId && (
+                  <SettingsTabletop
+                    tabletopId={props.tabletopId}
+                    deckId={props.deckId}
+                    collapsed={collapsed.tabletop !== false}
+                    collapsible
+                    onCollapse={(collapsed) =>
+                      setCollapsed((prev) => ({ ...prev, tabletop: collapsed }))
+                    }
+                  />
+                )}
+                {props.deckId && (
+                  <SettingsDeck
+                    deckId={props.deckId}
+                    collapsible
+                    collapsed={collapsed.deck !== false}
+                    onCollapse={(collapsed) =>
+                      setCollapsed((prev) => ({ ...prev, deck: collapsed }))
+                    }
+                  />
+                )}
+                <SettingsApp
+                  collapsible
+                  collapsed={collapsed.app !== false}
+                  onCollapse={(collapsed) =>
+                    setCollapsed((prev) => ({ ...prev, app: collapsed }))
+                  }
+                />
+                {devMode && (
+                  <DevMenu
+                    collapsed={collapsed.dev !== false}
+                    onCollapse={(collapsed) =>
+                      setCollapsed((prev) => ({ ...prev, dev: collapsed }))
+                    }
+                  />
+                )}
               </FieldSet>
             </View>
             <Version />

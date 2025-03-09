@@ -12,7 +12,7 @@ import { selectCanEditDeck, selectDeckCards } from "@/store/slices/decks";
 import DeckDetails from "@/components/DeckDetails";
 import DeckCard from "./DeckCard";
 import { useEditCardModal } from "./EditCardModal";
-import { useDeckToolbar } from "./DeckToolbar";
+import DeckToolbar from "./DeckToolbar";
 import IconButton from "./IconButton";
 import { DeckCardSizeProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
@@ -36,7 +36,6 @@ const initialRows = 4;
 
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DeckScreen.name);
-  const { defaultCard } = useDeckToolbar({ deckId: props.deckId });
   const canEditDeck = useAppSelector((state) =>
     selectCanEditDeck(state, { deckId: props.deckId }),
   );
@@ -96,10 +95,10 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       idType="deck"
       constraints={styles.constraints}
     >
+      <DeckToolbar deckId={props.deckId} />
       {!skeleton && (
         <View style={containerStyle}>
           {component}
-          {defaultCard.component}
           <FlatList<FlatListData>
             data={cards}
             numColumns={numColumns.current}

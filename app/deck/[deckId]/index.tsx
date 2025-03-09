@@ -13,10 +13,11 @@ export const paramKeys = {
 
 export default function DeckRoute() {
   const params = useGlobalSearchParams();
-  const deckId = params[paramKeys.deckId];
+  const deckIdParam = params[paramKeys.deckId];
+  const deckId = typeof deckIdParam === "string" ? deckIdParam : null;
   const navigation = useNavigation();
 
-  if (typeof deckId !== "string") {
+  if (!deckId) {
     if (navigation.isFocused()) {
       new AppError(`${DeckRoute.name}: deckId must be a string`).log("error");
     }

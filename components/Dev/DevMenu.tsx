@@ -1,15 +1,14 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import Flags from "./DevFlags";
 import Button from "@/components/Button";
 import { persistor } from "@/store/store";
 import AppError from "@/classes/AppError";
 import text from "@/constants/text";
-import FieldSet from "@/components/FieldSet";
+import FieldSet, { FieldSetProps } from "@/components/FieldSet";
 
-export interface DevMenuProps {
-  children?: React.ReactNode;
-}
+export type DevMenuProps = FieldSetProps;
+
+const titleProps = { type: "h2" } as const;
 
 export default function DevMenu(props: DevMenuProps): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
@@ -39,11 +38,11 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       title={text["settings.dev_mode.title"]}
       collapsible
       initialCollapsed
-      titleProps={{ type: "h2" }}
+      titleProps={titleProps}
+      {...props}
     >
       <Button
         title={`Purge Store${purgeStatus ? ` (${purgeStatus})` : ""}`}
-        style={styles.margin}
         onPress={purgeStore}
         variant="outline"
       />
@@ -51,9 +50,3 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
     </FieldSet>
   );
 }
-
-const styles = StyleSheet.create({
-  margin: {
-    marginBottom: 20,
-  },
-});

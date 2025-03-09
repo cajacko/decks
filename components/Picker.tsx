@@ -5,7 +5,7 @@ import {
   PickerItemProps as RNPickerItemProps,
 } from "@react-native-picker/picker";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { Platform, StyleSheet, View, ViewStyle } from "react-native";
 import { styles as buttonStyles } from "./Button";
 import { useThemedTextStyle } from "./ThemedText";
 import { styles as inputStyles } from "./TextInput";
@@ -152,7 +152,10 @@ const styles = StyleSheet.create({
   },
   picker: {
     padding: 0,
-    margin: inputStyles.outlineInput.padding,
+    margin:
+      Platform.select({
+        web: inputStyles.outlineInput.padding,
+      }) ?? 0,
     borderColor: "transparent",
   },
   item: {
