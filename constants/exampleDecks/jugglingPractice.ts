@@ -6,8 +6,25 @@ const deck: ExampleDeck = {
   name: "Juggling Practice",
   description:
     "A deck for practicing juggling. Practice the top card for 5 minutes, discard it and move on to the next card. When you've done them all, shuffle the deck and start again. Add new cards as you learn new tricks and remove cards you don't enjoy.",
-  backTemplateId: back.templateId,
-  frontTemplateId: front.templateId,
+  templates: {
+    back: {
+      templateId: back.templateId,
+      dataTemplateMapping: {},
+    },
+    front: {
+      dataTemplateMapping: {
+        title: {
+          dataSchemaItemId: "title",
+          templateSchemaItemId: front.schema.title.id,
+        },
+        description: {
+          dataSchemaItemId: "description",
+          templateSchemaItemId: front.schema.description.id,
+        },
+      },
+      templateId: front.templateId,
+    },
+  },
   cards: [
     {
       title: "3 ball cascade",

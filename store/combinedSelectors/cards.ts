@@ -105,10 +105,12 @@ const selectMergedCardData = createCachedSelector(
     Object.entries(deckDataSchema).forEach(([key, schemaItem]) => {
       const cardDataValue = combinedData[key];
 
+      // We have a value for this key, so we don't need to do anything
       if (cardDataValue) return;
 
       const deckDataDefaultValue = schemaItem?.defaultValidatedValue;
 
+      // No deck default
       if (!deckDataDefaultValue) return;
 
       combinedData[key] = deckDataDefaultValue;
@@ -156,6 +158,7 @@ export const selectCardTemplateData = createCachedSelector(
       ): Templates.ValidatedValue | undefined => {
         if (!value) return undefined;
 
+        if (value.type === Templates.DataType.Null) return value;
         if (value.type !== templateExpectedType) return undefined;
 
         return value;
@@ -179,11 +182,30 @@ export const selectCardTemplateData = createCachedSelector(
         }
       }
 
-      const validatedValue =
-        getValidatedValue(cardValue) ??
-        getValidatedValue(dataMappingDefaultValue) ??
-        getValidatedValue(templateDefaultValue) ??
-        null;
+      let validatedValue: Templates.ValidatedValue | null;
+
+      const _cardValue = getValidatedValue(cardValue);
+
+      // Priority of values is cardValue > dataMappingDefaultValue > templateDefaultValue > null
+      if (_cardValue !== undefined) {
+        validatedValue = _cardValue;
+      } else {
+        const _dataMappingDefaultValue = getValidatedValue(
+          dataMappingDefaultValue,
+        );
+
+        if (_dataMappingDefaultValue !== undefined) {
+          validatedValue = _dataMappingDefaultValue;
+        } else {
+          const _templateDefaultValue = getValidatedValue(templateDefaultValue);
+
+          if (_templateDefaultValue !== undefined) {
+            validatedValue = _templateDefaultValue;
+          } else {
+            validatedValue = null;
+          }
+        }
+      }
 
       const dataItem: LooseCardTemplateDataItem = {
         ...templateSchemaItem,

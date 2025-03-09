@@ -97,7 +97,11 @@ export function withUpdateStateFromProps(props: {
         // Or there is a type mismatch (which shouldn't really happen unless we have background
         // syncing of data and we're not creating new data items for them). But if we do have a
         // mismatch just use the saved value
-        if (!draftItem || draftItem.type !== savedItem.type) {
+        if (
+          !draftItem ||
+          (draftItem.type !== savedItem.type &&
+            draftItem.type !== Templates.DataType.Null)
+        ) {
           draft[side][key] = templateDataItemToEditingDataValue(
             savedItem,
             templateId,

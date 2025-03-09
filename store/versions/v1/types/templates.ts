@@ -9,6 +9,7 @@ export enum DataType {
   Color = "color",
   Number = "number",
   Boolean = "boolean",
+  Null = "null",
 }
 
 // Gives us some safety that the value has already been checked. e.g. text and colours are both
@@ -24,6 +25,7 @@ export type ValidatedValue<T extends DataType = DataType> = {
   [DataType.Color]: CreateValidatedValue<DataType.Color, string>;
   [DataType.Number]: CreateValidatedValue<DataType.Number, number>;
   [DataType.Boolean]: CreateValidatedValue<DataType.Boolean, boolean>;
+  [DataType.Null]: CreateValidatedValue<DataType.Null, null>;
 }[T];
 
 export type LooseDataItem<

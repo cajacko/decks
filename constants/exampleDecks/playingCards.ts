@@ -23,8 +23,25 @@ const deck: ExampleDeck<{
 }> = {
   name: "Playing Cards",
   description: "A standard deck of 52 playing cards",
-  frontTemplateId: playingCards.templateId,
-  backTemplateId: back.templateId,
+  templates: {
+    back: {
+      templateId: back.templateId,
+      dataTemplateMapping: {},
+    },
+    front: {
+      dataTemplateMapping: {
+        suit: {
+          dataSchemaItemId: "suit",
+          templateSchemaItemId: playingCards.schema.suit.id,
+        },
+        value: {
+          dataSchemaItemId: "value",
+          templateSchemaItemId: playingCards.schema.value.id,
+        },
+      },
+      templateId: playingCards.templateId,
+    },
+  },
   cards: [],
 };
 

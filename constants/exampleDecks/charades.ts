@@ -1,13 +1,41 @@
 import { ExampleDeck } from "./types";
 import front from "@/constants/builtInTemplates/front";
 import back from "@/constants/builtInTemplates/back";
+import { Templates } from "@/store/types";
 
 const deck: ExampleDeck = {
   name: "Charades",
   description:
     "A fun game where players act out a word or phrase without speaking.",
-  backTemplateId: back.templateId,
-  frontTemplateId: front.templateId,
+  templates: {
+    back: {
+      templateId: back.templateId,
+      dataTemplateMapping: {},
+    },
+    front: {
+      dataTemplateMapping: {
+        title: {
+          dataSchemaItemId: "title",
+          templateSchemaItemId: front.schema.title.id,
+        },
+        description: {
+          dataSchemaItemId: "description",
+          templateSchemaItemId: front.schema.description.id,
+        },
+      },
+      templateId: front.templateId,
+    },
+  },
+  dataSchema: {
+    description: {
+      id: "description",
+      type: Templates.DataType.Text,
+      defaultValidatedValue: {
+        type: Templates.DataType.Null,
+        value: null,
+      },
+    },
+  },
   cards: [
     { title: "Elephant" },
     { title: "Cupcake" },

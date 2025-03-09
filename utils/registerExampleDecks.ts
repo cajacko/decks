@@ -16,6 +16,37 @@ type State = Pick<
   SliceName.Decks | SliceName.Cards | SliceName.Tabletops
 >;
 
+function getValidatedDataType(
+  value: string | boolean | null,
+): Cards.Data[string] {
+  let data: Cards.Data[string];
+
+  // TODO: Validate the card types here.
+  switch (typeof value) {
+    case "string":
+      data = {
+        value: value,
+        type: Templates.DataType.Text,
+      };
+      break;
+    case "boolean":
+      data = {
+        value: value,
+        type: Templates.DataType.Boolean,
+      };
+      break;
+    default:
+      if (value === null) {
+        data = {
+          type: Templates.DataType.Null,
+          value: null,
+        };
+      }
+  }
+
+  return data;
+}
+
 export default function registerExampleDecks() {
   const state: State = {
     decks: {
@@ -38,27 +69,20 @@ export default function registerExampleDecks() {
     const stack1Id = ids.stackId("1");
     const stack2Id = ids.stackId("2");
 
+    const dataSchema = exampleDeck.dataSchema ?? {};
+
     const deck: Decks.Props = {
       id: deckId,
       name: exampleDeck.name,
       description: exampleDeck.description,
       cards: [],
       cardSize: Decks.CardSize.Poker,
-      dataSchema: {},
-      dataSchemaOrder: [],
+      dataSchema,
+      dataSchemaOrder: Object.keys(dataSchema),
       defaultTabletopId: tabletopId,
       status: "active",
       canEdit: false,
-      templates: {
-        back: {
-          dataTemplateMapping: {},
-          templateId: exampleDeck.backTemplateId,
-        },
-        front: {
-          dataTemplateMapping: {},
-          templateId: exampleDeck.frontTemplateId,
-        },
-      },
+      templates: exampleDeck.templates,
     };
 
     const tabletop: Tabletops.Props = {
@@ -87,8 +111,6 @@ export default function registerExampleDecks() {
     exampleDeck.cards.forEach((cardProps, index) => {
       const cardId = ids.cardId(`${index + 1}`);
       const cardInstanceId = ids.cardInstanceId(cardId);
-      // const titleId = ReservedDataSchemaIds.Title;
-      // const descriptionId = ReservedDataSchemaIds.Description;
 
       const card: Cards.Props = {
         cardId,
@@ -99,17 +121,7 @@ export default function registerExampleDecks() {
       };
 
       Object.entries(cardProps).forEach(([dataSchemaId, value]) => {
-        // TODO: Validate the card types here.
-        card.data[dataSchemaId] =
-          typeof value === "string"
-            ? {
-                value: value,
-                type: Templates.DataType.Text,
-              }
-            : {
-                value: value,
-                type: Templates.DataType.Boolean,
-              };
+        card.data[dataSchemaId] = getValidatedDataType(value);
 
         deck.templates.front.dataTemplateMapping[dataSchemaId] = {
           dataSchemaItemId: dataSchemaId,

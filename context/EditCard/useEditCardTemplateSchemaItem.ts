@@ -46,7 +46,10 @@ function withOnChange(props: {
       // NOTE: We should never get to here, it's only if something updated from the api like a
       // new data type change or something. Best never to change data types, just create new
       // ones?
-      if (editingItemDraft.type !== value.type) {
+      if (
+        editingItemDraft.type !== value.type &&
+        value.type !== Templates.DataType.Null
+      ) {
         draft[props.side][props.templateSchemaItemId] = newEditingItem;
         draft.hasChanges[props.side][props.templateSchemaItemId] = true;
 

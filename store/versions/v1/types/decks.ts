@@ -22,7 +22,9 @@ type CreateDataSchemaItemHelper<
   // title?: string;
   // description?: string;
   type: T;
-  defaultValidatedValue?: TemplatesType.ValidatedValue<T>;
+  defaultValidatedValue?:
+    | TemplatesType.ValidatedValue<T>
+    | TemplatesType.ValidatedValue<TemplatesType.DataType.Null>;
 };
 
 export type DataSchemaItem<Id extends DataSchemaItemId = DataSchemaItemId> = {
@@ -44,6 +46,13 @@ type DataTemplateMapItem = {
    * The key the template uses to render data
    */
   templateSchemaItemId: TemplatesType.DataItemId;
+  /**
+   * Useful for when the template has a default value set, but we want it to be null. As we wouldn't
+   * usually have this null value in deck defaults (why add a data entry that doesn't match how your
+   * cards are going to be used), we need a way to override the default value. You may also add
+   * defaults here for values you don't want the card to override e.g. background colour or
+   * something.
+   */
   defaultValidatedValue?: TemplatesType.ValidatedValue;
 };
 
@@ -65,7 +74,15 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
   templates: Templates;
   name: string;
   description: string | null | undefined;
+  /**
+   * The order in which you want to show the card data in forms. Any missing items will be shown at
+   * the end
+   */
   dataSchemaOrder: DsId[];
+  /**
+   * Define the way you want to store ata about your cards. Using any keys you want. Mapping happens
+   * a the template level
+   */
   dataSchema: DataSchema<DsId>;
   defaultTabletopId: string;
   status: "creating" | "active" | "deleting";
