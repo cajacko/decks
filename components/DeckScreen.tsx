@@ -24,13 +24,13 @@ export interface DeckScreenProps {
   style?: ViewStyle;
 }
 
-interface FlatListData {
+type FlatListData = null | {
   cardId: string;
   quantity: number;
-}
+};
 
 const keyExtractor: FlatListProps<FlatListData>["keyExtractor"] = (item) =>
-  item.cardId;
+  item?.cardId ?? "null";
 
 const initialRows = 4;
 
@@ -56,13 +56,22 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     selectDeckCards(state, { deckId: props.deckId }),
   );
 
-  const cards = React.useMemo(
-    () =>
-      skeleton
-        ? cardsState?.slice(0, numColumns.current * initialRows)
-        : cardsState,
-    [cardsState, skeleton, numColumns],
-  );
+  const cards = React.useMemo<FlatListData[]>(() => {
+    let _cards: FlatListData[] | undefined = skeleton
+      ? cardsState?.slice(0, numColumns.current * initialRows)
+      : cardsState;
+
+    if (!_cards || _cards.length === 0) {
+      _cards = [null];
+    }
+
+    return _cards;
+  }, [cardsState, skeleton, numColumns]);
+
+  const { open, component } = useEditCardModal({
+    type: "new-card-in-deck",
+    id: props.deckId,
+  });
 
   // Memoized renderItem to prevent unnecessary re-renders
   const renderItem = React.useCallback<
@@ -71,23 +80,27 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     ({ item }) => (
       <DeckCard
         style={styles.item}
-        cardId={item.cardId}
-        quantity={item.quantity}
+        id={item?.cardId ?? props.deckId}
+        type={item ? "card" : "new-card-in-deck"}
+        quantity={item?.quantity}
         skeleton={skeleton}
+        editCard={open}
       />
     ),
-    [skeleton],
+    [skeleton, props.deckId, open],
   );
-
-  const { open, component } = useEditCardModal({
-    type: "new-card-in-deck",
-    id: props.deckId,
-  });
 
   const containerStyle = React.useMemo(
     () => [styles.container, props.style],
     [props.style],
   );
+
+  const addNew = React.useCallback(() => {
+    open({
+      id: props.deckId,
+      type: "new-card-in-deck",
+    });
+  }, [open, props.deckId]);
 
   return (
     <DeckCardSizeProvider
@@ -121,7 +134,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
             // })}
           />
           {canEditDeck && (
-            <IconButton icon="add" onPress={open} style={styles.button} />
+            <IconButton icon="add" onPress={addNew} style={styles.button} />
           )}
         </View>
       )}

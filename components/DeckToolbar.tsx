@@ -36,13 +36,17 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     navigate(`/deck/${newDeckId}`);
   }, [props.deckId, dispatch, navigate]);
 
+  const open = React.useCallback(() => {
+    defaultCard.open();
+  }, [defaultCard]);
+
   return (
     <Toolbar useParent>
       {canEditDeck ? (
         <>
           {defaultCard.component}
           <Button
-            onPressOut={defaultCard.open}
+            onPressOut={open}
             style={styles.action}
             title={text["deck.actions.default"]}
             variant="transparent"

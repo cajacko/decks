@@ -9,7 +9,7 @@ export interface EditCardModalProps extends EditCardProps {
 }
 
 export function useEditCardModal(initialTargetProp: Target): {
-  open: () => void;
+  open: (target?: Target) => void;
   close: () => void;
   target: Target;
   visible: boolean;
@@ -29,10 +29,13 @@ export function useEditCardModal(initialTargetProp: Target): {
 
   const close = React.useCallback(() => setVisible(false), []);
 
-  const open = React.useCallback(() => {
-    setTarget(initialTarget);
-    setVisible(true);
-  }, [initialTarget]);
+  const open = React.useCallback(
+    (openTarget?: Target) => {
+      setTarget(openTarget ?? initialTarget);
+      setVisible(true);
+    },
+    [initialTarget],
+  );
 
   const EditCardProps = React.useMemo<EditCardModalProps>(
     () => ({

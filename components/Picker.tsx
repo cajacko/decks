@@ -131,7 +131,6 @@ export default function Picker<T>({
     <View style={style}>
       <RNPicker<string>
         dropdownIconColor={colors.text}
-        selectionColor={colors.link}
         {...props}
         selectedValue={valueToPickerValue(selectedValueProp)}
         onValueChange={onValueChange}
