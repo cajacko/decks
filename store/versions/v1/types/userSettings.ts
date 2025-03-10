@@ -31,6 +31,7 @@ export const flagMap = {
   // Debug logs
   DEBUG_BOTTOM_DRAWER: [false, true],
   DEBUG_AUTO_SAVE: [false, true],
+  DEBUG_EDIT_CARD: [false, true],
 } as const;
 
 type _FlagMap = typeof flagMap;
