@@ -13,7 +13,7 @@ export function getHasChanges(props: HasChangesMap): boolean {
   return getHasSideChanges(props.front) || getHasSideChanges(props.back);
 }
 
-function useDoesCardSideHaveChanges(
+export function useDoesCardSideHaveChanges(
   side: Cards.Side,
   target?: Target,
 ): boolean | null {

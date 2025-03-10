@@ -22,6 +22,7 @@ export const themes = {
     drawerDragBarActive: "#c5c5c5",
     inputOutline: "#c5c5c5",
     placeholder: colors.black,
+    changesIndicator: "#ffd151",
   },
   dark: {
     text: "#ECEDEE",
@@ -33,6 +34,7 @@ export const themes = {
     drawerDragBarActive: "#6e6e6e",
     inputOutline: "#ccc",
     placeholder: colors.white,
+    changesIndicator: "#ffd151",
   },
 };
 

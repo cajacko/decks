@@ -7,14 +7,17 @@ import { ThemedTextProps } from "./ThemedText";
 export interface FieldSetProps
   extends Pick<
     CollapsibleProps,
-    "collapsed" | "onCollapse" | "initialCollapsed" | "collapsible"
+    | "collapsed"
+    | "onCollapse"
+    | "initialCollapsed"
+    | "collapsible"
+    | "titleProps"
+    | "subTitleProps"
+    | "subTitle"
+    | "title"
   > {
-  title?: string | null;
   children?: React.ReactNode;
   style?: ViewStyle;
-  titleProps?: Partial<ThemedTextProps>;
-  subTitleProps?: Partial<ThemedTextProps>;
-  subTitle?: string;
   itemSpacing?: number;
 }
 
@@ -55,7 +58,7 @@ export default function FieldSet({
   }, [childrenProp, itemSpacing]);
 
   const titleProps = React.useMemo(
-    (): Partial<ThemedTextProps> => ({
+    (): CollapsibleProps["titleProps"] => ({
       type: "h3",
       ...titlePropsProp,
     }),

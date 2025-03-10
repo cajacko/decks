@@ -91,8 +91,9 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
 
   return (
     <Field
-      label={`${fieldLabel}${hasChanges && !isNewCard ? " (changed)" : ""}`}
+      label={fieldLabel}
       style={props.style}
+      hasChanges={hasChanges && !isNewCard}
     >
       {input}
     </Field>

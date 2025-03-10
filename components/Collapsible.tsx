@@ -7,6 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import IconSymbol from "./IconSymbol";
 import ThemedText, { ThemedTextProps } from "./ThemedText";
+import Label, { LabelProps } from "./Label";
 
 export interface CollapsibleProps {
   title?: string | null;
@@ -17,7 +18,7 @@ export interface CollapsibleProps {
   initialCollapsed?: boolean;
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
-  titleProps?: Partial<ThemedTextProps>;
+  titleProps?: Partial<LabelProps>;
   subTitleProps?: Partial<ThemedTextProps>;
   headerStyle?: ViewStyle;
 }
@@ -88,13 +89,12 @@ export default function Collapsible({
         >
           <View style={styles.headerText}>
             {title && (
-              <ThemedText
+              <Label
+                text={title}
                 type="body1"
                 {...titleProps}
                 style={titleProps?.style}
-              >
-                {title}
-              </ThemedText>
+              />
             )}
             {subTitle && (
               <ThemedText
