@@ -11,6 +11,7 @@ import { Templates } from "@/store/types";
 import AppError from "@/classes/AppError";
 import ColorInput from "./ColorInput";
 import Field from "./Field";
+import useFlag from "@/hooks/useFlag";
 
 export interface TemplateSchemaItemProps {
   side: "front" | "back";
@@ -20,6 +21,7 @@ export interface TemplateSchemaItemProps {
 }
 
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
+  const showMoreInfo = useFlag("EDIT_CARD_MORE_INFO") === "enabled";
   const isNewCard = useIsNewCard();
   const schemaItemName = useAppSelector(
     (state) => selectTemplateSchemaItem(state, props)?.name,
@@ -54,6 +56,14 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     },
     [onChange, validatedValue.type],
   );
+
+  const handleClear = React.useMemo(() => {
+    if (!showMoreInfo) return;
+
+    return () => {
+      onChange({ value: null, type: Templates.DataType.Null });
+    };
+  }, [showMoreInfo, onChange]);
 
   const input = React.useMemo(() => {
     switch (validatedValue.type) {
@@ -94,6 +104,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       label={fieldLabel}
       style={props.style}
       hasChanges={hasChanges && !isNewCard}
+      handleClear={handleClear}
     >
       {input}
     </Field>
