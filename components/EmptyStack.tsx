@@ -11,12 +11,14 @@ export type EmptyStackProps = {
   style?: CardProps["style"];
   CardProps?: CardProps;
   handleDeleteStack?: () => void;
+  handleEditDeck?: () => void;
 };
 
 export default function EmptyStack({
   style,
   CardProps,
   handleDeleteStack,
+  handleEditDeck,
 }: EmptyStackProps): React.ReactNode {
   const context = useTabletopContext();
 
@@ -37,6 +39,13 @@ export default function EmptyStack({
             style={styles.delete}
             title={text["stack.actions.delete"]}
             onPress={handleDeleteStack}
+          />
+        )}
+        {handleEditDeck && (
+          <Button
+            style={styles.delete}
+            title={text["stack.actions.edit_deck"]}
+            onPress={handleEditDeck}
           />
         )}
       </View>

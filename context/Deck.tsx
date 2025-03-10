@@ -41,7 +41,13 @@ export function DeckTabletopProvider({
     idType: "deck",
   });
 
-  return <TabletopProvider cardProportions={cardProportions} {...props} />;
+  return (
+    <TabletopProvider
+      deckId={deckId}
+      cardProportions={cardProportions}
+      {...props}
+    />
+  );
 }
 
 type DeckCardSizeProviderProps = Omit<CardSizeProviderProps, "proportions"> & {

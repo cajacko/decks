@@ -22,6 +22,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     width,
     handleDeleteStack,
     opacity,
+    handleEditDeck,
   } = useStack(props);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -95,6 +96,7 @@ export default function Stack(props: StackProps): React.ReactNode {
         <EmptyStack
           style={styles.empty}
           handleDeleteStack={props.skeleton ? undefined : handleDeleteStack}
+          handleEditDeck={props.skeleton ? undefined : handleEditDeck}
         />
       </Animated.View>
     </Animated.View>

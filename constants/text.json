@@ -42,6 +42,7 @@
   "settings.theme": "Theme",
   "settings.title": "App Settings",
   "stack.actions.delete": "Delete Stack",
+  "stack.actions.edit_deck": "Add Cards",
   "tabletop.reset.button": "Reset",
   "tabletop.reset.message": "This will move all cards back into the first stack and deck order. This does not delete any data, just rearranges the play area.",
   "tabletop.reset.title": "Reset Play Area",

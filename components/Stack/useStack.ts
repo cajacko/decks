@@ -15,7 +15,11 @@ import {
   defaultCardDimensions,
 } from "../Card/cardSizes";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
-import { deleteStack } from "@/store/slices/tabletop";
+import {
+  deleteStack,
+  selectDoesTabletopHaveCards,
+} from "@/store/slices/tabletop";
+import { useRouter } from "expo-router";
 
 // These dummy values aren't getting used, we just want the length and doing it this way to keep a
 // single source of truth for the number of offset positions.
@@ -30,13 +34,18 @@ export default function useStack({
   stackId,
   stackListRef,
   canDelete = false,
+  canShowEditDeck = false,
 }: StackProps) {
   const dispatch = useAppDispatch();
-  const { tabletopId, stackWidth } = useTabletopContext();
+  const { tabletopId, stackWidth, deckId } = useTabletopContext();
   const width = useSharedValue(stackWidth);
   const opacity = useSharedValue(1);
   const rotation = useSharedValue(0);
   const [showActions, setShowActions] = React.useState(true);
+  const { navigate } = useRouter();
+  const doesTabletopHaveCards = useAppSelector((state) =>
+    selectDoesTabletopHaveCards(state, { tabletopId }),
+  );
 
   React.useEffect(() => {
     width.value = stackWidth;
@@ -104,6 +113,15 @@ export default function useStack({
     };
   }, [stackId, width, tabletopId, dispatch, stackListRef, opacity, canDelete]);
 
+  const handleEditDeck = React.useMemo(() => {
+    if (doesTabletopHaveCards) return;
+    if (!canShowEditDeck) return;
+
+    return async () => {
+      navigate(`/deck/${deckId}`);
+    };
+  }, [doesTabletopHaveCards, deckId, navigate, canShowEditDeck]);
+
   return {
     opacity,
     width,
@@ -113,5 +131,6 @@ export default function useStack({
     showActions,
     rotation,
     handleDeleteStack,
+    handleEditDeck,
   };
 }

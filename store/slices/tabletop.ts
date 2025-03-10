@@ -404,4 +404,11 @@ export const selectFirstXCardInstances = createCachedSelector<
   },
 )((_, props) => `${props.stackId}-${props.limit}`);
 
+export const selectDoesTabletopHaveCards = createCachedSelector(
+  selectPresentState,
+  (presentState): boolean => {
+    return Object.keys(presentState?.cardInstancesById ?? {}).length > 0;
+  },
+)((_, props: { tabletopId: string }) => props.tabletopId);
+
 export default tabletopsSlice;

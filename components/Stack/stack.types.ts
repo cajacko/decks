@@ -10,6 +10,7 @@ export interface StackProps {
   stackListRef: React.RefObject<StackListRef>;
   canDelete?: boolean;
   skeleton?: boolean;
+  canShowEditDeck?: boolean;
 }
 
 export type StackDimensions = {
