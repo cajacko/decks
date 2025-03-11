@@ -8,7 +8,7 @@ import FieldSet from "./FieldSet";
 
 export default function EditCardSideForm(
   props: Target & {
-    templateId: Templates.TemplateId;
+    templateId: Templates.Id;
     title: string | null;
     side: Cards.Side;
   },

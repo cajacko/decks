@@ -1,5 +1,8 @@
-import { Cards, Templates } from "@/store/types";
-import { CardDataItem } from "@/store/combinedActions/types";
+import {
+  SetCardData,
+  CardDataItem,
+  CreateCardDataItemHelper,
+} from "@/store/combinedActions/types";
 import { EditCardState } from "./EditCard.types";
 
 /**
@@ -7,42 +10,29 @@ import { EditCardState } from "./EditCard.types";
  */
 export default function getUpdateCardData(
   contextState: EditCardState,
-): CardDataItem[] {
-  const data: CardDataItem[] = [];
+): SetCardData {
+  const items: CardDataItem[] = [];
 
-  function processSide(side: Cards.Side) {
-    const editingValues = contextState[side];
+  const editingValues = contextState.data;
 
-    for (const key in editingValues) {
-      // Don't save all for performance and to ensure we keep the hasChanges logic up to date
-      if (contextState.hasChanges[side][key] !== true) continue;
+  for (const key in editingValues) {
+    // Don't save all for performance and to ensure we keep the hasChanges logic up to date
+    if (contextState.hasChanges[key] !== true) continue;
 
-      const editingValue = editingValues[key];
+    const editingValue = editingValues[key];
 
-      if (!editingValue) continue;
+    if (!editingValue) continue;
 
-      const value: Templates.ValidatedValue = {
-        type: editingValue.type,
-        value: editingValue.editValue,
-      } as Templates.ValidatedValue; // FIXME:
-
-      if (editingValue.cardDataItemId) {
-        data.push({
-          cardDataId: editingValue.cardDataItemId,
-          value,
-        });
-      } else {
-        data.push({
-          templateDataItemId: editingValue.templateItemId,
-          side,
-          value,
-        });
-      }
-    }
+    items.push({
+      cardDataId: editingValue.cardDataItemId,
+      validatedValue: editingValue.editValidatedValue,
+      fieldType: editingValue.fieldType,
+      // Best we can get without going cra cra
+    } satisfies CreateCardDataItemHelper as CardDataItem);
   }
 
-  processSide("front");
-  processSide("back");
-
-  return data;
+  return {
+    items,
+    templateMapping: contextState.templateMapping,
+  };
 }

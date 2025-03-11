@@ -1,4 +1,4 @@
-import { Templates } from "@/store/types";
+import { Templates, Markup } from "@/store/types";
 import builtInTemplateIds from "@/utils/builtInTemplateIds";
 import text from "@/constants/text";
 import { fixed } from "@/constants/colors";
@@ -21,9 +21,9 @@ const mainSuitSize = 10;
 const faceCardOffset = 2;
 const iconOpacity = 0.75;
 
-const corner: Templates.Markup = [
+const corner: Markup.Nodes = [
   {
-    type: "view",
+    type: "View",
     style: {
       justifyContent: "center",
       alignItems: "center",
@@ -31,7 +31,7 @@ const corner: Templates.Markup = [
     },
     children: [
       {
-        type: "text",
+        type: "Text",
         text: `{{${dataItemIds.value}}}`,
         style: {
           fontSize: 8,
@@ -40,7 +40,7 @@ const corner: Templates.Markup = [
         },
       },
       {
-        type: "text",
+        type: "Text",
         text: `{{${dataItemIds.suit}}}`,
         conditional: dataItemIds.suit,
         style: {
@@ -53,7 +53,7 @@ const corner: Templates.Markup = [
   },
 ];
 
-function singleIcon(value: string): Templates.Markup {
+function singleIcon(value: string): Markup.Nodes {
   let text: string;
 
   switch (value.toLowerCase().trim()) {
@@ -75,7 +75,7 @@ function singleIcon(value: string): Templates.Markup {
 
   return [
     {
-      type: "view",
+      type: "View",
       conditional: `{{equals ${dataItemIds.value} "${value}"}}`,
       style: {
         flex: 1,
@@ -86,7 +86,7 @@ function singleIcon(value: string): Templates.Markup {
       },
       children: [
         {
-          type: "text",
+          type: "Text",
           text: `{{${dataItemIds.suit}}}`,
           style: {
             fontSize: mainSuitSize,
@@ -96,14 +96,14 @@ function singleIcon(value: string): Templates.Markup {
           },
         },
         {
-          type: "text",
+          type: "Text",
           text,
           style: {
             fontSize: 30,
           },
         },
         {
-          type: "text",
+          type: "Text",
           text: `{{${dataItemIds.suit}}}`,
           style: {
             fontSize: mainSuitSize,
@@ -149,24 +149,24 @@ const numberPatterns = [
   ],
 ];
 
-function repeatSuit(count: number): Templates.Markup {
+function repeatSuit(count: number): Markup.Nodes {
   const numberPattern = numberPatterns[count - 1];
 
   if (!numberPattern) return [];
 
-  const columns: Templates.Markup = [];
+  const columns: Markup.Nodes = [];
 
   numberPattern.forEach((column, i) => {
     const isFirstColumn = i === 0;
     const isLastColumn = i === numberPattern.length - 1;
-    const rows: Templates.Markup = [];
+    const rows: Markup.Nodes = [];
 
     column.forEach((hasSuitIcon, i) => {
       // If the row is in the bottom half of rows (middle counts as top), flip the suit icon
       const shouldFlip = i >= Math.ceil(column.length / 2);
 
       rows.push({
-        type: "text",
+        type: "Text",
         text: hasSuitIcon ? `{{${dataItemIds.suit}}}` : "",
         style: {
           fontSize: mainSuitSize,
@@ -177,7 +177,7 @@ function repeatSuit(count: number): Templates.Markup {
     });
 
     columns.push({
-      type: "view",
+      type: "View",
       style: {
         flexDirection: "column",
         justifyContent:
@@ -191,7 +191,7 @@ function repeatSuit(count: number): Templates.Markup {
 
   return [
     {
-      type: "view",
+      type: "View",
       conditional: `{{equals ${dataItemIds.value} ${count === 1 ? `"A"` : count}}}`,
       style: {
         flex: 1,
@@ -211,37 +211,38 @@ const template = {
     [dataItemIds.value]: {
       id: dataItemIds.value,
       name: text["template.built_in.playing-cards.value.name"],
-      type: Templates.DataType.Text,
+      type: "text",
     },
     [dataItemIds.suit]: {
       id: dataItemIds.suit,
       name: text["template.built_in.playing-cards.suit.name"],
-      type: Templates.DataType.Text,
+      type: "text",
     },
     [dataItemIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
         value: fixed.cardPresets.yellow,
-        type: Templates.DataType.Color,
+        type: "color",
+        origin: "template",
       },
     },
   },
   markup: [
     {
-      type: "view",
+      type: "View",
       style: {
         flex: 1,
         backgroundColor: colorFunction("lightness", dataItemIds.color, 98),
       },
       children: [
         {
-          type: "view",
+          type: "View",
           style: {
             flex: 1,
           },
           children: [
             {
-              type: "view",
+              type: "View",
               children: corner,
               style: {
                 transform: "rotate(180deg)",
@@ -251,7 +252,7 @@ const template = {
               },
             },
             {
-              type: "view",
+              type: "View",
               children: corner,
               style: {
                 position: "absolute",
@@ -260,7 +261,7 @@ const template = {
               },
             },
             {
-              type: "view",
+              type: "View",
               style: {
                 flex: 1,
                 padding: 10,

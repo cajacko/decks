@@ -36,7 +36,7 @@ function useEditCardTemplateValues(
       const prop = data[key];
 
       if (prop) {
-        values[key] = prop.editValue;
+        values[key] = prop.editValidatedValue?.value;
       }
     }
 

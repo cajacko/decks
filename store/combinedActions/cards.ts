@@ -1,32 +1,32 @@
 import { createAction } from "@reduxjs/toolkit";
 import { Cards, Decks, Tabletops } from "../types";
-import { CardDataItem } from "./types";
+import { SetCardData } from "./types";
 import createDelayedActionForAnimations from "../utils/createDelayedActionForAnimations";
 
 export const deleteDeck = createDelayedActionForAnimations<{
-  deckId: Decks.DeckId;
-  cardIds: Cards.CardId[];
+  deckId: Decks.Id;
+  cardIds: Cards.Id[];
 }>("deleteDeck");
 
 export const updateCard = createAction<{
-  cardId: Cards.CardId;
-  deckId: Decks.DeckId;
-  data: CardDataItem[];
+  cardId: Cards.Id;
+  deckId: Decks.Id;
+  data: SetCardData;
 }>("updateCard");
 
 export interface CreateCardActionPayload {
-  cardId: Cards.CardId;
-  deckId: Decks.DeckId;
+  cardId: Cards.Id;
+  deckId: Decks.Id;
   tabletops: {
-    tabletopId: Tabletops.TabletopId;
+    tabletopId: Tabletops.Id;
     cardInstances: Tabletops.CardInstance[];
   }[];
-  data: CardDataItem[];
+  data: SetCardData;
 }
 
 export const createCard = createAction<CreateCardActionPayload>("createCard");
 
 export const deleteCard = createDelayedActionForAnimations<{
-  cardId: Cards.CardId;
-  deckId: Decks.DeckId | null;
+  cardId: Cards.Id;
+  deckId: Decks.Id | null;
 }>("deleteCard");

@@ -5,7 +5,7 @@ import { selectTemplate } from "../slices/templates";
 import { RootState, Decks, Cards, Templates } from "../types";
 import { getIsCardId, Target } from "@/utils/cardTarget";
 
-type CardIdProps = { cardId: string };
+type CardIdProps = { cardId: Cards.Id };
 export type DeckOrCardSideProps = Target & { side: Cards.Side };
 
 export const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
@@ -70,8 +70,9 @@ export const selectTemplateSchemaOrder = createCachedSelector(
   (template) => {
     if (!template) return undefined;
 
-    const schemaOrder = template.schemaOrder;
+    const schemaOrder = template.schemaOrder ?? [];
 
+    // Add missing keys
     Object.keys(template.schema).forEach((key) => {
       if (!schemaOrder.includes(key)) {
         schemaOrder.push(key);
@@ -121,18 +122,17 @@ const selectMergedCardData = createCachedSelector(
 )(cardOrDeckKey);
 
 export type LooseCardTemplateDataItem<
-  T extends Templates.DataType = Templates.DataType,
-  Id extends Templates.DataItemId = Templates.DataItemId,
-> = Templates.LooseDataItem<T, Id> & {
-  validatedValue: Templates.ValidatedValue<T> | null;
-  cardDataItemId: Decks.DataSchemaItemId | null;
+  T extends Templates.FieldType = Templates.FieldType,
+> = Templates.DataItem<T> & {
+  validatedValue: Templates.ValidatedValue<T> | undefined;
+  cardDataItemId: Cards.DataId | null;
 };
 
 export type LooseCardTemplateData<
-  T extends Templates.DataType = Templates.DataType,
-  Id extends Templates.DataItemId = Templates.DataItemId,
+  T extends Templates.FieldType = Templates.FieldType,
+  Id extends Templates.DataId = Templates.DataId,
 > = {
-  [K in Id]: LooseCardTemplateDataItem<T, K>;
+  [K in Id]: LooseCardTemplateDataItem<T>;
 };
 
 export const selectCardTemplateData = createCachedSelector(
@@ -150,71 +150,69 @@ export const selectCardTemplateData = createCachedSelector(
 
     const data: LooseCardTemplateData = {};
 
-    Object.entries(templateSchema).forEach(([key, templateSchemaItem]) => {
-      const templateExpectedType = templateSchemaItem.type;
+    Object.entries(templateSchema).forEach(
+      ([templateSchemaId, templateSchemaItem]) => {
+        if (!templateSchemaItem) return;
 
-      const getValidatedValue = (
-        value: Templates.ValidatedValue | undefined,
-      ): Templates.ValidatedValue | undefined => {
-        if (!value) return undefined;
+        const templateExpectedType = templateSchemaItem.type;
 
-        if (value.type === Templates.DataType.Null) return value;
-        if (value.type !== templateExpectedType) return undefined;
+        const getValidatedValue = (
+          value: Templates.ValidatedValue | undefined,
+        ): Templates.ValidatedValue | undefined => {
+          if (!value) return undefined;
 
-        return value;
-      };
+          if (value.type === "null") return value;
+          if (value.type !== templateExpectedType) return undefined;
 
-      const templateDefaultValue = templateSchemaItem.defaultValidatedValue;
+          return value;
+        };
 
-      let cardValue: Templates.ValidatedValue | undefined;
-      let dataMappingDefaultValue: Templates.ValidatedValue | undefined;
-      let cardDataItemId: Decks.DataSchemaItemId | undefined;
+        const templateDefaultValue = templateSchemaItem.defaultValidatedValue;
 
-      if (dataTemplateMapping) {
-        const mapping = dataTemplateMapping[key];
+        let cardValue: Templates.ValidatedValue | undefined;
+        let dataMappingDefaultValue: Templates.ValidatedValue | undefined;
+        let cardDataItemId: Cards.DataId | undefined;
 
-        if (mapping) {
-          dataMappingDefaultValue = mapping.defaultValidatedValue;
+        if (dataTemplateMapping) {
+          const mapping = dataTemplateMapping[templateSchemaId];
 
-          cardDataItemId = mapping.dataSchemaItemId;
+          if (mapping) {
+            dataMappingDefaultValue = mapping.defaultValidatedValue;
 
-          cardValue = mergedCardData?.[cardDataItemId];
-        }
-      }
+            cardDataItemId = mapping.dataId;
 
-      let validatedValue: Templates.ValidatedValue | null;
-
-      const _cardValue = getValidatedValue(cardValue);
-
-      // Priority of values is cardValue > dataMappingDefaultValue > templateDefaultValue > null
-      if (_cardValue !== undefined) {
-        validatedValue = _cardValue;
-      } else {
-        const _dataMappingDefaultValue = getValidatedValue(
-          dataMappingDefaultValue,
-        );
-
-        if (_dataMappingDefaultValue !== undefined) {
-          validatedValue = _dataMappingDefaultValue;
-        } else {
-          const _templateDefaultValue = getValidatedValue(templateDefaultValue);
-
-          if (_templateDefaultValue !== undefined) {
-            validatedValue = _templateDefaultValue;
-          } else {
-            validatedValue = null;
+            cardValue = mergedCardData?.[cardDataItemId];
           }
         }
-      }
 
-      const dataItem: LooseCardTemplateDataItem = {
-        ...templateSchemaItem,
-        validatedValue,
-        cardDataItemId: cardDataItemId ?? null,
-      };
+        let validatedValue: Templates.ValidatedValue | undefined;
 
-      data[key] = dataItem;
-    });
+        const _cardValue = getValidatedValue(cardValue);
+
+        // Priority of values is cardValue > dataMappingDefaultValue > templateDefaultValue
+        if (_cardValue !== undefined) {
+          validatedValue = _cardValue;
+        } else {
+          const _dataMappingDefaultValue = getValidatedValue(
+            dataMappingDefaultValue,
+          );
+
+          if (_dataMappingDefaultValue !== undefined) {
+            validatedValue = _dataMappingDefaultValue;
+          } else {
+            validatedValue = getValidatedValue(templateDefaultValue);
+          }
+        }
+
+        const dataItem: LooseCardTemplateDataItem = {
+          ...templateSchemaItem,
+          validatedValue,
+          cardDataItemId: cardDataItemId ?? null,
+        };
+
+        data[templateSchemaId] = dataItem;
+      },
+    );
 
     return data;
   },

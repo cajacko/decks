@@ -6,67 +6,68 @@ import {
 } from "./useContextSelector";
 import * as Types from "./EditCard.types";
 import getHasChanges from "./getHasChanges";
+import createCardDataSchemaId from "@/store/utils/createCardDataSchemaId";
+// import { useAppSelector } from "@/store/hooks";
+// import { useAppSelector } from "@/store/hooks";
+// import { selectTemplateSchemaItem } from "@/store/slices/templates";
 
 function withOnChange(props: {
   editState: Types.EditState;
-  side: Cards.Side;
-  templateId: Templates.TemplateId;
-  templateSchemaItemId: Templates.DataItemId;
+  cardDataItemId: string;
+  fieldType: Templates.FieldType;
 }): Types.UseEditCardTemplateSchemaItemReturn["onChange"] {
-  const { editState, templateId } = props;
+  const { editState, cardDataItemId, fieldType } = props;
 
-  return <T extends Templates.DataType>(value: Types.PartialDataValue<T>) => {
+  return (value: Templates.ValidatedValue | undefined) => {
     editState((draft) => {
-      const editingItemDraft = draft[props.side][props.templateSchemaItemId];
-
-      const newEditingItem: Types.EditingDataValues<T> = {
-        templateId: editingItemDraft?.templateId ?? templateId,
-        cardDataItemId: null,
-        templateItemId:
-          editingItemDraft?.templateItemId ?? props.templateSchemaItemId,
-        type: value.type,
-        editValue: value.value ?? null,
-        savedValue: null,
-      };
+      const editingItemDraft = draft.data[cardDataItemId];
 
       // If the item doesn't exist, it's new so add it
       if (!editingItemDraft) {
         // There's no new value to set anyways so return.
-        if (!value.value) return;
+        if (!value) return;
 
-        draft[props.side][props.templateSchemaItemId] = newEditingItem;
-        draft.hasChanges[props.side][props.templateSchemaItemId] = true;
+        draft.data[cardDataItemId] = {
+          cardDataItemId,
+          savedValidatedValue: undefined,
+          editValidatedValue: value,
+          fieldType,
+        };
+
+        draft.hasChanges[cardDataItemId] = true;
 
         return;
       }
 
       // Don't update something that has no changes
-      if (editingItemDraft.editValue === value.value) return;
+      if (editingItemDraft.editValidatedValue?.value === value?.value) return;
 
       // NOTE: We should never get to here, it's only if something updated from the api like a
       // new data type change or something. Best never to change data types, just create new
       // ones?
-      if (
-        editingItemDraft.type !== value.type &&
-        value.type !== Templates.DataType.Null
-      ) {
-        draft[props.side][props.templateSchemaItemId] = newEditingItem;
-        draft.hasChanges[props.side][props.templateSchemaItemId] = true;
+      if (editingItemDraft.fieldType !== fieldType) {
+        draft.data[cardDataItemId] = {
+          cardDataItemId,
+          savedValidatedValue: undefined,
+          editValidatedValue: value,
+          fieldType,
+        };
+
+        draft.hasChanges[cardDataItemId] = true;
 
         return;
       }
 
       // The value is different and the same type, lets update it normally
-
-      editingItemDraft.editValue = value.value ?? null;
+      editingItemDraft.editValidatedValue = value;
 
       const hasChanges = getHasChanges(
-        editingItemDraft.savedValue,
-        editingItemDraft.editValue,
+        editingItemDraft.editValidatedValue?.value,
+        editingItemDraft.savedValidatedValue?.value,
       );
 
       // Update if we have changes or not
-      draft.hasChanges[props.side][props.templateSchemaItemId] = hasChanges;
+      draft.hasChanges[cardDataItemId] = hasChanges;
     });
   };
 }
@@ -74,14 +75,26 @@ function withOnChange(props: {
 export default function useEditCardTemplateSchemaItem(props: {
   side: Cards.Side;
   templateSchemaItemId: string;
+  templateId: string;
+  fieldType: Templates.FieldType;
 }): Types.UseEditCardTemplateSchemaItemReturn {
-  const editingItem = useRequiredContextSelector(
-    (context) => context?.state?.[props.side][props.templateSchemaItemId],
+  const fieldType = props.fieldType;
+  const cardDataItemId =
+    useContextSelector(
+      (context) =>
+        context?.state?.templateMapping[props.side][props.templateSchemaItemId],
+    ) ??
+    createCardDataSchemaId({
+      side: props.side,
+      templateDataItemId: props.templateSchemaItemId,
+    });
+
+  const editingItem = useContextSelector((context) =>
+    cardDataItemId ? context?.state?.data[cardDataItemId] : undefined,
   );
 
-  const hasChanges = useContextSelector(
-    (context) =>
-      context?.state?.hasChanges[props.side][props.templateSchemaItemId],
+  const hasChanges = useContextSelector((context) =>
+    cardDataItemId ? context?.state?.hasChanges[cardDataItemId] : undefined,
   );
 
   const editState = useRequiredContextSelector((context) => context?.editState);
@@ -92,23 +105,41 @@ export default function useEditCardTemplateSchemaItem(props: {
     () =>
       withOnChange({
         editState,
-        side: props.side,
-        templateId: editingItem.templateId,
-        templateSchemaItemId: props.templateSchemaItemId,
+        cardDataItemId,
+        fieldType,
       }),
-    [props.side, props.templateSchemaItemId, editState, editingItem.templateId],
+    [cardDataItemId, editState, fieldType],
   );
 
-  const validatedValue = React.useMemo<Types.PartialDataValue>(() => {
-    return {
-      type: editingItem.type,
-      value: editingItem.editValue,
-    } as Types.PartialDataValue;
-  }, [editingItem.type, editingItem.editValue]);
+  const validatedValue =
+    editingItem?.editValidatedValue === undefined
+      ? editingItem?.savedValidatedValue
+      : editingItem?.editValidatedValue;
+
+  let usingDefault: Types.DefaultValueLocation | null;
+
+  switch (validatedValue?.origin) {
+    case undefined:
+    case "card":
+    default:
+      usingDefault = null;
+      break;
+    case "deck":
+      usingDefault = "deck";
+      break;
+    case "template":
+      usingDefault = "template";
+      break;
+    case "template-map":
+      usingDefault = "template-map";
+      break;
+  }
 
   return {
     onChange,
+    fieldType,
     validatedValue,
     hasChanges: !!hasChanges,
+    usingDefault,
   };
 }

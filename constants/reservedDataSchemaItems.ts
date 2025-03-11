@@ -17,25 +17,25 @@ export const reservedDataSchemaItems = {
   [ReservedDataSchemaIds.Title]: {
     id: ReservedDataSchemaIds.Title,
     name: text["template.reserved_data_item.title.name"],
-    type: Templates.DataType.Text,
+    type: "text",
     description: text["template.reserved_data_item.title.description"],
   },
   [ReservedDataSchemaIds.Description]: {
     id: ReservedDataSchemaIds.Description,
     name: text["template.reserved_data_item.description.name"],
-    type: Templates.DataType.Text,
+    type: "text",
     description: text["template.reserved_data_item.description.description"],
   },
   [ReservedDataSchemaIds.Color]: {
     id: ReservedDataSchemaIds.Color,
     name: text["template.reserved_data_item.color.name"],
-    type: Templates.DataType.Color,
+    type: "color",
     description: text["template.reserved_data_item.color.description"],
   },
   [ReservedDataSchemaIds.Emoji]: {
     id: ReservedDataSchemaIds.Emoji,
     name: text["template.reserved_data_item.emoji.name"],
-    type: Templates.DataType.Text,
+    type: "text",
     description: text["template.reserved_data_item.emoji.description"],
   },
-} as const satisfies Templates.Data<ReservedDataSchemaIds>;
+} as const satisfies Templates.Data;

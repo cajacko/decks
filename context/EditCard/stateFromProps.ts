@@ -8,62 +8,75 @@ import * as Types from "./EditCard.types";
 import getHasChanges from "./getHasChanges";
 import { Target } from "@/utils/cardTarget";
 import AppError from "@/classes/AppError";
+import createCardDataSchemaId from "@/store/utils/createCardDataSchemaId";
 
-function templateDataItemToEditingDataValue<T extends Templates.DataType>(
-  item: LooseCardTemplateDataItem<T>,
-  templateId: Templates.TemplateId,
-): Types.EditingDataValues<T> {
-  const value = item.validatedValue?.value;
-
+function templateDataItemToEditingDataValue<T extends Templates.FieldType>({
+  cardDataItemId,
+  item,
+}: {
+  item: LooseCardTemplateDataItem<T>;
+  cardDataItemId: string;
+}): Types.EditingDataValues<T> {
   return {
-    templateId,
-    cardDataItemId: item.cardDataItemId,
-    templateItemId: item.id,
-    type: item.type,
-    savedValue: value ?? null,
-    editValue: value ?? null,
+    cardDataItemId,
+    savedValidatedValue: item.validatedValue,
+    editValidatedValue: item.validatedValue,
+    fieldType: item.type,
   };
 }
 
-function templateDataToEditingValues(
-  data: LooseCardTemplateData,
-  templateId: Templates.TemplateId,
-): Types.EditDataValueMap {
-  const result: Types.EditDataValueMap = {};
+function templateDataToEditingValues(props: {
+  front: LooseCardTemplateData;
+  back: LooseCardTemplateData;
+}) {
+  const data: Types.EditDataValueMap = {};
+  const templateMapping: Types.EditCardState["templateMapping"] = {
+    front: {},
+    back: {},
+  };
 
-  for (const key in data) {
-    result[key] = templateDataItemToEditingDataValue(data[key], templateId);
+  function processSide(side: Cards.Side) {
+    const sideData = props[side];
+
+    for (const templateSchemaId in sideData) {
+      const item = sideData[templateSchemaId];
+
+      const cardDataItemId =
+        item.cardDataItemId ??
+        createCardDataSchemaId({ side, templateDataItemId: templateSchemaId });
+
+      data[cardDataItemId] = templateDataItemToEditingDataValue({
+        item: item,
+        cardDataItemId,
+      });
+
+      templateMapping[side][templateSchemaId] = cardDataItemId;
+    }
   }
 
-  return result;
+  processSide("front");
+  processSide("back");
+
+  return { data, templateMapping };
 }
 
 export default function stateFromProps(props: {
   target?: Target | null;
   front?: LooseCardTemplateData | null;
   back?: LooseCardTemplateData | null;
-  frontTemplateId?: Templates.TemplateId | null;
-  backTemplateId?: Templates.TemplateId | null;
   stateRef: React.MutableRefObject<Types.EditCardState | null>;
 }): Types.EditCardState | null {
-  if (
-    !props.target ||
-    !props.front ||
-    !props.back ||
-    !props.frontTemplateId ||
-    !props.backTemplateId
-  ) {
+  if (!props.target || !props.front || !props.back) {
     return null;
   }
 
   return {
     target: props.target,
-    front: templateDataToEditingValues(props.front, props.frontTemplateId),
-    back: templateDataToEditingValues(props.back, props.backTemplateId),
-    hasChanges: {
-      back: {},
-      front: {},
-    },
+    ...templateDataToEditingValues({
+      front: props.front,
+      back: props.back,
+    }),
+    hasChanges: {},
     getContextState: () => {
       if (!props.stateRef.current) {
         throw new AppError(
@@ -79,49 +92,51 @@ export default function stateFromProps(props: {
 export function withUpdateStateFromProps(props: {
   front: LooseCardTemplateData;
   back: LooseCardTemplateData;
-  frontTemplateId: Templates.TemplateId;
-  backTemplateId: Templates.TemplateId;
 }): Types.EditDraftRecipe {
-  const { back, backTemplateId, front, frontTemplateId } = props;
+  const { back, front } = props;
 
   return (draft) => {
     function updateSide(side: Cards.Side) {
-      const templateId = side === "front" ? frontTemplateId : backTemplateId;
-      const data = side === "front" ? front : back;
+      const templateData = side === "front" ? front : back;
 
-      for (const key in data) {
-        const savedItem = data[key];
-        const draftItem = draft[side][key];
+      for (const templateSchemaId in templateData) {
+        const savedItem = templateData[templateSchemaId];
+        const cardDataItemId = savedItem.cardDataItemId;
+
+        if (!cardDataItemId) {
+          // TODO: Do we need to do anything here?
+          continue;
+        }
+
+        const draftItem = draft.data[cardDataItemId];
 
         // There's no draft item so we can just use the saved info as it is
         // Or there is a type mismatch (which shouldn't really happen unless we have background
         // syncing of data and we're not creating new data items for them). But if we do have a
         // mismatch just use the saved value
-        if (
-          !draftItem ||
-          (draftItem.type !== savedItem.type &&
-            draftItem.type !== Templates.DataType.Null)
-        ) {
-          draft[side][key] = templateDataItemToEditingDataValue(
-            savedItem,
-            templateId,
-          );
+        if (!draftItem || draftItem.fieldType !== savedItem.type) {
+          draft.data[cardDataItemId] = templateDataItemToEditingDataValue({
+            item: savedItem,
+            cardDataItemId,
+          });
 
-          draft.hasChanges[side][key] = false;
+          draft.hasChanges[cardDataItemId] = false;
 
           continue;
         }
 
-        const savedItemValue = savedItem.validatedValue?.value ?? null;
-
         // There's a new saved value so update the draft item saved item
-        if (draftItem.savedValue !== savedItemValue) {
-          draftItem.savedValue = savedItemValue;
+        if (
+          draftItem.savedValidatedValue?.value !==
+          savedItem.validatedValue?.value
+        ) {
+          draftItem.savedValidatedValue = savedItem.validatedValue;
+          draftItem.editValidatedValue = savedItem.validatedValue;
         }
 
-        draft.hasChanges[side][key] = getHasChanges(
-          draftItem.editValue,
-          draftItem.savedValue,
+        draft.hasChanges[cardDataItemId] = getHasChanges(
+          draftItem.editValidatedValue?.value,
+          draftItem.savedValidatedValue?.value,
         );
       }
     }

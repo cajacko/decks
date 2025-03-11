@@ -11,13 +11,13 @@ import { getBuiltInState } from "../utils/withBuiltInState";
 import { selectCard } from "../slices/cards";
 
 export function deleteDeckHelper(props: {
-  deckId: Decks.DeckId;
-  cardIds?: Cards.CardId[];
-  tabletopId?: string;
+  deckId: Decks.Id;
+  cardIds?: Cards.Id[];
+  tabletopId?: Tabletops.Id;
 }) {
   const deck = selectDeck(store.getState(), props);
 
-  const cardIds: Cards.CardId[] =
+  const cardIds: Cards.Id[] =
     props.cardIds ?? deck?.cards.map(({ cardId }) => cardId) ?? [];
 
   const tabletopId = deck?.defaultTabletopId ?? props.tabletopId ?? null;
@@ -25,7 +25,7 @@ export function deleteDeckHelper(props: {
   return deleteDeck({ cardIds, deckId: props.deckId, tabletopId });
 }
 
-export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
+export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
   const tabletopId = uuid();
 
   const deck: Decks.Props = {
@@ -38,7 +38,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
     description: text["deck.new.description"],
     status: "creating",
     canEdit: true,
-    cardSize: Decks.CardSize.Poker,
+    cardSize: Cards.Size.Poker,
     templates: {
       back: {
         dataTemplateMapping: {},
@@ -77,8 +77,8 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
 }
 
 export function copyDeckHelper(props: {
-  deckId: Decks.DeckId;
-  newDeckId: string;
+  deckId: Decks.Id;
+  newDeckId: Decks.Id;
 }) {
   const deckToCopy = selectDeck(store.getState(), props);
 
@@ -89,12 +89,12 @@ export function copyDeckHelper(props: {
   }
 
   const tabletopId = uuid();
-  const cardIdMap = new Map<Cards.CardId, Cards.CardId>();
+  const cardIdMap = new Map<Cards.Id, Cards.Id>();
 
   const cards: Cards.Props[] = [];
   const deckCards: Decks.Card[] = [];
 
-  function copyCard(existingCardId: Cards.CardId): string | null {
+  function copyCard(existingCardId: Cards.Id): Cards.Id | null {
     const existingCard = selectCard(store.getState(), {
       cardId: existingCardId,
     });
@@ -145,7 +145,7 @@ export function copyDeckHelper(props: {
       ([cardInstanceId, cardInstance]) => {
         if (!cardInstance) return;
 
-        let newCardId: string;
+        let newCardId: Cards.Id;
 
         const mappedCardId = cardIdMap.get(cardInstance.cardId);
 

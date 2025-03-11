@@ -1,20 +1,21 @@
 import React from "react";
 import { ViewStyle } from "react-native";
 import TextInput from "@/components/TextInput";
-import { useAppSelector } from "@/store/hooks";
+import { useRequiredAppSelector } from "@/store/hooks";
 import { selectTemplateSchemaItem } from "@/store/slices/templates";
 import {
   useEditCardTemplateSchemaItem,
   useIsNewCard,
 } from "@/context/EditCard";
-import { Templates } from "@/store/types";
 import AppError from "@/classes/AppError";
 import ColorInput from "./ColorInput";
 import Field from "./Field";
 import useFlag from "@/hooks/useFlag";
+import text from "@/constants/text";
+import { Cards } from "@/store/types";
 
 export interface TemplateSchemaItemProps {
-  side: "front" | "back";
+  side: Cards.Side;
   templateId: string;
   templateSchemaItemId: string;
   style?: ViewStyle;
@@ -23,63 +24,74 @@ export interface TemplateSchemaItemProps {
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   const showMoreInfo = useFlag("EDIT_CARD_MORE_INFO") === "enabled";
   const isNewCard = useIsNewCard();
-  const schemaItemName = useAppSelector(
-    (state) => selectTemplateSchemaItem(state, props)?.name,
+  const schemaItem = useRequiredAppSelector(
+    (state) => selectTemplateSchemaItem(state, props),
+    selectTemplateSchemaItem.name,
   );
 
-  // Log an error if we can't find the schema item name rather than throwing an error
-  React.useEffect(() => {
-    if (!schemaItemName) {
-      new AppError(
-        `${TemplateSchemaItem.name}: Could not find schema item name for template schema item id: ${props.templateSchemaItemId}`,
-        props,
-      ).log("error");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schemaItemName, props.templateSchemaItemId]);
+  const fieldLabel: string = schemaItem.name;
+  const fieldType = schemaItem.type;
 
-  const fieldLabel: string = schemaItemName || props.templateSchemaItemId;
-
-  const { onChange, validatedValue, placeholder, hasChanges } =
-    useEditCardTemplateSchemaItem(props);
+  const { onChange, validatedValue, placeholder, hasChanges, usingDefault } =
+    useEditCardTemplateSchemaItem({ ...props, fieldType });
 
   const onChangeText = React.useCallback(
     (text: string) => {
-      switch (validatedValue.type) {
-        case Templates.DataType.Text:
-        case Templates.DataType.Color:
-          onChange({ value: text, type: validatedValue.type });
+      switch (fieldType) {
+        case "text":
+        case "color":
+          onChange({ value: text, type: fieldType, origin: "card" });
           break;
         default:
           return;
       }
     },
-    [onChange, validatedValue.type],
+    [onChange, fieldType],
   );
 
-  const handleClear = React.useMemo(() => {
+  const handleUseDefaults = React.useMemo(() => {
     if (!showMoreInfo) return;
 
     return () => {
-      onChange({ value: null, type: Templates.DataType.Null });
+      onChange(undefined);
+    };
+  }, [showMoreInfo, onChange]);
+
+  const handleSetNull = React.useMemo(() => {
+    if (!showMoreInfo) return;
+
+    return (isEnabled: boolean) => {
+      onChange(
+        isEnabled ? undefined : { value: null, type: "null", origin: "card" },
+      );
     };
   }, [showMoreInfo, onChange]);
 
   const input = React.useMemo(() => {
-    switch (validatedValue.type) {
-      case Templates.DataType.Text: {
+    const nullText = text["general.null"];
+
+    switch (fieldType) {
+      case "text": {
         return (
           <TextInput
-            value={validatedValue.value}
+            value={
+              validatedValue?.value === null
+                ? nullText
+                : String(validatedValue?.value ?? "")
+            }
             onChangeText={onChangeText}
             placeholder={placeholder}
           />
         );
       }
-      case Templates.DataType.Color: {
+      case "color": {
         return (
           <ColorInput
-            value={validatedValue.value}
+            value={
+              validatedValue?.value === null
+                ? nullText
+                : String(validatedValue?.value ?? "")
+            }
             onChangeText={onChangeText}
             placeholder={placeholder}
           />
@@ -88,23 +100,32 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       default:
         return null;
     }
-  }, [validatedValue, onChangeText, placeholder]);
+  }, [validatedValue, onChangeText, placeholder, fieldType]);
 
   if (!input) {
     new AppError(
-      `${TemplateSchemaItem.name}: We do not have an TemplateSchemaItem input set up for this data type: ${validatedValue.type}, returning null`,
+      `${TemplateSchemaItem.name}: We do not have an TemplateSchemaItem input set up for this data type: ${fieldType}, returning null`,
       validatedValue,
     ).log("error");
 
     return null;
   }
 
+  let label = fieldLabel;
+
+  if (showMoreInfo && usingDefault) {
+    label = `${label} ${text["card.using_defaults"]} (${usingDefault})`;
+  }
+
   return (
     <Field
-      label={fieldLabel}
+      label={label}
       style={props.style}
       hasChanges={hasChanges && !isNewCard}
-      handleClear={handleClear}
+      handleClear={handleUseDefaults}
+      handleChangeEnable={handleSetNull}
+      showEnabled={showMoreInfo}
+      enabled={validatedValue?.value !== null}
     >
       {input}
     </Field>

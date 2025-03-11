@@ -12,6 +12,7 @@ import uuid from "@/utils/uuid";
 import AppError from "@/classes/AppError";
 import { getHasChanges } from "./useHasEditCardChanges";
 import useAutoSave from "@/hooks/useAutoSave";
+import debugLog from "./debugLog";
 
 /**
  * Must be used within the EditCard context and with a valid target. Otherwise why is this component
@@ -31,6 +32,8 @@ export default function useSaveEditCard(autoSave = false) {
 
     switch (contextState.target.type) {
       case "card": {
+        debugLog(`${useSaveEditCard.name} - update card`);
+
         dispatch(
           updateCardHelper({
             cardId: contextState.target.id,
@@ -41,6 +44,7 @@ export default function useSaveEditCard(autoSave = false) {
         return null;
       }
       case "new-card-in-deck": {
+        debugLog(`${useSaveEditCard.name} - new card`);
         const newCardId = uuid();
 
         dispatch(
@@ -58,6 +62,8 @@ export default function useSaveEditCard(autoSave = false) {
         return null;
       }
       case "deck-defaults": {
+        debugLog(`${useSaveEditCard.name} - update deck default`);
+
         dispatch(
           setDeckCardDefaults({
             deckId: contextState.target.id,
@@ -68,6 +74,8 @@ export default function useSaveEditCard(autoSave = false) {
         return null;
       }
       default:
+        debugLog(`${useSaveEditCard.name} - unknown target`);
+
         throw new AppError(
           `${useSaveEditCard.name} could not save card, unexpected target type: ${contextState.target.type}`,
           contextState.target,

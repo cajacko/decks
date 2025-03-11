@@ -1,14 +1,12 @@
 import React from "react";
 import { useAppSelector } from "@/store/hooks";
-import {
-  selectCardTemplateData,
-  selectCardTemplate,
-} from "@/store/combinedSelectors/cards";
+import { selectCardTemplateData } from "@/store/combinedSelectors/cards";
 import { produce } from "immer";
 import * as Types from "./EditCard.types";
 import { Target, getIsSameTarget } from "@/utils/cardTarget";
 import AppError from "@/classes/AppError";
 import stateFromProps, { withUpdateStateFromProps } from "./stateFromProps";
+import debugLog from "./debugLog";
 
 /**
  * Handles the saved props from redux and when to update our context when they change. As well as
@@ -17,16 +15,6 @@ import stateFromProps, { withUpdateStateFromProps } from "./stateFromProps";
 export default function useEditCardState(
   target: Target | null,
 ): [state: Types.EditCardState | null, editState: Types.EditState | null] {
-  const frontTemplateId = useAppSelector((state) =>
-    target
-      ? selectCardTemplate(state, { ...target, side: "front" })?.templateId
-      : null,
-  );
-  const backTemplateId = useAppSelector((state) =>
-    target
-      ? selectCardTemplate(state, { ...target, side: "back" })?.templateId
-      : null,
-  );
   const front = useAppSelector((state) =>
     target ? selectCardTemplateData(state, { ...target, side: "front" }) : null,
   );
@@ -37,15 +25,22 @@ export default function useEditCardState(
   const stateRef = React.useRef<Types.EditCardState | null>(null);
 
   const [state, setState] = React.useState<Types.EditCardState | null>(
-    (): Types.EditCardState | null =>
-      stateFromProps({
+    (): Types.EditCardState | null => {
+      const initState = stateFromProps({
         target,
         front,
         back,
-        frontTemplateId,
-        backTemplateId,
         stateRef,
-      }),
+      });
+
+      debugLog(`${useEditCardState.name} - init state`, {
+        initState,
+        front,
+        back,
+      });
+
+      return initState;
+    },
   );
 
   stateRef.current = state;
@@ -60,8 +55,8 @@ export default function useEditCardState(
     if (!hasState) return null;
 
     return (recipe) => {
-      // This condition shouldn't actually trigger based on the conditional above
       setState((prevState) => {
+        // This condition shouldn't actually trigger based on the conditional above
         if (prevState === null) {
           new AppError(
             `${useEditCardState.name}: Edit state called with no state, this should have been handled by conditionals`,
@@ -70,7 +65,11 @@ export default function useEditCardState(
           return prevState;
         }
 
-        return produce<Types.EditCardState>(prevState, recipe);
+        const newState = produce<Types.EditCardState>(prevState, recipe);
+
+        // debugLog(`${useEditCardState.name} - editState`, newState);
+
+        return newState;
       });
     };
   }, [hasState]);
@@ -80,6 +79,8 @@ export default function useEditCardState(
     // If we don't have a target set the state to null
     if (target === null) {
       prevTarget.current = target;
+
+      debugLog(`${useEditCardState.name} - no target`, target);
 
       // NOTE: React won't re-render/ go into a effect/ setState loop if the value is the same
       setState(target);
@@ -96,16 +97,16 @@ export default function useEditCardState(
     ) {
       prevTarget.current = target;
 
-      setState(
-        stateFromProps({
-          target,
-          front,
-          back,
-          frontTemplateId,
-          backTemplateId,
-          stateRef,
-        }),
-      );
+      const newState = stateFromProps({
+        target,
+        front,
+        back,
+        stateRef,
+      });
+
+      debugLog(`${useEditCardState.name} - target changed`, newState);
+
+      setState(newState);
 
       return;
     }
@@ -118,9 +119,9 @@ export default function useEditCardState(
       return;
     }
 
-    if (!front || !back || !frontTemplateId || !backTemplateId) {
+    if (!front || !back) {
       new AppError(
-        `Front, back, frontTemplateId or backTemplateId not set when we have prop changes to apply`,
+        `Front or back not set when we have prop changes to apply`,
       ).log("error");
 
       return;
@@ -138,8 +139,6 @@ export default function useEditCardState(
         target,
         front,
         back,
-        frontTemplateId,
-        backTemplateId,
         stateRef,
       });
 
@@ -158,18 +157,18 @@ export default function useEditCardState(
       return;
     }
 
+    debugLog(`${useEditCardState.name} - new saved data`, { back, front });
+
     // We have new saved data lets update
     editState(
       withUpdateStateFromProps({
         back,
-        backTemplateId,
         front,
-        frontTemplateId,
       }),
     );
     // NOTE: This hook is only for when saved props or the target has changed, we do not want it
     // updating n other situations as we may end up overriding editing data if we do
-  }, [target, editState, back, front, frontTemplateId, backTemplateId]);
+  }, [target, editState, back, front]);
 
   return [state, editState];
 }

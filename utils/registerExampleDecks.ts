@@ -1,12 +1,5 @@
 import exampleDecks from "@/constants/exampleDecks";
-import {
-  RootState,
-  SliceName,
-  Decks,
-  Tabletops,
-  Cards,
-  Templates,
-} from "@/store/types";
+import { RootState, SliceName, Decks, Tabletops, Cards } from "@/store/types";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
@@ -16,7 +9,7 @@ type State = Pick<
   SliceName.Decks | SliceName.Cards | SliceName.Tabletops
 >;
 
-function getValidatedDataType(
+function getValidatedValueType(
   value: string | boolean | null,
 ): Cards.Data[string] {
   let data: Cards.Data[string];
@@ -26,20 +19,23 @@ function getValidatedDataType(
     case "string":
       data = {
         value: value,
-        type: Templates.DataType.Text,
+        type: "text",
+        origin: "card",
       };
       break;
     case "boolean":
       data = {
         value: value,
-        type: Templates.DataType.Boolean,
+        type: "boolean",
+        origin: "card",
       };
       break;
     default:
       if (value === null) {
         data = {
-          type: Templates.DataType.Null,
+          type: "null",
           value: null,
+          origin: "card",
         };
       }
   }
@@ -76,7 +72,7 @@ export default function registerExampleDecks() {
       name: exampleDeck.name,
       description: exampleDeck.description,
       cards: [],
-      cardSize: Decks.CardSize.Poker,
+      cardSize: Cards.Size.Poker,
       dataSchema,
       dataSchemaOrder: Object.keys(dataSchema),
       defaultTabletopId: tabletopId,
@@ -120,12 +116,12 @@ export default function registerExampleDecks() {
         status: "active",
       };
 
-      Object.entries(cardProps).forEach(([dataSchemaId, value]) => {
-        card.data[dataSchemaId] = getValidatedDataType(value);
+      Object.entries(cardProps).forEach(([dataId, value]) => {
+        card.data[dataId] = getValidatedValueType(value);
 
-        deck.templates.front.dataTemplateMapping[dataSchemaId] = {
-          dataSchemaItemId: dataSchemaId,
-          templateSchemaItemId: builtInTemplates.front.schema.title.id,
+        deck.templates.front.dataTemplateMapping[dataId] = {
+          dataId: dataId,
+          templateDataId: builtInTemplates.front.schema.title.id,
         };
       });
 

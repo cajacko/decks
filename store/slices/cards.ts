@@ -32,16 +32,13 @@ export const cardsSlice = createSlice({
 
       if (!card) return;
 
-      actions.payload.data.forEach((dataItem) => {
-        const cardDataSchemaId =
-          "cardDataId" in dataItem
-            ? dataItem.cardDataId
-            : createCardDataSchemaId(dataItem);
+      actions.payload.data.items.forEach((dataItem) => {
+        const cardDataSchemaId = dataItem.cardDataId;
 
-        if (dataItem.value === null) {
+        if (dataItem.validatedValue === undefined) {
           delete card.data[cardDataSchemaId];
         } else {
-          card.data[cardDataSchemaId] = dataItem.value;
+          card.data[cardDataSchemaId] = dataItem.validatedValue;
         }
       });
     });
@@ -55,14 +52,14 @@ export const cardsSlice = createSlice({
         data: {},
       };
 
-      actions.payload.data.forEach((dataItem) => {
+      actions.payload.data.items.forEach((dataItem) => {
         const cardDataSchemaId =
           "cardDataId" in dataItem
             ? dataItem.cardDataId
             : createCardDataSchemaId(dataItem);
 
-        if (dataItem.value !== null) {
-          card.data[cardDataSchemaId] = dataItem.value;
+        if (dataItem.validatedValue !== undefined) {
+          card.data[cardDataSchemaId] = dataItem.validatedValue;
         }
       });
 

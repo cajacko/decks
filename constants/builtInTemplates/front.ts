@@ -27,14 +27,16 @@ const template = {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Title],
       defaultValidatedValue: {
         value: text["template.built_in.front.title.default"],
-        type: Templates.DataType.Text,
+        type: "text",
+        origin: "template",
       },
     },
     [dataItemIds.description]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Description],
       defaultValidatedValue: {
         value: text["template.built_in.front.description.default"],
-        type: Templates.DataType.Text,
+        type: "text",
+        origin: "template",
       },
     },
     [dataItemIds.emoji]: {
@@ -44,20 +46,21 @@ const template = {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
         value: fixed.cardPresets.yellow,
-        type: Templates.DataType.Color,
+        type: "color",
+        origin: "template",
       },
     },
   },
   markup: [
     {
-      type: "view",
+      type: "View",
       style: {
         flex: 1,
         backgroundColor: `{{${dataItemIds.color}}}`,
       },
       children: [
         {
-          type: "view",
+          type: "View",
           style: {
             margin: 2,
             flex: 1,
@@ -69,7 +72,7 @@ const template = {
           },
           children: [
             {
-              type: "text",
+              type: "Text",
               text: `{{${dataItemIds.emoji}}}`,
               conditional: `{{${dataItemIds.emoji}}}`,
               style: {
@@ -81,7 +84,7 @@ const template = {
               },
             },
             {
-              type: "text",
+              type: "Text",
               text: `{{${dataItemIds.title}}}`,
               style: {
                 fontSize: 8,
@@ -90,7 +93,7 @@ const template = {
               },
             },
             {
-              type: "text",
+              type: "Text",
               text: `{{${dataItemIds.description}}}`,
               conditional: `{{${dataItemIds.description}}}`,
               style: {

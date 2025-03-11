@@ -11,7 +11,7 @@ export default function useEditCardSideState(
   target?: Target,
 ): Types.EditDataValueMap | undefined {
   const isContextTarget = useIsContextTarget(target);
-  const sideState = useContextSelector((context) => context?.state?.[side]);
+  const sideState = useContextSelector((context) => context?.state?.data);
 
   if (!isContextTarget) return undefined;
 

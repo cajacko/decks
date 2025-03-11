@@ -23,7 +23,7 @@ export const templatesSlice = createSlice({
 export const selectTemplate = withBuiltInState(
   (
     state: RootState,
-    props: { templateId: Templates.TemplateId },
+    props: { templateId: Templates.Id },
   ): Templates.Props | undefined =>
     state[templatesSlice.name].templatesById[props.templateId] ??
     builtInTemplatesById[props.templateId],
@@ -32,10 +32,10 @@ export const selectTemplate = withBuiltInState(
 export const selectTemplateSchemaItem = (
   state: RootState,
   props: {
-    templateId: Templates.TemplateId;
-    templateSchemaItemId: Templates.DataItemId;
+    templateId: Templates.Id;
+    templateSchemaItemId: Templates.DataId;
   },
-): Templates.LooseDataItem | null =>
+): Templates.DataItem | null =>
   selectTemplate(state, props)?.schema[props.templateSchemaItemId] ?? null;
 
 export default templatesSlice;

@@ -16,7 +16,14 @@ export type TabletopHistoryState = Tabletops.HistoryState;
 export type Stack = Tabletops.Stack;
 export type CardInstance = Tabletops.CardInstance;
 
-export const MoveCardInstanceMethod = Tabletops.MoveCardInstanceMethod;
+export enum MoveCardInstanceMethod {
+  topFaceUp = "topFaceUp",
+  topFaceDown = "topFaceDown",
+  topNoChange = "topNoChange",
+  bottomFaceUp = "bottomFaceUp",
+  bottomFaceDown = "bottomFaceDown",
+  bottomNoChange = "bottomNoChange",
+}
 
 const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.tabletops
@@ -72,7 +79,7 @@ export const tabletopsSlice = createSlice({
           newStackDirection: "start" | "end";
           // Do we specify the method, or let the stack define it? Or both? If specified here it's
           // more specific, otherwise do what the stack it's going to says
-          method: Tabletops.MoveCardInstanceMethod;
+          method: MoveCardInstanceMethod;
         }>,
       ) => {
         const { cardInstanceId, method, toStackId, newStackDirection } =
@@ -221,8 +228,8 @@ export const tabletopsSlice = createSlice({
     function deleteCards(
       state: WritableDraft<TabletopState>,
       props: {
-        deckId: Decks.DeckId;
-        cardIds: Cards.CardId[];
+        deckId: Decks.Id;
+        cardIds: Cards.Id[];
       },
     ) {
       const { deckId, cardIds } = props;
