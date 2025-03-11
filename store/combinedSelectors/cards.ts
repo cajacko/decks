@@ -2,14 +2,22 @@ import { createCachedSelector } from "re-reselect";
 import { selectCard } from "../slices/cards";
 import { selectDeck as selectDeckByDeckId } from "../slices/decks";
 import { selectTemplate } from "../slices/templates";
-import { RootState, Decks, Cards, Templates } from "../types";
+import { RootState, Decks, Cards } from "../types";
 import { getIsCardId, Target } from "@/utils/cardTarget";
+import {
+  resolveCardData,
+  TemplateValuesMap,
+  ResolveCardDataProps,
+} from "@/utils/resolveCardData";
 
 type CardIdProps = { cardId: Cards.Id };
 export type DeckOrCardSideProps = Target & { side: Cards.Side };
+type DeckOrCardOptionalSideProps = Target & { side?: Cards.Side };
 
-export const cardOrDeckKey = (_: unknown, props: DeckOrCardSideProps): string =>
-  `${props.type}:${props.id}-${props.side}`;
+export const cardOrDeckKey = (
+  _: unknown,
+  props: DeckOrCardOptionalSideProps,
+): string => `${props.type}:${props.id}-${props.side}`;
 
 // Is a lookup, doesn't need to be cached
 export const selectDeckByCard = (
@@ -83,138 +91,73 @@ export const selectTemplateSchemaOrder = createCachedSelector(
   },
 )(cardOrDeckKey);
 
-/**
- * Selects the data for a card by merging the card data with the deck defaults.
- * If a cardId is passed we merge the data with the deck defaults
- * If a deckId is passed we just return the deck defaults (useful for creating new cards)
- *
- * NOTE: This does not merge in any defaults from the templates and doesn't have any awareness of
- * templates at this time
- */
-const selectMergedCardData = createCachedSelector(
-  (state: RootState, props: DeckOrCardSideProps) =>
+// export type LooseCardTemplateDataItem<
+//   T extends Templates.FieldType = Templates.FieldType,
+// > = Templates.DataItem<T> & {
+//   validatedValue: Templates.ValidatedValue<T> | undefined;
+//   cardDataItemId: Cards.DataId | null;
+// };
+
+// export type LooseCardTemplateData<
+//   T extends Templates.FieldType = Templates.FieldType,
+//   Id extends Templates.DataId = Templates.DataId,
+// > = {
+//   [K in Id]: LooseCardTemplateDataItem<T>;
+// };
+
+export const selectResolveCardDataProps = createCachedSelector(
+  (state: RootState, props: DeckOrCardOptionalSideProps) =>
     getIsCardId(props) ? selectCard(state, { cardId: props.id })?.data : null,
-  (state: RootState, props: DeckOrCardSideProps) =>
+  (state: RootState, props: DeckOrCardOptionalSideProps) =>
     selectDeck(state, props)?.dataSchema,
-  (cardData, deckDataSchema): Cards.Data | null => {
-    // If there's no deck schema then there's no defaults to find, so just return the card data or null
-    if (!deckDataSchema) return cardData ?? null;
-
-    // Now we merge the deck defaults into the missing entries from the card data
-    const combinedData: Cards.Data = { ...cardData };
-
-    Object.entries(deckDataSchema).forEach(([key, schemaItem]) => {
-      const cardDataValue = combinedData[key];
-
-      // We have a value for this key, so we don't need to do anything
-      if (cardDataValue) return;
-
-      const deckDataDefaultValue = schemaItem?.defaultValidatedValue;
-
-      // No deck default
-      if (!deckDataDefaultValue) return;
-
-      combinedData[key] = deckDataDefaultValue;
-    });
-
-    return combinedData;
+  (state: RootState, props: DeckOrCardOptionalSideProps) =>
+    props.side === "back"
+      ? null
+      : selectCardTemplate(state, { ...props, side: "front" })?.schema,
+  (state: RootState, props: DeckOrCardOptionalSideProps) =>
+    props.side === "back"
+      ? null
+      : selectCardSideTemplate(state, { ...props, side: "front" })
+          ?.dataTemplateMapping,
+  (state: RootState, props: DeckOrCardOptionalSideProps) =>
+    props.side === "front"
+      ? null
+      : selectCardTemplate(state, { ...props, side: "back" })?.schema,
+  (state: RootState, props: DeckOrCardOptionalSideProps) =>
+    props.side === "front"
+      ? null
+      : selectCardSideTemplate(state, { ...props, side: "back" })
+          ?.dataTemplateMapping,
+  (
+    cardData,
+    deckDataSchema,
+    frontSchema,
+    frontDataTemplateMapping,
+    backSchema,
+    backDataTemplateMapping,
+  ): ResolveCardDataProps => {
+    return {
+      cardData: cardData ?? null,
+      deckDataSchema: deckDataSchema ?? null,
+      templates: {
+        front: {
+          dataTemplateMapping: frontDataTemplateMapping ?? null,
+          schema: frontSchema ?? null,
+        },
+        back: {
+          dataTemplateMapping: backDataTemplateMapping ?? null,
+          schema: backSchema ?? null,
+        },
+      },
+    };
   },
 )(cardOrDeckKey);
 
-export type LooseCardTemplateDataItem<
-  T extends Templates.FieldType = Templates.FieldType,
-> = Templates.DataItem<T> & {
-  validatedValue: Templates.ValidatedValue<T> | undefined;
-  cardDataItemId: Cards.DataId | null;
-};
-
-export type LooseCardTemplateData<
-  T extends Templates.FieldType = Templates.FieldType,
-  Id extends Templates.DataId = Templates.DataId,
-> = {
-  [K in Id]: LooseCardTemplateDataItem<T>;
-};
-
 export const selectCardTemplateData = createCachedSelector(
-  (state: RootState, props: DeckOrCardSideProps) =>
-    selectCardTemplate(state, props)?.schema,
-  (state: RootState, props: DeckOrCardSideProps) =>
-    selectCardSideTemplate(state, props)?.dataTemplateMapping,
-  selectMergedCardData,
-  (
-    templateSchema,
-    dataTemplateMapping,
-    mergedCardData,
-  ): null | LooseCardTemplateData => {
-    if (!templateSchema) return null;
-
-    const data: LooseCardTemplateData = {};
-
-    Object.entries(templateSchema).forEach(
-      ([templateSchemaId, templateSchemaItem]) => {
-        if (!templateSchemaItem) return;
-
-        const templateExpectedType = templateSchemaItem.type;
-
-        const getValidatedValue = (
-          value: Templates.ValidatedValue | undefined,
-        ): Templates.ValidatedValue | undefined => {
-          if (!value) return undefined;
-
-          if (value.type === "null") return value;
-          if (value.type !== templateExpectedType) return undefined;
-
-          return value;
-        };
-
-        const templateDefaultValue = templateSchemaItem.defaultValidatedValue;
-
-        let cardValue: Templates.ValidatedValue | undefined;
-        let dataMappingDefaultValue: Templates.ValidatedValue | undefined;
-        let cardDataItemId: Cards.DataId | undefined;
-
-        if (dataTemplateMapping) {
-          const mapping = dataTemplateMapping[templateSchemaId];
-
-          if (mapping) {
-            dataMappingDefaultValue = mapping.defaultValidatedValue;
-
-            cardDataItemId = mapping.dataId;
-
-            cardValue = mergedCardData?.[cardDataItemId];
-          }
-        }
-
-        let validatedValue: Templates.ValidatedValue | undefined;
-
-        const _cardValue = getValidatedValue(cardValue);
-
-        // Priority of values is cardValue > dataMappingDefaultValue > templateDefaultValue
-        if (_cardValue !== undefined) {
-          validatedValue = _cardValue;
-        } else {
-          const _dataMappingDefaultValue = getValidatedValue(
-            dataMappingDefaultValue,
-          );
-
-          if (_dataMappingDefaultValue !== undefined) {
-            validatedValue = _dataMappingDefaultValue;
-          } else {
-            validatedValue = getValidatedValue(templateDefaultValue);
-          }
-        }
-
-        const dataItem: LooseCardTemplateDataItem = {
-          ...templateSchemaItem,
-          validatedValue,
-          cardDataItemId: cardDataItemId ?? null,
-        };
-
-        data[templateSchemaId] = dataItem;
-      },
-    );
-
-    return data;
+  selectResolveCardDataProps,
+  (_, props: DeckOrCardSideProps) => props.side,
+  (props, side): TemplateValuesMap | undefined => {
+    return resolveCardData(props).resolvedDataValues[side];
   },
 )(cardOrDeckKey);
 

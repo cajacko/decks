@@ -10,7 +10,6 @@ import {
 import getUpdateCardData from "./getUpdateCardData";
 import uuid from "@/utils/uuid";
 import AppError from "@/classes/AppError";
-import { getHasChanges } from "./useHasEditCardChanges";
 import useAutoSave from "@/hooks/useAutoSave";
 import debugLog from "./debugLog";
 
@@ -87,7 +86,7 @@ export default function useSaveEditCard(autoSave = false) {
     save,
     autoSave,
     hasChanges: React.useCallback(
-      () => getHasChanges(getContextState().hasChanges),
+      () => getContextState().hasChanges?.either === true,
       [getContextState],
     ),
   });

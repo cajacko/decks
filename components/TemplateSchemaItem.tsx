@@ -17,7 +17,7 @@ import { Cards } from "@/store/types";
 export interface TemplateSchemaItemProps {
   side: Cards.Side;
   templateId: string;
-  templateSchemaItemId: string;
+  templateDataId: string;
   style?: ViewStyle;
 }
 
@@ -33,7 +33,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   const fieldType = schemaItem.type;
 
   const { onChange, validatedValue, placeholder, hasChanges, usingDefault } =
-    useEditCardTemplateSchemaItem({ ...props, fieldType });
+    useEditCardTemplateSchemaItem(props);
 
   const onChangeText = React.useCallback(
     (text: string) => {

@@ -5,123 +5,62 @@ import {
   useContextSelector,
 } from "./useContextSelector";
 import * as Types from "./EditCard.types";
-import getHasChanges from "./getHasChanges";
 import createCardDataSchemaId from "@/store/utils/createCardDataSchemaId";
-// import { useAppSelector } from "@/store/hooks";
-// import { useAppSelector } from "@/store/hooks";
-// import { selectTemplateSchemaItem } from "@/store/slices/templates";
-
-function withOnChange(props: {
-  editState: Types.EditState;
-  cardDataItemId: string;
-  fieldType: Templates.FieldType;
-}): Types.UseEditCardTemplateSchemaItemReturn["onChange"] {
-  const { editState, cardDataItemId, fieldType } = props;
-
-  return (value: Templates.ValidatedValue | undefined) => {
-    editState((draft) => {
-      const editingItemDraft = draft.data[cardDataItemId];
-
-      // If the item doesn't exist, it's new so add it
-      if (!editingItemDraft) {
-        // There's no new value to set anyways so return.
-        if (!value) return;
-
-        draft.data[cardDataItemId] = {
-          cardDataItemId,
-          savedValidatedValue: undefined,
-          editValidatedValue: value,
-          fieldType,
-        };
-
-        draft.hasChanges[cardDataItemId] = true;
-
-        return;
-      }
-
-      // Don't update something that has no changes
-      if (editingItemDraft.editValidatedValue?.value === value?.value) return;
-
-      // NOTE: We should never get to here, it's only if something updated from the api like a
-      // new data type change or something. Best never to change data types, just create new
-      // ones?
-      if (editingItemDraft.fieldType !== fieldType) {
-        draft.data[cardDataItemId] = {
-          cardDataItemId,
-          savedValidatedValue: undefined,
-          editValidatedValue: value,
-          fieldType,
-        };
-
-        draft.hasChanges[cardDataItemId] = true;
-
-        return;
-      }
-
-      // The value is different and the same type, lets update it normally
-      editingItemDraft.editValidatedValue = value;
-
-      const hasChanges = getHasChanges(
-        editingItemDraft.editValidatedValue?.value,
-        editingItemDraft.savedValidatedValue?.value,
-      );
-
-      // Update if we have changes or not
-      draft.hasChanges[cardDataItemId] = hasChanges;
-    });
-  };
-}
 
 export default function useEditCardTemplateSchemaItem(props: {
   side: Cards.Side;
-  templateSchemaItemId: string;
-  templateId: string;
-  fieldType: Templates.FieldType;
+  templateDataId: Templates.DataId;
+  templateId: Templates.Id;
 }): Types.UseEditCardTemplateSchemaItemReturn {
-  const fieldType = props.fieldType;
   const cardDataItemId =
     useContextSelector(
       (context) =>
-        context?.state?.templateMapping[props.side][props.templateSchemaItemId],
+        context?.state?.dataIdByTemplateDataId[props.side][
+          props.templateDataId
+        ],
     ) ??
     createCardDataSchemaId({
       side: props.side,
-      templateDataItemId: props.templateSchemaItemId,
+      templateDataItemId: props.templateDataId,
     });
 
   const editingItem = useContextSelector((context) =>
-    cardDataItemId ? context?.state?.data[cardDataItemId] : undefined,
+    cardDataItemId
+      ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+      : undefined,
   );
 
-  const hasChanges = useContextSelector((context) =>
-    cardDataItemId ? context?.state?.hasChanges[cardDataItemId] : undefined,
+  const hasChanges = useContextSelector(
+    (context) =>
+      context?.state?.hasChanges?.[props.side]?.byTemplateDataId?.[
+        props.templateDataId
+      ],
   );
 
-  const editState = useRequiredContextSelector((context) => context?.editState);
+  const updateEditingDataItem = useRequiredContextSelector(
+    (context) => context?.updateEditingDataItem,
+  );
 
-  const onChange = React.useMemo<
+  const onChange = React.useCallback<
     Types.UseEditCardTemplateSchemaItemReturn["onChange"]
   >(
-    () =>
-      withOnChange({
-        editState,
-        cardDataItemId,
-        fieldType,
+    (validatedValue) =>
+      updateEditingDataItem({
+        side: props.side,
+        templateDataId: props.templateDataId,
+        validatedValue,
       }),
-    [cardDataItemId, editState, fieldType],
+    [updateEditingDataItem, props.side, props.templateDataId],
   );
 
-  const validatedValue =
-    editingItem?.editValidatedValue === undefined
-      ? editingItem?.savedValidatedValue
-      : editingItem?.editValidatedValue;
+  const validatedValue = editingItem?.resolvedValidatedValue;
 
   let usingDefault: Types.DefaultValueLocation | null;
 
   switch (validatedValue?.origin) {
     case undefined:
     case "card":
-    default:
+    case "editing":
       usingDefault = null;
       break;
     case "deck":
@@ -137,7 +76,6 @@ export default function useEditCardTemplateSchemaItem(props: {
 
   return {
     onChange,
-    fieldType,
     validatedValue,
     hasChanges: !!hasChanges,
     usingDefault,

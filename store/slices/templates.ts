@@ -33,9 +33,9 @@ export const selectTemplateSchemaItem = (
   state: RootState,
   props: {
     templateId: Templates.Id;
-    templateSchemaItemId: Templates.DataId;
+    templateDataId: Templates.DataId;
   },
 ): Templates.DataItem | null =>
-  selectTemplate(state, props)?.schema[props.templateSchemaItemId] ?? null;
+  selectTemplate(state, props)?.schema[props.templateDataId] ?? null;
 
 export default templatesSlice;

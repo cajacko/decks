@@ -21,10 +21,10 @@ export default function EditCardSideForm(
 
   return (
     <FieldSet title={props.title}>
-      {schemaOrder.map((templateSchemaItemId) => (
+      {schemaOrder.map((templateDataId) => (
         <TemplateSchemaItem
-          key={templateSchemaItemId}
-          templateSchemaItemId={templateSchemaItemId}
+          key={templateDataId}
+          templateDataId={templateDataId}
           templateId={props.templateId}
           side={props.side}
         />

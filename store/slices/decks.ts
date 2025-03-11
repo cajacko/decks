@@ -57,6 +57,7 @@ function updateDeckTemplateMapping(
       );
 
       if (!dataItem) return;
+      if (!dataItem.fieldType) return;
 
       deck.dataSchema[dataId] = {
         id: dataId,
@@ -130,8 +131,13 @@ export const cardsSlice = createSlice({
           if (existingDataSchemaItem) {
             existingDataSchemaItem.defaultValidatedValue =
               dataItem.validatedValue;
-            existingDataSchemaItem.type = dataItem.fieldType;
+
+            if (dataItem.fieldType) {
+              existingDataSchemaItem.type = dataItem.fieldType;
+            }
           } else {
+            if (!dataItem.fieldType) return;
+
             const dataSchemaItem = {
               id: dataId,
               type: dataItem.fieldType,

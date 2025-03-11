@@ -4,6 +4,7 @@ import {
   CreateCardDataItemHelper,
 } from "@/store/combinedActions/types";
 import { EditCardState } from "./EditCard.types";
+import { Cards } from "@/store/types";
 
 /**
  * Given the EditCard context state, get the data required by the updateCard action
@@ -13,26 +14,34 @@ export default function getUpdateCardData(
 ): SetCardData {
   const items: CardDataItem[] = [];
 
-  const editingValues = contextState.data;
+  function processSide(side: Cards.Side) {
+    const dataByCardDataId = contextState.dataByCardDataId[side];
 
-  for (const key in editingValues) {
-    // Don't save all for performance and to ensure we keep the hasChanges logic up to date
-    if (contextState.hasChanges[key] !== true) continue;
+    for (const cardDataId in dataByCardDataId) {
+      const data = dataByCardDataId[cardDataId];
 
-    const editingValue = editingValues[key];
+      if (!data) continue;
 
-    if (!editingValue) continue;
+      // Don't save all for performance and to ensure we keep the hasChanges logic up to date
+      if (
+        data.resolvedValidatedValue?.value === data.savedValidatedValue?.value
+      )
+        continue;
 
-    items.push({
-      cardDataId: editingValue.cardDataItemId,
-      validatedValue: editingValue.editValidatedValue,
-      fieldType: editingValue.fieldType,
-      // Best we can get without going cra cra
-    } satisfies CreateCardDataItemHelper as CardDataItem);
+      items.push({
+        cardDataId: data.dataId,
+        validatedValue: data.resolvedValidatedValue,
+        fieldType: data.fieldType,
+        // Best we can get without going cra cra
+      } satisfies CreateCardDataItemHelper as CardDataItem);
+    }
   }
+
+  processSide("front");
+  processSide("back");
 
   return {
     items,
-    templateMapping: contextState.templateMapping,
+    templateMapping: contextState.dataIdByTemplateDataId,
   };
 }

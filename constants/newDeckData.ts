@@ -1,4 +1,4 @@
-import { Cards, Templates } from "@/store/types";
+import { Cards } from "@/store/types";
 import { Target } from "@/utils/cardTarget";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";

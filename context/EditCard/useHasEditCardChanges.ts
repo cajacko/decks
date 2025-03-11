@@ -1,36 +1,27 @@
-import React from "react";
 import { useContextSelector } from "./useContextSelector";
 import { Cards } from "@/store/types";
 import useIsContextTarget from "./useIsContextTarget";
 import { Target } from "@/utils/cardTarget";
-import { HasChangesMap } from "./EditCard.types";
-
-export function getHasChanges(props: HasChangesMap): boolean {
-  return Object.values(props).some((hasChanges) => !!hasChanges);
-}
 
 export function useDoesCardSideHaveChanges(
   side: Cards.Side,
   target?: Target,
 ): boolean | null {
-  const hasChangesMap = useContextSelector(
-    (context) => context?.state?.hasChanges,
+  const hasChanges = useContextSelector(
+    (context) => context?.state?.hasChanges?.[side]?.any,
   );
 
-  const hasChanges = React.useMemo(
-    (): boolean | null => (hasChangesMap ? getHasChanges(hasChangesMap) : null),
-    [hasChangesMap],
-  );
-
-  return hasChanges;
+  return hasChanges === undefined ? null : hasChanges;
 }
 
 export default function useHasEditCardChanges(target?: Target): boolean | null {
   const isContextTarget = useIsContextTarget(target);
-  const frontHasChanges = useDoesCardSideHaveChanges("front", target);
-  const backHasChanges = useDoesCardSideHaveChanges("back", target);
+
+  const hasChanges = useContextSelector(
+    (context) => context?.state?.hasChanges?.either,
+  );
 
   if (!isContextTarget) return null;
 
-  return frontHasChanges || backHasChanges;
+  return hasChanges === undefined ? null : hasChanges;
 }

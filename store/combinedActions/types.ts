@@ -4,7 +4,7 @@ export type CreateCardDataItemHelper<
   Type extends Templates.FieldType = Templates.FieldType,
 > = {
   cardDataId: Cards.DataId;
-  fieldType: Type;
+  fieldType: Type | null;
   validatedValue: Templates.ValidatedValue<Type> | undefined;
 };
 
