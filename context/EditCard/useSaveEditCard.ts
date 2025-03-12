@@ -17,7 +17,12 @@ import debugLog from "./debugLog";
  * Must be used within the EditCard context and with a valid target. Otherwise why is this component
  * rendering?
  */
-export default function useSaveEditCard(autoSave = false) {
+export default function useSaveEditCard(options?: {
+  autoSave?: boolean;
+  onAutoSave?: () => void;
+}) {
+  const autoSave = !!options?.autoSave;
+  const onAutoSave = options?.onAutoSave;
   const dispatch = useAppDispatch();
   const onCreateCard = useContextSelector((context) => context?.onCreateCard);
   const setTarget = useRequiredContextSelector((context) => context?.setTarget);
@@ -32,6 +37,8 @@ export default function useSaveEditCard(autoSave = false) {
 
   const save = React.useCallback((): null => {
     const contextState = getContextState();
+
+    onAutoSave?.();
 
     switch (contextState.target.type) {
       case "card": {
@@ -84,7 +91,7 @@ export default function useSaveEditCard(autoSave = false) {
           contextState.target,
         );
     }
-  }, [getContextState, dispatch, onCreateCard, setTarget]);
+  }, [getContextState, dispatch, onCreateCard, setTarget, onAutoSave]);
 
   useAutoSave({
     save,
