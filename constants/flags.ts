@@ -33,15 +33,16 @@ export const flagRelationships: FlagRelationships = {
 };
 
 // The default value is the first defined option
-export const defaultFlags: UserSettings.FlagMap = Object.entries(
-  UserSettings.flagMap,
-).reduce(
-  (acc, [key, [defaultValue]]) => ({
-    ...acc,
-    [key]: defaultValue,
-  }),
-  {} as UserSettings.FlagMap,
-);
+export const defaultFlags: UserSettings.FlagMap = {
+  ...Object.entries(UserSettings.flagMap).reduce(
+    (acc, [key, [defaultValue]]) => ({
+      ...acc,
+      [key]: defaultValue,
+    }),
+    {} as UserSettings.FlagMap,
+  ),
+  DEV_MODE: process.env.NODE_ENV === "development" ? true : false,
+};
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,

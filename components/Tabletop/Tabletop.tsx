@@ -42,21 +42,31 @@ export default function Tabletop({
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
+      // Having the fade in here makes doubly sure we're showing the content. We had a bug where it
+      // wasn't showing the content, but this fixed it.
+      opacity.value = withTiming(1, {
+        // We want this really fast as otherwise in native you see lots of see-through bits
+        duration: 200,
+      });
+
       // Prevents us updating when the keyboard comes into view, which we don't want. Maybe there's
       // a better solution for this, that then allows window changes as well?
-      if (hasLayout.current) return;
+      if (hasLayout.current) {
+        return;
+      }
 
       hasLayout.current = true;
 
       const { width, height } = event.nativeEvent.layout;
 
-      opacity.value = withTiming(1, {
-        duration: 200,
-      });
-
       setSize({ width, height });
     },
     [opacity],
+  );
+
+  const contentStyle = React.useMemo(
+    () => [styles.content, animatedStyle],
+    [animatedStyle],
   );
 
   return (
@@ -67,8 +77,8 @@ export default function Tabletop({
       deckId={deckId}
     >
       <TabletopToolbar tabletopId={tabletopId} deckId={deckId} />
-      <Animated.View style={styles.content} onLayout={handleLayout}>
-        {!skeleton && <StackList style={animatedStyle} skeleton={skeleton} />}
+      <Animated.View style={contentStyle} onLayout={handleLayout}>
+        {!skeleton && <StackList skeleton={skeleton} />}
       </Animated.View>
     </DeckTabletopProvider>
   );

@@ -11,12 +11,14 @@ export default function useEnsureTabletop(props: { tabletopId: string }): {
 } {
   const dispatch = useAppDispatch();
   const hasTabletop = useAppSelector((state) => !!selectTabletop(state, props));
+
   const builtInTabletop = useBuiltInStateSelector((state) =>
     selectTabletop(state, props),
   );
 
   React.useEffect(() => {
     if (hasTabletop) return;
+    // Probably a 404
     if (!builtInTabletop) return;
 
     dispatch(
