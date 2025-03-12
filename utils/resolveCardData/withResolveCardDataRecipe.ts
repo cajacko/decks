@@ -4,6 +4,30 @@ import { Cards, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
 import { getFlag } from "@/store/combinedSelectors/flags";
 
+const originPriority: Types.ValueOrigin[] = [
+  "editing",
+  "card",
+  "deck-defaults",
+  "template",
+  "template-map",
+];
+
+const canSetAsFallbackMap: Record<Types.ValueOrigin, boolean> = {
+  "deck-defaults": true,
+  template: true,
+  "template-map": true,
+  card: false,
+  editing: false,
+};
+
+const canSetAsSavedMap: Record<Types.ValueOrigin, boolean> = {
+  card: true,
+  "deck-defaults": true,
+  template: false,
+  "template-map": false,
+  editing: false,
+};
+
 function addItemRecipe(
   draft: WritableDraft<Types.ResolvedCardData>,
   props: {
@@ -14,35 +38,91 @@ function addItemRecipe(
     side: Cards.Side | null;
   },
 ) {
+  const canSetAsFallback =
+    canSetAsFallbackMap[props.origin] && draft.targetOrigin !== props.origin;
+
+  const canSetAsSaved =
+    canSetAsSavedMap[props.origin] && draft.targetOrigin === props.origin;
+
+  const higherPriorities = originPriority.slice(
+    0,
+    originPriority.indexOf(props.origin),
+  );
+
   function addSideItem(side: Cards.Side) {
     const existingItem = draft.dataByCardDataId[side][props.cardDataId];
 
-    // FIXME: Draftify this
+    const item: Types.CreateDataItemHelper = existingItem ?? {
+      dataId: props.cardDataId,
+      fieldType: props.fieldType,
+      resolvedValidatedValue: undefined,
+      fallbackValidatedValue: undefined,
+      savedValidatedValue: undefined,
+    };
+
+    function setValue<
+      Prop extends keyof Pick<
+        Types.CreateDataItemHelper,
+        | "fallbackValidatedValue"
+        | "resolvedValidatedValue"
+        | "savedValidatedValue"
+      >,
+    >(prop: Prop, validatedValue: Types.ValidatedValue | undefined) {
+      const existingValidatedValue = item[prop];
+
+      // An existing value exists with a higher priority, so don't overwrite it
+      if (
+        existingValidatedValue?.origin &&
+        higherPriorities.includes(existingValidatedValue.origin)
+      ) {
+        return;
+      }
+
+      // New value or undefined so just set
+      if (!existingValidatedValue || validatedValue === undefined) {
+        item[prop] = validatedValue as Types.CreateDataItemHelper[Prop];
+
+        return;
+      }
+
+      // Update the props that need it so we can maintain references
+      if (existingValidatedValue.origin !== validatedValue.origin) {
+        existingValidatedValue.origin = validatedValue.origin;
+      }
+
+      if (existingValidatedValue.type !== validatedValue.type) {
+        existingValidatedValue.type = validatedValue.type;
+      }
+
+      if (existingValidatedValue.value !== validatedValue.value) {
+        existingValidatedValue.value = validatedValue.value;
+      }
+    }
+
     const validatedValue = props.validatedValue && {
       ...props.validatedValue,
       origin: props.origin,
     };
 
-    let savedValidatedValue: Types.CreateDataItemHelper["savedValidatedValue"] =
-      existingItem?.savedValidatedValue;
-
-    if (savedValidatedValue === undefined && props.origin !== "editing") {
-      savedValidatedValue = props.validatedValue && {
-        ...props.validatedValue,
-        origin: props.origin,
-      };
+    if (canSetAsFallback) {
+      setValue("fallbackValidatedValue", validatedValue);
     }
 
-    const newItem: Types.DataItem = {
-      dataId: props.cardDataId,
-      fieldType: existingItem?.fieldType || props.fieldType,
-      resolvedValidatedValue: validatedValue,
-      editingValidatedValue:
-        props.origin === "editing" ? props.validatedValue : undefined,
-      savedValidatedValue,
-    } satisfies Types.CreateDataItemHelper as Types.DataItem;
+    if (canSetAsSaved) {
+      setValue("savedValidatedValue", validatedValue);
+    }
 
-    draft.dataByCardDataId[side][props.cardDataId] = newItem;
+    setValue(
+      "resolvedValidatedValue",
+      // If we call this with undefined it means we want to use a fallback value if it exists
+      validatedValue ?? item.fallbackValidatedValue,
+    );
+
+    // Add the item if it's new, otherwise the updates will apply to the draft so don't need to do
+    // anything
+    if (!existingItem) {
+      draft.dataByCardDataId[side][props.cardDataId] = item as Types.DataItem;
+    }
   }
 
   // Only add side specific data if it's not a shared value
@@ -119,6 +199,10 @@ export default function withResolveCardDataRecipe(
   props: Types.ResolveCardDataProps | null,
 ) {
   return (draft: WritableDraft<Types.ResolvedCardData>): void => {
+    if (props?.targetOrigin !== draft.targetOrigin) {
+      draft.targetOrigin = props?.targetOrigin ?? null;
+    }
+
     if (getFlag("DEBUG_RESOLVE_CARD_DATA")) {
       draft._debugCount = draft._debugCount + 1;
     }
@@ -134,27 +218,30 @@ export default function withResolveCardDataRecipe(
       },
     };
 
-    function addItem(props: {
+    function addItem(addItemProps: {
       cardDataId: Cards.Id;
       validatedValue: Templates.ValidatedValue | undefined;
       fieldType: Templates.FieldType | null;
       origin: Types.ValueOrigin;
       side: Cards.Side | null;
     }) {
-      safeIds.cardDataIds[props.cardDataId] = true;
+      safeIds.cardDataIds[addItemProps.cardDataId] = true;
 
-      addItemRecipe(draft, props);
+      addItemRecipe(draft, addItemProps);
     }
 
-    function addTemplateMapping(props: {
+    function addTemplateMapping(addTemplateMappingProps: {
       side: Cards.Side;
       templateDataId: Templates.DataId;
       cardDataId: Cards.DataId;
     }) {
-      safeIds.cardDataIds[props.cardDataId] = true;
-      safeIds.templateDataIds[props.side][props.templateDataId] = true;
+      safeIds.cardDataIds[addTemplateMappingProps.cardDataId] = true;
 
-      addTemplateMappingRecipe(draft, props);
+      safeIds.templateDataIds[addTemplateMappingProps.side][
+        addTemplateMappingProps.templateDataId
+      ] = true;
+
+      addTemplateMappingRecipe(draft, addTemplateMappingProps);
     }
 
     if (props?.cardData) {
@@ -177,7 +264,7 @@ export default function withResolveCardDataRecipe(
           cardDataId,
           validatedValue: dataSchemaItem?.defaultValidatedValue,
           fieldType: dataSchemaItem?.type ?? null,
-          origin: "deck",
+          origin: "deck-defaults",
           side: null,
         });
       }

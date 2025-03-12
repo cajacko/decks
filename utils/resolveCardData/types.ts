@@ -3,10 +3,19 @@ import { Cards, Decks, Templates } from "@/store/types";
 
 export type { TemplateValuesMap };
 
-type SavedValueOrigin = "card" | "deck" | "template" | "template-map";
-type EditingValueOrigin = "editing";
+export type TargetOrigin = "card" | "deck-defaults";
 
-export type ValueOrigin = SavedValueOrigin | EditingValueOrigin;
+export type FallbackValueOrigin =
+  | Exclude<TargetOrigin, "card">
+  | "template"
+  | "template-map";
+
+export type EditingValueOrigin = "editing";
+
+export type ValueOrigin =
+  | FallbackValueOrigin
+  | EditingValueOrigin
+  | TargetOrigin;
 
 export type ValidatedValue<
   Origin extends ValueOrigin = ValueOrigin,
@@ -26,9 +35,15 @@ export type EditingData = Record<
 >;
 
 export interface ResolveCardDataProps {
+  /**
+   * The level at which we're setting data. This helps us figure out what level of fallback to use
+   */
+  targetOrigin: TargetOrigin | null;
   deckDataSchema: Decks.DataSchema | null;
   cardData: Cards.Data | null;
   templates: Record<Cards.Side, TemplateSide | null> | null;
+  // If this changes we reset the state
+  resetId?: string;
 }
 
 export interface UpdatedDataItem {
@@ -42,7 +57,10 @@ export type UpdateEditingDataItem = (
 ) => ResolvedCardData;
 
 export interface WithResolveCardDataReturn {
-  updateProps: (props: ResolveCardDataProps | null) => ResolvedCardData;
+  updateProps: (
+    props: ResolveCardDataProps | null,
+    options?: { reset?: boolean },
+  ) => ResolvedCardData;
   updateEditingDataItem: UpdateEditingDataItem;
   getResolvedCardData: () => ResolvedCardData;
 }
@@ -56,21 +74,32 @@ export type CreateDataItemHelper<
 > = {
   dataId: Cards.DataId;
   fieldType: Type | null;
+  /**
+   * The value we show the user and on the card (this could be a value we are editing)
+   */
   resolvedValidatedValue: undefined | ValidatedValue<ValueOrigin, Type>;
-  editingValidatedValue: undefined | Templates.ValidatedValue<Type>;
-  savedValidatedValue: undefined | ValidatedValue<SavedValueOrigin, Type>;
+  // /**
+  //  * The value we are currently editing (if any)
+  //  */
+  // editingValidatedValue: undefined | Templates.ValidatedValue<Type>;
+  /**
+   * The value saved on this target
+   */
+  savedValidatedValue: undefined | ValidatedValue<TargetOrigin, Type>;
+  /**
+   * The value we would fallback to if there's no values saved on this target
+   * Remember a target could be something like the card or the deck default.
+   * We need to know this for when a user indicates they want to use the fallback value
+   */
+  fallbackValidatedValue: undefined | ValidatedValue<FallbackValueOrigin, Type>;
 };
 
 export type DataItem<Type extends Templates.FieldType = Templates.FieldType> = {
   [K in Templates.FieldType]: CreateDataItemHelper<K>;
 }[Type];
 
-type TemplateHasChanges = {
-  any: boolean;
-  byTemplateDataId: Record<Templates.DataId, boolean | undefined>;
-};
-
 export interface ResolvedCardData {
+  targetOrigin: TargetOrigin | null;
   /**
    * For the CardTemplate component to use and display values on a card
    */
@@ -83,10 +112,5 @@ export interface ResolvedCardData {
     Cards.Side,
     Record<Templates.DataId, Cards.DataId | undefined>
   >;
-  hasChanges: null | {
-    either: boolean;
-    front: TemplateHasChanges | null;
-    back: TemplateHasChanges | null;
-  };
   _debugCount: number;
 }

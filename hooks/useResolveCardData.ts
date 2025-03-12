@@ -10,7 +10,7 @@ import {
 export default function useResolveCardData(
   props: ResolveCardDataProps | null,
 ): WithResolveCardDataReturn & { resolvedCardData: ResolvedCardData } {
-  const { cardData, deckDataSchema, templates } = props ?? {};
+  const { cardData, deckDataSchema, templates, targetOrigin } = props ?? {};
 
   const [
     {
@@ -56,11 +56,12 @@ export default function useResolveCardData(
     }
 
     updateProps({
+      targetOrigin: targetOrigin ?? null,
       cardData: cardData ?? null,
       deckDataSchema: deckDataSchema ?? null,
       templates: templates ?? null,
     });
-  }, [cardData, deckDataSchema, templates, updateProps]);
+  }, [cardData, deckDataSchema, templates, updateProps, targetOrigin]);
 
   return {
     getResolvedCardData,

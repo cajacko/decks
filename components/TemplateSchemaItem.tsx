@@ -32,7 +32,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   const fieldLabel: string = schemaItem.name;
   const fieldType = schemaItem.type;
 
-  const { onChange, validatedValue, placeholder, hasChanges, usingDefault } =
+  const { onChange, validatedValue, placeholder, hasChanges } =
     useEditCardTemplateSchemaItem(props);
 
   const onChangeText = React.useCallback(
@@ -113,8 +113,9 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
 
   let label = fieldLabel;
 
-  if (showMoreInfo && usingDefault) {
-    label = `${label} ${text["card.using_defaults"]} (${usingDefault})`;
+  // TODO: Do not show to end users
+  if (showMoreInfo) {
+    label = `${label} (${validatedValue?.origin ?? "N/A"})`;
   }
 
   return (

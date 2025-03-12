@@ -1,7 +1,11 @@
 import React from "react";
 import { Cards, Templates } from "@/store/types";
 import { Target } from "@/utils/cardTarget";
-import { ResolvedCardData, UpdatedDataItem } from "@/utils/resolveCardData";
+import {
+  ResolvedCardData,
+  UpdatedDataItem,
+  ValidatedValue,
+} from "@/utils/resolveCardData";
 
 export type OnCreateCard = (cardId: string) => void;
 export type OnChangeTarget = (target: Target | null) => void;
@@ -25,6 +29,7 @@ export type EditCardProviderProps = {
 export interface EditCardState extends ResolvedCardData {
   target: Target;
   getContextState: () => EditCardState;
+  getHasChanges: () => boolean;
 }
 
 export type SetTarget = React.Dispatch<React.SetStateAction<Target | null>>;
@@ -36,17 +41,12 @@ export interface EditCardContext {
   setSide: SetSide;
   side: Cards.Side;
   setTarget: SetTarget;
-
   updateEditingDataItem: (props: UpdatedDataItem) => void;
 }
 
 export type UseEditCardTemplateSchemaItemReturn = {
   onChange: (validatedValue: Templates.ValidatedValue | undefined) => void;
-  validatedValue: Templates.ValidatedValue | undefined;
+  validatedValue: ValidatedValue | undefined;
   placeholder?: string;
   hasChanges: boolean;
-  /**
-   * If the validatedValue is a default value, what kind is it?
-   */
-  usingDefault: DefaultValueLocation | null;
 };

@@ -106,6 +106,9 @@ export const selectTemplateSchemaOrder = createCachedSelector(
 // };
 
 export const selectResolveCardDataProps = createCachedSelector(
+  (_: RootState, props: DeckOrCardOptionalSideProps) => props.id,
+  (_: RootState, props: DeckOrCardOptionalSideProps) =>
+    props.type === "deck-defaults" ? "deck-defaults" : "card",
   (state: RootState, props: DeckOrCardOptionalSideProps) =>
     getIsCardId(props) ? selectCard(state, { cardId: props.id })?.data : null,
   (state: RootState, props: DeckOrCardOptionalSideProps) =>
@@ -129,6 +132,8 @@ export const selectResolveCardDataProps = createCachedSelector(
       : selectCardSideTemplate(state, { ...props, side: "back" })
           ?.dataTemplateMapping,
   (
+    resetId,
+    targetOrigin,
     cardData,
     deckDataSchema,
     frontSchema,
@@ -137,6 +142,8 @@ export const selectResolveCardDataProps = createCachedSelector(
     backDataTemplateMapping,
   ): ResolveCardDataProps => {
     return {
+      resetId,
+      targetOrigin,
       cardData: cardData ?? null,
       deckDataSchema: deckDataSchema ?? null,
       templates: {

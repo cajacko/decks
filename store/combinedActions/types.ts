@@ -5,6 +5,11 @@ export type CreateCardDataItemHelper<
 > = {
   cardDataId: Cards.DataId;
   fieldType: Type | null;
+  /**
+   * undefined - Delete the value, we want to use the defaults
+   * ValidatedValue - A new value to set (which includes a potential null type for when the user
+   * wants no value to be used and no fallback)
+   */
   validatedValue: Templates.ValidatedValue<Type> | undefined;
 };
 

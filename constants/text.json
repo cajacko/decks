@@ -6,7 +6,6 @@
   "card.delete.title": "Delete Card",
   "card.templates.back.title": "Back Side",
   "card.templates.front.title": "Front Side",
-  "card.using_defaults": "(Using Defaults)",
   "deck.actions.default": "Defaults",
   "deck.actions.edit": "Edit",
   "deck.actions.play": "Play",

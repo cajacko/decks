@@ -6,6 +6,7 @@ import {
 } from "./useContextSelector";
 import * as Types from "./EditCard.types";
 import createCardDataSchemaId from "@/store/utils/createCardDataSchemaId";
+import { getHasChanges } from "./getUpdateCardData";
 
 export default function useEditCardTemplateSchemaItem(props: {
   side: Cards.Side;
@@ -24,17 +25,27 @@ export default function useEditCardTemplateSchemaItem(props: {
       templateDataItemId: props.templateDataId,
     });
 
-  const editingItem = useContextSelector((context) =>
+  const resolvedValidatedValue = useContextSelector((context) =>
     cardDataItemId
       ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+          ?.resolvedValidatedValue
       : undefined,
   );
 
-  const hasChanges = useContextSelector(
-    (context) =>
-      context?.state?.hasChanges?.[props.side]?.byTemplateDataId?.[
-        props.templateDataId
-      ],
+  const savedValidatedValue = useContextSelector((context) =>
+    cardDataItemId
+      ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+          ?.savedValidatedValue
+      : undefined,
+  );
+
+  const hasChanges = React.useMemo(
+    () =>
+      getHasChanges({
+        resolvedValidatedValue,
+        savedValidatedValue,
+      }),
+    [resolvedValidatedValue, savedValidatedValue],
   );
 
   const updateEditingDataItem = useRequiredContextSelector(
@@ -53,31 +64,9 @@ export default function useEditCardTemplateSchemaItem(props: {
     [updateEditingDataItem, props.side, props.templateDataId],
   );
 
-  const validatedValue = editingItem?.resolvedValidatedValue;
-
-  let usingDefault: Types.DefaultValueLocation | null;
-
-  switch (validatedValue?.origin) {
-    case undefined:
-    case "card":
-    case "editing":
-      usingDefault = null;
-      break;
-    case "deck":
-      usingDefault = "deck";
-      break;
-    case "template":
-      usingDefault = "template";
-      break;
-    case "template-map":
-      usingDefault = "template-map";
-      break;
-  }
-
   return {
     onChange,
-    validatedValue,
+    validatedValue: resolvedValidatedValue,
     hasChanges: !!hasChanges,
-    usingDefault,
   };
 }

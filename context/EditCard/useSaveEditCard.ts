@@ -26,6 +26,10 @@ export default function useSaveEditCard(autoSave = false) {
     (context) => context?.state?.getContextState,
   );
 
+  const getHasChanges = useRequiredContextSelector(
+    (context) => context?.state?.getHasChanges,
+  );
+
   const save = React.useCallback((): null => {
     const contextState = getContextState();
 
@@ -85,10 +89,7 @@ export default function useSaveEditCard(autoSave = false) {
   useAutoSave({
     save,
     autoSave,
-    hasChanges: React.useCallback(
-      () => getContextState().hasChanges?.either === true,
-      [getContextState],
-    ),
+    hasChanges: getHasChanges,
   });
 
   return {

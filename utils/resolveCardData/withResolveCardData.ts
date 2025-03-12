@@ -5,12 +5,12 @@ import withResolveCardDataRecipe, {
 } from "./withResolveCardDataRecipe";
 import resolveCardData from "./resolveCardData";
 import debugLog from "./debugLog";
-import { cloneDeep } from "lodash";
 
 const withResolveCardData: Types.WithResolveCardData = (initProps) => {
+  let resetId = initProps?.resetId;
   let resolvedCardData: Types.ResolvedCardData = resolveCardData(initProps);
 
-  debugLog("withResolveCardData ini", { initProps, resolvedCardData });
+  debugLog("withResolveCardData init", { initProps, resolvedCardData });
 
   return {
     getResolvedCardData: () => resolvedCardData,
@@ -24,19 +24,25 @@ const withResolveCardData: Types.WithResolveCardData = (initProps) => {
 
       resolvedCardData = newResolvedCardData;
 
-      return cloneDeep(newResolvedCardData);
+      return newResolvedCardData;
     },
-    updateProps: (props) => {
-      const newResolvedCardData = produce(
-        resolvedCardData,
-        withResolveCardDataRecipe(props),
-      );
+    updateProps: (props, options) => {
+      if (!!options?.reset || resetId !== props?.resetId) {
+        resolvedCardData = resolveCardData(props);
+      } else {
+        const newResolvedCardData = produce(
+          resolvedCardData,
+          withResolveCardDataRecipe(props),
+        );
 
-      debugLog("updateProps", { props, newResolvedCardData });
+        resolvedCardData = newResolvedCardData;
+      }
 
-      resolvedCardData = newResolvedCardData;
+      resetId = props?.resetId;
 
-      return cloneDeep(newResolvedCardData);
+      debugLog("updateProps", resolvedCardData);
+
+      return resolvedCardData;
     },
   };
 };
