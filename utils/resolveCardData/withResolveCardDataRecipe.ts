@@ -129,16 +129,6 @@ function addItemRecipe(
     }
   }
 
-  // Only add side specific data if it's not a shared value
-  if (props.side) {
-    switch (props.origin) {
-      case "template":
-      case "template-map":
-        addSideItem(props.side);
-        return;
-    }
-  }
-
   addSideItem("front");
   addSideItem("back");
 }
