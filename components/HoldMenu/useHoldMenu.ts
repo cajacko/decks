@@ -9,8 +9,6 @@ import { MenuItem, HoldMenuProps } from "./types";
 import useFlag from "@/hooks/useFlag";
 import usePointer from "@/hooks/usePointer";
 
-export const DEV_INDICATOR = false;
-
 // NOTE: 50ms is the max we ever want to wait before showing the menu
 const swipeHoldThresholds: {
   distance:
@@ -62,16 +60,22 @@ const maxThresholdTimeout = swipeHoldThresholds.reduce(
   0,
 );
 
+const fadeInDuration = 100;
+const fadeOutDuration = 200;
+
 export default function useHoldMenu<I extends MenuItem>({
   touchBuffer = 20,
   ...props
 }: HoldMenuProps<I>) {
-  let holdMenuBehaviour: "always-visible" | "hold" = useFlag(
+  const devIndicator = useFlag("HOLD_MENU_DEV_INDICATOR") === "enabled";
+  const holdMenuBehaviour: "always-visible" | "hold" = useFlag(
     "HOLD_MENU_BEHAVIOUR",
   );
   const setPanResponderBehaviour = useFlag("HOLD_MENU_PAN_RESPONDER_BEHAVIOUR");
   const menuRef = React.useRef<View>(null);
-  const opacity = React.useRef(new Animated.Value(1)).current;
+  const opacity = React.useRef(
+    new Animated.Value(holdMenuBehaviour === "always-visible" ? 1 : 0),
+  ).current;
   const hoverIndicatorOpacity = React.useRef(new Animated.Value(0)).current;
   const hoverIndicatorX = React.useRef(new Animated.Value(0)).current;
   const hoverIndicatorY = React.useRef(new Animated.Value(0)).current;
@@ -94,11 +98,6 @@ export default function useHoldMenu<I extends MenuItem>({
 
   let highlightedItem = highlightedItemState;
 
-  if (!menuPosition) {
-    holdMenuBehaviour = "always-visible";
-    highlightedItem = null;
-  }
-
   const updateMenuPosition = React.useCallback(() => {
     menuRef.current?.measure((x, y, width, height, pageX, pageY) => {
       setMenuPosition({ pageX, pageY });
@@ -113,7 +112,7 @@ export default function useHoldMenu<I extends MenuItem>({
     const touchX = gestureState.moveX - menuPositionRef.current.pageX;
     const touchY = gestureState.moveY - menuPositionRef.current.pageY;
 
-    if (DEV_INDICATOR) {
+    if (devIndicator) {
       // Move the hover indicator to the touch position
       Animated.spring(hoverIndicatorX, {
         toValue: touchX,
@@ -148,31 +147,29 @@ export default function useHoldMenu<I extends MenuItem>({
   }>(null);
 
   const renderMenuRef = React.useRef(renderMenu);
-
   renderMenuRef.current = renderMenu;
 
   function showHoldMenu() {
     if (renderMenuRef.current) return;
-
-    renderMenuRef.current = true;
 
     // This accounts for scroll views and stuff.
     updateMenuPosition();
     setHighlightedItem(null);
     opacity.setValue(0);
     setRenderMenu(true);
+    renderMenuRef.current = true;
 
     Animated.timing(opacity, {
       toValue: 1,
-      duration: 100,
+      duration: fadeInDuration,
       useNativeDriver: true,
     }).start();
 
-    if (DEV_INDICATOR) {
+    if (devIndicator) {
       // Show hover indicator
       Animated.timing(hoverIndicatorOpacity, {
         toValue: 1,
-        duration: 100,
+        duration: fadeInDuration,
         useNativeDriver: true,
       }).start();
     }
@@ -194,18 +191,18 @@ export default function useHoldMenu<I extends MenuItem>({
 
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 200,
+      duration: fadeOutDuration,
       useNativeDriver: true,
     }).start(() => {
       renderMenuRef.current = false;
       setRenderMenu(false);
     });
 
-    if (DEV_INDICATOR) {
+    if (devIndicator) {
       // Hide hover indicator
       Animated.timing(hoverIndicatorOpacity, {
         toValue: 0,
-        duration: 200,
+        duration: fadeOutDuration,
         useNativeDriver: true,
       }).start();
     }
@@ -342,7 +339,13 @@ export default function useHoldMenu<I extends MenuItem>({
 
   const onPointerEnter = React.useCallback(() => {
     setRenderMenu(true);
-  }, []);
+
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: fadeInDuration,
+      useNativeDriver: true,
+    }).start();
+  }, [opacity]);
 
   const { getIsPointerOverRef } = usePointer();
 
@@ -353,8 +356,14 @@ export default function useHoldMenu<I extends MenuItem>({
   }, [menuRef, onPointerEnter, getIsPointerOverRef]);
 
   const onPointerLeave = React.useCallback(() => {
-    setRenderMenu(false);
-  }, []);
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: fadeOutDuration,
+      useNativeDriver: true,
+    }).start(() => {
+      setRenderMenu(false);
+    });
+  }, [opacity]);
 
   return {
     onPointerEnter:
@@ -363,11 +372,11 @@ export default function useHoldMenu<I extends MenuItem>({
       holdMenuBehaviour === "always-visible" ? undefined : onPointerLeave,
     panResponder: holdMenuBehaviour === "hold" ? panResponder : undefined,
     menuRef,
-    renderMenu: holdMenuBehaviour === "always-visible" || renderMenu,
     opacity,
     highlightedItem,
     holdMenuBehaviour,
     touchBuffer,
+    devIndicator,
     devIndicatorStyle: {
       opacity: hoverIndicatorOpacity,
       transform: [

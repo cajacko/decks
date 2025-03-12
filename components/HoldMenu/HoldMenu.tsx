@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Animated } from "react-native";
 import { MenuItem, HoldMenuProps } from "./types";
-import useHoldMenu, { DEV_INDICATOR } from "./useHoldMenu";
+import useHoldMenu from "./useHoldMenu";
 
 export default function HoldMenu<I extends MenuItem>(
   props: HoldMenuProps<I>,
@@ -17,51 +17,45 @@ export default function HoldMenu<I extends MenuItem>(
       onPointerLeave={state.onPointerLeave}
       onPointerMove={state.onPointerEnter}
     >
-      {DEV_INDICATOR && (
-        <Animated.View
-          style={StyleSheet.flatten([
-            styles.devIndicator,
-            state.devIndicatorStyle,
-          ])}
-        />
+      {state.devIndicator && (
+        <Animated.View style={[styles.devIndicator, state.devIndicatorStyle]} />
       )}
-      {state.renderMenu &&
-        props.menuItems.map((menuItem) => (
-          <Animated.View
-            key={menuItem.key}
-            style={{
-              position: "absolute",
-              top: menuItem.top,
-              left: menuItem.left,
-              height: menuItem.height,
-              width: menuItem.width,
-              opacity: state.opacity,
-            }}
-          >
-            {DEV_INDICATOR && (
-              <View
-                style={StyleSheet.flatten([
-                  styles.bufferBox,
-                  {
-                    backgroundColor:
-                      menuItem.key === state.highlightedItem?.key
-                        ? "yellow"
-                        : "green",
-                    top: -(menuItem.touchBuffer ?? state.touchBuffer),
-                    left: -(menuItem.touchBuffer ?? state.touchBuffer),
-                    right: -(menuItem.touchBuffer ?? state.touchBuffer),
-                    bottom: -(menuItem.touchBuffer ?? state.touchBuffer),
-                  },
-                ])}
-              />
-            )}
-            {props.renderItem({
-              ...menuItem,
-              highlight: menuItem.key === state.highlightedItem?.key,
-              holdMenuBehaviour: state.holdMenuBehaviour,
-            })}
-          </Animated.View>
-        ))}
+      {props.menuItems.map((menuItem) => (
+        <Animated.View
+          key={menuItem.key}
+          style={{
+            position: "absolute",
+            top: menuItem.top,
+            left: menuItem.left,
+            height: menuItem.height,
+            width: menuItem.width,
+            opacity: state.opacity,
+          }}
+        >
+          {state.devIndicator && (
+            <View
+              style={StyleSheet.flatten([
+                styles.bufferBox,
+                {
+                  backgroundColor:
+                    menuItem.key === state.highlightedItem?.key
+                      ? "yellow"
+                      : "green",
+                  top: -(menuItem.touchBuffer ?? state.touchBuffer),
+                  left: -(menuItem.touchBuffer ?? state.touchBuffer),
+                  right: -(menuItem.touchBuffer ?? state.touchBuffer),
+                  bottom: -(menuItem.touchBuffer ?? state.touchBuffer),
+                },
+              ])}
+            />
+          )}
+          {props.renderItem({
+            ...menuItem,
+            highlight: menuItem.key === state.highlightedItem?.key,
+            holdMenuBehaviour: state.holdMenuBehaviour,
+          })}
+        </Animated.View>
+      ))}
     </View>
   );
 }
@@ -73,6 +67,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    cursor: "pointer",
   },
   devIndicator: {
     height: 20,

@@ -11,6 +11,7 @@ export const flagMap = {
   // Dev flags
   HOLD_MENU_BEHAVIOUR: ["hold", "always-visible"],
   HOLD_MENU_PAN_RESPONDER_BEHAVIOUR: ["decide-on-action", "always-set"],
+  HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],
   BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],
   BOTTOM_DRAWER_DRAG: ["enabled", "disabled"],
   CARD_ACTIONS_ALWAYS_VISIBLE: [false, true],
