@@ -7,9 +7,10 @@
 export const flagMap = {
   // User control flags go here
   PERFORMANCE_MODE: ["disabled", "enabled"],
-  HOLD_MENU_BEHAVIOUR: ["hold", "always-visible"],
 
   // Dev flags
+  HOLD_MENU_BEHAVIOUR: ["hold", "always-visible"],
+  HOLD_MENU_PAN_RESPONDER_BEHAVIOUR: ["decide-on-action", "always-set"],
   BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],
   BOTTOM_DRAWER_DRAG: ["enabled", "disabled"],
   CARD_ACTIONS_ALWAYS_VISIBLE: [false, true],

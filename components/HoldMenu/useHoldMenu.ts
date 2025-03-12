@@ -69,6 +69,7 @@ export default function useHoldMenu<I extends MenuItem>({
   let holdMenuBehaviour: "always-visible" | "hold" = useFlag(
     "HOLD_MENU_BEHAVIOUR",
   );
+  const setPanResponderBehaviour = useFlag("HOLD_MENU_PAN_RESPONDER_BEHAVIOUR");
   const menuRef = React.useRef<View>(null);
   const opacity = React.useRef(new Animated.Value(1)).current;
   const hoverIndicatorOpacity = React.useRef(new Animated.Value(0)).current;
@@ -212,6 +213,8 @@ export default function useHoldMenu<I extends MenuItem>({
   const panResponder = React.useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => {
+        if (setPanResponderBehaviour === "always-set") return true;
+
         // If it's already visible grant access
         if (renderMenuRef.current) return true;
 

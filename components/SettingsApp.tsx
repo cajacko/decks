@@ -29,6 +29,8 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
     "system";
 
   const performanceModeEnabled = useFlag("PERFORMANCE_MODE") === "enabled";
+  const holdMenuAlwaysVisible =
+    useFlag("HOLD_MENU_BEHAVIOUR") === "always-visible";
 
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
@@ -43,6 +45,18 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         setUserFlag({
           key: "PERFORMANCE_MODE",
           value: value ? "enabled" : "disabled",
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const onChangeHoldMenu = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setUserFlag({
+          key: "HOLD_MENU_BEHAVIOUR",
+          value: value ? "always-visible" : "hold",
         }),
       );
     },
@@ -71,6 +85,11 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         FieldProps={{
           subLabel: text["settings.performance_mode.helper"],
         }}
+      />
+      <SwitchField
+        label={text["settings.hold_menu.always_show"]}
+        value={holdMenuAlwaysVisible}
+        onValueChange={onChangeHoldMenu}
       />
     </FieldSet>
   );
