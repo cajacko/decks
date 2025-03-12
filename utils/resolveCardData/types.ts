@@ -73,7 +73,7 @@ export type CreateDataItemHelper<
   Type extends Templates.FieldType = Templates.FieldType,
 > = {
   dataId: Cards.DataId;
-  fieldType: Type | null;
+  fieldType: Type | undefined;
   /**
    * The value we show the user and on the card (this could be a value we are editing)
    */

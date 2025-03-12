@@ -33,7 +33,7 @@ function addItemRecipe(
   props: {
     cardDataId: Cards.Id;
     validatedValue: Templates.ValidatedValue | undefined;
-    fieldType: Templates.FieldType | null;
+    fieldType: Templates.FieldType | undefined;
     origin: Types.ValueOrigin;
     side: Cards.Side | null;
   },
@@ -59,6 +59,10 @@ function addItemRecipe(
       fallbackValidatedValue: undefined,
       savedValidatedValue: undefined,
     };
+
+    if (item.fieldType === undefined && props.fieldType) {
+      item.fieldType = props.fieldType;
+    }
 
     function setValue<
       Prop extends keyof Pick<
@@ -183,7 +187,7 @@ export function withUpdateEditingDataItemRecipe(props: Types.UpdatedDataItem) {
     addItemRecipe(draft, {
       ...props,
       cardDataId,
-      fieldType: null,
+      fieldType: undefined,
       origin: "editing",
     });
 
@@ -221,7 +225,7 @@ export default function withResolveCardDataRecipe(
     function addItem(addItemProps: {
       cardDataId: Cards.Id;
       validatedValue: Templates.ValidatedValue | undefined;
-      fieldType: Templates.FieldType | null;
+      fieldType: Templates.FieldType | undefined;
       origin: Types.ValueOrigin;
       side: Cards.Side | null;
     }) {
@@ -249,7 +253,7 @@ export default function withResolveCardDataRecipe(
         addItem({
           cardDataId,
           validatedValue: props.cardData[cardDataId],
-          fieldType: null,
+          fieldType: undefined,
           origin: "card",
           side: null,
         });
@@ -263,7 +267,7 @@ export default function withResolveCardDataRecipe(
         addItem({
           cardDataId,
           validatedValue: dataSchemaItem?.defaultValidatedValue,
-          fieldType: dataSchemaItem?.type ?? null,
+          fieldType: dataSchemaItem?.type ?? undefined,
           origin: "deck-defaults",
           side: null,
         });
@@ -290,7 +294,7 @@ export default function withResolveCardDataRecipe(
           addItem({
             cardDataId,
             validatedValue: dataTemplateMapItem?.defaultValidatedValue,
-            fieldType: null,
+            fieldType: undefined,
             origin: "template-map",
             side,
           });
@@ -317,7 +321,7 @@ export default function withResolveCardDataRecipe(
           addItem({
             cardDataId,
             validatedValue: schemaItem?.defaultValidatedValue,
-            fieldType: schemaItem?.type ?? null,
+            fieldType: schemaItem?.type ?? undefined,
             origin: "template",
             side,
           });

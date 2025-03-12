@@ -9,6 +9,7 @@ import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { SetCardData } from "../combinedActions/types";
 import withBuiltInState, { getBuiltInState } from "../utils/withBuiltInState";
+import AppError from "@/classes/AppError";
 
 const initialState: Decks.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.decks
@@ -136,7 +137,14 @@ export const cardsSlice = createSlice({
               existingDataSchemaItem.type = dataItem.fieldType;
             }
           } else {
-            if (!dataItem.fieldType) return;
+            if (!dataItem.fieldType) {
+              new AppError(
+                `setDeckCardDefaults - decks slice could not add a new deck default. No fieldType was given`,
+                dataItem,
+              ).log("error");
+
+              return;
+            }
 
             const dataSchemaItem = {
               id: dataId,

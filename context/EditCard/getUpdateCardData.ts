@@ -80,11 +80,15 @@ export default function getUpdateCardData(
     const dataByCardDataId = contextState.dataByCardDataId[side];
 
     for (const cardDataId in dataByCardDataId) {
+      if (items.some((item) => item.cardDataId === cardDataId)) continue;
+
       const dataItem = dataByCardDataId[cardDataId];
 
       if (!dataItem) continue;
 
       const valueToSave = getValueToSave(dataItem);
+
+      if (!valueToSave) continue;
 
       items.push({
         cardDataId: dataItem.dataId,
