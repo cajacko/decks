@@ -20,42 +20,46 @@ export default function HoldMenu<I extends MenuItem>(
       {state.devIndicator && (
         <Animated.View style={[styles.devIndicator, state.devIndicatorStyle]} />
       )}
-      {props.menuItems.map((menuItem) => (
-        <Animated.View
-          key={menuItem.key}
-          style={{
-            position: "absolute",
-            top: menuItem.top,
-            left: menuItem.left,
-            height: menuItem.height,
-            width: menuItem.width,
-            opacity: state.opacity,
-          }}
-        >
-          {state.devIndicator && (
-            <View
-              style={StyleSheet.flatten([
-                styles.bufferBox,
-                {
-                  backgroundColor:
-                    menuItem.key === state.highlightedItem?.key
-                      ? "yellow"
-                      : "green",
-                  top: -(menuItem.touchBuffer ?? state.touchBuffer),
-                  left: -(menuItem.touchBuffer ?? state.touchBuffer),
-                  right: -(menuItem.touchBuffer ?? state.touchBuffer),
-                  bottom: -(menuItem.touchBuffer ?? state.touchBuffer),
-                },
-              ])}
-            />
-          )}
-          {props.renderItem({
-            ...menuItem,
-            highlight: menuItem.key === state.highlightedItem?.key,
-            holdMenuBehaviour: state.holdMenuBehaviour,
-          })}
-        </Animated.View>
-      ))}
+      {Object.entries(props.menuItems).map(
+        ([position, menuItem]) =>
+          menuItem && (
+            <Animated.View
+              key={menuItem.key}
+              style={{
+                position: "absolute",
+                top: position === "top" ? -menuItem.height / 2 : undefined,
+                left: position === "left" ? -menuItem.width / 2 : undefined,
+                right: position === "right" ? -menuItem.width / 2 : undefined,
+                bottom:
+                  position === "bottom" ? -menuItem.height / 2 : undefined,
+                opacity: state.opacity,
+                alignItems: "center",
+                justifyContent: "center",
+                width:
+                  position === "top" || position === "bottom"
+                    ? "100%"
+                    : undefined,
+                height:
+                  position === "left" || position === "right"
+                    ? "100%"
+                    : undefined,
+              }}
+            >
+              <View
+                style={{
+                  height: menuItem.height,
+                  width: menuItem.width,
+                }}
+              >
+                {props.renderItem({
+                  ...menuItem,
+                  highlight: menuItem.key === state.highlightedItem?.key,
+                  holdMenuBehaviour: state.holdMenuBehaviour,
+                })}
+              </View>
+            </Animated.View>
+          ),
+      )}
     </View>
   );
 }

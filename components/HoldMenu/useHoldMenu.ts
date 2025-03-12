@@ -5,9 +5,53 @@ import {
   Animated,
   PanResponderGestureState,
 } from "react-native";
-import { MenuItem, HoldMenuProps } from "./types";
+import { MenuItem, HoldMenuProps, MenuPosition, MenuItems } from "./types";
 import useFlag from "@/hooks/useFlag";
 import usePointer from "@/hooks/usePointer";
+
+const maxDistanceForTap = 10;
+const minDistanceForDirection = maxDistanceForTap;
+const maxTimeoutForTap = 500;
+const fadeInDuration = 100;
+const fadeOutDuration = 200;
+
+function getGestureDistance(gestureState: PanResponderGestureState) {
+  return Math.sqrt(gestureState.dx ** 2 + gestureState.dy ** 2);
+}
+function withGetTargetDirection<P extends object = object>(
+  menuItems: MenuItems<P>,
+) {
+  return (gestureState: PanResponderGestureState): MenuItem<P> | null => {
+    const distance = getGestureDistance(gestureState);
+
+    if (distance < minDistanceForDirection) return null;
+
+    const { dx, dy } = gestureState;
+
+    // Calculate the angle of movement
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    // Determine the ideal direction based on the angle
+    let preferredDirection: MenuPosition;
+
+    if (angle >= -45 && angle < 45) {
+      preferredDirection = "right";
+    } else if (angle >= 45 && angle < 135) {
+      preferredDirection = "bottom";
+    } else if (angle >= -135 && angle < -45) {
+      preferredDirection = "top";
+    } else {
+      preferredDirection = "left";
+    }
+
+    // If the preferred direction is available, return it
+    if (menuItems[preferredDirection]) {
+      return menuItems[preferredDirection] ?? null;
+    }
+
+    return null;
+  };
+}
 
 // NOTE: 50ms is the max we ever want to wait before showing the menu
 const swipeHoldThresholds: {
@@ -60,13 +104,15 @@ const maxThresholdTimeout = swipeHoldThresholds.reduce(
   0,
 );
 
-const fadeInDuration = 100;
-const fadeOutDuration = 200;
-
 export default function useHoldMenu<I extends MenuItem>({
   touchBuffer = 20,
   ...props
 }: HoldMenuProps<I>) {
+  const getTargetDirection = React.useMemo(
+    () => withGetTargetDirection(props.menuItems),
+    [props.menuItems],
+  );
+
   const devIndicator = useFlag("HOLD_MENU_DEV_INDICATOR") === "enabled";
   const holdMenuBehaviour: "always-visible" | "hold" = useFlag(
     "HOLD_MENU_BEHAVIOUR",
@@ -106,13 +152,15 @@ export default function useHoldMenu<I extends MenuItem>({
 
   React.useLayoutEffect(updateMenuPosition, [updateMenuPosition]);
 
-  const getHoveredItem = (gestureState: PanResponderGestureState) => {
-    if (!menuPositionRef.current) return;
-
-    const touchX = gestureState.moveX - menuPositionRef.current.pageX;
-    const touchY = gestureState.moveY - menuPositionRef.current.pageY;
+  const getDraggedDirection = (
+    gestureState: PanResponderGestureState,
+  ): MenuItem<I> | null => {
+    if (!menuPositionRef.current) return null;
 
     if (devIndicator) {
+      const touchX = gestureState.moveX - menuPositionRef.current.pageX;
+      const touchY = gestureState.moveY - menuPositionRef.current.pageY;
+
       // Move the hover indicator to the touch position
       Animated.spring(hoverIndicatorX, {
         toValue: touchX,
@@ -125,19 +173,7 @@ export default function useHoldMenu<I extends MenuItem>({
       }).start();
     }
 
-    // Find which menu item contains the touch point
-    const hoveredItem = props.menuItems.find((item) => {
-      const finalTouchBuffer = item.touchBuffer ?? touchBuffer;
-
-      return (
-        touchX >= item.left - finalTouchBuffer &&
-        touchX <= item.left + item.width + finalTouchBuffer &&
-        touchY >= item.top - finalTouchBuffer &&
-        touchY <= item.top + item.height + finalTouchBuffer
-      );
-    });
-
-    return hoveredItem ?? null;
+    return getTargetDirection(gestureState);
   };
 
   const horizontalDistance = React.useRef<null | {
@@ -179,10 +215,10 @@ export default function useHoldMenu<I extends MenuItem>({
     if (!renderMenuRef.current) return;
 
     if (gestureState) {
-      const hoveredItem = getHoveredItem(gestureState);
+      const item = getDraggedDirection(gestureState);
 
-      if (hoveredItem && !actionHandled.current) {
-        props.handleAction(hoveredItem);
+      if (item && !actionHandled.current) {
+        props.handleAction(item);
         actionHandled.current = true;
       }
     }
@@ -300,11 +336,11 @@ export default function useHoldMenu<I extends MenuItem>({
       },
 
       onPanResponderMove: (_, gestureState) => {
-        const hoveredItem = getHoveredItem(gestureState);
+        const item = getDraggedDirection(gestureState);
 
-        if (hoveredItem && hoveredItem.key !== highlightedItem?.key) {
-          setHighlightedItem(hoveredItem);
-        } else if (!hoveredItem) {
+        if (item && item.key !== highlightedItem?.key) {
+          setHighlightedItem(item);
+        } else if (!item) {
           setHighlightedItem(null);
         }
       },
@@ -316,14 +352,12 @@ export default function useHoldMenu<I extends MenuItem>({
           ? Date.now() - panStartTime.current
           : null;
 
-        const travelledDistance = Math.abs(
-          Math.sqrt(gestureState.dx ** 2 + gestureState.dy ** 2),
-        );
+        const travelledDistance = getGestureDistance(gestureState);
 
         if (
-          travelledDistance < 10 &&
+          travelledDistance < maxDistanceForTap &&
           timeOfPan &&
-          timeOfPan < 500 &&
+          timeOfPan < maxTimeoutForTap &&
           !actionHandled.current
         ) {
           if (props.handlePress) {
