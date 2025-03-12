@@ -12,7 +12,6 @@ export default function HoldMenu<I extends MenuItem>(
     <View
       style={styles.container}
       {...state.panResponder?.panHandlers}
-      onTouchStart={state.onTouchStart}
       ref={state.menuRef}
       onPointerEnter={state.onPointerEnter}
       onPointerLeave={state.onPointerLeave}

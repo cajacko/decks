@@ -8,8 +8,13 @@ export function withAnimateOut(props: {
   translateY: RequiredRefObject<Animated.Value>;
   height: RequiredRefObject<number>;
   width: RequiredRefObject<number>;
+  canAnimate: boolean;
 }): CardRef["animateOut"] {
   return async ({ animateOpacity = true, duration = 300, direction }) => {
+    if (!props.canAnimate) {
+      return;
+    }
+
     const animateKey = "out";
     props.animationUpdate.current(animateKey, true);
 
@@ -73,8 +78,13 @@ export function withAnimateFlipOut(props: {
   scaleX: RequiredRefObject<Animated.Value>;
   initialRotation: RequiredRefObject<number>;
   rotate: RequiredRefObject<Animated.Value>;
+  canAnimate: boolean;
 }): CardRef["animateFlipOut"] {
   return async () => {
+    if (!props.canAnimate) {
+      return;
+    }
+
     const animateKey = "flip";
     props.animationUpdate.current(animateKey, true);
 
@@ -100,8 +110,13 @@ export function withAnimateFlipIn(props: {
   scaleX: RequiredRefObject<Animated.Value>;
   initialRotation: RequiredRefObject<number>;
   rotate: RequiredRefObject<Animated.Value>;
+  canAnimate: boolean;
 }): CardRef["animateFlipIn"] {
   return async () => {
+    if (!props.canAnimate) {
+      return;
+    }
+
     const animateKey = "flipIn";
     props.animationUpdate.current(animateKey, true);
 

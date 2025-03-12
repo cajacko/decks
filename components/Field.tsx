@@ -16,6 +16,7 @@ export interface FieldProps {
   enabled?: boolean;
   showEnabled?: boolean;
   faded?: boolean;
+  inline?: boolean;
 }
 
 export default function Field(props: FieldProps): React.ReactNode {
@@ -48,19 +49,22 @@ export default function Field(props: FieldProps): React.ReactNode {
             hasChanges={props.hasChanges}
           />
         </View>
+        {props.inline && <View style={styles.input}>{props.children}</View>}
       </View>
-      <View style={styles.inputs}>
-        <View style={styles.input}>{props.children}</View>
-        {props.handleClear && (
-          <IconButton
-            style={styles.clear}
-            icon="cancel"
-            variant="transparent"
-            size={36}
-            onPress={props.handleClear}
-          />
-        )}
-      </View>
+      {!props.inline && (
+        <View style={styles.inputs}>
+          <View style={styles.input}>{props.children}</View>
+          {props.handleClear && (
+            <IconButton
+              style={styles.clear}
+              icon="cancel"
+              variant="transparent"
+              size={36}
+              onPress={props.handleClear}
+            />
+          )}
+        </View>
+      )}
 
       {props.subLabel !== undefined && (
         <ThemedText type="body2" style={styles.subLabel}>

@@ -12,11 +12,13 @@ import { DeckTabletopProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import useEnsureTabletop from "@/hooks/useEnsureTabletop";
+import useFlag from "@/hooks/useFlag";
 
 export default function Tabletop({
   tabletopId,
   deckId,
 }: TabletopProps): React.ReactNode {
+  const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const { hasTabletop } = useEnsureTabletop({ tabletopId });
 
   useDeckLastScreen({
@@ -44,10 +46,14 @@ export default function Tabletop({
     (event) => {
       // Having the fade in here makes doubly sure we're showing the content. We had a bug where it
       // wasn't showing the content, but this fixed it.
-      opacity.value = withTiming(1, {
-        // We want this really fast as otherwise in native you see lots of see-through bits
-        duration: 200,
-      });
+      if (performanceMode) {
+        opacity.value = 1;
+      } else {
+        opacity.value = withTiming(1, {
+          // We want this really fast as otherwise in native you see lots of see-through bits
+          duration: 200,
+        });
+      }
 
       // Prevents us updating when the keyboard comes into view, which we don't want. Maybe there's
       // a better solution for this, that then allows window changes as well?
@@ -61,7 +67,7 @@ export default function Tabletop({
 
       setSize({ width, height });
     },
-    [opacity],
+    [opacity, performanceMode],
   );
 
   const contentStyle = React.useMemo(

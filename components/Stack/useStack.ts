@@ -20,6 +20,7 @@ import {
   selectDoesTabletopHaveCards,
 } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
+import useFlag from "@/hooks/useFlag";
 
 // These dummy values aren't getting used, we just want the length and doing it this way to keep a
 // single source of truth for the number of offset positions.
@@ -36,6 +37,7 @@ export default function useStack({
   canDelete = false,
   canShowEditDeck = false,
 }: StackProps) {
+  const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
   const dispatch = useAppDispatch();
   const { tabletopId, stackWidth, deckId } = useTabletopContext();
   const width = useSharedValue(stackWidth);
@@ -63,18 +65,22 @@ export default function useStack({
   );
 
   const handleShuffle = React.useCallback(async () => {
-    rotation.value = 0;
-    setShowActions(false);
+    let promise: Promise<unknown> | undefined;
 
-    const duration = 500;
+    if (canAnimateCards) {
+      rotation.value = 0;
+      setShowActions(false);
 
-    const promise = new Promise<void>((resolve) => {
-      rotation.value = withTiming(360, { duration }, () => {
-        runOnJS(resolve)();
+      const duration = 500;
+
+      promise = new Promise<void>((resolve) => {
+        rotation.value = withTiming(360, { duration }, () => {
+          runOnJS(resolve)();
+        });
       });
-    });
 
-    await new Promise((resolve) => setTimeout(resolve, duration / 2));
+      await new Promise((resolve) => setTimeout(resolve, duration / 2));
+    }
 
     dispatch(
       setStackOrder({
@@ -88,7 +94,7 @@ export default function useStack({
     await promise;
 
     setShowActions(true);
-  }, [dispatch, stackId, tabletopId, rotation]);
+  }, [dispatch, stackId, tabletopId, rotation, canAnimateCards]);
 
   onUpdateCardList(cardInstancesIds ?? []);
 
@@ -99,19 +105,35 @@ export default function useStack({
       const scroll = stackListRef.current?.scrollPrev?.();
 
       const transform = new Promise<void>((resolve) => {
-        const toValue = withTiming(0, { duration: 500 }, () => {
-          runOnJS(resolve)();
-        });
+        if (canAnimateCards) {
+          const toValue = withTiming(0, { duration: 500 }, () => {
+            runOnJS(resolve)();
+          });
 
-        opacity.value = toValue;
-        width.value = toValue;
+          opacity.value = toValue;
+          width.value = toValue;
+        } else {
+          opacity.value = 0;
+          width.value = 0;
+
+          resolve();
+        }
       });
 
       await Promise.all([scroll, transform]);
 
       dispatch(deleteStack({ tabletopId, stackId: stackId }));
     };
-  }, [stackId, width, tabletopId, dispatch, stackListRef, opacity, canDelete]);
+  }, [
+    stackId,
+    width,
+    tabletopId,
+    dispatch,
+    stackListRef,
+    opacity,
+    canDelete,
+    canAnimateCards,
+  ]);
 
   const handleEditDeck = React.useMemo(() => {
     if (doesTabletopHaveCards) return;

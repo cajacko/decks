@@ -8,6 +8,7 @@ import Animated, {
 import IconSymbol from "./IconSymbol";
 import ThemedText, { ThemedTextProps } from "./ThemedText";
 import Label, { LabelProps } from "./Label";
+import useFlag from "@/hooks/useFlag";
 
 export interface CollapsibleProps {
   title?: string | null;
@@ -36,6 +37,7 @@ export default function Collapsible({
   subTitle,
   headerStyle,
 }: CollapsibleProps): React.ReactNode {
+  const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const [isCollapsed, setIsCollapsed] = useState(
     controlledCollapsed === undefined ? initialCollapsed : controlledCollapsed,
   );
@@ -56,8 +58,14 @@ export default function Collapsible({
   const height = useSharedValue(isCollapsed ? 0 : 1);
 
   useEffect(() => {
-    height.value = withTiming(isCollapsed ? 0 : 1, { duration: 300 });
-  }, [isCollapsed, height]);
+    const newValue = isCollapsed ? 0 : 1;
+
+    if (performanceMode) {
+      height.value = newValue;
+    } else {
+      height.value = withTiming(newValue, { duration: 300 });
+    }
+  }, [isCollapsed, height, performanceMode]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     height: height.value === 0 ? 0 : "auto",

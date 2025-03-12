@@ -7,6 +7,7 @@ import {
 } from "react-native-reanimated";
 import { Gesture } from "react-native-gesture-handler";
 import { autoAnimateConfig } from "./bottomDrawer.style";
+import useFlag from "@/hooks/useFlag";
 
 // NOTE: Debug logs don't work inside the pan events, even with runOnJs
 export default function useDrag(props: {
@@ -15,6 +16,9 @@ export default function useDrag(props: {
   maxAutoHeight: number;
   minHeight: number;
 }) {
+  const canAnimate = useFlag("BOTTOM_DRAWER_ANIMATE") === "enabled";
+  const canDrag = useFlag("BOTTOM_DRAWER_DRAG") === "enabled";
+
   const { height } = props;
 
   const pressed = useSharedValue<boolean>(false);
@@ -49,6 +53,10 @@ export default function useDrag(props: {
 
       draggedDistance.value = event.translationY;
 
+      if (!canDrag) {
+        return;
+      }
+
       height.value = withClamp(
         {
           max: maxHeight.value,
@@ -82,10 +90,15 @@ export default function useDrag(props: {
         moveTo = "bottom";
       }
 
-      height.value = withSpring(
-        moveTo === "top" ? maxAutoHeight.value : minHeight.value,
-        autoAnimateConfig,
-      );
+      const newHeight =
+        moveTo === "top" ? maxAutoHeight.value : minHeight.value;
+
+      if (!canAnimate) {
+        height.value = newHeight;
+        return;
+      }
+
+      height.value = withSpring(newHeight, autoAnimateConfig);
     });
 
   return {

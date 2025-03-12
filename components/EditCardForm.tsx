@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
   withSequence,
 } from "react-native-reanimated";
+import useFlag from "@/hooks/useFlag";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
@@ -36,6 +37,7 @@ export default function EditCardForm({
 }: EditCardFormProps): React.ReactNode {
   const dispatch = useAppDispatch();
   const saveAnimation = useSharedValue(1);
+  const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
 
   const backTemplate = useAppSelector((state) =>
     selectCardTemplate(state, { id, type, side: "back" }),
@@ -46,13 +48,15 @@ export default function EditCardForm({
   );
 
   const animateOnSave = React.useCallback(() => {
+    if (performanceMode) return;
+
     const duration = 500;
 
     saveAnimation.value = withSequence(
       withTiming(0.5, { duration }),
       withTiming(1, { duration }),
     );
-  }, [saveAnimation]);
+  }, [saveAnimation, performanceMode]);
 
   const { save } = useSaveEditCard({
     autoSave: true,

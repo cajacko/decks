@@ -66,7 +66,9 @@ export default function useHoldMenu<I extends MenuItem>({
   touchBuffer = 20,
   ...props
 }: HoldMenuProps<I>) {
-  let holdMenuBehaviour: "tap" | "hold" = useFlag("HOLD_MENU_BEHAVIOUR");
+  let holdMenuBehaviour: "always-visible" | "hold" = useFlag(
+    "HOLD_MENU_BEHAVIOUR",
+  );
   const menuRef = React.useRef<View>(null);
   const opacity = React.useRef(new Animated.Value(1)).current;
   const hoverIndicatorOpacity = React.useRef(new Animated.Value(0)).current;
@@ -92,7 +94,7 @@ export default function useHoldMenu<I extends MenuItem>({
   let highlightedItem = highlightedItemState;
 
   if (!menuPosition) {
-    holdMenuBehaviour = "tap";
+    holdMenuBehaviour = "always-visible";
     highlightedItem = null;
   }
 
@@ -307,29 +309,6 @@ export default function useHoldMenu<I extends MenuItem>({
     }),
   ).current;
 
-  const onTouchStart = React.useCallback(() => {
-    setHighlightedItem(null);
-
-    if (renderMenu) {
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => {
-        setRenderMenu(false);
-      });
-    } else {
-      opacity.setValue(0);
-      setRenderMenu(true);
-
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [opacity, renderMenu]);
-
   const onPointerEnter = React.useCallback(() => {
     setRenderMenu(true);
   }, []);
@@ -342,18 +321,21 @@ export default function useHoldMenu<I extends MenuItem>({
     }
   }, [menuRef, onPointerEnter, getIsPointerOverRef]);
 
+  const onPointerLeave = React.useCallback(() => {
+    setRenderMenu(false);
+  }, []);
+
   return {
-    onPointerEnter,
-    onPointerLeave: React.useCallback(() => {
-      setRenderMenu(false);
-    }, []),
+    onPointerEnter:
+      holdMenuBehaviour === "always-visible" ? undefined : onPointerEnter,
+    onPointerLeave:
+      holdMenuBehaviour === "always-visible" ? undefined : onPointerLeave,
     panResponder: holdMenuBehaviour === "hold" ? panResponder : undefined,
     menuRef,
-    renderMenu,
+    renderMenu: holdMenuBehaviour === "always-visible" || renderMenu,
     opacity,
     highlightedItem,
     holdMenuBehaviour,
-    onTouchStart: holdMenuBehaviour === "tap" ? onTouchStart : undefined,
     touchBuffer,
     devIndicatorStyle: {
       opacity: hoverIndicatorOpacity,

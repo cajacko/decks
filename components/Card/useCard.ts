@@ -11,6 +11,7 @@ import {
 import { getOffsetPositions } from "./card.styles";
 import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 import { useCardSizes } from "./CardSize.context";
+import useFlag from "@/hooks/useFlag";
 
 export default function useCard(
   props: Pick<
@@ -24,6 +25,7 @@ export default function useCard(
   >,
   ref: React.ForwardedRef<CardRef>,
 ) {
+  const canAnimate = useFlag("CARD_ANIMATIONS") === "enabled";
   const cardSizes = useCardSizes(props);
   const height = cardSizes.dpHeight;
   const width = cardSizes.dpWidth;
@@ -92,12 +94,14 @@ export default function useCard(
       scaleX,
       rotate,
       initialRotation,
+      canAnimate,
     }),
     animateFlipIn: withAnimateFlipIn({
       animationUpdate: animationUpdateRef,
       scaleX,
       rotate,
       initialRotation,
+      canAnimate,
     }),
     animateOut: withAnimateOut({
       animationUpdate: animationUpdateRef,
@@ -106,6 +110,7 @@ export default function useCard(
       opacity,
       translateY,
       width: widthRef,
+      canAnimate,
     }),
   }));
 

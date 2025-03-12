@@ -2,11 +2,14 @@ import React from "react";
 import { CardRef } from "@/components/Card";
 import { CardSidesRef } from "./CardSides.types";
 import { Cards } from "@/store/types";
+import useFlag from "@/hooks/useFlag";
 
 export default function useCardSides(
   sideProp: Cards.Side,
   ref: React.Ref<CardSidesRef>,
 ) {
+  const animateCards = useFlag("CARD_ANIMATIONS") === "enabled";
+
   const [flipState, setFlipState] = React.useState<
     | null
     | "flipping-to-back"
@@ -43,25 +46,32 @@ export default function useCardSides(
   React.useImperativeHandle(ref, () => ({
     animateFlip: async () => {
       if (side.current === "front") {
-        setFlipState("flipping-to-back");
+        if (animateCards) {
+          setFlipState("flipping-to-back");
 
-        await faceUpRef.current?.animateFlipOut();
-        await faceDownRef.current?.animateFlipIn();
+          await faceUpRef.current?.animateFlipOut();
+          await faceDownRef.current?.animateFlipIn();
+        }
 
         setFlipState("flipped-to-back");
 
         return "back";
       }
-      setFlipState("flipping-to-front");
 
-      await faceDownRef.current?.animateFlipOut();
-      await faceUpRef.current?.animateFlipIn();
+      if (animateCards) {
+        setFlipState("flipping-to-front");
+
+        await faceDownRef.current?.animateFlipOut();
+        await faceUpRef.current?.animateFlipIn();
+      }
 
       setFlipState("flipped-to-front");
 
       return "front";
     },
     animateOut: async (props) => {
+      if (!animateCards) return;
+
       if (side.current === "front") {
         return faceUpRef.current?.animateOut(props);
       } else {

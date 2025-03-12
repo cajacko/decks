@@ -6,9 +6,13 @@
 // NOTE: First option is the default
 export const flagMap = {
   // User control flags go here
-  HOLD_MENU_BEHAVIOUR: ["hold", "tap"],
+  PERFORMANCE_MODE: ["disabled", "enabled"],
+  HOLD_MENU_BEHAVIOUR: ["hold", "always-visible"],
 
   // Dev flags
+  BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],
+  BOTTOM_DRAWER_DRAG: ["enabled", "disabled"],
+  CARD_ACTIONS_ALWAYS_VISIBLE: [false, true],
   EDIT_CARD_MORE_INFO: ["disabled", "enabled"],
   USE_DEV_INITIAL_REDUX_STATE: [false, true],
   CARD_ANIMATIONS: ["enabled", "disabled"],

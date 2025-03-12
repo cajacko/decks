@@ -9,7 +9,7 @@ export type MenuItem<P extends object = object> = P & {
 
 export type RenderItemMenuItem<P extends MenuItem> = P & {
   highlight: boolean;
-  holdMenuBehaviour: "hold" | "tap";
+  holdMenuBehaviour: "hold" | "always-visible";
 };
 
 export interface HoldMenuProps<I extends MenuItem> {
