@@ -8,7 +8,7 @@ import {
 import text from "@/constants/text";
 import ThemedText from "./ThemedText";
 
-export interface SwitchProps extends RNSwitchProps {}
+export type SwitchProps = RNSwitchProps;
 
 export default function Switch(props: SwitchProps): React.ReactNode {
   return (
