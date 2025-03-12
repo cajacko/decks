@@ -39,6 +39,13 @@ export default function useEditCardTemplateSchemaItem(props: {
       : undefined,
   );
 
+  const fallbackValidatedValue = useContextSelector((context) =>
+    cardDataItemId
+      ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+          ?.fallbackValidatedValue
+      : undefined,
+  );
+
   const hasChanges = React.useMemo(
     () =>
       getHasChanges({
@@ -68,5 +75,9 @@ export default function useEditCardTemplateSchemaItem(props: {
     onChange,
     validatedValue: resolvedValidatedValue,
     hasChanges: !!hasChanges,
+    usingFallback:
+      resolvedValidatedValue?.origin === fallbackValidatedValue?.origin
+        ? (fallbackValidatedValue?.origin ?? "template")
+        : null,
   };
 }

@@ -13,6 +13,7 @@ import Field from "./Field";
 import useFlag from "@/hooks/useFlag";
 import text from "@/constants/text";
 import { Cards } from "@/store/types";
+import { FallbackValueOrigin } from "@/utils/resolveCardData";
 
 export interface TemplateSchemaItemProps {
   side: Cards.Side;
@@ -20,6 +21,12 @@ export interface TemplateSchemaItemProps {
   templateDataId: string;
   style?: ViewStyle;
 }
+
+const fallbackText: Record<FallbackValueOrigin, string> = {
+  "deck-defaults": text["card.using_default.deck"],
+  "template-map": text["card.using_default.template_mapping"],
+  template: text["card.using_default.template"],
+};
 
 export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   const showMoreInfo = useFlag("EDIT_CARD_MORE_INFO") === "enabled";
@@ -32,7 +39,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   const fieldLabel: string = schemaItem.name;
   const fieldType = schemaItem.type;
 
-  const { onChange, validatedValue, placeholder, hasChanges } =
+  const { onChange, validatedValue, placeholder, hasChanges, usingFallback } =
     useEditCardTemplateSchemaItem(props);
 
   const onChangeText = React.useCallback(
@@ -111,22 +118,16 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     return null;
   }
 
-  let label = fieldLabel;
-
-  // TODO: Do not show to end users
-  if (showMoreInfo) {
-    label = `${label} (${validatedValue?.origin ?? "N/A"})`;
-  }
-
   return (
     <Field
-      label={label}
+      label={fieldLabel}
       style={props.style}
       hasChanges={hasChanges && !isNewCard}
       handleClear={handleUseDefaults}
       handleChangeEnable={handleSetNull}
       showEnabled={showMoreInfo}
       enabled={validatedValue?.value !== null}
+      subLabel={usingFallback ? fallbackText[usingFallback] : null}
     >
       {input}
     </Field>

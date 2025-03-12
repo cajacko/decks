@@ -5,6 +5,7 @@ import {
   ResolvedCardData,
   UpdatedDataItem,
   ValidatedValue,
+  FallbackValueOrigin,
 } from "@/utils/resolveCardData";
 
 export type OnCreateCard = (cardId: string) => void;
@@ -49,4 +50,5 @@ export type UseEditCardTemplateSchemaItemReturn = {
   validatedValue: ValidatedValue | undefined;
   placeholder?: string;
   hasChanges: boolean;
+  usingFallback: FallbackValueOrigin | null;
 };

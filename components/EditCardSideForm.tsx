@@ -20,7 +20,7 @@ export default function EditCardSideForm(
   if (!schemaOrder || schemaOrder.length === 0) return null;
 
   return (
-    <FieldSet title={props.title}>
+    <FieldSet title={props.title} itemSpacing={15}>
       {schemaOrder.map((templateDataId) => (
         <TemplateSchemaItem
           key={templateDataId}
