@@ -28,6 +28,10 @@ const template = {
       id: dataItemIds.text,
       name: text["template.built_in.back.text"],
       type: "text",
+      defaultValidatedValue: {
+        type: "text",
+        value: `{{${deckTemplateIds.name}}}`,
+      },
     },
     [dataItemIds.emoji]: {
       id: dataItemIds.emoji,
@@ -69,7 +73,8 @@ const template = {
         },
         {
           type: "Text",
-          text: `{{#if ${dataItemIds.text}}}{{${dataItemIds.text}}}{{else}}{{${deckTemplateIds.name}}}{{/if}}`,
+          text: `{{${dataItemIds.text}}}`,
+          conditional: `{{${dataItemIds.text}}}`,
           style: {
             color: colorFunction("lightness", dataItemIds.color, 15),
             fontSize: 10,
