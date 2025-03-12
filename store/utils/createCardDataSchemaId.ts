@@ -2,11 +2,13 @@ import { Cards, Templates, Decks } from "../types";
 
 export type CreateCardDataSchemaProps = {
   side: Cards.Side;
-  templateDataItemId: Templates.DataItemId;
+  templateDataItemId: Templates.DataId;
 };
 
 export default function createCardDataSchemaId(
   props: CreateCardDataSchemaProps,
-): Decks.DataSchemaItemId {
-  return `${props.side}:${props.templateDataItemId}`;
+): Decks.DataId {
+  // NOTE: Don't combine the side, let the user remap the data if they want to. Most of the time,
+  // this is what we'd want
+  return props.templateDataItemId;
 }

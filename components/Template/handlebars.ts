@@ -76,8 +76,18 @@ function compileTemplate(props: {
     return cached;
   }
 
-  const template = Handlebars.compile(props.text, { noEscape: true });
-  const value = template(props.values);
+  let value = props.text;
+
+  const hasTemplate = value.includes("{{");
+
+  if (hasTemplate) {
+    // Loop twice as our variables can be handlebar strings as well
+    for (let i = 0; i < 2; i++) {
+      const template = Handlebars.compile(value, { noEscape: true });
+
+      value = template(props.values);
+    }
+  }
 
   if (cacheKey) {
     handlebarsCache.set(cacheKey, value);

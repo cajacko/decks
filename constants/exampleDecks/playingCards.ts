@@ -1,7 +1,6 @@
 import { ExampleDeck } from "./types";
 import playingCards from "@/constants/builtInTemplates/playingCards";
 import back from "@/constants/builtInTemplates/back";
-import { Templates } from "@/store/types";
 
 const suits = [{ name: "❤️" }, { name: "♦️" }, { name: "♣️" }, { name: "♠️" }];
 
@@ -29,24 +28,24 @@ const deck: ExampleDeck<{
       templateId: back.templateId,
       dataTemplateMapping: {
         color: {
-          dataSchemaItemId: "color",
-          templateSchemaItemId: back.schema.color.id,
+          dataId: "color",
+          templateDataId: back.schema.color.id,
         },
       },
     },
     front: {
       dataTemplateMapping: {
         suit: {
-          dataSchemaItemId: "suit",
-          templateSchemaItemId: playingCards.schema.suit.id,
+          dataId: "suit",
+          templateDataId: playingCards.schema.suit.id,
         },
         value: {
-          dataSchemaItemId: "value",
-          templateSchemaItemId: playingCards.schema.value.id,
+          dataId: "value",
+          templateDataId: playingCards.schema.value.id,
         },
         color: {
-          dataSchemaItemId: "color",
-          templateSchemaItemId: playingCards.schema.color.id,
+          dataId: "color",
+          templateDataId: playingCards.schema.color.id,
         },
       },
       templateId: playingCards.templateId,
@@ -55,10 +54,11 @@ const deck: ExampleDeck<{
   dataSchema: {
     color: {
       id: "color",
-      type: Templates.DataType.Color,
+      type: "color",
       defaultValidatedValue: {
-        type: Templates.DataType.Color,
+        type: "color",
         value: "#D4F6FF",
+        origin: "deck",
       },
     },
   },

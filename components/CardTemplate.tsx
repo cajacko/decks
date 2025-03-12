@@ -9,7 +9,8 @@ import {
   cardOrDeckKey,
 } from "@/store/combinedSelectors/cards";
 import { useEditCardSideState } from "@/context/EditCard";
-import templateDataToValues from "@/components/Template/templateDataToValues";
+// TODO: Can this be deleted?
+// import templateDataToValues from "@/components/Template/templateDataToValues";
 import { Cards } from "@/store/types";
 import { Target } from "@/utils/cardTarget";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
@@ -18,30 +19,29 @@ import { RootState } from "@/store/store";
 
 export type CardTemplateProps = DeckOrCardSideProps;
 
+function mergeWithDeckValues(
+  values: Values | null | undefined,
+  deckValues: DeckValues | null | undefined,
+): Values | null {
+  if (!values && !deckValues) return null;
+
+  return {
+    ...values,
+    deck: deckValues,
+  };
+}
+
 function useEditCardTemplateValues(
   side: Cards.Side,
   target: Target,
   deckValues: DeckValues,
 ): Values | null {
-  const data = useEditCardSideState(side, target);
+  const values = useEditCardSideState(side, target);
 
-  return React.useMemo<Values | null>(() => {
-    if (!data) return null;
-
-    const values: Values = {
-      deck: deckValues,
-    };
-
-    for (const key in data) {
-      const prop = data[key];
-
-      if (prop) {
-        values[key] = prop.editValue;
-      }
-    }
-
-    return values;
-  }, [data, deckValues]);
+  return React.useMemo<Values | null>(
+    () => (values ? mergeWithDeckValues(values, deckValues) : null),
+    [values, deckValues],
+  );
 }
 
 // Custom selectors just for this component, this ensures our value references stay the same when
@@ -51,7 +51,7 @@ function useEditCardTemplateValues(
 
 const selectDeckValues = createCachedSelector(
   (state: RootState, props: Target) => selectDeck(state, props)?.name,
-  (deckName) =>
+  (deckName): DeckValues | null =>
     deckName
       ? {
           name: deckNameWithFallback(deckName),
@@ -62,14 +62,14 @@ const selectDeckValues = createCachedSelector(
 const selectCardTemplateValues = createCachedSelector(
   selectCardTemplateData,
   selectDeckValues,
-  (data, deckValues) => (data ? templateDataToValues(data, deckValues) : null),
+  mergeWithDeckValues,
 )(cardOrDeckKey);
 
 export default function CardTemplate(
   props: CardTemplateProps,
 ): React.ReactNode {
   const deckValues = useAppSelector((state) => selectDeckValues(state, props));
-  const values = useAppSelector((state) =>
+  const savedValues = useAppSelector((state) =>
     selectCardTemplateValues(state, props),
   );
 
@@ -80,5 +80,7 @@ export default function CardTemplate(
 
   const editValues = useEditCardTemplateValues(props.side, props, deckValues);
 
-  return <Template values={editValues ?? values} markup={markup} />;
+  const values = editValues ?? savedValues;
+
+  return <Template values={values} markup={markup} />;
 }

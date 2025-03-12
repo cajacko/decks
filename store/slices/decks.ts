@@ -1,14 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
-import { Decks, RootState, SliceName } from "../types";
+import { Cards, Decks, RootState, SliceName } from "../types";
 import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
-import { CardDataItem } from "../combinedActions/types";
+import { SetCardData } from "../combinedActions/types";
 import withBuiltInState, { getBuiltInState } from "../utils/withBuiltInState";
+import AppError from "@/classes/AppError";
 
 const initialState: Decks.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.decks
@@ -21,39 +22,53 @@ function updateDeckTemplateMapping(
   state: WritableDraft<Decks.State>,
   props: {
     deckId: string;
-    data: CardDataItem[];
+    data: SetCardData;
   },
 ) {
   const deck = state.decksById[props.deckId];
 
-  if (!deck) return;
+  function processSide(side: Cards.Side) {
+    if (!deck) return;
 
-  props.data.forEach((dataItem) => {
-    if (dataItem.value === null) return;
-    if ("cardDataId" in dataItem) return;
+    const map = props.data.templateMapping[side];
+    const templateMapping = deck.templates[side].dataTemplateMapping;
 
-    const cardDataSchemaId = createCardDataSchemaId(dataItem);
+    Object.entries(map).forEach(([dataId, templateDataId]) => {
+      if (!templateDataId) return;
 
-    const templateMapping = deck.templates[dataItem.side].dataTemplateMapping;
+      if (templateMapping[dataId]?.templateDataId !== templateDataId) {
+        templateMapping[dataId] = {
+          dataId,
+          templateDataId,
+        };
+      }
 
-    if (!templateMapping[dataItem.templateDataItemId]) {
-      templateMapping[dataItem.templateDataItemId] = {
-        dataSchemaItemId: cardDataSchemaId,
-        templateSchemaItemId: dataItem.templateDataItemId,
+      if (!deck.dataSchemaOrder) {
+        deck.dataSchemaOrder = [];
+      }
+
+      if (!deck.dataSchemaOrder.includes(dataId)) {
+        deck.dataSchemaOrder.push(dataId);
+      }
+
+      if (deck.dataSchema[dataId]) return;
+
+      const dataItem = props.data.items.find(
+        (item) => item.cardDataId === dataId,
+      );
+
+      if (!dataItem) return;
+      if (!dataItem.fieldType) return;
+
+      deck.dataSchema[dataId] = {
+        id: dataId,
+        type: dataItem.fieldType,
       };
-    }
+    });
+  }
 
-    if (!deck.dataSchemaOrder.includes(cardDataSchemaId)) {
-      deck.dataSchemaOrder.push(cardDataSchemaId);
-    }
-
-    if (deck.dataSchema[cardDataSchemaId]) return;
-
-    deck.dataSchema[cardDataSchemaId] = {
-      id: cardDataSchemaId,
-      type: dataItem.value?.type,
-    };
-  });
+  processSide("front");
+  processSide("back");
 }
 
 export const cardsSlice = createSlice({
@@ -62,7 +77,7 @@ export const cardsSlice = createSlice({
   reducers: {
     setLastScreen: (
       state,
-      actions: PayloadAction<{ deckId: Decks.DeckId; screen: "deck" | "play" }>,
+      actions: PayloadAction<{ deckId: Decks.Id; screen: "deck" | "play" }>,
     ) => {
       const deck = state.decksById[actions.payload.deckId];
 
@@ -73,7 +88,7 @@ export const cardsSlice = createSlice({
     setDeckDetails: (
       state,
       actions: PayloadAction<{
-        deckId: Decks.DeckId;
+        deckId: Decks.Id;
         name?: string;
         description?: string;
       }>,
@@ -93,8 +108,8 @@ export const cardsSlice = createSlice({
     setDeckCardDefaults: (
       state,
       actions: PayloadAction<{
-        deckId: Decks.DeckId;
-        data: CardDataItem[];
+        deckId: Decks.Id;
+        data: SetCardData;
       }>,
     ) => {
       updateDeckTemplateMapping(state, actions.payload);
@@ -103,29 +118,42 @@ export const cardsSlice = createSlice({
 
       if (!deck) return;
 
-      actions.payload.data.forEach((dataItem) => {
-        const cardDataSchemaId =
+      actions.payload.data.items.forEach((dataItem) => {
+        const dataId =
           "cardDataId" in dataItem
             ? dataItem.cardDataId
             : createCardDataSchemaId(dataItem);
 
-        if (dataItem.value === null) {
-          delete deck.dataSchema[cardDataSchemaId];
+        if (dataItem.validatedValue === undefined) {
+          delete deck.dataSchema[dataId];
         } else {
-          const existingDataSchemaItem = deck.dataSchema[cardDataSchemaId];
+          const existingDataSchemaItem = deck.dataSchema[dataId];
 
           if (existingDataSchemaItem) {
-            existingDataSchemaItem.defaultValidatedValue = dataItem.value;
-            existingDataSchemaItem.type = dataItem.value.type;
-          } else {
-            const dataSchemaItem: Decks.LooseDataSchemaItem = {
-              id: cardDataSchemaId,
-              type: dataItem.value.type,
-              defaultValidatedValue: dataItem.value,
-            };
+            existingDataSchemaItem.defaultValidatedValue =
+              dataItem.validatedValue;
 
-            deck.dataSchema[cardDataSchemaId] =
-              dataSchemaItem as Decks.DataSchemaItem;
+            if (dataItem.fieldType) {
+              existingDataSchemaItem.type = dataItem.fieldType;
+            }
+          } else {
+            if (!dataItem.fieldType) {
+              new AppError(
+                `setDeckCardDefaults - decks slice could not add a new deck default. No fieldType was given`,
+                dataItem,
+              ).log("error");
+
+              return;
+            }
+
+            const dataSchemaItem = {
+              id: dataId,
+              type: dataItem.fieldType,
+              defaultValidatedValue: dataItem.validatedValue,
+              // This is the best we can get without going a bit cra cra
+            } satisfies Decks.CreateDataSchemaItemHelper as Decks.DataSchemaItem;
+
+            deck.dataSchema[dataId] = dataSchemaItem;
           }
         }
       });
@@ -209,7 +237,7 @@ export const selectDeck = withBuiltInState(
     state[cardsSlice.name].decksById[props.deckId],
 );
 
-export const selectDeckIds = (state: RootState): Decks.DeckId[] =>
+export const selectDeckIds = (state: RootState): Decks.Id[] =>
   state[cardsSlice.name].deckIds;
 
 export const selectDeckCards = (

@@ -2,7 +2,7 @@ import { createCachedSelector } from "re-reselect";
 import { selectTabletop } from "../slices/tabletop";
 import { RootState, Decks, Tabletops } from "../types";
 
-type TabletopProps = { tabletopId: Tabletops.TabletopId };
+type TabletopProps = { tabletopId: Tabletops.Id };
 
 export const selectTabletopAvailableDeckCards = createCachedSelector(
   (state: RootState, props: TabletopProps) =>

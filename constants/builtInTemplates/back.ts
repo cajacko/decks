@@ -19,7 +19,7 @@ const dataItemIds = {
   emoji: dataItemId("emoji"),
 };
 
-const template: Templates.Props = {
+const template = {
   templateId,
   name: text["template.built_in.back.title"],
   schemaOrder: [dataItemIds.text, dataItemIds.color],
@@ -27,24 +27,29 @@ const template: Templates.Props = {
     [dataItemIds.text]: {
       id: dataItemIds.text,
       name: text["template.built_in.back.text"],
-      type: Templates.DataType.Text,
+      type: "text",
+      defaultValidatedValue: {
+        type: "text",
+        value: `{{${deckTemplateIds.name}}}`,
+      },
     },
     [dataItemIds.emoji]: {
       id: dataItemIds.emoji,
       name: text["template.built_in.back.emoji"],
-      type: Templates.DataType.Text,
+      type: "text",
     },
     [dataItemIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
         value: fixed.cardPresets.yellow,
-        type: Templates.DataType.Color,
+        type: "color",
+        origin: "template",
       },
     },
   },
   markup: [
     {
-      type: "view",
+      type: "View",
       style: {
         flex: 1,
         justifyContent: "center",
@@ -55,7 +60,7 @@ const template: Templates.Props = {
       },
       children: [
         {
-          type: "text",
+          type: "Text",
           text: `{{${dataItemIds.emoji}}}`,
           conditional: `{{${dataItemIds.emoji}}}`,
           style: {
@@ -67,8 +72,9 @@ const template: Templates.Props = {
           },
         },
         {
-          type: "text",
-          text: `{{#if ${dataItemIds.text}}}{{${dataItemIds.text}}}{{else}}{{${deckTemplateIds.name}}}{{/if}}`,
+          type: "Text",
+          text: `{{${dataItemIds.text}}}`,
+          conditional: `{{${dataItemIds.text}}}`,
           style: {
             color: colorFunction("lightness", dataItemIds.color, 15),
             fontSize: 10,
@@ -79,7 +85,7 @@ const template: Templates.Props = {
           },
         },
         {
-          type: "view",
+          type: "View",
           style: {
             position: "absolute",
             top: "-100%",
@@ -92,7 +98,7 @@ const template: Templates.Props = {
           },
           children: [
             {
-              type: "view",
+              type: "View",
               style: {
                 flex: 1,
                 flexDirection: "row",
@@ -104,7 +110,7 @@ const template: Templates.Props = {
               },
               children: [
                 {
-                  type: "view",
+                  type: "View",
                   style: {
                     flex: 1,
                     backgroundColor: colorFunction(
@@ -115,7 +121,7 @@ const template: Templates.Props = {
                   },
                 },
                 {
-                  type: "view",
+                  type: "View",
                   style: {
                     flex: 1,
                   },
@@ -123,7 +129,7 @@ const template: Templates.Props = {
               ],
             },
             {
-              type: "view",
+              type: "View",
               style: {
                 flex: 1,
               },

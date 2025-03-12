@@ -1,6 +1,6 @@
 import React from "react";
 import { TemplateProps } from "./Template.types";
-import { MarkupChildren } from "./MarkupElement";
+import { MarkupChildren } from "./MarkupNode";
 import { TemplateProvider } from "./TemplateContext";
 import uuid from "@/utils/uuid";
 
@@ -23,7 +23,7 @@ export default React.memo<TemplateProps>(function Template({ values, markup }) {
 
   return (
     <TemplateProvider values={values ?? null}>
-      <MarkupChildren elements={markup} cacheKey={cacheKey} />
+      <MarkupChildren nodes={markup} cacheKey={cacheKey} />
     </TemplateProvider>
   );
 });

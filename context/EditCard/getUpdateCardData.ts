@@ -1,48 +1,109 @@
-import { Cards, Templates } from "@/store/types";
-import { CardDataItem } from "@/store/combinedActions/types";
+import {
+  SetCardData,
+  CardDataItem,
+  CreateCardDataItemHelper,
+} from "@/store/combinedActions/types";
 import { EditCardState } from "./EditCard.types";
+import { Cards } from "@/store/types";
+import { ValidatedValue, DataItem } from "@/utils/resolveCardData";
+
+type GetValueToSaveProps = Pick<
+  DataItem,
+  "resolvedValidatedValue" | "savedValidatedValue"
+>;
+
+/**
+ * null - There are no changes, nothing to save
+ * { value: undefined } - The value has been unset, save this (remove from store). Usually done when
+ * the user is indicating they want to use the fallback value
+ * { value: ValidatedValue } - Save this new value. ValidatedValue might be of type null which
+ * indicates the user wants no value to be used (so no fallback)
+ */
+function getValueToSave(
+  item: GetValueToSaveProps,
+):
+  | null
+  | { value: ValidatedValue; type: "new-value" }
+  | { value: undefined; type: "unset" } {
+  // The values we're displaying and have saved are the same, and come from the same place, so
+  // there's definitely no changes
+  if (
+    item.resolvedValidatedValue?.value === item.savedValidatedValue?.value &&
+    item.resolvedValidatedValue?.origin === item.savedValidatedValue?.origin
+  ) {
+    return null;
+  }
+
+  // We have an editing value, but that value is currently the same as the saved one, so don't save
+  // anything, the user is probably typing
+  if (
+    item.resolvedValidatedValue?.origin === "editing" &&
+    item.resolvedValidatedValue?.value === item.savedValidatedValue?.value
+  ) {
+    return null;
+  }
+
+  // The value we're using isn't a value we're editing. It must be a fallback value. We've already
+  // checked higher up if the saved value is being used as the resolved value, so this must be a
+  // fallback value
+  if (item.resolvedValidatedValue?.origin !== "editing") {
+    // We already don't have a saved value, so don't save anything
+    if (item.savedValidatedValue === undefined) {
+      return null;
+    }
+
+    return {
+      type: "unset",
+      value: undefined,
+    };
+  }
+
+  return {
+    type: "new-value",
+    value: item.resolvedValidatedValue,
+  };
+}
+
+export function getHasChanges(item: GetValueToSaveProps): boolean {
+  return !!getValueToSave(item);
+}
 
 /**
  * Given the EditCard context state, get the data required by the updateCard action
  */
 export default function getUpdateCardData(
   contextState: EditCardState,
-): CardDataItem[] {
-  const data: CardDataItem[] = [];
+): SetCardData {
+  const items: CardDataItem[] = [];
 
   function processSide(side: Cards.Side) {
-    const editingValues = contextState[side];
+    const dataByCardDataId = contextState.dataByCardDataId[side];
 
-    for (const key in editingValues) {
-      // Don't save all for performance and to ensure we keep the hasChanges logic up to date
-      if (contextState.hasChanges[side][key] !== true) continue;
+    for (const cardDataId in dataByCardDataId) {
+      if (items.some((item) => item.cardDataId === cardDataId)) continue;
 
-      const editingValue = editingValues[key];
+      const dataItem = dataByCardDataId[cardDataId];
 
-      if (!editingValue) continue;
+      if (!dataItem) continue;
 
-      const value: Templates.ValidatedValue = {
-        type: editingValue.type,
-        value: editingValue.editValue,
-      } as Templates.ValidatedValue; // FIXME:
+      const valueToSave = getValueToSave(dataItem);
 
-      if (editingValue.cardDataItemId) {
-        data.push({
-          cardDataId: editingValue.cardDataItemId,
-          value,
-        });
-      } else {
-        data.push({
-          templateDataItemId: editingValue.templateItemId,
-          side,
-          value,
-        });
-      }
+      if (!valueToSave) continue;
+
+      items.push({
+        cardDataId: dataItem.dataId,
+        validatedValue: valueToSave?.value,
+        fieldType: dataItem.fieldType,
+        // Best we can get without going cra cra
+      } satisfies CreateCardDataItemHelper as CardDataItem);
     }
   }
 
   processSide("front");
   processSide("back");
 
-  return data;
+  return {
+    items,
+    templateMapping: contextState.dataIdByTemplateDataId,
+  };
 }

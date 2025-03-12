@@ -8,7 +8,7 @@ import FieldSet from "./FieldSet";
 
 export default function EditCardSideForm(
   props: Target & {
-    templateId: Templates.TemplateId;
+    templateId: Templates.Id;
     title: string | null;
     side: Cards.Side;
   },
@@ -20,11 +20,11 @@ export default function EditCardSideForm(
   if (!schemaOrder || schemaOrder.length === 0) return null;
 
   return (
-    <FieldSet title={props.title}>
-      {schemaOrder.map((templateSchemaItemId) => (
+    <FieldSet title={props.title} itemSpacing={15}>
+      {schemaOrder.map((templateDataId) => (
         <TemplateSchemaItem
-          key={templateSchemaItemId}
-          templateSchemaItemId={templateSchemaItemId}
+          key={templateDataId}
+          templateDataId={templateDataId}
           templateId={props.templateId}
           side={props.side}
         />

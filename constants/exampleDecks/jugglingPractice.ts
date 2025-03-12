@@ -1,7 +1,6 @@
 import { ExampleDeck } from "./types";
 import front from "@/constants/builtInTemplates/front";
 import back from "@/constants/builtInTemplates/back";
-import { Templates } from "@/store/types";
 
 const deck: ExampleDeck = {
   name: "Juggling Practice",
@@ -12,24 +11,24 @@ const deck: ExampleDeck = {
       templateId: back.templateId,
       dataTemplateMapping: {
         color: {
-          dataSchemaItemId: "color",
-          templateSchemaItemId: back.schema.color.id,
+          dataId: "color",
+          templateDataId: back.schema.color.id,
         },
       },
     },
     front: {
       dataTemplateMapping: {
         title: {
-          dataSchemaItemId: "title",
-          templateSchemaItemId: front.schema.title.id,
+          dataId: "title",
+          templateDataId: front.schema.title.id,
         },
         description: {
-          dataSchemaItemId: "description",
-          templateSchemaItemId: front.schema.description.id,
+          dataId: "description",
+          templateDataId: front.schema.description.id,
         },
         color: {
-          dataSchemaItemId: "color",
-          templateSchemaItemId: front.schema.color.id,
+          dataId: "color",
+          templateDataId: front.schema.color.id,
         },
       },
       templateId: front.templateId,
@@ -38,10 +37,11 @@ const deck: ExampleDeck = {
   dataSchema: {
     color: {
       id: "color",
-      type: Templates.DataType.Color,
+      type: "color",
       defaultValidatedValue: {
-        type: Templates.DataType.Color,
+        type: "color",
         value: "#F0F0D7",
+        origin: "deck",
       },
     },
   },

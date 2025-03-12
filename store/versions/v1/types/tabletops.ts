@@ -1,24 +1,19 @@
 import { History as CreateHistoryHelper } from "./helpers";
-import * as Cards from "./cards";
-import * as Decks from "./decks";
+import {
+  CardInstanceId,
+  StackId,
+  TabletopId as Id,
+  CardSide,
+  CardId,
+  DeckId,
+} from "./types";
 
-export type TabletopId = string;
-export type StackId = string;
-export type CardInstanceId = string;
-
-export enum MoveCardInstanceMethod {
-  topFaceUp = "topFaceUp",
-  topFaceDown = "topFaceDown",
-  topNoChange = "topNoChange",
-  bottomFaceUp = "bottomFaceUp",
-  bottomFaceDown = "bottomFaceDown",
-  bottomNoChange = "bottomNoChange",
-}
+export type { CardInstanceId, StackId, Id };
 
 export interface CardInstance {
   cardInstanceId: CardInstanceId;
-  cardId: Cards.CardId;
-  side: Cards.Side;
+  cardId: CardId;
+  side: CardSide;
 }
 
 export interface Stack {
@@ -42,11 +37,11 @@ export interface HistoryState {
 type History = CreateHistoryHelper<HistoryState>;
 
 export interface Props {
-  id: TabletopId;
-  availableDecks: Decks.DeckId[];
+  id: Id;
+  availableDecks: DeckId[];
   history: History;
 }
 
 export interface State {
-  tabletopsById: Record<TabletopId, Props | undefined>;
+  tabletopsById: Record<Id, Props | undefined>;
 }

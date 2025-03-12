@@ -1,51 +1,46 @@
-import * as TemplatesType from "./templates";
+import {
+  CardSide,
+  CardSize,
+  DeckId as Id,
+  CardId,
+  CardDataId as DataId,
+  TabletopId,
+  TemplateId,
+  TemplateDataId,
+  ValidatedValue,
+  FieldType,
+} from "./types";
 
-export type CardSide = "front" | "back";
+export type { Id };
 
-export type DeckId = string;
-export type DataSchemaItemId = string;
-
-export enum CardSize {
-  Poker = "poker",
-}
+export type { DataId };
 
 export interface Card {
-  cardId: string;
+  cardId: CardId;
   quantity: number;
 }
 
-type CreateDataSchemaItemHelper<
-  Id extends DataSchemaItemId,
-  T extends TemplatesType.DataType = TemplatesType.DataType,
-> = {
-  id: Id;
-  // title?: string;
-  // description?: string;
-  type: T;
-  defaultValidatedValue?:
-    | TemplatesType.ValidatedValue<T>
-    | TemplatesType.ValidatedValue<TemplatesType.DataType.Null>;
+export type CreateDataSchemaItemHelper<Type extends FieldType = FieldType> = {
+  id: DataId;
+  type: Type;
+  defaultValidatedValue?: ValidatedValue<Type>;
 };
 
-export type DataSchemaItem<Id extends DataSchemaItemId = DataSchemaItemId> = {
-  [K in TemplatesType.DataType]: CreateDataSchemaItemHelper<Id, K>;
-}[TemplatesType.DataType];
+export type DataSchemaItem<Type extends FieldType = FieldType> = {
+  [K in FieldType]: CreateDataSchemaItemHelper<K>;
+}[Type];
 
-export type LooseDataSchemaItem = CreateDataSchemaItemHelper<DataSchemaItemId>;
-
-export type DataSchema<DsId extends DataSchemaItemId = DataSchemaItemId> = {
-  [K in DsId]: DataSchemaItem<K> | undefined;
-};
+export type DataSchema = Record<DataId, DataSchemaItem | undefined>;
 
 type DataTemplateMapItem = {
   /**
    * The key we save the data in the card/ deck
    */
-  dataSchemaItemId: DataSchemaItemId;
+  dataId: DataId;
   /**
    * The key the template uses to render data
    */
-  templateSchemaItemId: TemplatesType.DataItemId;
+  templateDataId: TemplateDataId;
   /**
    * Useful for when the template has a default value set, but we want it to be null. As we wouldn't
    * usually have this null value in deck defaults (why add a data entry that doesn't match how your
@@ -53,23 +48,23 @@ type DataTemplateMapItem = {
    * defaults here for values you don't want the card to override e.g. background colour or
    * something.
    */
-  defaultValidatedValue?: TemplatesType.ValidatedValue;
+  defaultValidatedValue?: ValidatedValue;
 };
 
 export type DataTemplateMapping = Record<
-  TemplatesType.DataItemId,
+  TemplateDataId,
   DataTemplateMapItem | undefined
 >;
 
 export type SideTemplate = {
-  templateId: string;
+  templateId: TemplateId;
   dataTemplateMapping: DataTemplateMapping;
 };
 
 export type Templates = Record<CardSide, SideTemplate>;
 
-export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
-  id: DeckId;
+export interface Props {
+  id: Id;
   cards: Card[];
   templates: Templates;
   name: string;
@@ -78,13 +73,13 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
    * The order in which you want to show the card data in forms. Any missing items will be shown at
    * the end
    */
-  dataSchemaOrder: DsId[];
+  dataSchemaOrder?: DataId[];
   /**
    * Define the way you want to store ata about your cards. Using any keys you want. Mapping happens
    * a the template level
    */
-  dataSchema: DataSchema<DsId>;
-  defaultTabletopId: string;
+  dataSchema: DataSchema;
+  defaultTabletopId: TabletopId;
   status: "creating" | "active" | "deleting";
   canEdit: boolean;
   cardSize: CardSize;
@@ -92,6 +87,6 @@ export interface Props<DsId extends DataSchemaItemId = DataSchemaItemId> {
 }
 
 export interface State {
-  decksById: Record<DeckId, Props | undefined>;
-  deckIds: DeckId[];
+  decksById: Record<Id, Props | undefined>;
+  deckIds: Id[];
 }

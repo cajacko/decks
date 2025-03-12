@@ -6,9 +6,7 @@ import { createInitStacks } from "@/utils/minStacks";
 import uuid from "@/utils/uuid";
 import { getBuiltInState } from "../utils/withBuiltInState";
 
-export function resetTabletopHelper(props: {
-  tabletopId: Tabletops.TabletopId;
-}) {
+export function resetTabletopHelper(props: { tabletopId: Tabletops.Id }) {
   const builtInTabletop = selectTabletop(getBuiltInState(), props);
 
   if (builtInTabletop) {
@@ -18,7 +16,7 @@ export function resetTabletopHelper(props: {
     });
   }
 
-  const cardInstanceIds: string[] = [];
+  const cardInstanceIds: Tabletops.CardInstanceId[] = [];
   const cardInstancesById: Tabletops.HistoryState["cardInstancesById"] = {};
 
   const availableDeckCards = selectTabletopAvailableDeckCards(

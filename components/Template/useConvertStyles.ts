@@ -1,5 +1,5 @@
 import React from "react";
-import { Templates } from "@/store/types";
+import { Markup } from "@/store/types";
 import { usePhysicalMeasures } from "@/context/PhysicalMeasures";
 import { Values } from "./Template.types";
 import { replaceVariables } from "./handlebars";
@@ -33,7 +33,7 @@ const distanceProperties: string[] = [
   "borderLeftWidth",
   "fontSize",
   "lineHeight",
-] satisfies (keyof Templates.AllStyles)[];
+] satisfies (keyof Markup.AllStyles)[];
 
 export const variableRegex = /{{(.*?)}}/;
 
@@ -48,7 +48,7 @@ export default function useConvertStyles(props: {
    * a performant way
    */
   return React.useCallback(
-    <S extends Templates.ValidStyles>(style?: S): S | undefined => {
+    <S extends Markup.ValidStyles>(style?: S): S | undefined => {
       if (!style) return undefined;
 
       const newStyle: S = { ...style };
