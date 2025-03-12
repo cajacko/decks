@@ -15,6 +15,7 @@ export type RenderItemMenuItem<P extends MenuItem> = P & {
 export interface HoldMenuProps<I extends MenuItem> {
   renderItem: (item: RenderItemMenuItem<I>) => React.ReactNode;
   handleAction: (item: I) => void;
+  handlePress?: () => void;
   menuItems: I[];
   touchBuffer?: number;
 }

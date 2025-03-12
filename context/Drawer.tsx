@@ -5,6 +5,7 @@ import DrawerContent, {
 } from "@/components/Drawer";
 import AppError from "@/classes/AppError";
 import { useFocusEffect } from "expo-router";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export type DrawerProps = Omit<_DrawerProps, "isOpen" | "closeDrawer">;
 
@@ -42,6 +43,7 @@ export function useSetDrawerProps(drawerProps?: DrawerProps) {
 export function DrawerProvider(props: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [drawerProps, setDrawerProps] = React.useState<DrawerProps>({});
+  const backgroundColor = useThemeColor("background");
 
   const open = React.useCallback(() => {
     setIsOpen(true);
@@ -70,6 +72,13 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
     [drawerProps, isOpen, close],
   );
 
+  const drawerStyle = React.useMemo(
+    () => ({
+      backgroundColor,
+    }),
+    [backgroundColor],
+  );
+
   return (
     <Context.Provider value={value}>
       <Drawer
@@ -80,6 +89,7 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
         drawerPosition="right"
         drawerType="front"
         swipeEnabled={false}
+        drawerStyle={drawerStyle}
       >
         {props.children}
       </Drawer>

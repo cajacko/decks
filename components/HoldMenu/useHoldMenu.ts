@@ -184,8 +184,9 @@ export default function useHoldMenu<I extends MenuItem>({
     if (gestureState) {
       const hoveredItem = getHoveredItem(gestureState);
 
-      if (hoveredItem) {
+      if (hoveredItem && !actionHandled.current) {
         props.handleAction(hoveredItem);
+        actionHandled.current = true;
       }
     }
 
@@ -209,6 +210,9 @@ export default function useHoldMenu<I extends MenuItem>({
       }).start();
     }
   }
+
+  const panStartTime = React.useRef<number | null>(null);
+  const actionHandled = React.useRef<boolean | null>(null);
 
   const panResponder = React.useRef(
     PanResponder.create({
@@ -293,6 +297,8 @@ export default function useHoldMenu<I extends MenuItem>({
       },
 
       onPanResponderGrant: () => {
+        actionHandled.current = false;
+        panStartTime.current = Date.now();
         showHoldMenu();
       },
 
@@ -308,6 +314,28 @@ export default function useHoldMenu<I extends MenuItem>({
 
       onPanResponderRelease: (event, gestureState) => {
         hideHoldMenu(gestureState);
+
+        const timeOfPan = panStartTime.current
+          ? Date.now() - panStartTime.current
+          : null;
+
+        const travelledDistance = Math.abs(
+          Math.sqrt(gestureState.dx ** 2 + gestureState.dy ** 2),
+        );
+
+        if (
+          travelledDistance < 10 &&
+          timeOfPan &&
+          timeOfPan < 500 &&
+          !actionHandled.current
+        ) {
+          if (props.handlePress) {
+            props.handlePress();
+            actionHandled.current = true;
+          }
+        }
+
+        panStartTime.current = null;
       },
     }),
   ).current;

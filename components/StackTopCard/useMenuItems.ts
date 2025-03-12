@@ -29,32 +29,20 @@ export default function useMenuItems(props: StackTopCardProps) {
     // const sideTop = cardHeight / 2 - buttonSize * 1.25;
     // const sideBottom = sideTop + buttonSize * 1.5;
     const sideMiddle = cardHeight / 2 - buttonSize / 2;
-    const verticalLeft = cardWidth / 2 - buttonSize * 1.5;
-    const verticalRight = cardWidth / 2 + buttonSize * 0.5;
+    // const verticalLeft = cardWidth / 2 - buttonSize * 1.5;
+    // const verticalRight = cardWidth / 2 + buttonSize * 0.5;
 
     const items: StackTopCardMenuItem[] = [
       {
         key: "flip",
         top: bottom,
-        left: canEditCard ? verticalLeft : centerLeft,
+        left: centerLeft,
         height: buttonSize,
         width: buttonSize,
         icon: "flip",
         onPress: state.handleFlipCard,
       },
     ];
-
-    if (canEditCard) {
-      items.push({
-        key: "edit",
-        top: bottom,
-        left: verticalRight,
-        height: buttonSize,
-        width: buttonSize,
-        icon: "edit-document",
-        onPress: () => setShowEditModal(true),
-      });
-    }
 
     if (state.handleMoveToBottom) {
       items.push({
@@ -63,7 +51,7 @@ export default function useMenuItems(props: StackTopCardProps) {
         left: centerLeft,
         height: buttonSize,
         width: buttonSize,
-        icon: "vertical-align-bottom",
+        icon: "vertical-align-top",
         onPress: state.handleMoveToBottom,
       });
     }
@@ -101,8 +89,15 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.handleMoveToBottom,
     state.moveRight,
     state.moveLeft,
-    canEditCard,
   ]);
+
+  const handlePress = React.useMemo(() => {
+    if (!canEditCard) return undefined;
+
+    return () => {
+      setShowEditModal(true);
+    };
+  }, [canEditCard, setShowEditModal]);
 
   return {
     cardId: state.cardId,
@@ -113,5 +108,6 @@ export default function useMenuItems(props: StackTopCardProps) {
     showEditModal,
     closeEditModal,
     side: state.side,
+    handlePress,
   };
 }

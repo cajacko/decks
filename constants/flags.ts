@@ -7,6 +7,7 @@
  */
 
 import { UserSettings } from "@/store/types";
+import { Platform } from "react-native";
 
 // If set, this value will be used
 export const flagOverrides: Partial<UserSettings.FlagMap> = {};
@@ -63,6 +64,8 @@ export const defaultFlags: UserSettings.FlagMap = {
     {} as UserSettings.FlagMap,
   ),
   DEV_MODE: process.env.NODE_ENV === "development" ? true : false,
+  HOLD_MENU_BEHAVIOUR:
+    Platform.OS === "ios" || Platform.OS === "web" ? "always-visible" : "hold",
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(

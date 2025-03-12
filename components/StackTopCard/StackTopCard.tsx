@@ -47,6 +47,7 @@ export default function StackTopCard(
           menuItems={state.menuItems}
           handleAction={handleAction}
           renderItem={renderItem}
+          handlePress={state.handlePress}
         />
       ),
     }),
@@ -57,6 +58,7 @@ export default function StackTopCard(
       state.menuItems,
       handleAction,
       renderItem,
+      state.handlePress,
     ],
   );
 
