@@ -9,6 +9,7 @@ import {
   withTiming,
   withDelay,
   Easing,
+  WithTimingConfig,
 } from "react-native-reanimated";
 import useOffsetPositions from "./useOffsetPositions";
 
@@ -51,7 +52,7 @@ function bezierEasing({
       rotation = (x > 0 ? 1 : -1) * randomRotation();
       break;
     case "left":
-      x = -width - randomOffset();
+      x = -width;
       y = randomOffset();
       rotation = (y > 0 ? 1 : -1) * randomRotation();
       break;
@@ -70,6 +71,42 @@ function bezierEasing({
   };
 }
 
+function linear({
+  direction,
+  width,
+  height,
+}: {
+  direction: "top" | "right" | "bottom" | "left";
+  width: number;
+  height: number;
+}) {
+  let x = 0;
+  let y = 0;
+
+  switch (direction) {
+    case "top":
+      y = -height;
+      break;
+    case "right":
+      x = width;
+      break;
+    case "bottom":
+      y = height;
+      break;
+    case "left":
+      x = -width;
+      break;
+  }
+
+  return {
+    x,
+    y,
+    rotation: undefined,
+    easing: undefined,
+    opacityEasing: undefined,
+  };
+}
+
 export default function useCard(
   props: Pick<
     CardProps,
@@ -82,6 +119,7 @@ export default function useCard(
   >,
   ref: React.ForwardedRef<CardRef>,
 ) {
+  const animateOutBehaviour = useFlag("CARD_ANIMATE_OUT_BEHAVIOUR");
   const canAnimate = useFlag("CARD_ANIMATIONS") === "enabled";
   const cardSizes = useCardSizes(props);
   const height = cardSizes.dpHeight;
@@ -203,18 +241,25 @@ export default function useCard(
       rotate.value = rotate.value ?? 0;
 
       return new Promise<unknown>((resolve) => {
-        const { x, y, rotation, easing, opacityEasing } = bezierEasing({
-          direction,
-          width: widthRef.current,
-          height: heightRef.current,
-        });
+        const { x, y, rotation, easing, opacityEasing } =
+          animateOutBehaviour === "bezier"
+            ? bezierEasing({
+                direction,
+                width: widthRef.current,
+                height: heightRef.current,
+              })
+            : linear({
+                direction,
+                width: widthRef.current,
+                height: heightRef.current,
+              });
 
         const waitingFor: (
           | "translateX"
           | "translateY"
           | "animateOpacity"
           | "rotate"
-        )[] = ["translateX", "translateY", "rotate"];
+        )[] = ["translateX", "translateY"];
 
         function resolveIfReady(key: (typeof waitingFor)[number]) {
           waitingFor.splice(waitingFor.indexOf(key), 1);
@@ -224,26 +269,58 @@ export default function useCard(
           }
         }
 
-        translateX.value = withTiming(x, { duration, easing }, () => {
-          runOnJS(resolveIfReady)("translateX");
-        });
+        function getConfig({
+          easing,
+          duration,
+        }: WithTimingConfig): WithTimingConfig {
+          const config: WithTimingConfig = {
+            duration,
+          };
 
-        translateY.value = withTiming(y, { duration, easing }, () => {
-          runOnJS(resolveIfReady)("translateY");
-        });
+          if (easing) {
+            config.easing = easing;
+          }
 
-        rotate.value = withTiming(rotation, { duration, easing }, () => {
-          runOnJS(resolveIfReady)("rotate");
-        });
+          return config;
+        }
+
+        translateX.value = withTiming(
+          x,
+          getConfig({ duration, easing }),
+          () => {
+            runOnJS(resolveIfReady)("translateX");
+          },
+        );
+
+        translateY.value = withTiming(
+          y,
+          getConfig({ duration, easing }),
+          () => {
+            runOnJS(resolveIfReady)("translateY");
+          },
+        );
+
+        if (rotation !== undefined) {
+          waitingFor.push("rotate");
+
+          rotate.value = withTiming(
+            rotation,
+            getConfig({ duration, easing }),
+            () => {
+              runOnJS(resolveIfReady)("rotate");
+            },
+          );
+        }
 
         if (animateOpacity) {
           waitingFor.push("animateOpacity");
           opacity.value = 1;
+
           opacity.value = withDelay(
             (duration / 3) * 2,
             withTiming(
               0,
-              { duration: duration / 3, easing: opacityEasing },
+              getConfig({ duration: duration / 3, easing: opacityEasing }),
               () => {
                 runOnJS(resolveIfReady)("animateOpacity");
               },
@@ -252,7 +329,7 @@ export default function useCard(
         }
       }).finally(() => animationUpdateRef.current(animateKey, false));
     },
-    [canAnimate, translateX, translateY, opacity, rotate],
+    [canAnimate, translateX, translateY, opacity, rotate, animateOutBehaviour],
   );
 
   React.useImperativeHandle(ref, () => ({

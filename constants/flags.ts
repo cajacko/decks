@@ -70,6 +70,7 @@ export const defaultFlags: UserSettings.FlagMap = {
     Platform.OS === "ios" || Platform.OS === "web"
       ? "always-visible"
       : "hold/hover",
+  CARD_ANIMATE_OUT_BEHAVIOUR: Platform.OS === "web" ? "linear" : "bezier",
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(
