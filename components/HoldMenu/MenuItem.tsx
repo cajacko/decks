@@ -2,6 +2,7 @@ import React from "react";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 import { StyleProp, ViewStyle } from "react-native";
 import { MenuItemProps } from "./types";
+import { GestureDetector } from "react-native-gesture-handler";
 
 export default function MenuItem({
   component,
@@ -11,6 +12,7 @@ export default function MenuItem({
   style,
   contentStyle: contentStyleProp,
   isHighlighted,
+  tapGesture,
 }: MenuItemProps): React.ReactNode {
   const children = React.useMemo(
     () =>
@@ -53,7 +55,9 @@ export default function MenuItem({
 
   return (
     <Animated.View style={containerStyle}>
-      <Animated.View style={contentStyle}>{children}</Animated.View>
+      <GestureDetector gesture={tapGesture}>
+        <Animated.View style={contentStyle}>{children}</Animated.View>
+      </GestureDetector>
     </Animated.View>
   );
 }

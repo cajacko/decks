@@ -9,6 +9,7 @@ export default function withHoldMenuItem(
   return function HoldMenuItem({
     isHighlighted,
   }: MenuItemComponentProps): React.ReactNode {
-    return <CardAction icon={icon} onPress={action} active={isHighlighted} />;
+    // DO not pass the action in here as the hold menu covers it
+    return <CardAction icon={icon} active={isHighlighted} />;
   };
 }

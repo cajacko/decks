@@ -16,7 +16,7 @@ const fadeInDuration = 500;
 const fadeOutDuration = 200;
 const scaleSize = 1.05;
 const scaleDuration = 200;
-const showMenuDelay = 500;
+const showMenuDelay = 200;
 
 export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
   // Flags
@@ -49,11 +49,14 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
       Gesture.Tap()
         .enabled(!!handlePress)
         .maxDuration(maxTimeoutForTap)
+        .maxDistance(10000)
+        .shouldCancelWhenOutside(false)
         .onEnd(() => {
           if (!handlePress) return;
 
           runOnJS(handlePress)();
         }),
+
     [handlePress],
   );
 
@@ -112,6 +115,11 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
       .onStart(() => {
         menuOpacity.value = withTiming(1, {
           duration: fadeInDuration,
+        });
+      })
+      .onEnd(() => {
+        menuOpacity.value = withTiming(0, {
+          duration: fadeOutDuration,
         });
       });
   }, [menuOpacity, holdMenuBehaviour]);
@@ -217,6 +225,44 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
     );
   }, [tap, longPress, pan, hover, touching]);
 
+  const menuTaps = React.useMemo(
+    () => ({
+      top: Gesture.Tap()
+        .enabled(!!menuItems.top)
+        .onEnd(() => {
+          if (!menuItems.top) return;
+
+          runOnJS(menuItems.top.handleAction)();
+        })
+        .blocksExternalGesture(...gesture.toGestureArray()),
+      bottom: Gesture.Tap()
+        .enabled(!!menuItems.bottom)
+        .onEnd(() => {
+          if (!menuItems.bottom) return;
+
+          runOnJS(menuItems.bottom.handleAction)();
+        })
+        .blocksExternalGesture(...gesture.toGestureArray()),
+      left: Gesture.Tap()
+        .enabled(!!menuItems.left)
+        .onEnd(() => {
+          if (!menuItems.left) return;
+
+          runOnJS(menuItems.left.handleAction)();
+        })
+        .blocksExternalGesture(...gesture.toGestureArray()),
+      right: Gesture.Tap()
+        .enabled(!!menuItems.right)
+        .onEnd(() => {
+          if (!menuItems.right) return;
+
+          runOnJS(menuItems.right.handleAction)();
+        })
+        .blocksExternalGesture(...gesture.toGestureArray()),
+    }),
+    [menuItems, gesture],
+  );
+
   return {
     alwaysShowCardActions,
     gesture,
@@ -227,5 +273,6 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
     devIndicatorOpacity,
     devStartIndicator,
     scale,
+    menuTaps,
   };
 }

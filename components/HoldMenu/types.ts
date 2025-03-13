@@ -1,5 +1,6 @@
 import React from "react";
 import { ViewStyle } from "react-native";
+import { GestureType } from "react-native-gesture-handler";
 import { AnimatedStyle } from "react-native-reanimated";
 
 export interface MenuItemComponentProps {
@@ -19,6 +20,7 @@ export interface MenuItemProps extends MenuItem {
   style?: AnimatedStyle<ViewStyle>;
   contentStyle?: AnimatedStyle<ViewStyle>;
   isHighlighted?: boolean;
+  tapGesture: GestureType;
 }
 
 export type MenuPosition = "top" | "bottom" | "left" | "right";
