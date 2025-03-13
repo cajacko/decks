@@ -20,10 +20,12 @@ function bezierEasing({
   direction,
   width,
   height,
+  addBuffer = 0,
 }: {
   direction: "top" | "right" | "bottom" | "left";
   width: number;
   height: number;
+  addBuffer?: number;
 }) {
   let x = 0;
   let y = 0;
@@ -37,22 +39,22 @@ function bezierEasing({
 
   switch (direction) {
     case "top":
-      y = -height;
+      y = -height - addBuffer;
       x = randomOffset();
       rotation = (x > 0 ? 1 : -1) * randomRotation();
       break;
     case "right":
-      x = width;
+      x = width + addBuffer;
       y = randomOffset();
       rotation = (y > 0 ? 1 : -1) * randomRotation();
       break;
     case "bottom":
-      y = height;
+      y = height + addBuffer;
       x = randomOffset();
       rotation = (x > 0 ? 1 : -1) * randomRotation();
       break;
     case "left":
-      x = -width;
+      x = -width - addBuffer;
       y = randomOffset();
       rotation = (y > 0 ? 1 : -1) * randomRotation();
       break;
@@ -75,26 +77,28 @@ function linear({
   direction,
   width,
   height,
+  addBuffer = 0,
 }: {
   direction: "top" | "right" | "bottom" | "left";
   width: number;
   height: number;
+  addBuffer?: number;
 }) {
   let x = 0;
   let y = 0;
 
   switch (direction) {
     case "top":
-      y = -height;
+      y = -height - addBuffer;
       break;
     case "right":
-      x = width;
+      x = width + addBuffer;
       break;
     case "bottom":
-      y = height;
+      y = height + addBuffer;
       break;
     case "left":
-      x = -width;
+      x = -width - addBuffer;
       break;
   }
 
@@ -228,7 +232,12 @@ export default function useCard(
   }, [canAnimate, scaleX, rotate, initialRotation]);
 
   const animateOut = React.useCallback<CardRef["animateOut"]>(
-    async ({ animateOpacity = true, duration = 300, direction }) => {
+    async ({
+      animateOpacity = true,
+      duration = 300,
+      direction,
+      animateBack,
+    }) => {
       if (!canAnimate) {
         return;
       }
@@ -239,6 +248,7 @@ export default function useCard(
       translateX.value = translateX.value ?? 0;
       translateY.value = translateY.value ?? 0;
       rotate.value = rotate.value ?? 0;
+      const addBuffer = animateBack ? 40 : undefined;
 
       return new Promise<unknown>((resolve) => {
         const { x, y, rotation, easing, opacityEasing } =
@@ -247,11 +257,13 @@ export default function useCard(
                 direction,
                 width: widthRef.current,
                 height: heightRef.current,
+                addBuffer,
               })
             : linear({
                 direction,
                 width: widthRef.current,
                 height: heightRef.current,
+                addBuffer,
               });
 
         const waitingFor: (
@@ -265,7 +277,36 @@ export default function useCard(
           waitingFor.splice(waitingFor.indexOf(key), 1);
 
           if (waitingFor.length === 0) {
-            resolve(undefined);
+            if (animateBack) {
+              animateBack().finally(() => {
+                opacity.value = 1;
+
+                opacity.value = withDelay(
+                  duration / 2,
+                  withTiming(
+                    0,
+                    getConfig({
+                      duration: duration / 3,
+                      easing: opacityEasing,
+                    }),
+                  ),
+                );
+                rotate.value = withTiming(0, getConfig({ duration, easing }));
+                translateX.value = withTiming(
+                  0,
+                  getConfig({ duration, easing }),
+                );
+                translateY.value = withTiming(
+                  0,
+                  getConfig({ duration, easing }),
+                  () => {
+                    runOnJS(resolve)(undefined);
+                  },
+                );
+              });
+            } else {
+              resolve(undefined);
+            }
           }
         }
 
@@ -312,7 +353,7 @@ export default function useCard(
           );
         }
 
-        if (animateOpacity) {
+        if (animateOpacity && !animateBack) {
           waitingFor.push("animateOpacity");
           opacity.value = 1;
 

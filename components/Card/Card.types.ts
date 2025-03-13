@@ -41,6 +41,7 @@ export interface AnimateOutProps {
   direction: "top" | "right" | "bottom" | "left";
   duration?: number;
   animateOpacity?: boolean;
+  animateBack?: () => Promise<void>;
 }
 
 export interface CardRef {

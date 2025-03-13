@@ -83,5 +83,6 @@ export default function useMenuItems(props: StackTopCardProps) {
     closeEditModal,
     side: state.side,
     handlePress,
+    animatedToBack: state.animatedToBack,
   };
 }

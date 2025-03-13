@@ -5,11 +5,12 @@ import HoldMenu from "../HoldMenu";
 import useMenuItems from "./useMenuItems";
 import EditCardModal from "../EditCardModal";
 import { Target } from "@/utils/cardTarget";
+import { StyleProp, ViewStyle } from "react-native";
 
 export * from "./types";
 
 export default function StackTopCard({
-  style,
+  style: styleProp,
   ...props
 }: StackTopCardProps): React.ReactNode {
   const state = useMenuItems(props);
@@ -26,6 +27,12 @@ export default function StackTopCard({
     (): Target => ({ id: state.cardId, type: "card" }),
     [state.cardId],
   );
+
+  const style = React.useMemo((): StyleProp<ViewStyle> => {
+    if (state.animatedToBack) return [styleProp, { zIndex: 0 }];
+
+    return styleProp;
+  }, [styleProp, state.animatedToBack]);
 
   return (
     <>

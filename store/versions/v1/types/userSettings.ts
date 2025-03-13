@@ -11,6 +11,7 @@ export const flagMap = {
   STACK_OFFSET_BEHAVIOUR: ["messy", "neat"],
 
   // Dev flags
+  CARD_ANIMATE_SEND_TO_BACK: ["enabled", "disabled"],
   CARD_ANIMATE_OUT_BEHAVIOUR: ["linear", "bezier"],
   HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],
   BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],

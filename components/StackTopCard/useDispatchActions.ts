@@ -21,6 +21,11 @@ export default function useDispatchActions({
 }: StackTopCardProps) {
   const { tabletopId } = useTabletopContext();
 
+  const animateSendToBack = useFlag("CARD_ANIMATE_SEND_TO_BACK") === "enabled";
+  const [animatedToBack, setAnimatedToBack] = React.useState<string | null>(
+    null,
+  );
+
   const { cardId, side } = useRequiredAppSelector(
     (state) => selectCardInstance(state, { tabletopId, cardInstanceId }),
     useDispatchActions.name,
@@ -160,6 +165,11 @@ export default function useDispatchActions({
         try {
           await cardInstanceRef.current.animateOut({
             direction: "top",
+            animateBack: animateSendToBack
+              ? async () => {
+                  setAnimatedToBack(cardInstanceId);
+                }
+              : undefined,
           });
         } catch {}
       }
@@ -175,6 +185,7 @@ export default function useDispatchActions({
       );
     };
   }, [
+    animateSendToBack,
     dispatch,
     cardInstanceId,
     stackId,
@@ -195,5 +206,6 @@ export default function useDispatchActions({
     handleMoveToBottom,
     setIsAnimating,
     hideActions: isAnimating,
+    animatedToBack,
   };
 }

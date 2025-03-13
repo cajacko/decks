@@ -1,5 +1,5 @@
 import React from "react";
-import { ViewStyle } from "react-native";
+import { StyleProp, ViewStyle } from "react-native";
 import { GestureType } from "react-native-gesture-handler";
 import { AnimatedStyle } from "react-native-reanimated";
 
@@ -34,6 +34,6 @@ export interface HoldMenuProps {
   menuItems: MenuItems;
   touchBuffer?: number;
   children?: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   hideActions?: boolean;
 }
