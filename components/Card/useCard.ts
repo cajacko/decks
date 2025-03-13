@@ -15,6 +15,61 @@ import useOffsetPositions from "./useOffsetPositions";
 export const flipScaleDuration = 200;
 export const flipRotationDuration = Math.round(flipScaleDuration / 4);
 
+function bezierEasing({
+  direction,
+  width,
+  height,
+}: {
+  direction: "top" | "right" | "bottom" | "left";
+  width: number;
+  height: number;
+}) {
+  let x = 0;
+  let y = 0;
+  let rotation = 0;
+
+  // Small random variations for a more organic feel
+  const randomOffset = () =>
+    (Math.random() > 0.5 ? 1 : -1) * (Math.random() - 0.5) * 50; // +/- 20 pixels
+
+  const randomRotation = () => (Math.random() - 0.5) * 20; // +/- 5 degrees
+
+  switch (direction) {
+    case "top":
+      y = -height;
+      x = randomOffset();
+      rotation = (x > 0 ? 1 : -1) * randomRotation();
+      break;
+    case "right":
+      x = width;
+      y = randomOffset();
+      rotation = (y > 0 ? 1 : -1) * randomRotation();
+      break;
+    case "bottom":
+      y = height;
+      x = randomOffset();
+      rotation = (x > 0 ? 1 : -1) * randomRotation();
+      break;
+    case "left":
+      x = -width - randomOffset();
+      y = randomOffset();
+      rotation = (y > 0 ? 1 : -1) * randomRotation();
+      break;
+  }
+
+  // https://cubic-bezier.com/#.62,.07,.96,.58
+  const easing = Easing.bezier(0.62, 0.07, 0.96, 0.58);
+  const opacityEasing = Easing.ease;
+
+  return {
+    x,
+    y,
+    rotation,
+    easing,
+    opacityEasing,
+  };
+}
+
 export default function useCard(
   props: Pick<
     CardProps,
@@ -145,30 +200,21 @@ export default function useCard(
 
       translateX.value = translateX.value ?? 0;
       translateY.value = translateY.value ?? 0;
+      rotate.value = rotate.value ?? 0;
 
       return new Promise<unknown>((resolve) => {
-        let x = 0;
-        let y = 0;
+        const { x, y, rotation, easing, opacityEasing } = bezierEasing({
+          direction,
+          width: widthRef.current,
+          height: heightRef.current,
+        });
 
-        switch (direction) {
-          case "top":
-            y = -heightRef.current;
-            break;
-          case "right":
-            x = widthRef.current;
-            break;
-          case "bottom":
-            y = heightRef.current;
-            break;
-          case "left":
-            x = -widthRef.current;
-            break;
-        }
-
-        const waitingFor: ("translateX" | "translateY" | "animateOpacity")[] = [
-          "translateX",
-          "translateY",
-        ];
+        const waitingFor: (
+          | "translateX"
+          | "translateY"
+          | "animateOpacity"
+          | "rotate"
+        )[] = ["translateX", "translateY", "rotate"];
 
         function resolveIfReady(key: (typeof waitingFor)[number]) {
           waitingFor.splice(waitingFor.indexOf(key), 1);
@@ -178,8 +224,6 @@ export default function useCard(
           }
         }
 
-        const easing = Easing.ease;
-
         translateX.value = withTiming(x, { duration, easing }, () => {
           runOnJS(resolveIfReady)("translateX");
         });
@@ -188,26 +232,27 @@ export default function useCard(
           runOnJS(resolveIfReady)("translateY");
         });
 
+        rotate.value = withTiming(rotation, { duration, easing }, () => {
+          runOnJS(resolveIfReady)("rotate");
+        });
+
         if (animateOpacity) {
           waitingFor.push("animateOpacity");
-
           opacity.value = 1;
-
           opacity.value = withDelay(
             (duration / 3) * 2,
             withTiming(
               0,
-              { duration: duration / 3, easing: Easing.ease },
+              { duration: duration / 3, easing: opacityEasing },
               () => {
                 runOnJS(resolveIfReady)("animateOpacity");
               },
             ),
           );
-        } else {
         }
       }).finally(() => animationUpdateRef.current(animateKey, false));
     },
-    [canAnimate, translateX, translateY, opacity],
+    [canAnimate, translateX, translateY, opacity, rotate],
   );
 
   React.useImperativeHandle(ref, () => ({
