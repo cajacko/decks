@@ -1,24 +1,37 @@
-export type MenuItem<P extends object = object> = P & {
-  key: string;
+import React from "react";
+import { ViewStyle } from "react-native";
+import { AnimatedStyle } from "react-native-reanimated";
+
+export interface MenuItemComponentProps {
+  isHighlighted?: boolean;
+}
+export interface MenuItem {
   height: number;
   width: number;
-};
+  handleAction: () => void;
+  component:
+    | React.ReactNode
+    | ((props: MenuItemComponentProps) => React.ReactNode);
+}
 
-export type RenderItemMenuItem<P extends MenuItem> = P & {
-  highlight: boolean;
-  holdMenuBehaviour: "hold" | "always-visible";
-};
+export interface MenuItemProps extends MenuItem {
+  position: MenuPosition;
+  style?: AnimatedStyle<ViewStyle>;
+  contentStyle?: AnimatedStyle<ViewStyle>;
+  isHighlighted?: boolean;
+}
 
 export type MenuPosition = "top" | "bottom" | "left" | "right";
 
-export type MenuItems<P extends object = object> = {
-  [K in MenuPosition]?: MenuItem<P>;
+export type MenuItems = {
+  [K in MenuPosition]?: MenuItem;
 };
 
-export interface HoldMenuProps<I extends MenuItem> {
-  renderItem: (item: RenderItemMenuItem<I>) => React.ReactNode;
-  handleAction: (item: I) => void;
+export interface HoldMenuProps {
   handlePress?: () => void;
-  menuItems: MenuItems<I>;
+  menuItems: MenuItems;
   touchBuffer?: number;
+  children?: React.ReactNode;
+  style?: ViewStyle;
+  hideActions?: boolean;
 }

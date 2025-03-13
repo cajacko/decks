@@ -9,7 +9,7 @@ export const flagMap = {
   PERFORMANCE_MODE: ["disabled", "enabled"],
 
   // Dev flags
-  HOLD_MENU_BEHAVIOUR: ["hold", "always-visible"],
+  HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
   HOLD_MENU_PAN_RESPONDER_BEHAVIOUR: ["decide-on-action", "always-set"],
   HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],
   BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],

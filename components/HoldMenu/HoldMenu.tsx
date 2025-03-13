@@ -1,110 +1,114 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { MenuItem, HoldMenuProps } from "./types";
+import { StyleSheet } from "react-native";
+import { HoldMenuProps } from "./types";
 import useHoldMenu from "./useHoldMenu";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import {
   GestureDetector,
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
+import MenuItem from "./MenuItem";
 
 export const HoldMenuWrapper = GestureHandlerRootView;
 
-export default function HoldMenu<I extends MenuItem>(
-  props: HoldMenuProps<I>,
-): React.ReactNode {
-  const state = useHoldMenu<I>(props);
+export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
+  const state = useHoldMenu(props);
 
-  const rightStyle = useAnimatedStyle(() => ({
-    opacity: state.activeDirection.value === "right" ? 1 : 0.5,
-  }));
-  const leftStyle = useAnimatedStyle(() => ({
-    opacity: state.activeDirection.value === "left" ? 1 : 0.5,
-  }));
-  const topStyle = useAnimatedStyle(() => ({
-    opacity: state.activeDirection.value === "top" ? 1 : 0.5,
-  }));
-  const bottomStyle = useAnimatedStyle(() => ({
-    opacity: state.activeDirection.value === "bottom" ? 1 : 0.5,
+  const _menuItemStyle = useAnimatedStyle(() => ({
+    opacity: state.menuOpacity.value,
   }));
 
-  return (
-    <GestureDetector gesture={state.pan}>
-      <View
-        style={styles.container}
-        // {...state.panResponder?.panHandlers}
-        ref={state.menuRef}
-        onPointerEnter={state.onPointerEnter}
-        onPointerLeave={state.onPointerLeave}
-        onPointerMove={state.onPointerEnter}
-      >
-        {state.devIndicator && (
-          <>
-            <Animated.View
-              style={[
-                styles.devIndicator,
-                styles.devIndicatorStart,
-                state.devIndicatorStartStyle,
-              ]}
-            />
-            <Animated.View
-              style={[
-                styles.devIndicator,
-                styles.devIndicatorEnd,
-                state.devIndicatorEndStyle,
-              ]}
-            />
-          </>
-        )}
-        {Object.entries(props.menuItems).map(
-          ([position, menuItem]) =>
-            menuItem && (
-              <Animated.View
-                key={menuItem.key}
-                style={{
-                  position: "absolute",
-                  top: position === "top" ? -menuItem.height / 2 : undefined,
-                  left: position === "left" ? -menuItem.width / 2 : undefined,
-                  right: position === "right" ? -menuItem.width / 2 : undefined,
-                  bottom:
-                    position === "bottom" ? -menuItem.height / 2 : undefined,
-                  opacity: state.opacity,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width:
-                    position === "top" || position === "bottom"
-                      ? "100%"
-                      : undefined,
-                  height:
-                    position === "left" || position === "right"
-                      ? "100%"
-                      : undefined,
-                }}
-              >
-                <Animated.View
-                  style={[
-                    {
-                      height: menuItem.height,
-                      width: menuItem.width,
-                    },
-                    position === "top" && topStyle,
-                    position === "bottom" && bottomStyle,
-                    position === "left" && leftStyle,
-                    position === "right" && rightStyle,
-                  ]}
-                >
-                  {props.renderItem({
-                    ...menuItem,
-                    highlight: false,
-                    holdMenuBehaviour: state.holdMenuBehaviour,
-                  })}
-                </Animated.View>
-              </Animated.View>
-            ),
-        )}
-      </View>
-    </GestureDetector>
+  const menuItemStyle = state.alwaysShowCardActions
+    ? undefined
+    : _menuItemStyle;
+
+  const scaleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: state.scale.value }],
+  }));
+
+  const hasChildren = !!props.children;
+
+  const containerStyle = React.useMemo(
+    () => [
+      hasChildren ? styles.containerWithChildren : styles.container,
+      props.style,
+    ],
+    [hasChildren, props.style],
   );
+
+  const childrenStyle = React.useMemo(
+    () => [styles.children, scaleStyle],
+    [scaleStyle],
+  );
+
+  const component = (
+    <Animated.View
+      style={containerStyle}
+      ref={state.menuRef}
+      onPointerEnter={state.onPointerEnter}
+      onPointerLeave={state.onPointerLeave}
+      onPointerMove={state.onPointerEnter}
+    >
+      {props.children && (
+        <Animated.View style={childrenStyle}>{props.children}</Animated.View>
+      )}
+      {props.menuItems.top && (
+        <MenuItem
+          {...props.menuItems.top}
+          position="top"
+          style={menuItemStyle}
+          isHighlighted={state.highlightedPosition === "top"}
+        />
+      )}
+      {props.menuItems.bottom && (
+        <MenuItem
+          {...props.menuItems.bottom}
+          position="bottom"
+          style={menuItemStyle}
+          isHighlighted={state.highlightedPosition === "bottom"}
+        />
+      )}
+      {props.menuItems.left && (
+        <MenuItem
+          {...props.menuItems.left}
+          position="left"
+          style={menuItemStyle}
+          isHighlighted={state.highlightedPosition === "left"}
+        />
+      )}
+      {props.menuItems.right && (
+        <MenuItem
+          {...props.menuItems.right}
+          position="right"
+          style={menuItemStyle}
+          isHighlighted={state.highlightedPosition === "right"}
+        />
+      )}
+
+      {state.devIndicator && (
+        <>
+          <Animated.View
+            style={[
+              styles.devIndicator,
+              styles.devIndicatorStart,
+              state.devIndicatorStartStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.devIndicator,
+              styles.devIndicatorEnd,
+              state.devIndicatorEndStyle,
+            ]}
+          />
+        </>
+      )}
+    </Animated.View>
+  );
+
+  if (!state.pan) return component;
+
+  return <GestureDetector gesture={state.pan}>{component}</GestureDetector>;
 }
 
 const styles = StyleSheet.create({
@@ -116,6 +120,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     cursor: "pointer",
   },
+  containerWithChildren: {
+    position: "relative",
+    cursor: "pointer",
+  },
+  children: {
+    zIndex: 1,
+    position: "relative",
+  },
   devIndicator: {
     height: 20,
     width: 20,
@@ -123,6 +135,7 @@ const styles = StyleSheet.create({
     left: -10,
     borderRadius: 10,
     position: "absolute",
+    zIndex: 3,
   },
   devIndicatorStart: {
     backgroundColor: "green",

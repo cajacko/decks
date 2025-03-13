@@ -65,7 +65,9 @@ export const defaultFlags: UserSettings.FlagMap = {
   ),
   DEV_MODE: process.env.NODE_ENV === "development" ? true : false,
   HOLD_MENU_BEHAVIOUR:
-    Platform.OS === "ios" || Platform.OS === "web" ? "always-visible" : "hold",
+    Platform.OS === "ios" || Platform.OS === "web"
+      ? "always-visible"
+      : "hold/hover",
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(
