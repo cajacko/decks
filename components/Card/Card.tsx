@@ -1,37 +1,65 @@
 import React from "react";
-import { Animated, View } from "react-native";
+import { View } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
 import { getContainerStyle, getInnerStyle } from "./card.styles";
 import useCard from "./useCard";
 import { PhysicalMeasuresProvider } from "@/context/PhysicalMeasures";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { DefaultStyle } from "react-native-reanimated/lib/typescript/hook/commonTypes";
 
 export default React.forwardRef<CardRef, CardProps>(function Card(props, ref) {
   const state = useCard(props, ref);
+
+  const animationStyle = useAnimatedStyle<
+    Pick<DefaultStyle, "transform" | "opacity">
+  >(() => {
+    let transform: DefaultStyle["transform"] = [];
+
+    if (state.translateX.value !== null) {
+      transform = [...transform, { translateX: state.translateX.value }];
+    }
+
+    if (state.translateY.value !== null) {
+      transform = [...transform, { translateY: state.translateY.value }];
+    }
+
+    if (state.rotate.value !== null) {
+      transform = [...transform, { rotate: `${state.rotate.value}deg` }];
+    }
+
+    if (state.scaleX.value !== null) {
+      transform = [...transform, { scaleX: state.scaleX.value }];
+    }
+
+    const style: Pick<DefaultStyle, "transform" | "opacity"> = {};
+
+    if (transform.length > 0) {
+      style.transform = transform;
+    }
+
+    if (state.opacity.value !== null) {
+      style.opacity = state.opacity.value;
+    }
+
+    return style;
+  });
 
   const containerStyle = React.useMemo(
     () =>
       getContainerStyle({
         ...state.cardSizes,
-        opacity: state.opacity,
-        scaleX: state.scaleX,
-        translateX: state.translateX,
-        translateY: state.translateY,
         style: props.style,
         zIndex: props.zIndex,
         offsetPosition: props.offsetPosition,
-        rotate: state.rotate,
+        animationStyle,
       }),
     [
       state.cardSizes,
-      state.opacity,
-      state.scaleX,
-      state.translateX,
-      state.translateY,
       props.style,
       props.zIndex,
       props.offsetPosition,
-      state.rotate,
+      animationStyle,
     ],
   );
 

@@ -1,17 +1,18 @@
 import React from "react";
-import { Animated } from "react-native";
 import { CardProps, CardRef } from "./Card.types";
-// import { useTabletopContext } from "../Tabletop/Tabletop.context";
-import {
-  withAnimateOut,
-  withAnimateFlipIn,
-  withAnimateFlipOut,
-} from "./animations";
-// import { getOffsetPositions, parseCardSize } from "./card.styles";
 import { getOffsetPositions } from "./card.styles";
 import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 import { useCardSizes } from "./CardSize.context";
 import useFlag from "@/hooks/useFlag";
+import {
+  runOnJS,
+  useSharedValue,
+  withTiming,
+  withDelay,
+} from "react-native-reanimated";
+
+export const flipScaleDuration = 200;
+export const flipRotationDuration = Math.round(flipScaleDuration / 4);
 
 export default function useCard(
   props: Pick<
@@ -30,8 +31,6 @@ export default function useCard(
   const height = cardSizes.dpHeight;
   const width = cardSizes.dpWidth;
 
-  // const { height, width } = parseCardSize(useTabletopContext());
-
   const offsetPositions = React.useMemo(
     () => getOffsetPositions(cardSizes),
     [cardSizes],
@@ -43,15 +42,13 @@ export default function useCard(
   );
 
   const isAnimatingRef = React.useRef<Record<string, boolean | undefined>>({});
-  const translateX = React.useRef(new Animated.Value(offsetPosition.x ?? 0));
-  const translateY = React.useRef(new Animated.Value(offsetPosition.y ?? 0));
-
-  const rotate = React.useRef(
-    new Animated.Value(props.initialRotation ?? offsetPosition.rotate ?? 0),
+  const translateX = useSharedValue<number | null>(offsetPosition?.x ?? null);
+  const translateY = useSharedValue<number | null>(offsetPosition?.y ?? null);
+  const opacity = useSharedValue<number | null>(null);
+  const rotate = useSharedValue<number | null>(
+    props.initialRotation ?? offsetPosition?.rotate ?? null,
   );
-
-  const opacity = React.useRef(new Animated.Value(1));
-  const scaleX = React.useRef(new Animated.Value(props.initialScaleX ?? 1));
+  const scaleX = useSharedValue<number | null>(props.initialScaleX ?? null);
 
   function getIsAnimating() {
     return Object.values(isAnimatingRef.current).some(
@@ -76,42 +73,138 @@ export default function useCard(
   const animationUpdateRef = React.useRef(animationUpdate);
   const heightRef = React.useRef(height);
   const widthRef = React.useRef(width);
-  const initialRotation = React.useRef(offsetPosition.rotate);
+  const initialRotation = useSharedValue<number | null>(
+    offsetPosition?.rotate ?? null,
+  );
 
   animationUpdateRef.current = animationUpdate;
   heightRef.current = height;
   widthRef.current = width;
-  initialRotation.current = offsetPosition.rotate;
+
+  React.useEffect(() => {
+    initialRotation.value = offsetPosition?.rotate ?? null;
+  }, [initialRotation, offsetPosition?.rotate]);
+
+  const animateFlipOut = React.useCallback<CardRef["animateFlipOut"]>(() => {
+    const animateKey = "flip";
+
+    animationUpdateRef.current(animateKey, true);
+
+    rotate.value = initialRotation.value ?? 0;
+    scaleX.value = 1;
+
+    return new Promise((resolve) => {
+      if (!canAnimate) {
+        return resolve(undefined);
+      }
+
+      rotate.value = withTiming(0, { duration: flipRotationDuration }, () => {
+        scaleX.value = withTiming(0, { duration: flipScaleDuration }, () => {
+          runOnJS(resolve)(undefined);
+        });
+      });
+    }).finally(() => animationUpdateRef.current(animateKey, false));
+  }, [canAnimate, rotate, scaleX, initialRotation]);
+
+  const animateFlipIn = React.useCallback<CardRef["animateFlipIn"]>(() => {
+    const animateKey = "flipIn";
+
+    animationUpdateRef.current(animateKey, true);
+
+    rotate.value = 0;
+    scaleX.value = 0;
+
+    return new Promise((resolve) => {
+      if (!canAnimate) {
+        return resolve(undefined);
+      }
+
+      scaleX.value = withTiming(1, { duration: flipScaleDuration }, () => {
+        rotate.value = withTiming(
+          initialRotation.value ?? 0,
+          { duration: flipRotationDuration },
+          () => {
+            runOnJS(resolve)(undefined);
+          },
+        );
+      });
+    }).finally(() => {
+      animationUpdateRef.current(animateKey, false);
+      scaleX.value = null;
+      rotate.value = initialRotation.value ?? null;
+    });
+  }, [canAnimate, scaleX, rotate, initialRotation]);
+
+  const animateOut = React.useCallback<CardRef["animateOut"]>(
+    async ({ animateOpacity = true, duration = 300, direction }) => {
+      if (!canAnimate) {
+        return;
+      }
+
+      const animateKey = "out";
+      animationUpdateRef.current(animateKey, true);
+
+      return new Promise<unknown>((resolve) => {
+        let x = 0,
+          y = 0;
+
+        switch (direction) {
+          case "top":
+            y = -heightRef.current;
+            break;
+          case "right":
+            x = widthRef.current;
+            break;
+          case "bottom":
+            y = heightRef.current;
+            break;
+          case "left":
+            x = -widthRef.current;
+            break;
+        }
+
+        const waitingFor: ("translateX" | "translateY" | "animateOpacity")[] = [
+          "translateX",
+          "translateY",
+        ];
+
+        function resolveIfReady(key: (typeof waitingFor)[number]) {
+          waitingFor.splice(waitingFor.indexOf(key), 1);
+
+          if (waitingFor.length === 0) {
+            resolve(undefined);
+          }
+        }
+
+        translateX.value = withTiming(x, { duration }, () => {
+          runOnJS(resolveIfReady)("translateX");
+        });
+
+        translateY.value = withTiming(y, { duration }, () => {
+          runOnJS(resolveIfReady)("translateY");
+        });
+
+        if (animateOpacity) {
+          waitingFor.push("animateOpacity");
+
+          opacity.value = withDelay(
+            duration / 2,
+            withTiming(0, { duration: duration / 3 }, () => {
+              runOnJS(resolveIfReady)("animateOpacity");
+            }),
+          );
+        } else {
+        }
+      }).finally(() => animationUpdateRef.current(animateKey, false));
+    },
+    [canAnimate, translateX, translateY, opacity],
+  );
 
   React.useImperativeHandle(ref, () => ({
     getIsAnimating,
-    prepareForFlipIn: () => {
-      scaleX.current.setValue(0);
-      rotate.current.setValue(0);
-    },
-    animateFlipOut: withAnimateFlipOut({
-      animationUpdate: animationUpdateRef,
-      scaleX,
-      rotate,
-      initialRotation,
-      canAnimate,
-    }),
-    animateFlipIn: withAnimateFlipIn({
-      animationUpdate: animationUpdateRef,
-      scaleX,
-      rotate,
-      initialRotation,
-      canAnimate,
-    }),
-    animateOut: withAnimateOut({
-      animationUpdate: animationUpdateRef,
-      translateX,
-      height: heightRef,
-      opacity,
-      translateY,
-      width: widthRef,
-      canAnimate,
-    }),
+    animateFlipOut,
+    animateFlipIn,
+    animateOut,
   }));
 
   return {

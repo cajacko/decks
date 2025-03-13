@@ -112,6 +112,7 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
       .enabled(holdMenuBehaviour !== "always-visible")
       .minDuration(showMenuDelay)
       .maxDistance(10000)
+      .shouldCancelWhenOutside(false)
       .onStart(() => {
         menuOpacity.value = withTiming(1, {
           duration: fadeInDuration,

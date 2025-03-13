@@ -78,8 +78,6 @@ export default function useStack({
           runOnJS(resolve)();
         });
       });
-
-      await new Promise((resolve) => setTimeout(resolve, duration / 2));
     }
 
     dispatch(
