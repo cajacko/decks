@@ -8,12 +8,6 @@ import { StackProps } from "./stack.types";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
-import { getOffsetPositions } from "@/components/Card/card.styles";
-import {
-  getCardSizes,
-  defaultCardDpWidth,
-  defaultCardDimensions,
-} from "../Card/cardSizes";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import {
   deleteStack,
@@ -21,15 +15,7 @@ import {
 } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
 import useFlag from "@/hooks/useFlag";
-
-// These dummy values aren't getting used, we just want the length and doing it this way to keep a
-// single source of truth for the number of offset positions.
-const offsetPositionsCount = getOffsetPositions(
-  getCardSizes({
-    constraints: { width: defaultCardDpWidth },
-    proportions: defaultCardDimensions,
-  }),
-).length;
+import useOffsetPositions from "@/components/Card/useOffsetPositions";
 
 export default function useStack({
   stackId,
@@ -37,6 +23,12 @@ export default function useStack({
   canDelete = false,
   canShowEditDeck = false,
 }: StackProps) {
+  // we just want the length and doing it this way to keep a
+  // single source of truth for the number of offset positions
+  const offsetPositions = useOffsetPositions();
+  // Our fallback needs to be enough for see a card behind when animating
+  const offsetPositionsCount = offsetPositions ? offsetPositions.length : 2;
+
   const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
   const dispatch = useAppDispatch();
   const { tabletopId, stackWidth, deckId } = useTabletopContext();
@@ -53,7 +45,10 @@ export default function useStack({
   }, [width, stackWidth]);
 
   const { getCardOffsetPosition, onUpdateCardList, stackCountLimit } =
-    React.useMemo(() => withStackOffsetPositions(offsetPositionsCount), []);
+    React.useMemo(
+      () => withStackOffsetPositions(offsetPositionsCount),
+      [offsetPositionsCount],
+    );
 
   const cardInstancesIds = useAppSelector((state) =>
     selectFirstXCardInstances(state, {

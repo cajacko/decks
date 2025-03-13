@@ -7,6 +7,9 @@ import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
+import { setUserFlag } from "@/store/slices/userSettings";
+import SwitchField from "./SwitchField";
+import useFlag from "@/hooks/useFlag";
 
 const titleProps = { type: "h2" } as const;
 
@@ -25,6 +28,7 @@ export default function SettingsTabletop({
   const deckName = deckNameWithFallback(
     useAppSelector((state) => selectDeck(state, { deckId })?.name),
   );
+  const isNeatStack = useFlag("STACK_OFFSET_BEHAVIOUR") === "neat";
 
   const resetTabletop = React.useCallback(() => {
     dispatch(resetTabletopHelper({ tabletopId }));
@@ -36,6 +40,18 @@ export default function SettingsTabletop({
     message: text["tabletop.reset.message"],
     deleteButtonText: text["tabletop.reset.button"],
   });
+
+  const onChangeIsNeat = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setUserFlag({
+          key: "STACK_OFFSET_BEHAVIOUR",
+          value: value ? "neat" : "messy",
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   return (
     <>
@@ -50,6 +66,14 @@ export default function SettingsTabletop({
           title={text["tabletop.reset.title"]}
           onPress={resetTabletopModal.open}
           variant="outline"
+        />
+        <SwitchField
+          label={text["settings.neat_stack"]}
+          value={isNeatStack}
+          onValueChange={onChangeIsNeat}
+          FieldProps={{
+            subLabel: text["settings.neat_stack.helper"],
+          }}
         />
       </FieldSet>
     </>

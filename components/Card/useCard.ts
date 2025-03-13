@@ -1,6 +1,5 @@
 import React from "react";
 import { CardProps, CardRef } from "./Card.types";
-import { getOffsetPositions } from "./card.styles";
 import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 import { useCardSizes } from "./CardSize.context";
 import useFlag from "@/hooks/useFlag";
@@ -10,6 +9,7 @@ import {
   withTiming,
   withDelay,
 } from "react-native-reanimated";
+import useOffsetPositions from "./useOffsetPositions";
 
 export const flipScaleDuration = 200;
 export const flipRotationDuration = Math.round(flipScaleDuration / 4);
@@ -30,14 +30,12 @@ export default function useCard(
   const cardSizes = useCardSizes(props);
   const height = cardSizes.dpHeight;
   const width = cardSizes.dpWidth;
-
-  const offsetPositions = React.useMemo(
-    () => getOffsetPositions(cardSizes),
-    [cardSizes],
-  );
+  const offsetPositions = useOffsetPositions(props);
 
   const offsetPosition = React.useMemo(
-    () => getOffsetPosition(offsetPositions, props.offsetPosition),
+    () =>
+      offsetPositions &&
+      getOffsetPosition(offsetPositions, props.offsetPosition),
     [offsetPositions, props.offsetPosition],
   );
 

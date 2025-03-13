@@ -7,9 +7,10 @@
 export const flagMap = {
   // User control flags go here
   PERFORMANCE_MODE: ["disabled", "enabled"],
+  HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
+  STACK_OFFSET_BEHAVIOUR: ["messy", "neat"],
 
   // Dev flags
-  HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
   HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],
   BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],
   BOTTOM_DRAWER_DRAG: ["enabled", "disabled"],
