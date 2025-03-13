@@ -43,7 +43,6 @@ export default function useStack({
   const width = useSharedValue(stackWidth);
   const opacity = useSharedValue(1);
   const rotation = useSharedValue(0);
-  const [showActions, setShowActions] = React.useState(true);
   const { navigate } = useRouter();
   const doesTabletopHaveCards = useAppSelector((state) =>
     selectDoesTabletopHaveCards(state, { tabletopId }),
@@ -69,7 +68,6 @@ export default function useStack({
 
     if (canAnimateCards) {
       rotation.value = 0;
-      setShowActions(false);
 
       const duration = 500;
 
@@ -90,8 +88,6 @@ export default function useStack({
     );
 
     await promise;
-
-    setShowActions(true);
   }, [dispatch, stackId, tabletopId, rotation, canAnimateCards]);
 
   onUpdateCardList(cardInstancesIds ?? []);
@@ -148,7 +144,6 @@ export default function useStack({
     cardInstancesIds,
     getCardOffsetPosition,
     handleShuffle,
-    showActions,
     rotation,
     handleDeleteStack,
     handleEditDeck,

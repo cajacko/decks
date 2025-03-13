@@ -15,7 +15,6 @@ export default function Stack(props: StackProps): React.ReactNode {
 
   const {
     cardInstancesIds,
-    showActions,
     getCardOffsetPosition,
     handleShuffle,
     rotation,
@@ -45,8 +44,11 @@ export default function Stack(props: StackProps): React.ReactNode {
   );
 
   const shuffleStyle = React.useMemo(
-    () => getShuffleStyle({ stackPadding: dimensions.stackPadding }),
-    [dimensions.stackPadding],
+    () =>
+      getShuffleStyle({
+        buttonSize: dimensions.buttonSize,
+      }),
+    [dimensions.buttonSize],
   );
 
   const cardInstances = React.useMemo(() => {
@@ -82,14 +84,6 @@ export default function Stack(props: StackProps): React.ReactNode {
           <View style={styles.cardInstances}>
             <CardSpacer />
             {cardInstances}
-
-            {cardInstances.length > 1 && showActions && (
-              <CardAction
-                icon="shuffle"
-                style={shuffleStyle}
-                onPress={handleShuffle}
-              />
-            )}
           </View>
         )}
 
@@ -99,6 +93,15 @@ export default function Stack(props: StackProps): React.ReactNode {
           handleEditDeck={props.skeleton ? undefined : handleEditDeck}
         />
       </Animated.View>
+      {cardInstances && cardInstances.length > 1 && (
+        <View style={shuffleStyle}>
+          <CardAction
+            icon="shuffle"
+            style={styles.shuffleButton}
+            onPress={handleShuffle}
+          />
+        </View>
+      )}
     </Animated.View>
   );
 }

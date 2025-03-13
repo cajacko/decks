@@ -17,7 +17,8 @@ export type StackDimensions = {
   stackWidth: number;
   stackHeight: number;
   buttonSize: number;
-  stackPadding: number;
+  stackHorizontalPadding: number;
+  stackVerticalPadding: number;
   spaceBetweenStacks: number;
   cardSizes: CardSizeProps;
 };
