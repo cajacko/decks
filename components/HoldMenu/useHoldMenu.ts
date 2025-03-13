@@ -15,10 +15,11 @@ import { Gesture } from "react-native-gesture-handler";
 const maxDistanceForTap = 10;
 const minDistanceForDirection = maxDistanceForTap * 4;
 const maxTimeoutForTap = 500;
-const fadeInDuration = 100;
+const fadeInDuration = 500;
 const fadeOutDuration = 200;
 const scaleSize = 1.05;
 const scaleDuration = 200;
+const showMenuDelay = 500;
 
 export default function useHoldMenu({
   touchBuffer = 20,
@@ -43,6 +44,7 @@ export default function useHoldMenu({
   const panActionHandled = useSharedValue<null | boolean>(null);
   const activeDirectionSharedValue = useSharedValue<MenuPosition | null>(null);
   const scaleUpFinished = useSharedValue(true);
+  const menuOpacityTimer = useSharedValue(0);
 
   const pan = Gesture.Pan()
     .onBegin((event) => {
@@ -62,9 +64,22 @@ export default function useHoldMenu({
         });
       }
 
-      menuOpacity.value = withTiming(1, {
-        duration: fadeInDuration,
-      });
+      // Doing our timers like this keeps things working in the way reanimated works with their
+      // worklets
+      menuOpacityTimer.value = withTiming(
+        menuOpacityTimer.value === 0 ? 1 : 0,
+        {
+          duration: showMenuDelay,
+        },
+        () => {
+          // If the pan has finished do nothing
+          if (panStartTime.value === null) return;
+
+          menuOpacity.value = withTiming(1, {
+            duration: fadeInDuration,
+          });
+        },
+      );
 
       if (devIndicator) {
         devIndicatorOpacity.value = 1;
