@@ -43,63 +43,76 @@ export default function useDrag(props: {
   // Used to decide whether we have pressed or dragged
   const draggedDistance = useSharedValue(0);
 
-  const drag = Gesture.Pan()
-    .onBegin(() => {
-      pressed.value = true;
-      draggedDistance.value = 0;
-    })
-    .onChange((event) => {
-      let newHeight = height.value - event.changeY * 10;
+  const drag = React.useMemo(
+    () =>
+      Gesture.Pan()
+        .onBegin(() => {
+          pressed.value = true;
+          draggedDistance.value = 0;
+        })
+        .onChange((event) => {
+          let newHeight = height.value - event.changeY * 10;
 
-      draggedDistance.value = event.translationY;
+          draggedDistance.value = event.translationY;
 
-      if (!canDrag) {
-        return;
-      }
+          if (!canDrag) {
+            return;
+          }
 
-      height.value = withClamp(
-        {
-          max: maxHeight.value,
-          min: minHeight.value,
-        },
-        withSpring(newHeight, {
-          damping: 20,
-          stiffness: 300,
+          height.value = withClamp(
+            {
+              max: maxHeight.value,
+              min: minHeight.value,
+            },
+            withSpring(newHeight, {
+              damping: 20,
+              stiffness: 300,
+            }),
+          );
+        })
+        .onFinalize(() => {
+          pressed.value = false;
+
+          if (Math.abs(draggedDistance.value) > 10) {
+            return;
+          }
+
+          // This is a press
+
+          let moveTo: "top" | "bottom";
+
+          const distanceToTop = height.value - minHeight.value;
+          const distanceToBottom = maxAutoHeight.value - height.value;
+
+          if (height.value >= maxAutoHeight.value) {
+            moveTo = "bottom";
+          } else if (distanceToTop < distanceToBottom) {
+            moveTo = "top";
+          } else {
+            moveTo = "bottom";
+          }
+
+          const newHeight =
+            moveTo === "top" ? maxAutoHeight.value : minHeight.value;
+
+          if (!canAnimate) {
+            height.value = newHeight;
+            return;
+          }
+
+          height.value = withSpring(newHeight, autoAnimateConfig);
         }),
-      );
-    })
-    .onFinalize(() => {
-      pressed.value = false;
-
-      if (Math.abs(draggedDistance.value) > 10) {
-        return;
-      }
-
-      // This is a press
-
-      let moveTo: "top" | "bottom";
-
-      const distanceToTop = height.value - minHeight.value;
-      const distanceToBottom = maxAutoHeight.value - height.value;
-
-      if (height.value >= maxAutoHeight.value) {
-        moveTo = "bottom";
-      } else if (distanceToTop < distanceToBottom) {
-        moveTo = "top";
-      } else {
-        moveTo = "bottom";
-      }
-
-      const newHeight =
-        moveTo === "top" ? maxAutoHeight.value : minHeight.value;
-
-      if (!canAnimate) {
-        height.value = newHeight;
-        return;
-      }
-
-      height.value = withSpring(newHeight, autoAnimateConfig);
-    });
+    [
+      height,
+      maxHeight,
+      maxAutoHeight,
+      minHeight,
+      canDrag,
+      canAnimate,
+      draggedDistance,
+      pressed,
+    ],
+  );
 
   return {
     pressed,

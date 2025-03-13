@@ -1,10 +1,11 @@
 import React from "react";
-import { StackTopCardProps, StackTopCardMenuItem } from "./types";
+import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import { selectCanEditCard } from "@/store/combinedSelectors/cards";
 import { useAppSelector } from "@/store/hooks";
-import { MenuItems } from "../HoldMenu";
+import { MenuItems, MenuItem } from "../HoldMenu";
+import withHoldMenuItem from "./withHoldMenuItem";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
@@ -18,37 +19,36 @@ export default function useMenuItems(props: StackTopCardProps) {
     setShowEditModal(false);
   }, []);
 
-  const menuItems = React.useMemo((): MenuItems<StackTopCardMenuItem> => {
-    const bottom: StackTopCardMenuItem = {
-      key: "flip",
+  const menuItems = React.useMemo((): MenuItems => {
+    const bottom: MenuItem = {
       height: buttonSize,
       width: buttonSize,
-      icon: "flip",
-      onPress: state.handleFlipCard,
+      component: withHoldMenuItem("flip", state.handleFlipCard),
+      handleAction: state.handleFlipCard,
     };
 
-    const top: StackTopCardMenuItem | undefined = state.handleMoveToBottom && {
-      key: "bottom",
+    const top: MenuItem | undefined = state.handleMoveToBottom && {
       height: buttonSize,
       width: buttonSize,
-      icon: "vertical-align-top",
-      onPress: state.handleMoveToBottom,
+      component: withHoldMenuItem(
+        "vertical-align-top",
+        state.handleMoveToBottom,
+      ),
+      handleAction: state.handleMoveToBottom,
     };
 
-    const right: StackTopCardMenuItem | undefined = state.moveRight && {
-      key: "Rt",
+    const right: MenuItem | undefined = state.moveRight && {
       height: buttonSize,
       width: buttonSize,
-      icon: "chevron-right",
-      onPress: state.moveRight.top,
+      component: withHoldMenuItem("chevron-right", state.moveRight.top),
+      handleAction: state.moveRight.top,
     };
 
-    const left: StackTopCardMenuItem | undefined = state.moveLeft && {
-      key: "Lt",
+    const left: MenuItem | undefined = state.moveLeft && {
       height: buttonSize,
       width: buttonSize,
-      icon: "chevron-left",
-      onPress: state.moveLeft.top,
+      component: withHoldMenuItem("chevron-left", state.moveLeft.top),
+      handleAction: state.moveLeft.top,
     };
 
     return {

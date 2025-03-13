@@ -56,7 +56,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
       dispatch(
         setUserFlag({
           key: "HOLD_MENU_BEHAVIOUR",
-          value: value ? "always-visible" : "hold",
+          value: value ? "always-visible" : "hold/hover",
         }),
       );
     },
