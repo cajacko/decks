@@ -41,14 +41,24 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
     [scaleStyle],
   );
 
+  const devIndicatorStartStyle = useAnimatedStyle(() => ({
+    opacity: state.devIndicatorOpacity.value,
+    transform: [
+      { translateX: state.devStartIndicator.value.x },
+      { translateY: state.devStartIndicator.value.y },
+    ],
+  }));
+
+  const devIndicatorEndStyle = useAnimatedStyle(() => ({
+    opacity: state.devIndicatorOpacity.value,
+    transform: [
+      { translateX: state.devEndIndicator.value.x },
+      { translateY: state.devEndIndicator.value.y },
+    ],
+  }));
+
   const component = (
-    <Animated.View
-      style={containerStyle}
-      ref={state.menuRef}
-      onPointerEnter={state.onPointerEnter}
-      onPointerLeave={state.onPointerLeave}
-      onPointerMove={state.onPointerEnter}
-    >
+    <Animated.View style={containerStyle}>
       {props.children && (
         <Animated.View style={childrenStyle}>{props.children}</Animated.View>
       )}
@@ -91,14 +101,14 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
             style={[
               styles.devIndicator,
               styles.devIndicatorStart,
-              state.devIndicatorStartStyle,
+              devIndicatorStartStyle,
             ]}
           />
           <Animated.View
             style={[
               styles.devIndicator,
               styles.devIndicatorEnd,
-              state.devIndicatorEndStyle,
+              devIndicatorEndStyle,
             ]}
           />
         </>
@@ -106,9 +116,9 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
     </Animated.View>
   );
 
-  if (!state.pan) return component;
+  if (!state.gesture) return component;
 
-  return <GestureDetector gesture={state.pan}>{component}</GestureDetector>;
+  return <GestureDetector gesture={state.gesture}>{component}</GestureDetector>;
 }
 
 const styles = StyleSheet.create({

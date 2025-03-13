@@ -1,11 +1,8 @@
 import React from "react";
-import { View } from "react-native";
 import { HoldMenuProps, MenuPosition } from "./types";
 import useFlag from "@/hooks/useFlag";
-import usePointer from "@/hooks/usePointer";
 import {
   useSharedValue,
-  useAnimatedStyle,
   withTiming,
   withSpring,
   runOnJS,
@@ -21,226 +18,214 @@ const scaleSize = 1.05;
 const scaleDuration = 200;
 const showMenuDelay = 500;
 
-export default function useHoldMenu({
-  touchBuffer = 20,
-  ...props
-}: HoldMenuProps) {
+export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
+  // Flags
   const devIndicator = useFlag("HOLD_MENU_DEV_INDICATOR") === "enabled";
   const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
   const holdMenuBehaviour = useFlag("HOLD_MENU_BEHAVIOUR");
   const alwaysShowCardActions =
     useFlag("CARD_ACTIONS_ALWAYS_VISIBLE") === true ||
     holdMenuBehaviour === "always-visible";
-  const menuRef = React.useRef<View>(null);
+
+  // Shared values
   const menuOpacity = useSharedValue(0);
   const devIndicatorOpacity = useSharedValue(0);
   const devEndIndicator = useSharedValue({ x: 0, y: 0 });
   const devStartIndicator = useSharedValue({ x: 0, y: 0 });
-  const [highlightedPosition, setHighlightedPosition] =
-    React.useState<MenuPosition | null>(null);
-  const isHovering = useSharedValue(false);
   const scale = useSharedValue(1);
-  const panStartTime = useSharedValue<number | null>(null);
-  const panActionHandled = useSharedValue<null | boolean>(null);
   const activeDirectionSharedValue = useSharedValue<MenuPosition | null>(null);
   const scaleUpFinished = useSharedValue(true);
-  const menuOpacityTimer = useSharedValue(0);
+  const isTouching = useSharedValue(false);
 
-  const pan = Gesture.Pan()
-    .onBegin((event) => {
-      if (isHovering.value) return;
+  // State
+  const [highlightedPosition, setHighlightedPosition] =
+    React.useState<MenuPosition | null>(null);
 
-      panActionHandled.value = false;
-      scaleUpFinished.value = false;
-      panStartTime.value = Date.now();
+  // Gestures
 
-      if (canAnimateCards) {
+  // Run handlePress on tap
+  const tap = React.useMemo(
+    () =>
+      Gesture.Tap()
+        .enabled(!!handlePress)
+        .maxDuration(maxTimeoutForTap)
+        .onEnd(() => {
+          if (!handlePress) return;
+
+          runOnJS(handlePress)();
+        }),
+    [handlePress],
+  );
+
+  // Scale the card up when touching
+  const touching = React.useMemo(() => {
+    return Gesture.LongPress()
+      .enabled(holdMenuBehaviour !== "always-visible" && canAnimateCards)
+      .minDuration(0)
+      .maxDistance(10000)
+      .shouldCancelWhenOutside(false)
+      .onStart(() => {
+        isTouching.value = true;
+        scaleUpFinished.value = false;
+
         scale.value = withTiming(scaleSize, { duration: scaleDuration }, () => {
           scaleUpFinished.value = true;
 
-          if (panStartTime.value === null) {
+          if (!isTouching.value) {
             scale.value = withTiming(1, { duration: scaleDuration });
           }
         });
-      }
+      })
+      .onEnd(() => {
+        isTouching.value = false;
 
-      // Doing our timers like this keeps things working in the way reanimated works with their
-      // worklets
-      menuOpacityTimer.value = withTiming(
-        menuOpacityTimer.value === 0 ? 1 : 0,
-        {
-          duration: showMenuDelay,
-        },
-        () => {
-          // If the pan has finished do nothing
-          if (panStartTime.value === null) return;
+        if (!scaleUpFinished.value) return;
 
+        scale.value = withTiming(1, { duration: scaleDuration });
+      });
+  }, [holdMenuBehaviour, canAnimateCards, scaleUpFinished, isTouching, scale]);
+
+  // Show the menu on hover
+  const hover = React.useMemo(
+    () =>
+      Gesture.Hover()
+        .enabled(!alwaysShowCardActions)
+        .onStart(() => {
           menuOpacity.value = withTiming(1, {
             duration: fadeInDuration,
           });
-        },
-      );
+        })
+        .onEnd((event) => {
+          menuOpacity.value = withTiming(0, {
+            duration: fadeOutDuration,
+          });
+        }),
+    [alwaysShowCardActions, menuOpacity],
+  );
 
-      if (devIndicator) {
-        devIndicatorOpacity.value = 1;
-
-        devStartIndicator.value = {
-          x: event.x,
-          y: event.y,
-        };
-      }
-    })
-    .onChange((event) => {
-      if (isHovering.value) return;
-
-      if (devIndicator) {
-        devEndIndicator.value = {
-          x: event.x,
-          y: event.y,
-        };
-      }
-
-      const distance = Math.sqrt(
-        event.translationX ** 2 + event.translationY ** 2,
-      );
-
-      let activeDirection: MenuPosition | null;
-
-      if (distance < minDistanceForDirection) {
-        activeDirection = null;
-      } else {
-        const { translationX, translationY } = event;
-
-        // Calculate the angle of movement
-        const angle = Math.atan2(translationX, translationY) * (180 / Math.PI);
-
-        if (angle >= -45 && angle < 45) {
-          activeDirection = "bottom";
-        } else if (angle >= 45 && angle < 135) {
-          activeDirection = "right";
-        } else if (angle >= -135 && angle < -45) {
-          activeDirection = "left";
-        } else {
-          activeDirection = "top";
-        }
-      }
-
-      if (activeDirectionSharedValue.value !== activeDirection) {
-        runOnJS(setHighlightedPosition)(activeDirection);
-        activeDirectionSharedValue.value = activeDirection;
-      }
-    })
-    .onFinalize((event) => {
-      if (isHovering.value) return;
-
-      const timeOfPan = panStartTime.value
-        ? Date.now() - panStartTime.value
-        : null;
-
-      panStartTime.value = null;
-
-      if (scaleUpFinished.value && canAnimateCards) {
-        scale.value = withTiming(1, { duration: scaleDuration });
-      }
-
-      if (devIndicator) {
-        devEndIndicator.value = {
-          x: withSpring(devStartIndicator.value.x),
-          y: withSpring(devStartIndicator.value.y),
-        };
-
-        devIndicatorOpacity.value = withSpring(0);
-      }
-
-      menuOpacity.value = withTiming(0, {
-        duration: fadeOutDuration,
+  // Show the menu on a long press
+  const longPress = React.useMemo(() => {
+    return Gesture.LongPress()
+      .enabled(holdMenuBehaviour !== "always-visible")
+      .minDuration(showMenuDelay)
+      .maxDistance(10000)
+      .onStart(() => {
+        menuOpacity.value = withTiming(1, {
+          duration: fadeInDuration,
+        });
       });
+  }, [menuOpacity, holdMenuBehaviour]);
 
-      const totalPanDistance = Math.sqrt(
-        event.translationX ** 2 + event.translationY ** 2,
-      );
+  const pan = React.useMemo(() => {
+    return Gesture.Pan()
+      .enabled(holdMenuBehaviour === "hold/hover")
+      .onStart((event) => {
+        if (devIndicator) {
+          devIndicatorOpacity.value = 1;
 
-      const isATapAction =
-        totalPanDistance < maxDistanceForTap &&
-        timeOfPan &&
-        timeOfPan < maxTimeoutForTap &&
-        !panActionHandled.value;
+          devStartIndicator.value = {
+            x: event.x,
+            y: event.y,
+          };
+        }
+      })
+      .onUpdate((event) => {
+        if (devIndicator) {
+          devEndIndicator.value = {
+            x: event.x,
+            y: event.y,
+          };
+        }
 
-      if (isATapAction) {
-        runOnJS(props.handlePress || (() => undefined))();
+        const distance = Math.sqrt(
+          event.translationX ** 2 + event.translationY ** 2,
+        );
 
-        panActionHandled.value = true;
-      } else {
+        let activeDirection: MenuPosition | null;
+
+        if (distance < minDistanceForDirection) {
+          activeDirection = null;
+        } else {
+          const { translationX, translationY } = event;
+
+          // Calculate the angle of movement
+          const angle =
+            Math.atan2(translationX, translationY) * (180 / Math.PI);
+
+          if (angle >= -45 && angle < 45) {
+            activeDirection = "bottom";
+          } else if (angle >= 45 && angle < 135) {
+            activeDirection = "right";
+          } else if (angle >= -135 && angle < -45) {
+            activeDirection = "left";
+          } else {
+            activeDirection = "top";
+          }
+        }
+
+        if (activeDirectionSharedValue.value !== activeDirection) {
+          runOnJS(setHighlightedPosition)(activeDirection);
+          activeDirectionSharedValue.value = activeDirection;
+        }
+      })
+      .onEnd(() => {
+        if (devIndicator) {
+          devEndIndicator.value = {
+            x: withSpring(devStartIndicator.value.x),
+            y: withSpring(devStartIndicator.value.y),
+          };
+
+          devIndicatorOpacity.value = withSpring(0);
+        }
+
+        menuOpacity.value = withTiming(0, {
+          duration: fadeOutDuration,
+        });
+
         const selectedActionItem =
           activeDirectionSharedValue.value &&
-          props.menuItems[activeDirectionSharedValue.value];
+          menuItems[activeDirectionSharedValue.value];
 
         // We have dragged and selected an action, run it
         if (selectedActionItem) {
           runOnJS(selectedActionItem.handleAction)();
-          panActionHandled.value = true;
         }
-      }
 
-      // Clear up
-      runOnJS(setHighlightedPosition)(null);
-      activeDirectionSharedValue.value = null;
-    });
+        // Clear up
+        runOnJS(setHighlightedPosition)(null);
+        activeDirectionSharedValue.value = null;
+      });
+  }, [
+    holdMenuBehaviour,
+    activeDirectionSharedValue,
+    devIndicator,
+    devEndIndicator,
+    devIndicatorOpacity,
+    devStartIndicator,
+    menuOpacity,
+    menuItems,
+  ]);
 
-  const onPointerEnter = React.useCallback(() => {
-    // This fires constantly as moving over the hold menu, so ignore
-    if (isHovering.value) return;
-
-    isHovering.value = true;
-
-    menuOpacity.value = withTiming(1, {
-      duration: fadeInDuration,
-    });
-  }, [menuOpacity, isHovering]);
-
-  const onPointerLeave = React.useCallback(() => {
-    isHovering.value = false;
-
-    menuOpacity.value = withTiming(0, {
-      duration: fadeOutDuration,
-    });
-  }, [menuOpacity, isHovering]);
-
-  const { getIsPointerOverRef } = usePointer();
-
-  React.useEffect(() => {
-    if (!getIsPointerOverRef(menuRef)) return;
-
-    onPointerEnter();
-  }, [menuRef, onPointerEnter, getIsPointerOverRef]);
-
-  const devIndicatorStartStyle = useAnimatedStyle(() => ({
-    opacity: devIndicatorOpacity.value,
-    transform: [
-      { translateX: devStartIndicator.value.x },
-      { translateY: devStartIndicator.value.y },
-    ],
-  }));
-
-  const devIndicatorEndStyle = useAnimatedStyle(() => ({
-    opacity: devIndicatorOpacity.value,
-    transform: [
-      { translateX: devEndIndicator.value.x },
-      { translateY: devEndIndicator.value.y },
-    ],
-  }));
+  // Defines the priorities of gestures and how they work together
+  const gesture = React.useMemo(() => {
+    return Gesture.Simultaneous(
+      touching,
+      Gesture.Race(
+        tap,
+        Gesture.Race(hover, Gesture.Simultaneous(longPress, pan)),
+      ),
+    );
+  }, [tap, longPress, pan, hover, touching]);
 
   return {
-    onPointerEnter: alwaysShowCardActions ? undefined : onPointerEnter,
-    onPointerLeave: alwaysShowCardActions ? undefined : onPointerLeave,
     alwaysShowCardActions,
-    pan: holdMenuBehaviour === "hold/hover" ? pan : undefined,
-    menuRef,
+    gesture,
     menuOpacity,
     highlightedPosition,
     devIndicator,
-    devIndicatorEndStyle,
-    devIndicatorStartStyle,
+    devEndIndicator,
+    devIndicatorOpacity,
+    devStartIndicator,
     scale,
   };
 }
