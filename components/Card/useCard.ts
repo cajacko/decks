@@ -8,6 +8,7 @@ import {
   useSharedValue,
   withTiming,
   withDelay,
+  Easing,
 } from "react-native-reanimated";
 import useOffsetPositions from "./useOffsetPositions";
 
@@ -142,9 +143,12 @@ export default function useCard(
       const animateKey = "out";
       animationUpdateRef.current(animateKey, true);
 
+      translateX.value = translateX.value ?? 0;
+      translateY.value = translateY.value ?? 0;
+
       return new Promise<unknown>((resolve) => {
-        let x = 0,
-          y = 0;
+        let x = 0;
+        let y = 0;
 
         switch (direction) {
           case "top":
@@ -174,22 +178,30 @@ export default function useCard(
           }
         }
 
-        translateX.value = withTiming(x, { duration }, () => {
+        const easing = Easing.ease;
+
+        translateX.value = withTiming(x, { duration, easing }, () => {
           runOnJS(resolveIfReady)("translateX");
         });
 
-        translateY.value = withTiming(y, { duration }, () => {
+        translateY.value = withTiming(y, { duration, easing }, () => {
           runOnJS(resolveIfReady)("translateY");
         });
 
         if (animateOpacity) {
           waitingFor.push("animateOpacity");
 
+          opacity.value = 1;
+
           opacity.value = withDelay(
-            duration / 2,
-            withTiming(0, { duration: duration / 3 }, () => {
-              runOnJS(resolveIfReady)("animateOpacity");
-            }),
+            (duration / 3) * 2,
+            withTiming(
+              0,
+              { duration: duration / 3, easing: Easing.ease },
+              () => {
+                runOnJS(resolveIfReady)("animateOpacity");
+              },
+            ),
           );
         } else {
         }
