@@ -11,11 +11,14 @@ import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import {
   deleteStack,
-  selectDoesTabletopHaveCards,
+  selectDoesTabletopHaveCardInstances,
 } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
 import useFlag from "@/hooks/useFlag";
 import useOffsetPositions from "@/components/Card/useOffsetPositions";
+import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
+import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/tabletops";
+import text from "@/constants/text";
 
 export default function useStack({
   stackId,
@@ -37,7 +40,10 @@ export default function useStack({
   const rotation = useSharedValue(0);
   const { navigate } = useRouter();
   const doesTabletopHaveCards = useAppSelector((state) =>
-    selectDoesTabletopHaveCards(state, { tabletopId }),
+    selectDoesTabletopHaveCardInstances(state, { tabletopId }),
+  );
+  const doesTabletopHaveAvailableCards = useAppSelector((state) =>
+    selectDoesTabletopHaveAvailableCards(state, { tabletopId }),
   );
 
   React.useEffect(() => {
@@ -87,32 +93,28 @@ export default function useStack({
 
   onUpdateCardList(cardInstancesIds ?? []);
 
-  const handleDeleteStack = React.useMemo(() => {
-    if (!canDelete) return;
+  const handleDeleteStack = React.useCallback(async () => {
+    const scroll = stackListRef.current?.scrollPrev?.();
 
-    return async () => {
-      const scroll = stackListRef.current?.scrollPrev?.();
+    const transform = new Promise<void>((resolve) => {
+      if (canAnimateCards) {
+        const toValue = withTiming(0, { duration: 500 }, () => {
+          runOnJS(resolve)();
+        });
 
-      const transform = new Promise<void>((resolve) => {
-        if (canAnimateCards) {
-          const toValue = withTiming(0, { duration: 500 }, () => {
-            runOnJS(resolve)();
-          });
+        opacity.value = toValue;
+        width.value = toValue;
+      } else {
+        opacity.value = 0;
+        width.value = 0;
 
-          opacity.value = toValue;
-          width.value = toValue;
-        } else {
-          opacity.value = 0;
-          width.value = 0;
+        resolve();
+      }
+    });
 
-          resolve();
-        }
-      });
+    await Promise.all([scroll, transform]);
 
-      await Promise.all([scroll, transform]);
-
-      dispatch(deleteStack({ tabletopId, stackId: stackId }));
-    };
+    dispatch(deleteStack({ tabletopId, stackId: stackId }));
   }, [
     stackId,
     width,
@@ -120,18 +122,46 @@ export default function useStack({
     dispatch,
     stackListRef,
     opacity,
-    canDelete,
     canAnimateCards,
   ]);
 
-  const handleEditDeck = React.useMemo(() => {
-    if (doesTabletopHaveCards) return;
-    if (!canShowEditDeck) return;
+  const emptyStackButton = React.useMemo(() => {
+    if (canDelete) {
+      return {
+        action: handleDeleteStack,
+        title: text["stack.actions.delete"],
+      };
+    }
 
-    return async () => {
-      navigate(`/deck/${deckId}`);
+    if (doesTabletopHaveCards) return null;
+    if (!canShowEditDeck) return null;
+
+    if (doesTabletopHaveAvailableCards) {
+      return {
+        action: () => {
+          dispatch(resetTabletopHelper({ tabletopId }));
+        },
+        title: text["tabletop.reset.title"],
+      };
+    }
+
+    return {
+      action: () => {
+        navigate(`/deck/${deckId}`);
+      },
+      title: text["stack.actions.edit_deck"],
     };
-  }, [doesTabletopHaveCards, deckId, navigate, canShowEditDeck]);
+  }, [
+    handleDeleteStack,
+    canDelete,
+    doesTabletopHaveCards,
+    canShowEditDeck,
+    doesTabletopHaveAvailableCards,
+    deckId,
+    dispatch,
+    tabletopId,
+    navigate,
+  ]);
 
   return {
     opacity,
@@ -140,7 +170,6 @@ export default function useStack({
     getCardOffsetPosition,
     handleShuffle,
     rotation,
-    handleDeleteStack,
-    handleEditDeck,
+    emptyStackButton,
   };
 }

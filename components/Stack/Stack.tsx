@@ -19,9 +19,8 @@ export default function Stack(props: StackProps): React.ReactNode {
     handleShuffle,
     rotation,
     width,
-    handleDeleteStack,
     opacity,
-    handleEditDeck,
+    emptyStackButton,
   } = useStack(props);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -89,8 +88,8 @@ export default function Stack(props: StackProps): React.ReactNode {
 
         <EmptyStack
           style={styles.empty}
-          handleDeleteStack={props.skeleton ? undefined : handleDeleteStack}
-          handleEditDeck={props.skeleton ? undefined : handleEditDeck}
+          buttonTitle={props.skeleton ? undefined : emptyStackButton?.title}
+          buttonAction={props.skeleton ? undefined : emptyStackButton?.action}
         />
       </Animated.View>
       {cardInstances && cardInstances.length > 1 && (

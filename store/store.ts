@@ -32,7 +32,7 @@ const appReducer = combineReducers(reducerMap);
 type AppState = StateFromReducersMapObject<typeof reducerMap>;
 type AppAction = ActionFromReducersMapObject<typeof reducerMap>;
 
-export const resetStoreAction = { type: "root/resetStore" };
+const resetStoreAction = { type: "root/resetStore" };
 
 const rootReducer = (state: AppState | undefined, action: AppAction) => {
   if (action.type === resetStoreAction.type) {

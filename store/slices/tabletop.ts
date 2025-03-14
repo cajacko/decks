@@ -411,10 +411,24 @@ export const selectFirstXCardInstances = createCachedSelector<
   },
 )((_, props) => `${props.stackId}-${props.limit}`);
 
-export const selectDoesTabletopHaveCards = createCachedSelector(
+export const selectDoesTabletopHaveCardInstances = createCachedSelector(
   selectPresentState,
   (presentState): boolean => {
-    return Object.keys(presentState?.cardInstancesById ?? {}).length > 0;
+    if (!presentState) return false;
+
+    for (const stackId in presentState.stacksIds) {
+      const stack = presentState.stacksById[stackId];
+
+      if (!stack) continue;
+
+      for (const cardInstanceId of stack.cardInstances) {
+        if (presentState.cardInstancesById[cardInstanceId]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   },
 )((_, props: { tabletopId: string }) => props.tabletopId);
 

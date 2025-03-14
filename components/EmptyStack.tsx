@@ -2,7 +2,6 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import Card, { CardProps, getBorderRadius } from "./Card";
 import { useTabletopContext } from "./Tabletop/Tabletop.context";
-import text from "@/constants/text";
 import Button from "./Button";
 import { fixed } from "@/constants/colors";
 import { defaultOpacity } from "./CardAction";
@@ -10,15 +9,15 @@ import { defaultOpacity } from "./CardAction";
 export type EmptyStackProps = {
   style?: CardProps["style"];
   CardProps?: CardProps;
-  handleDeleteStack?: () => void;
-  handleEditDeck?: () => void;
+  buttonTitle?: string;
+  buttonAction?: () => void;
 };
 
 export default function EmptyStack({
   style,
   CardProps,
-  handleDeleteStack,
-  handleEditDeck,
+  buttonAction,
+  buttonTitle,
 }: EmptyStackProps): React.ReactNode {
   const context = useTabletopContext();
 
@@ -34,18 +33,11 @@ export default function EmptyStack({
           { borderRadius: getBorderRadius(context.cardSizes) },
         ])}
       >
-        {handleDeleteStack && (
+        {buttonAction && buttonTitle && (
           <Button
-            style={styles.delete}
-            title={text["stack.actions.delete"]}
-            onPress={handleDeleteStack}
-          />
-        )}
-        {handleEditDeck && (
-          <Button
-            style={styles.delete}
-            title={text["stack.actions.edit_deck"]}
-            onPress={handleEditDeck}
+            style={styles.action}
+            title={buttonTitle}
+            onPress={buttonAction}
           />
         )}
       </View>
@@ -62,7 +54,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     boxShadow: "none",
   },
-  delete: {
+  action: {
     marginTop: 20,
     opacity: defaultOpacity,
   },

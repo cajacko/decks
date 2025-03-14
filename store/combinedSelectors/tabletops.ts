@@ -26,3 +26,10 @@ export const selectTabletopAvailableDeckCards = createCachedSelector(
     return cards;
   },
 )((_, props) => props.tabletopId);
+
+export const selectDoesTabletopHaveAvailableCards = createCachedSelector(
+  selectTabletopAvailableDeckCards,
+  (cards): boolean | null => {
+    return cards && cards.length > 0;
+  },
+)((_, props) => props.tabletopId);
