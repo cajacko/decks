@@ -16,6 +16,10 @@ export const dataIds = {
   description: ReservedDataSchemaIds.Description,
   color: ReservedDataSchemaIds.Color,
   emoji: dataItemId("emoji"),
+  borderColor: dataItemId("borderColor"),
+  backgroundColor: dataItemId("backgroundColor"),
+  titleColor: dataItemId("titleColor"),
+  descriptionColor: dataItemId("descriptionColor"),
 } as const;
 
 type DataId = (typeof dataIds)[keyof typeof dataIds];
@@ -23,14 +27,22 @@ type DataId = (typeof dataIds)[keyof typeof dataIds];
 const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.front.name"],
-  schemaOrder: [dataIds.title, dataIds.description, dataIds.color],
+  schemaOrder: [
+    dataIds.title,
+    dataIds.description,
+    dataIds.color,
+    dataIds.emoji,
+    dataIds.titleColor,
+    dataIds.descriptionColor,
+    dataIds.borderColor,
+    dataIds.backgroundColor,
+  ],
   schema: {
     [dataIds.title]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Title],
       defaultValidatedValue: {
         value: text["template.built_in.front.title.default"],
         type: "text",
-        origin: "template",
       },
     },
     [dataIds.description]: {
@@ -38,7 +50,6 @@ const template: Templates.Props<DataId> = {
       defaultValidatedValue: {
         value: text["template.built_in.front.description.default"],
         type: "text",
-        origin: "template",
       },
     },
     [dataIds.emoji]: {
@@ -51,8 +62,27 @@ const template: Templates.Props<DataId> = {
       defaultValidatedValue: {
         value: fixed.cardPresets.builtInTemplatesFallbackColor,
         type: "color",
-        origin: "template",
       },
+    },
+    [dataIds.backgroundColor]: {
+      id: dataIds.backgroundColor,
+      type: "color",
+      name: text["template.built_in.front.background_color"],
+    },
+    [dataIds.titleColor]: {
+      id: dataIds.titleColor,
+      type: "color",
+      name: text["template.built_in.front.title_color"],
+    },
+    [dataIds.descriptionColor]: {
+      id: dataIds.descriptionColor,
+      type: "color",
+      name: text["template.built_in.front.description_color"],
+    },
+    [dataIds.borderColor]: {
+      id: dataIds.borderColor,
+      type: "color",
+      name: text["template.built_in.front.border_color"],
     },
   },
   markup: [
@@ -60,7 +90,7 @@ const template: Templates.Props<DataId> = {
       type: "View",
       style: {
         flex: 1,
-        backgroundColor: `{{${dataIds.color}}}`,
+        backgroundColor: `{{#if ${dataIds.borderColor}}}{{${dataIds.borderColor}}}{{else}}{{${dataIds.color}}}{{/if}}`,
       },
       children: [
         {
@@ -70,7 +100,7 @@ const template: Templates.Props<DataId> = {
             flex: 1,
             padding: 5,
             borderRadius: 2,
-            backgroundColor: colorFunction("lightness", dataIds.color, 95),
+            backgroundColor: `{{#if ${dataIds.backgroundColor}}}{{${dataIds.backgroundColor}}}{{else}}${colorFunction("lightness", dataIds.color, 95)}{{/if}}`,
             justifyContent: "center",
             alignItems: "center",
           },
@@ -93,7 +123,7 @@ const template: Templates.Props<DataId> = {
               style: {
                 fontSize: 8,
                 textAlign: "center",
-                color: colorFunction("lightness", dataIds.color, 30),
+                color: `{{#if ${dataIds.titleColor}}}{{${dataIds.titleColor}}}{{else}}${colorFunction("lightness", dataIds.color, 30)}{{/if}}`,
               },
             },
             {
@@ -104,7 +134,7 @@ const template: Templates.Props<DataId> = {
                 marginTop: 2,
                 fontSize: 4,
                 textAlign: "center",
-                color: colorFunction("lightness", dataIds.color, 35),
+                color: `{{#if ${dataIds.descriptionColor}}}{{${dataIds.descriptionColor}}}{{else}}${colorFunction("lightness", dataIds.color, 35)}{{/if}}`,
               },
             },
           ],

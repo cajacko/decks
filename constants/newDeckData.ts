@@ -26,12 +26,10 @@ export const newDeckCard: Cards.Props = {
     [dataSchemaIds.title]: {
       type: "text",
       value: text["decks_screen.my_decks.new"],
-      origin: "card",
     },
     [dataSchemaIds.color]: {
       type: "color",
       value: fixed.cardPresets.newDeck,
-      origin: "card",
     },
   },
   deckId: null,

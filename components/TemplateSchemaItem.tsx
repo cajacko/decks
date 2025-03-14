@@ -48,7 +48,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       switch (fieldType) {
         case "text":
         case "color":
-          onChange({ value: text, type: fieldType, origin: "card" });
+          onChange({ value: text, type: fieldType });
           break;
         default:
           return;
@@ -69,9 +69,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     if (!showMoreInfo) return;
 
     return (isEnabled: boolean) => {
-      onChange(
-        isEnabled ? undefined : { value: null, type: "null", origin: "card" },
-      );
+      onChange(isEnabled ? undefined : { value: null, type: "null" });
     };
   }, [showMoreInfo, onChange]);
 

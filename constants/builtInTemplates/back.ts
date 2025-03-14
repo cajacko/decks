@@ -53,7 +53,6 @@ const template: Templates.Props<DataId> = {
       defaultValidatedValue: {
         value: fixed.cardPresets.builtInTemplatesFallbackColor,
         type: "color",
-        origin: "template",
       },
     },
     [dataIds.backgroundColor]: {

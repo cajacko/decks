@@ -20,14 +20,12 @@ function getValidatedValueType(
       data = {
         value: value,
         type: "text",
-        origin: "card",
       };
       break;
     case "boolean":
       data = {
         value: value,
         type: "boolean",
-        origin: "card",
       };
       break;
     default:
@@ -35,7 +33,6 @@ function getValidatedValueType(
         data = {
           type: "null",
           value: null,
-          origin: "card",
         };
       }
   }

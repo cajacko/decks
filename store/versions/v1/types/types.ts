@@ -39,8 +39,6 @@ export type ValueType = FieldType | "null";
 type CreateValidatedValue<Type extends ValueType, Value> = {
   type: Type;
   value: Value;
-  // TODO: Remove once we've refactored
-  origin?: unknown;
 };
 
 export type ValidatedValue<Type extends FieldType = FieldType> =

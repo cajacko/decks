@@ -160,7 +160,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     width: "100%",
-    backgroundColor: fixed.cardPresets.white,
+    // NOTE: On dark cards we see this background when they are rotated. So ensure background colors
+    // are always passed in.
+    // backgroundColor: fixed.cardPresets.white,
     overflow: "hidden",
   },
 });

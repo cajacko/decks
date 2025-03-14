@@ -41,7 +41,6 @@ const deck: ExampleDeck = {
       defaultValidatedValue: {
         type: "color",
         value: "#F0F0D7",
-        origin: "deck",
       },
     },
   },
