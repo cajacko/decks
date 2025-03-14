@@ -13,19 +13,21 @@ import { colorFunction } from "@/components/Template/handlebars";
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
 
-const dataItemIds = {
+export const dataIds = {
   text: dataItemId("text"),
   color: ReservedDataSchemaIds.Color,
   emoji: dataItemId("emoji"),
-};
+} as const;
 
-const template = {
+type DataId = (typeof dataIds)[keyof typeof dataIds];
+
+const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.back.title"],
-  schemaOrder: [dataItemIds.text, dataItemIds.color],
+  schemaOrder: [dataIds.text, dataIds.color],
   schema: {
-    [dataItemIds.text]: {
-      id: dataItemIds.text,
+    [dataIds.text]: {
+      id: dataIds.text,
       name: text["template.built_in.back.text"],
       type: "text",
       defaultValidatedValue: {
@@ -33,12 +35,12 @@ const template = {
         value: `{{${deckTemplateIds.name}}}`,
       },
     },
-    [dataItemIds.emoji]: {
-      id: dataItemIds.emoji,
+    [dataIds.emoji]: {
+      id: dataIds.emoji,
       name: text["template.built_in.back.emoji"],
       type: "text",
     },
-    [dataItemIds.color]: {
+    [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
         value: fixed.cardPresets.yellow,
@@ -61,8 +63,8 @@ const template = {
       children: [
         {
           type: "Text",
-          text: `{{${dataItemIds.emoji}}}`,
-          conditional: `{{${dataItemIds.emoji}}}`,
+          text: `{{${dataIds.emoji}}}`,
+          conditional: `{{${dataIds.emoji}}}`,
           style: {
             fontSize: 24,
             textAlign: "center",
@@ -73,10 +75,10 @@ const template = {
         },
         {
           type: "Text",
-          text: `{{${dataItemIds.text}}}`,
-          conditional: `{{${dataItemIds.text}}}`,
+          text: `{{${dataIds.text}}}`,
+          conditional: `{{${dataIds.text}}}`,
           style: {
-            color: colorFunction("lightness", dataItemIds.color, 15),
+            color: colorFunction("lightness", dataIds.color, 15),
             fontSize: 10,
             textAlign: "center",
             zIndex: 2,
@@ -93,7 +95,7 @@ const template = {
             right: "-100%",
             bottom: "-100%",
             zIndex: 1,
-            backgroundColor: colorFunction("lightness", dataItemIds.color, 70),
+            backgroundColor: colorFunction("lightness", dataIds.color, 70),
             transform: [{ rotate: "-45deg" }, { translateX: "-10%" }],
           },
           children: [
@@ -102,11 +104,7 @@ const template = {
               style: {
                 flex: 1,
                 flexDirection: "row",
-                backgroundColor: colorFunction(
-                  "lightness",
-                  dataItemIds.color,
-                  80,
-                ),
+                backgroundColor: colorFunction("lightness", dataIds.color, 80),
               },
               children: [
                 {
@@ -115,7 +113,7 @@ const template = {
                     flex: 1,
                     backgroundColor: colorFunction(
                       "lightness",
-                      dataItemIds.color,
+                      dataIds.color,
                       65,
                     ),
                   },
@@ -139,6 +137,6 @@ const template = {
       ],
     },
   ],
-} as const satisfies Templates.Props;
+};
 
 export default template;

@@ -11,11 +11,13 @@ import { colorFunction } from "@/components/Template/handlebars";
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { templateId, dataItemId } = builtInTemplateIds("playing-cards");
 
-const dataItemIds = {
+export const dataIds = {
   suit: dataItemId("suit"),
   value: dataItemId("value"),
   color: ReservedDataSchemaIds.Color,
-};
+} as const;
+
+type DataId = (typeof dataIds)[keyof typeof dataIds];
 
 const mainSuitSize = 10;
 const faceCardOffset = 2;
@@ -32,17 +34,17 @@ const corner: Markup.Nodes = [
     children: [
       {
         type: "Text",
-        text: `{{${dataItemIds.value}}}`,
+        text: `{{${dataIds.value}}}`,
         style: {
           fontSize: 8,
           textAlign: "center",
-          color: colorFunction("lightness", dataItemIds.color, 30),
+          color: colorFunction("lightness", dataIds.color, 30),
         },
       },
       {
         type: "Text",
-        text: `{{${dataItemIds.suit}}}`,
-        conditional: dataItemIds.suit,
+        text: `{{${dataIds.suit}}}`,
+        conditional: dataIds.suit,
         style: {
           fontSize: 6,
           textAlign: "center",
@@ -58,7 +60,7 @@ function singleIcon(value: string): Markup.Nodes {
 
   switch (value.toLowerCase().trim()) {
     case "a":
-      text = `{{${dataItemIds.suit}}}`;
+      text = `{{${dataIds.suit}}}`;
       break;
     case "j":
       text = "👨";
@@ -76,18 +78,18 @@ function singleIcon(value: string): Markup.Nodes {
   return [
     {
       type: "View",
-      conditional: `{{equals ${dataItemIds.value} "${value}"}}`,
+      conditional: `{{equals ${dataIds.value} "${value}"}}`,
       style: {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        borderColor: colorFunction("lightness", dataItemIds.color, 30),
+        borderColor: colorFunction("lightness", dataIds.color, 30),
         borderWidth: 0.5,
       },
       children: [
         {
           type: "Text",
-          text: `{{${dataItemIds.suit}}}`,
+          text: `{{${dataIds.suit}}}`,
           style: {
             fontSize: mainSuitSize,
             position: "absolute",
@@ -104,7 +106,7 @@ function singleIcon(value: string): Markup.Nodes {
         },
         {
           type: "Text",
-          text: `{{${dataItemIds.suit}}}`,
+          text: `{{${dataIds.suit}}}`,
           style: {
             fontSize: mainSuitSize,
             transform: [{ rotate: "180deg" }],
@@ -167,7 +169,7 @@ function repeatSuit(count: number): Markup.Nodes {
 
       rows.push({
         type: "Text",
-        text: hasSuitIcon ? `{{${dataItemIds.suit}}}` : "",
+        text: hasSuitIcon ? `{{${dataIds.suit}}}` : "",
         style: {
           fontSize: mainSuitSize,
           textAlign: "center",
@@ -192,7 +194,7 @@ function repeatSuit(count: number): Markup.Nodes {
   return [
     {
       type: "View",
-      conditional: `{{equals ${dataItemIds.value} ${count === 1 ? `"A"` : count}}}`,
+      conditional: `{{equals ${dataIds.value} ${count === 1 ? `"A"` : count}}}`,
       style: {
         flex: 1,
         flexDirection: "row",
@@ -203,22 +205,22 @@ function repeatSuit(count: number): Markup.Nodes {
   ];
 }
 
-const template = {
+const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.playing-cards.name"],
-  schemaOrder: [dataItemIds.value, dataItemIds.suit, dataItemIds.color],
+  schemaOrder: [dataIds.value, dataIds.suit, dataIds.color],
   schema: {
-    [dataItemIds.value]: {
-      id: dataItemIds.value,
+    [dataIds.value]: {
+      id: dataIds.value,
       name: text["template.built_in.playing-cards.value.name"],
       type: "text",
     },
-    [dataItemIds.suit]: {
-      id: dataItemIds.suit,
+    [dataIds.suit]: {
+      id: dataIds.suit,
       name: text["template.built_in.playing-cards.suit.name"],
       type: "text",
     },
-    [dataItemIds.color]: {
+    [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
         value: fixed.cardPresets.yellow,
@@ -232,7 +234,7 @@ const template = {
       type: "View",
       style: {
         flex: 1,
-        backgroundColor: colorFunction("lightness", dataItemIds.color, 98),
+        backgroundColor: colorFunction("lightness", dataIds.color, 98),
       },
       children: [
         {
@@ -288,6 +290,6 @@ const template = {
       ],
     },
   ],
-} as const satisfies Templates.Props;
+};
 
 export default template;

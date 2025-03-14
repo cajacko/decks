@@ -18,9 +18,12 @@ export type { DataId, Id, FieldType, ValidatedValue, Markup };
 //     defaultValue: "hi",
 //   },
 // };
-export type DataItem<T extends FieldType = FieldType> = {
+export type DataItem<
+  T extends FieldType = FieldType,
+  DID extends DataId = DataId,
+> = {
   [K in FieldType]: {
-    id: DataId;
+    id: DID;
     name: string;
     description?: string;
     type: K;
@@ -28,18 +31,17 @@ export type DataItem<T extends FieldType = FieldType> = {
   };
 }[T];
 
-// export type Data<DataIds extends DataId = DataId> = {
-//   [Id in DataIds]: LooseDataItem<FieldType, Id>;
-// };
+export type Data<DID extends DataId = DataId> = {
+  [Key in DID]: DataItem<FieldType, Key>;
+};
 
-export type Data = Record<DataId, DataItem | undefined>;
-
-export interface Props {
+// Allowing to pass in the data id lets us validate our prebuilt decks that are defined in the code
+export interface Props<DID extends DataId = DataId> {
   templateId: Id;
   name: string;
   description?: string;
-  schemaOrder?: DataId[];
-  schema: Data;
+  schemaOrder?: DID[];
+  schema: Data<DID>;
   markup: Markup;
 }
 

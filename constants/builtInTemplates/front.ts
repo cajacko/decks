@@ -9,21 +9,23 @@ import {
 import { colorFunction } from "@/components/Template/handlebars";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
-const { templateId } = builtInTemplateIds("front");
+const { templateId, dataItemId } = builtInTemplateIds("front");
 
-const dataItemIds = {
+export const dataIds = {
   title: ReservedDataSchemaIds.Title,
   description: ReservedDataSchemaIds.Description,
   color: ReservedDataSchemaIds.Color,
-  emoji: ReservedDataSchemaIds.Emoji,
-};
+  emoji: dataItemId("emoji"),
+} as const;
 
-const template = {
+type DataId = (typeof dataIds)[keyof typeof dataIds];
+
+const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.front.name"],
-  schemaOrder: [dataItemIds.title, dataItemIds.description, dataItemIds.color],
+  schemaOrder: [dataIds.title, dataIds.description, dataIds.color],
   schema: {
-    [dataItemIds.title]: {
+    [dataIds.title]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Title],
       defaultValidatedValue: {
         value: text["template.built_in.front.title.default"],
@@ -31,7 +33,7 @@ const template = {
         origin: "template",
       },
     },
-    [dataItemIds.description]: {
+    [dataIds.description]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Description],
       defaultValidatedValue: {
         value: text["template.built_in.front.description.default"],
@@ -39,10 +41,13 @@ const template = {
         origin: "template",
       },
     },
-    [dataItemIds.emoji]: {
-      ...reservedDataSchemaItems[ReservedDataSchemaIds.Emoji],
+    [dataIds.emoji]: {
+      id: dataIds.emoji,
+      name: text["template.built_in.front.emoji.name"],
+      type: "text",
+      description: text["template.built_in.front.emoji.description"],
     },
-    [dataItemIds.color]: {
+    [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
         value: fixed.cardPresets.yellow,
@@ -56,7 +61,7 @@ const template = {
       type: "View",
       style: {
         flex: 1,
-        backgroundColor: `{{${dataItemIds.color}}}`,
+        backgroundColor: `{{${dataIds.color}}}`,
       },
       children: [
         {
@@ -66,15 +71,15 @@ const template = {
             flex: 1,
             padding: 5,
             borderRadius: 2,
-            backgroundColor: colorFunction("lightness", dataItemIds.color, 95),
+            backgroundColor: colorFunction("lightness", dataIds.color, 95),
             justifyContent: "center",
             alignItems: "center",
           },
           children: [
             {
               type: "Text",
-              text: `{{${dataItemIds.emoji}}}`,
-              conditional: `{{${dataItemIds.emoji}}}`,
+              text: `{{${dataIds.emoji}}}`,
+              conditional: `{{${dataIds.emoji}}}`,
               style: {
                 fontSize: 24,
                 textAlign: "center",
@@ -85,22 +90,22 @@ const template = {
             },
             {
               type: "Text",
-              text: `{{${dataItemIds.title}}}`,
+              text: `{{${dataIds.title}}}`,
               style: {
                 fontSize: 8,
                 textAlign: "center",
-                color: colorFunction("lightness", dataItemIds.color, 30),
+                color: colorFunction("lightness", dataIds.color, 30),
               },
             },
             {
               type: "Text",
-              text: `{{${dataItemIds.description}}}`,
-              conditional: `{{${dataItemIds.description}}}`,
+              text: `{{${dataIds.description}}}`,
+              conditional: `{{${dataIds.description}}}`,
               style: {
                 marginTop: 2,
                 fontSize: 4,
                 textAlign: "center",
-                color: colorFunction("lightness", dataItemIds.color, 35),
+                color: colorFunction("lightness", dataIds.color, 35),
               },
             },
           ],
@@ -108,6 +113,6 @@ const template = {
       ],
     },
   ],
-} as const satisfies Templates.Props;
+};
 
 export default template;

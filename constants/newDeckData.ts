@@ -1,6 +1,6 @@
 import { Cards } from "@/store/types";
 import { Target } from "@/utils/cardTarget";
-import builtInTemplates from "@/constants/builtInTemplates";
+import builtInTemplates, { back } from "@/constants/builtInTemplates";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 import text from "./text";
 import { fixed } from "./colors";
@@ -52,9 +52,9 @@ export const newDeckCard: Cards.Props = {
     },
     back: {
       dataTemplateMapping: {
-        [builtInTemplates.back.schema.text.id]: {
+        [builtInTemplates.back.schema[back.dataIds.text].id]: {
           dataId: dataSchemaIds.title,
-          templateDataId: builtInTemplates.back.schema.text.id,
+          templateDataId: builtInTemplates.back.schema[back.dataIds.text].id,
         },
         [builtInTemplates.back.schema.color.id]: {
           dataId: dataSchemaIds.color,
