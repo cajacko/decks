@@ -51,7 +51,7 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
         <Animated.View style={drawerContainerStyle}>
           <View style={styles.drawerContainer}>
             <GestureDetector gesture={state.drag}>
-              <View style={styles.dragBar} pointerEvents="box-none">
+              <View style={styles.dragBar}>
                 <Animated.View style={dragBoxStyle}>
                   <ThemedText style={styles.dragIcon}>====</ThemedText>
                 </Animated.View>
