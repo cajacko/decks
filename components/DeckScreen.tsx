@@ -18,6 +18,7 @@ import { DeckCardSizeProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import { maxWidth } from "./DecksScreen";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
+import Loader from "@/components/Loader";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -56,17 +57,15 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     selectDeckCards(state, { deckId: props.deckId }),
   );
 
-  const cards = React.useMemo<FlatListData[]>(() => {
-    let _cards: FlatListData[] | undefined = skeleton
-      ? cardsState?.slice(0, numColumns.current * initialRows)
-      : cardsState;
+  const cards = React.useMemo<FlatListData[] | null>(() => {
+    if (skeleton) return null;
 
-    if (!_cards || _cards.length === 0) {
-      _cards = [null];
+    if (!cardsState || cardsState.length === 0) {
+      return [null];
     }
 
-    return _cards;
-  }, [cardsState, skeleton, numColumns]);
+    return cardsState;
+  }, [cardsState, skeleton]);
 
   const { open, component } = useEditCardModal({
     type: "new-card-in-deck",
@@ -109,40 +108,49 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       constraints={styles.constraints}
     >
       <DeckToolbar deckId={props.deckId} />
-      {!skeleton && (
-        <View style={containerStyle}>
-          {component}
-          <FlatList<FlatListData>
-            data={cards}
-            numColumns={numColumns.current}
-            initialNumToRender={numColumns.current * initialRows}
-            columnWrapperStyle={styles.columnWrapperStyle}
-            windowSize={5}
-            maxToRenderPerBatch={numColumns.current * 2}
-            removeClippedSubviews={true}
-            ListHeaderComponent={
+      <View style={containerStyle}>
+        {component}
+        <FlatList<FlatListData>
+          data={cards}
+          numColumns={numColumns.current}
+          initialNumToRender={numColumns.current * initialRows}
+          columnWrapperStyle={styles.columnWrapperStyle}
+          windowSize={5}
+          maxToRenderPerBatch={numColumns.current * 2}
+          removeClippedSubviews={true}
+          ListHeaderComponent={
+            <>
               <DeckDetails deckId={props.deckId} skeleton={skeleton} />
-            }
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-            style={styles.list}
-            // TODO: Can calculate this once and improve performance
-            // getItemLayout={(data, index) => ({
-            //   length: ITEM_HEIGHT,
-            //   offset: ITEM_HEIGHT * index,
-            //   index,
-            // })}
-          />
-          {canEditDeck && (
-            <IconButton icon="add" onPress={addNew} style={styles.button} />
-          )}
-        </View>
-      )}
+              {skeleton && (
+                <View style={styles.loader}>
+                  <Loader />
+                </View>
+              )}
+            </>
+          }
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          style={styles.list}
+          // TODO: Can calculate this once and improve performance
+          // getItemLayout={(data, index) => ({
+          //   length: ITEM_HEIGHT,
+          //   offset: ITEM_HEIGHT * index,
+          //   index,
+          // })}
+        />
+        {canEditDeck && (
+          <IconButton icon="add" onPress={addNew} style={styles.button} />
+        )}
+      </View>
     </DeckCardSizeProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  loader: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   list: {
     maxWidth,
     width: "100%",
