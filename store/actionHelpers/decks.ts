@@ -5,12 +5,15 @@ import { Cards, Decks, Tabletops } from "../types";
 import uuid from "@/utils/uuid";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { createInitStacks } from "@/utils/minStacks";
-import text from "@/constants/text";
+import text, { TextKey } from "@/constants/text";
 import { selectTabletop } from "../slices/tabletop";
 import { getBuiltInState } from "../utils/withBuiltInState";
 import { selectCard } from "../slices/cards";
 import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
-import { selectDeckDefaultColors } from "../combinedSelectors/decks";
+import {
+  selectDeckDefaultColors,
+  selectDeckNames,
+} from "../combinedSelectors/decks";
 import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
 import { fixed } from "@/constants/colors";
 
@@ -29,9 +32,44 @@ export function deleteDeckHelper(props: {
   return deleteDeck({ cardIds, deckId: props.deckId, tabletopId });
 }
 
+type ValidNumbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type ValidatedTextKey<K extends TextKey> = K;
+type UnvalidatedTextKey<T extends number = number> =
+  `deck.new.title.append.${T}`;
+// This validates that our appended key is an actual TextKey
+export type Test = ValidatedTextKey<UnvalidatedTextKey<ValidNumbers>>;
+
+function getNewDeckNameAppend(
+  textMap: Record<string, string | undefined>,
+  i: number,
+): string | null {
+  const key: UnvalidatedTextKey = `deck.new.title.append.${i}`;
+
+  return textMap[key] ?? null;
+}
+
 export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
   const tabletopId = uuid();
   const deckDefaultColors = selectDeckDefaultColors(store.getState());
+  const deckNames = selectDeckNames(store.getState());
+
+  let deckName = text["deck.new.title"];
+  let i = 0;
+  let copy = 1;
+
+  while (deckNames.includes(deckName)) {
+    const newDeckNameAppend = getNewDeckNameAppend(text, i);
+
+    if (newDeckNameAppend) {
+      deckName = `${text["deck.new.title"]}${newDeckNameAppend}`;
+
+      i += 1;
+    } else {
+      deckName = `${deckName} (${copy})`;
+
+      copy += 1;
+    }
+  }
 
   const color = pickLeastUsedColor({
     availableColors: fixed.cardPresets.smartNewDeckColors,
@@ -54,7 +92,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     },
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
-    name: text["deck.new.title"],
+    name: deckName,
     description: text["deck.new.description"],
     status: "creating",
     canEdit: true,

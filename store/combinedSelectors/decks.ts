@@ -16,3 +16,13 @@ export const selectDeckDefaultColors = createSelector(selectDecks, (decks) => {
 
   return colors;
 });
+
+export const selectDeckNames = createSelector(selectDecks, (decks) => {
+  const names: string[] = [];
+
+  for (const deck of decks) {
+    names.push(deck.name);
+  }
+
+  return names;
+});
