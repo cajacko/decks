@@ -17,13 +17,11 @@ export const reservedDataSchemaItems = {
     id: ReservedDataSchemaIds.Title,
     name: text["template.reserved_data_item.title.name"],
     type: "text",
-    description: text["template.reserved_data_item.title.description"],
   },
   [ReservedDataSchemaIds.Description]: {
     id: ReservedDataSchemaIds.Description,
     name: text["template.reserved_data_item.description.name"],
     type: "text",
-    description: text["template.reserved_data_item.description.description"],
   },
   [ReservedDataSchemaIds.Color]: {
     id: ReservedDataSchemaIds.Color,

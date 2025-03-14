@@ -37,6 +37,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   );
 
   const fieldLabel: string = schemaItem.name;
+  const description = schemaItem.description;
   const fieldType = schemaItem.type;
 
   const { onChange, validatedValue, placeholder, hasChanges, usingFallback } =
@@ -118,6 +119,14 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
     return null;
   }
 
+  let subLabel = description;
+
+  if (usingFallback && description) {
+    subLabel = `${description}\n${fallbackText[usingFallback]}`;
+  } else if (usingFallback) {
+    subLabel = fallbackText[usingFallback];
+  }
+
   return (
     <Field
       label={fieldLabel}
@@ -127,7 +136,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       handleChangeEnable={handleSetNull}
       showEnabled={showMoreInfo}
       enabled={validatedValue?.value !== null}
-      subLabel={usingFallback ? fallbackText[usingFallback] : null}
+      subLabel={subLabel ?? null}
     >
       {input}
     </Field>

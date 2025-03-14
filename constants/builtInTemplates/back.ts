@@ -17,6 +17,8 @@ export const dataIds = {
   text: dataItemId("text"),
   color: ReservedDataSchemaIds.Color,
   emoji: dataItemId("emoji"),
+  backgroundColor: dataItemId("backgroundColor"),
+  textColor: dataItemId("textColor"),
 } as const;
 
 type DataId = (typeof dataIds)[keyof typeof dataIds];
@@ -24,7 +26,13 @@ type DataId = (typeof dataIds)[keyof typeof dataIds];
 const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.back.title"],
-  schemaOrder: [dataIds.text, dataIds.color],
+  schemaOrder: [
+    dataIds.text,
+    dataIds.emoji,
+    dataIds.color,
+    dataIds.backgroundColor,
+    dataIds.textColor,
+  ],
   schema: {
     [dataIds.text]: {
       id: dataIds.text,
@@ -48,6 +56,16 @@ const template: Templates.Props<DataId> = {
         origin: "template",
       },
     },
+    [dataIds.backgroundColor]: {
+      id: dataIds.backgroundColor,
+      type: "color",
+      name: text["template.built_in.back.background_color"],
+    },
+    [dataIds.textColor]: {
+      id: dataIds.textColor,
+      type: "color",
+      name: text["template.built_in.back.text_color"],
+    },
   },
   markup: [
     {
@@ -70,7 +88,7 @@ const template: Templates.Props<DataId> = {
             textAlign: "center",
             zIndex: 2,
             position: "relative",
-            opacity: 0.5,
+            opacity: 0.75,
           },
         },
         {
@@ -78,7 +96,7 @@ const template: Templates.Props<DataId> = {
           text: `{{${dataIds.text}}}`,
           conditional: `{{${dataIds.text}}}`,
           style: {
-            color: colorFunction("lightness", dataIds.color, 15),
+            color: `{{#if ${dataIds.textColor}}}{{${dataIds.textColor}}}{{else}}${colorFunction("lightness", dataIds.color, 15)}{{/if}}`,
             fontSize: 10,
             textAlign: "center",
             zIndex: 2,
@@ -95,7 +113,7 @@ const template: Templates.Props<DataId> = {
             right: "-100%",
             bottom: "-100%",
             zIndex: 1,
-            backgroundColor: colorFunction("lightness", dataIds.color, 70),
+            backgroundColor: `{{#if ${dataIds.backgroundColor}}}${colorFunction("lighten", dataIds.backgroundColor, 0.2)}{{else}}${colorFunction("lightness", dataIds.color, 70)}{{/if}}`,
             transform: [{ rotate: "-45deg" }, { translateX: "-10%" }],
           },
           children: [
@@ -104,18 +122,14 @@ const template: Templates.Props<DataId> = {
               style: {
                 flex: 1,
                 flexDirection: "row",
-                backgroundColor: colorFunction("lightness", dataIds.color, 80),
+                backgroundColor: `{{#if ${dataIds.backgroundColor}}}{{${dataIds.backgroundColor}}}{{else}}${colorFunction("lightness", dataIds.color, 80)}{{/if}}`,
               },
               children: [
                 {
                   type: "View",
                   style: {
                     flex: 1,
-                    backgroundColor: colorFunction(
-                      "lightness",
-                      dataIds.color,
-                      65,
-                    ),
+                    backgroundColor: `{{#if ${dataIds.backgroundColor}}}${colorFunction("darken", dataIds.backgroundColor, 0.2)}{{else}}${colorFunction("lightness", dataIds.color, 65)}{{/if}}`,
                   },
                 },
                 {

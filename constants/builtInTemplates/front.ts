@@ -45,7 +45,6 @@ const template: Templates.Props<DataId> = {
       id: dataIds.emoji,
       name: text["template.built_in.front.emoji.name"],
       type: "text",
-      description: text["template.built_in.front.emoji.description"],
     },
     [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
