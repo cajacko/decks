@@ -414,9 +414,11 @@ export const selectFirstXCardInstances = createCachedSelector<
 export const selectDoesTabletopHaveCardInstances = createCachedSelector(
   selectPresentState,
   (presentState): boolean => {
-    if (!presentState) return false;
+    if (!presentState) {
+      return false;
+    }
 
-    for (const stackId in presentState.stacksIds) {
+    for (const stackId of presentState.stacksIds) {
       const stack = presentState.stacksById[stackId];
 
       if (!stack) continue;

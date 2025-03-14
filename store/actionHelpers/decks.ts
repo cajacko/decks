@@ -16,6 +16,8 @@ import {
 } from "../combinedSelectors/decks";
 import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
 import { fixed } from "@/constants/colors";
+import { getResetHistoryState } from "./tabletop";
+import { cloneDeep } from "lodash";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.Id;
@@ -156,7 +158,7 @@ export function copyDeckHelper(props: {
     return createDeckHelper({ deckId });
   }
 
-  const tabletopId = uuid();
+  const newTabletopId = uuid();
   const cardIdMap = new Map<Cards.Id, Cards.Id>();
 
   const cards: Cards.Props[] = [];
@@ -242,27 +244,23 @@ export function copyDeckHelper(props: {
         past: [],
         present: {
           cardInstancesById,
-          stacksById: existingTabletop.history.present.stacksById,
-          stacksIds: existingTabletop.history.present.stacksIds,
+          stacksById: cloneDeep(existingTabletop.history.present.stacksById),
+          stacksIds: cloneDeep(existingTabletop.history.present.stacksIds),
         },
       },
-      id: tabletopId,
+      id: newTabletopId,
       availableDecks: [deckId],
     };
   } else {
-    const { stacksIds, stacksById } = createInitStacks();
-
+    // We have no existing tabletop to copy from, so we need to create a new one
     defaultTabletop = {
-      id: tabletopId,
+      id: newTabletopId,
       availableDecks: [deckId],
       history: {
         future: [],
         past: [],
-        present: {
-          cardInstancesById: {},
-          stacksById,
-          stacksIds,
-        },
+        // Uses the same logic as the reset
+        present: getResetHistoryState(deckCards),
       },
     };
   }
@@ -277,7 +275,7 @@ export function copyDeckHelper(props: {
     name: `${deckToCopy.name}${text["deck.copied.append"]}`,
     description: deckToCopy.description,
     id: deckId,
-    defaultTabletopId: tabletopId,
+    defaultTabletopId: newTabletopId,
     status: "creating",
     canEdit: true,
   };

@@ -40,6 +40,15 @@ export const selectDoesTabletopHaveAvailableCards = createCachedSelector(
 export const selectTabletopNeedsResetting = createCachedSelector(
   selectDoesTabletopHaveCardInstances,
   selectDoesTabletopHaveAvailableCards,
-  (hasCardInstances, hasAvailableCards) =>
-    !hasCardInstances && !!hasAvailableCards,
+  (hasCardInstances, hasAvailableCards) => {
+    if (hasCardInstances) {
+      return false;
+    }
+
+    if (hasAvailableCards) {
+      return true;
+    }
+
+    return false;
+  },
 )((_, props) => props.tabletopId);
