@@ -13,6 +13,9 @@ import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import useEnsureTabletop from "@/hooks/useEnsureTabletop";
 import useFlag from "@/hooks/useFlag";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { selectTabletopNeedsResetting } from "@/store/combinedSelectors/tabletops";
+import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 
 export default function Tabletop({
   tabletopId,
@@ -20,6 +23,23 @@ export default function Tabletop({
 }: TabletopProps): React.ReactNode {
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const { hasTabletop } = useEnsureTabletop({ tabletopId });
+  const dispatch = useAppDispatch();
+  const tabletopNeedsResetting = useAppSelector((state) =>
+    selectTabletopNeedsResetting(state, { tabletopId }),
+  );
+
+  const hasTriedToAutoReset = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!tabletopNeedsResetting) return;
+    // To prevent any bugs causing some infinite loops or something
+    // Our stacks also say if it needs resetting, so it's an okay fallback
+    if (hasTriedToAutoReset.current) return;
+
+    dispatch(resetTabletopHelper({ tabletopId }));
+
+    hasTriedToAutoReset.current = true;
+  }, [tabletopNeedsResetting, dispatch, tabletopId]);
 
   useDeckLastScreen({
     deckId,

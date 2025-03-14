@@ -1,5 +1,8 @@
 import { createCachedSelector } from "re-reselect";
-import { selectTabletop } from "../slices/tabletop";
+import {
+  selectTabletop,
+  selectDoesTabletopHaveCardInstances,
+} from "../slices/tabletop";
 import { RootState, Decks, Tabletops } from "../types";
 
 type TabletopProps = { tabletopId: Tabletops.Id };
@@ -32,4 +35,11 @@ export const selectDoesTabletopHaveAvailableCards = createCachedSelector(
   (cards): boolean | null => {
     return cards && cards.length > 0;
   },
+)((_, props) => props.tabletopId);
+
+export const selectTabletopNeedsResetting = createCachedSelector(
+  selectDoesTabletopHaveCardInstances,
+  selectDoesTabletopHaveAvailableCards,
+  (hasCardInstances, hasAvailableCards) =>
+    !hasCardInstances && !!hasAvailableCards,
 )((_, props) => props.tabletopId);
