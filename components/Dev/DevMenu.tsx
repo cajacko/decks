@@ -1,7 +1,7 @@
 import React from "react";
 import Flags from "./DevFlags";
 import Button from "@/components/Button";
-import { persistor } from "@/store/store";
+import { persistor, resetStore } from "@/store/store";
 import AppError from "@/classes/AppError";
 import text from "@/constants/text";
 import FieldSet, { FieldSetProps } from "@/components/FieldSet";
@@ -22,6 +22,7 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       .purge()
       .then(() => {
         setPurgeStatus("Purged");
+        resetStore();
       })
       .catch((unknownError) => {
         AppError.getError(unknownError, "Error purging store").log("debug");

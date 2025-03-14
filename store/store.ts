@@ -1,4 +1,9 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  combineReducers,
+  StateFromReducersMapObject,
+  ActionFromReducersMapObject,
+} from "@reduxjs/toolkit";
 import { enablePatches } from "immer";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "./storage";
@@ -14,13 +19,27 @@ import templatesSlice from "./slices/templates";
 
 enablePatches();
 
-const rootReducer = combineReducers({
+const reducerMap = {
   [cardsSlice.name]: cardsSlice.reducer,
   [tabletopsSlice.name]: tabletopsSlice.reducer,
   [decksSlice.name]: decksSlice.reducer,
   [userSettingsSlice.name]: userSettingsSlice.reducer,
   [templatesSlice.name]: templatesSlice.reducer,
-});
+};
+
+const appReducer = combineReducers(reducerMap);
+
+type AppState = StateFromReducersMapObject<typeof reducerMap>;
+type AppAction = ActionFromReducersMapObject<typeof reducerMap>;
+
+export const resetStoreAction = { type: "root/resetStore" };
+
+const rootReducer = (state: AppState | undefined, action: AppAction) => {
+  if (action.type === resetStoreAction.type) {
+    state = undefined; // This will reset the entire store
+  }
+  return appReducer(state, action);
+};
 
 const persistedReducer = persistReducer(
   {
@@ -53,6 +72,10 @@ export const store = configureStore({
       immutableCheck: false,
     }),
 });
+
+export function resetStore() {
+  store.dispatch(resetStoreAction);
+}
 
 export const persistor = persistStore(store);
 
