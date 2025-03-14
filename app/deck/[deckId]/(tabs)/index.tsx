@@ -1,4 +1,4 @@
-import { useGlobalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import DeckScreen from "@/components/DeckScreen";
 import AppError from "@/classes/AppError";
@@ -12,7 +12,7 @@ export const paramKeys = {
 };
 
 export default function DeckRoute() {
-  const params = useGlobalSearchParams();
+  const params = useLocalSearchParams();
   const deckIdParam = params[paramKeys.deckId];
   const deckId = typeof deckIdParam === "string" ? deckIdParam : null;
   const navigation = useNavigation();

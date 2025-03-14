@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { getDeckName } from "@/app/deck/[deckId]/_layout";
+import { getDeckName } from "@/app/deck/[deckId]/(tabs)/_layout";
 import text from "@/constants/text";
 import { withApp } from "@/components/App";
 import useFlag from "@/hooks/useFlag";
@@ -47,7 +47,7 @@ function RootLayout() {
   return (
     <Stack screenOptions={navOptions.default}>
       <Stack.Screen name="index" options={navOptions.index} />
-      <Stack.Screen name="deck/[deckId]" options={navOptions.deck} />
+      <Stack.Screen name="deck/[deckId]/(tabs)" options={navOptions.deck} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

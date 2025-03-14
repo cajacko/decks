@@ -5,6 +5,10 @@ import { persistor, resetStore } from "@/store/store";
 import AppError from "@/classes/AppError";
 import text from "@/constants/text";
 import FieldSet, { FieldSetProps } from "@/components/FieldSet";
+import { useRouter } from "expo-router";
+import exampleDecks from "@/constants/exampleDecks";
+import { exampleDeckIds } from "@/utils/builtInTemplateIds";
+import Collapsible from "../Collapsible";
 
 export interface DevMenuProps extends FieldSetProps {
   closeDrawer: () => void;
@@ -14,6 +18,7 @@ const titleProps = { type: "h2" } as const;
 
 export default function DevMenu(props: DevMenuProps): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
+  const { navigate } = useRouter();
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -49,6 +54,20 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
         onPress={purgeStore}
         variant="outline"
       />
+      <Collapsible title="Example Decks" initialCollapsed>
+        {Object.entries(exampleDecks).map(([id, { name }]) => (
+          <Button
+            key={id}
+            title={name}
+            variant="outline"
+            onPress={() => {
+              navigate(`/deck/${exampleDeckIds(id).deckId}`);
+              props.closeDrawer();
+            }}
+            style={{ marginTop: 10 }}
+          />
+        ))}
+      </Collapsible>
       <Flags />
     </FieldSet>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, useNavigation, useLocalSearchParams } from "expo-router";
+import { Tabs, useNavigation, useGlobalSearchParams } from "expo-router";
 import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
@@ -48,9 +48,17 @@ function useSetDeckName(deckId: string | null) {
   }, [navigation, deckId]);
 }
 
+export const paramKeys = {
+  deckId: "deckId",
+};
+
 export default function DeckLayout() {
-  const params = useLocalSearchParams();
-  const deckId = typeof params.deckId === "string" ? params.deckId : undefined;
+  // Getting the global search ones are key here. We had an issue when navigating between decks
+  // where the local search params would retain the previous deckId, adding this and the href props
+  // in the navOptions fixed the issue
+  const params = useGlobalSearchParams();
+  const deckIdParam = params[paramKeys.deckId];
+  const deckId = typeof deckIdParam === "string" ? deckIdParam : undefined;
   const canEditDeck = useAppSelector((state) =>
     deckId ? selectCanEditDeck(state, { deckId }) : false,
   );
@@ -88,14 +96,30 @@ export default function DeckLayout() {
             size={size}
           />
         ),
+        href: deckId
+          ? {
+              pathname: "/deck/[deckId]/(tabs)",
+              params: {
+                deckId,
+              },
+            }
+          : undefined,
       },
       play: {
         headerShown: false,
         tabBarLabel: text["screen.deck.play.title"],
         tabBarIcon: ({ size }) => <IconSymbol name="play-arrow" size={size} />,
+        href: deckId
+          ? {
+              pathname: "/deck/[deckId]/(tabs)/play",
+              params: {
+                deckId,
+              },
+            }
+          : undefined,
       },
     }),
-    [animation, freezeOnBlur, canEditDeck],
+    [animation, freezeOnBlur, canEditDeck, deckId],
   );
 
   return (

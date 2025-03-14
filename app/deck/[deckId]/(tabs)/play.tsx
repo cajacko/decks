@@ -1,5 +1,5 @@
 import Tabletop from "@/components/Tabletop/Tabletop";
-import { useGlobalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import AppError from "@/classes/AppError";
 import { useAppSelector } from "@/store/hooks";
@@ -13,7 +13,7 @@ export const paramKeys = {
 };
 
 export default function DeckTabletopScreen() {
-  const params = useGlobalSearchParams();
+  const params = useLocalSearchParams();
   const deckIdParam = params[paramKeys.deckId];
   const navigation = useNavigation();
   const deckId = typeof deckIdParam === "string" ? deckIdParam : null;
