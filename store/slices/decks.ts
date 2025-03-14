@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { Cards, Decks, RootState, SliceName } from "../types";
 import { getFlag } from "@/utils/flags";
@@ -232,13 +232,34 @@ export const cardsSlice = createSlice({
 export const { setDeckCardDefaults, setDeckDetails, setLastScreen } =
   cardsSlice.actions;
 
+export const selectDecksById = (state: RootState): Decks.State["decksById"] =>
+  state[cardsSlice.name].decksById;
+
 export const selectDeck = withBuiltInState(
   (state: RootState, props: { deckId: string }): Decks.Props | undefined =>
-    state[cardsSlice.name].decksById[props.deckId],
+    selectDecksById(state)[props.deckId],
 );
 
 export const selectDeckIds = (state: RootState): Decks.Id[] =>
   state[cardsSlice.name].deckIds;
+
+export const selectDecks = createSelector(
+  selectDeckIds,
+  selectDecksById,
+  (deckIds, decksById) => {
+    const decks: Decks.Props[] = [];
+
+    for (const deckId of deckIds) {
+      const deck = decksById[deckId];
+
+      if (deck) {
+        decks.push(deck);
+      }
+    }
+
+    return decks;
+  },
+);
 
 export const selectDeckCards = (
   state: RootState,

@@ -50,7 +50,7 @@ const template: Templates.Props<DataId> = {
     [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
-        value: fixed.cardPresets.yellow,
+        value: fixed.cardPresets.builtInTemplatesFallbackColor,
         type: "color",
         origin: "template",
       },

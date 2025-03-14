@@ -44,10 +44,20 @@ export const fixed = {
   cardPresets: {
     black: colors.black,
     white: colors.white,
-    grey: colors.grey,
-    yellow: "#ffd151",
+    // For when the user unsets a smart default we set
+    builtInTemplatesFallbackColor: "#ffd151",
     // Kinda want this to stand out against the other preset options
     newDeck: "#D1F8EF",
+    smartNewDeckColors: [
+      "#85B4F2",
+      "#C5F263",
+      "#F2D857",
+      "#F27979",
+      "#ECC199",
+      "#CBDBA7",
+      "#76C1C3",
+      "#F2358D",
+    ],
   },
   textureBackground: {
     stop1: "#b0bfdb",

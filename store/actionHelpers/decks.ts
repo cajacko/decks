@@ -9,6 +9,10 @@ import text from "@/constants/text";
 import { selectTabletop } from "../slices/tabletop";
 import { getBuiltInState } from "../utils/withBuiltInState";
 import { selectCard } from "../slices/cards";
+import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
+import { selectDeckDefaultColors } from "../combinedSelectors/decks";
+import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
+import { fixed } from "@/constants/colors";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.Id;
@@ -27,11 +31,27 @@ export function deleteDeckHelper(props: {
 
 export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
   const tabletopId = uuid();
+  const deckDefaultColors = selectDeckDefaultColors(store.getState());
+
+  const color = pickLeastUsedColor({
+    availableColors: fixed.cardPresets.smartNewDeckColors,
+    usedColors: deckDefaultColors,
+    fallback: fixed.cardPresets.newDeck,
+  });
 
   const deck: Decks.Props = {
     id: deckId,
     cards: [],
-    dataSchema: {},
+    dataSchema: {
+      [ReservedDataSchemaIds.Color]: {
+        id: ReservedDataSchemaIds.Color,
+        type: "color",
+        defaultValidatedValue: {
+          type: "color",
+          value: color,
+        },
+      },
+    },
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
     name: text["deck.new.title"],
@@ -41,11 +61,21 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     cardSize: Cards.Size.Poker,
     templates: {
       back: {
-        dataTemplateMapping: {},
+        dataTemplateMapping: {
+          [builtInTemplates.back.schema.color.id]: {
+            dataId: ReservedDataSchemaIds.Color,
+            templateDataId: builtInTemplates.back.schema.color.id,
+          },
+        },
         templateId: builtInTemplates.back.templateId,
       },
       front: {
-        dataTemplateMapping: {},
+        dataTemplateMapping: {
+          [builtInTemplates.front.schema.color.id]: {
+            dataId: ReservedDataSchemaIds.Color,
+            templateDataId: builtInTemplates.front.schema.color.id,
+          },
+        },
         templateId: builtInTemplates.front.templateId,
       },
     },
