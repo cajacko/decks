@@ -19,7 +19,7 @@ export interface CreateCardActionPayload {
   deckId: Decks.Id;
   tabletops: {
     tabletopId: Tabletops.Id;
-    cardInstances: Tabletops.CardInstance[];
+    cardInstances: Omit<Tabletops.CardInstance, "side">[];
   }[];
   data: SetCardData;
 }

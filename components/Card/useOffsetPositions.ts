@@ -3,7 +3,7 @@ import { getOffsetPositions } from "./card.styles";
 import { CardSizeContextProps } from "./Card.types";
 import { useCardSizes } from "./CardSize.context";
 import { useOptionalTabletopContext } from "@/components/Tabletop/Tabletop.context";
-import { selectTabletopSettings } from "@/store/slices/tabletop";
+import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
 import { useAppSelector } from "@/store/hooks";
 
 export default function useOffsetPositions(

@@ -45,15 +45,19 @@ export interface Settings {
   /**
    * Store the number the user sees (so not 0 indexed)
    */
-  newCardsJoinStack?: number;
+  newCardsJoinStackNumber?: number;
   newCardsGoToTopOfStack?: boolean;
+  doNotAddNewCardsAutomatically?: boolean;
 }
 
 export interface Props {
   id: Id;
   availableDecks: DeckId[];
   history: History;
-  settings?: Settings;
+  // Undefined forces us to make a decision of what value to set here in our builders for example
+  // decks etc
+  settings: Settings | undefined;
+  missingCardIds: CardId[] | undefined;
 }
 
 export interface State {

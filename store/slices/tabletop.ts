@@ -9,6 +9,7 @@ import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
+import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -52,6 +53,50 @@ function removeCardInstancesFromStacks(
       cardInstanceIds.includes(item),
     );
   });
+}
+
+function addCardInstancesToTabletop(
+  tabletop: WritableDraft<Tabletop>,
+  cardInstances: Omit<Tabletops.CardInstance, "side">[],
+) {
+  const present = tabletop.history.present;
+
+  const stackId = getStackIdForNewCardsAndReset(
+    present.stacksIds,
+    tabletop.settings,
+  );
+
+  // We have no where to add them! Shouldn't happen
+  if (!stackId) return;
+
+  const stack = present.stacksById[stackId];
+
+  if (!stack) return;
+
+  let didEdit = false;
+
+  cardInstances.forEach((cardInstance) => {
+    didEdit = true;
+
+    present.cardInstancesById[cardInstance.cardInstanceId] = {
+      ...cardInstance,
+      side: tabletop.settings?.defaultCardSide ?? "front",
+    };
+
+    if (tabletop.settings?.newCardsGoToTopOfStack) {
+      stack.cardInstances.unshift(cardInstance.cardInstanceId);
+    } else {
+      stack.cardInstances.push(cardInstance.cardInstanceId);
+    }
+  });
+
+  // It feels like a bit of a cluster fuck to try and support. As they can then undo a card
+  // getting in the tabletop and then have a lost card until they reset. If we add a batter
+  // solution we can change this
+  if (didEdit) {
+    tabletop.history.past = [];
+    tabletop.history.future = [];
+  }
 }
 
 export const tabletopsSlice = createSlice({
@@ -294,6 +339,21 @@ export const tabletopsSlice = createSlice({
         state.cardInstancesById = action.payload.historyState.cardInstancesById;
       },
     ),
+    addMissingTabletopCards: (
+      state,
+      action: PayloadAction<{
+        tabletopId: string;
+        cardInstances: Omit<Tabletops.CardInstance, "side">[];
+      }>,
+    ) => {
+      const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+      if (!tabletop) return;
+
+      tabletop.missingCardIds = [];
+
+      addCardInstancesToTabletop(tabletop, action.payload.cardInstances);
+    },
     setTabletopSetting: <K extends keyof Tabletops.Settings>(
       state: WritableDraft<TabletopState>,
       action: PayloadAction<{
@@ -393,33 +453,17 @@ export const tabletopsSlice = createSlice({
 
         if (!tabletop) return;
 
-        const present = tabletop.history.present;
+        if (tabletop.settings?.doNotAddNewCardsAutomatically) {
+          if (!tabletop.missingCardIds) {
+            tabletop.missingCardIds = [];
+          }
 
-        let didEdit = false;
+          tabletop.missingCardIds.push(actions.payload.cardId);
 
-        cardInstances.forEach((cardInstance) => {
-          didEdit = true;
-
-          present.cardInstancesById[cardInstance.cardInstanceId] = cardInstance;
-
-          const stackId = present.stacksIds[0];
-
-          if (!stackId) return;
-
-          const stack = present.stacksById[stackId];
-
-          if (!stack) return;
-
-          stack.cardInstances.push(cardInstance.cardInstanceId);
-        });
-
-        // It feels like a bit of a cluster fuck to try and support. As they can then undo a card
-        // getting in the tabletop and then have a lost card until they reset. If we add a batter
-        // solution we can change this
-        if (didEdit) {
-          tabletop.history.past = [];
-          tabletop.history.future = [];
+          return;
         }
+
+        addCardInstancesToTabletop(tabletop, cardInstances);
       });
     });
   },
@@ -435,6 +479,7 @@ export const {
   resetTabletop,
   setTabletop,
   setTabletopSetting,
+  addMissingTabletopCards,
 } = tabletopsSlice.actions;
 
 export const selectTabletop = (
@@ -523,10 +568,5 @@ export const selectDoesTabletopHaveCardInstances = createCachedSelector(
     return false;
   },
 )((_, props: { tabletopId: string }) => props.tabletopId);
-
-export const selectTabletopSettings = (
-  state: RootState,
-  props: { tabletopId: string },
-): Tabletops.Settings | undefined => selectTabletop(state, props)?.settings;
 
 export default tabletopsSlice;

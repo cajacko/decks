@@ -50,7 +50,11 @@ export function configureHistory<
     },
     withHistory:
       <A extends PayloadAction<P>>(
-        callback: (state: Draft<Draft<HistoryState>>, action: A) => void,
+        callback: (
+          state: Draft<Draft<HistoryState>>,
+          action: A,
+          originalNonHistoryState: WritableDraft<SliceState>,
+        ) => void,
       ) =>
       (state: WritableDraft<SliceState>, action: A): void => {
         const history = selectHistory(state, action.payload);
@@ -59,7 +63,7 @@ export function configureHistory<
 
         const [nextState, patches, inversePatches] = produceWithPatches(
           history.present,
-          (draft) => callback(draft, action),
+          (draft) => callback(draft, action, state),
         );
 
         history.past.push({ inversePatches, patches });

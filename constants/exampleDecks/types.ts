@@ -1,5 +1,5 @@
 import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
-import { Decks } from "@/store/types";
+import { Decks, Tabletops } from "@/store/types";
 
 export type ReservedCardData = {
   [K in ReservedDataSchemaIds]?: string | null;
@@ -14,4 +14,5 @@ export interface ExampleDeck<CardData extends object = ReservedCardData> {
   cards: CardData[];
   templates: Decks.Templates;
   dataSchema?: Decks.DataSchema;
+  tabletopSettings?: Tabletops.Settings;
 }

@@ -45,16 +45,20 @@ export function createCardHelper(props: {
   data: SetCardData;
 }) {
   const tabletops: CreateCardActionPayload["tabletops"] = [];
-  const deck = selectDeck(store.getState(), props)?.defaultTabletopId;
+  const defaultTabletopId = selectDeck(
+    store.getState(),
+    props,
+  )?.defaultTabletopId;
 
-  if (deck) {
+  // NOTE: The tabletop reducer decides whether to add the card instance or not and where based on
+  // it's settings, we don't need to do that here
+  if (defaultTabletopId) {
     tabletops.push({
-      tabletopId: deck,
+      tabletopId: defaultTabletopId,
       cardInstances: [
         {
           cardId: props.cardId,
           cardInstanceId: uuid(),
-          side: "front",
         },
       ],
     });

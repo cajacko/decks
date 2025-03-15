@@ -52,3 +52,8 @@ export const selectTabletopNeedsResetting = createCachedSelector(
     return false;
   },
 )((_, props) => props.tabletopId);
+
+export const selectTabletopSettings = (
+  state: RootState,
+  props: { tabletopId: string },
+): Tabletops.Settings | undefined => selectTabletop(state, props)?.settings;

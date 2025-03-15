@@ -81,6 +81,8 @@ export default function registerExampleDecks() {
     const tabletop: Tabletops.Props = {
       id: tabletopId,
       availableDecks: [deckId],
+      settings: exampleDeck.tabletopSettings,
+      missingCardIds: [],
       history: {
         future: [],
         past: [],

@@ -123,7 +123,12 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
 
   const cards: Cards.Props[] = [];
 
-  const { stacksIds, stacksById } = createInitStacks();
+  const tabletopSettings: Tabletops.Props["settings"] = undefined;
+
+  const { stacksIds, stacksById } = createInitStacks(
+    null,
+    tabletopSettings ?? null,
+  );
 
   const defaultTabletop: Tabletops.Props = {
     id: tabletopId,
@@ -137,6 +142,8 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
         stacksIds,
       },
     },
+    settings: tabletopSettings,
+    missingCardIds: [],
   };
 
   return createDeck({
@@ -250,18 +257,22 @@ export function copyDeckHelper(props: {
       },
       id: newTabletopId,
       availableDecks: [deckId],
+      settings: existingTabletop.settings,
+      missingCardIds: existingTabletop.missingCardIds,
     };
   } else {
     // We have no existing tabletop to copy from, so we need to create a new one
     defaultTabletop = {
       id: newTabletopId,
       availableDecks: [deckId],
+      settings: undefined,
       history: {
         future: [],
         past: [],
         // Uses the same logic as the reset
-        present: getResetHistoryState(deckCards),
+        present: getResetHistoryState(deckCards, null),
       },
+      missingCardIds: [],
     };
   }
 
