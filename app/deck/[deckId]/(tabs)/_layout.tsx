@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, useNavigation, useGlobalSearchParams } from "expo-router";
+import { Tabs, useNavigation } from "expo-router";
 import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
@@ -8,6 +8,7 @@ import IconSymbol from "@/components/IconSymbol";
 import useFlag from "@/hooks/useFlag";
 import { TabAnimationName } from "@react-navigation/bottom-tabs/lib/typescript/commonjs/src/types";
 import { useAppSelector } from "@/store/hooks";
+import useScreenDeckId from "@/hooks/useScreenDeckId";
 
 type NavOptions = {
   default?: React.ComponentProps<typeof Tabs>["screenOptions"];
@@ -53,12 +54,7 @@ export const paramKeys = {
 };
 
 export default function DeckLayout() {
-  // Getting the global search ones are key here. We had an issue when navigating between decks
-  // where the local search params would retain the previous deckId, adding this and the href props
-  // in the navOptions fixed the issue
-  const params = useGlobalSearchParams();
-  const deckIdParam = params[paramKeys.deckId];
-  const deckId = typeof deckIdParam === "string" ? deckIdParam : undefined;
+  const deckId = useScreenDeckId("layout", null);
   const canEditDeck = useAppSelector((state) =>
     deckId ? selectCanEditDeck(state, { deckId }) : false,
   );
