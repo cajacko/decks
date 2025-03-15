@@ -84,7 +84,7 @@ export default function useStack({
         stackId,
         allCardInstancesState: "noChange",
         tabletopId,
-        seed: generateSeed(),
+        method: { type: "shuffle", seed: generateSeed() },
       }),
     );
 

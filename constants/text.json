@@ -42,6 +42,8 @@
   "general.null": "(disabled)",
   "general.off": "Off",
   "general.on": "On",
+  "general.undo": "Undo",
+  "general.redo": "Redo",
   "screen.404.title": "Oops!",
   "screen.deck.index.title": "Edit Deck",
   "screen.deck.play.title": "Play Deck",
@@ -58,6 +60,7 @@
   "settings.performance_mode.helper": "Makes the app run faster by turning off animations and other visual effects. Isn't as pretty, but works better on older devices or if you're experiencing issues. This will also lock some additional settings until you turn this off.",
   "settings.performance_mode": "Performance Mode",
   "settings.tabletop.title": "Play Settings",
+  "settings.tabletop.all_title": "All Play Settings/ Actions",
   "settings.theme.dark": "Dark",
   "settings.theme.light": "Light",
   "settings.theme.system": "System",
@@ -87,5 +90,7 @@
   "template.reserved_data_item.color.description": "A colour that templates may use to style different aspects of a card. Often overridden by the template or more specific fields.",
   "template.reserved_data_item.color.name": "Colour Profile",
   "template.reserved_data_item.description.name": "Description",
-  "template.reserved_data_item.title.name": "Title"
+  "template.reserved_data_item.title.name": "Title",
+  "settings.stack_actions.move.new_stack_start": "New Stack (Start)",
+  "settings.stack_actions.move.new_stack_end": "New Stack (End)"
 }

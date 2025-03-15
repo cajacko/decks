@@ -6,7 +6,7 @@ import Checkbox from "expo-checkbox";
 import ThemedText from "./ThemedText";
 
 export interface FieldProps {
-  label: string;
+  label?: string;
   subLabel?: string | null;
   children?: React.ReactNode;
   style?: ViewStyle;
@@ -43,11 +43,13 @@ export default function Field(props: FieldProps): React.ReactNode {
               onValueChange={props.handleChangeEnable}
             />
           )}
-          <Label
-            style={styles.label}
-            text={props.label}
-            hasChanges={props.hasChanges}
-          />
+          {props.label && (
+            <Label
+              style={styles.label}
+              text={props.label}
+              hasChanges={props.hasChanges}
+            />
+          )}
         </View>
         {props.inline && <View style={styles.input}>{props.children}</View>}
       </View>

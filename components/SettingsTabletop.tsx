@@ -10,6 +10,8 @@ import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { setUserFlag } from "@/store/slices/userSettings";
 import SwitchField from "./SwitchField";
 import useFlag from "@/hooks/useFlag";
+import StackActions from "./StackActions";
+import useTabletopHistory from "@/hooks/useTabletopHistory";
 
 const titleProps = { type: "h2" } as const;
 
@@ -25,6 +27,7 @@ export default function SettingsTabletop({
   ...props
 }: SettingsTabletopProps): React.ReactNode {
   const dispatch = useAppDispatch();
+  const { undo, redo } = useTabletopHistory(tabletopId);
   const deckName = deckNameWithFallback(
     useAppSelector((state) => selectDeck(state, { deckId })?.name),
   );
@@ -62,19 +65,38 @@ export default function SettingsTabletop({
         subTitle={`(${deckName})`}
         {...props}
       >
-        <Button
-          title={text["tabletop.reset.title"]}
-          onPress={resetTabletopModal.open}
-          variant="outline"
-        />
-        <SwitchField
-          label={text["settings.neat_stack"]}
-          value={isNeatStack}
-          onValueChange={onChangeIsNeat}
-          FieldProps={{
-            subLabel: text["settings.neat_stack.helper"],
-          }}
-        />
+        <StackActions tabletopId={tabletopId} collapsible initialCollapsed />
+        <FieldSet
+          title={text["settings.tabletop.all_title"]}
+          collapsible
+          initialCollapsed
+        >
+          <Button
+            title={text["general.undo"]}
+            onPress={undo}
+            variant="outline"
+            style={{ opacity: undo ? 1 : 0.5 }}
+          />
+          <Button
+            title={text["general.redo"]}
+            onPress={redo}
+            variant="outline"
+            style={{ opacity: redo ? 1 : 0.5 }}
+          />
+          <Button
+            title={text["tabletop.reset.title"]}
+            onPress={resetTabletopModal.open}
+            variant="outline"
+          />
+          <SwitchField
+            label={text["settings.neat_stack"]}
+            value={isNeatStack}
+            onValueChange={onChangeIsNeat}
+            FieldProps={{
+              subLabel: text["settings.neat_stack.helper"],
+            }}
+          />
+        </FieldSet>
       </FieldSet>
     </>
   );

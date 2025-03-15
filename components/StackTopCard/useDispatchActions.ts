@@ -48,7 +48,7 @@ export default function useDispatchActions({
     dispatch(
       changeCardState({
         tabletopId,
-        cardInstanceId,
+        target: { cardInstanceId },
         side: side === "back" ? "front" : "back",
       }),
     );
@@ -68,10 +68,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: rightStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
+            toTarget: rightStackId
+              ? { stackId: rightStackId }
+              : { stackId: uuid(), newStackDirection: "end" },
             method: MoveCardInstanceMethod.bottomNoChange,
-            newStackDirection: "end",
           }),
         );
       },
@@ -87,10 +88,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: rightStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
+            toTarget: rightStackId
+              ? { stackId: rightStackId }
+              : { stackId: uuid(), newStackDirection: "end" },
             method: MoveCardInstanceMethod.topNoChange,
-            newStackDirection: "end",
           }),
         );
       },
@@ -121,10 +123,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: leftStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
             method: MoveCardInstanceMethod.bottomNoChange,
-            newStackDirection: "start",
+            toTarget: leftStackId
+              ? { stackId: leftStackId }
+              : { stackId: uuid(), newStackDirection: "start" },
           }),
         );
       },
@@ -140,10 +143,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: leftStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
             method: MoveCardInstanceMethod.topNoChange,
-            newStackDirection: "start",
+            toTarget: leftStackId
+              ? { stackId: leftStackId }
+              : { stackId: uuid(), newStackDirection: "start" },
           }),
         );
       },
@@ -177,10 +181,9 @@ export default function useDispatchActions({
       dispatch(
         moveCard({
           tabletopId,
-          cardInstanceId,
-          toStackId: stackId,
+          moveTarget: { cardInstanceId },
           method: MoveCardInstanceMethod.bottomNoChange,
-          newStackDirection: "end",
+          toTarget: { stackId: stackId },
         }),
       );
     };

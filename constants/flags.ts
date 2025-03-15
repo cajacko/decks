@@ -66,10 +66,6 @@ export const defaultFlags: UserSettings.FlagMap = {
     {} as UserSettings.FlagMap,
   ),
   DEV_MODE: process.env.NODE_ENV === "development" ? true : false,
-  HOLD_MENU_BEHAVIOUR:
-    Platform.OS === "ios" || Platform.OS === "web"
-      ? "always-visible"
-      : "hold/hover",
   CARD_ANIMATE_OUT_BEHAVIOUR: Platform.OS === "web" ? "linear" : "bezier",
 };
 
