@@ -294,6 +294,24 @@ export const tabletopsSlice = createSlice({
         state.cardInstancesById = action.payload.historyState.cardInstancesById;
       },
     ),
+    setTabletopSetting: <K extends keyof Tabletops.Settings>(
+      state: WritableDraft<TabletopState>,
+      action: PayloadAction<{
+        tabletopId: string;
+        key: K;
+        value: Tabletops.Settings[K];
+      }>,
+    ) => {
+      const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+      if (!tabletop) return;
+
+      if (!tabletop.settings) {
+        tabletop.settings = {};
+      }
+
+      tabletop.settings[action.payload.key] = action.payload.value;
+    },
   },
   extraReducers: (builder) => {
     function deleteCards(
@@ -416,6 +434,7 @@ export const {
   deleteStack,
   resetTabletop,
   setTabletop,
+  setTabletopSetting,
 } = tabletopsSlice.actions;
 
 export const selectTabletop = (
@@ -504,5 +523,10 @@ export const selectDoesTabletopHaveCardInstances = createCachedSelector(
     return false;
   },
 )((_, props: { tabletopId: string }) => props.tabletopId);
+
+export const selectTabletopSettings = (
+  state: RootState,
+  props: { tabletopId: string },
+): Tabletops.Settings | undefined => selectTabletop(state, props)?.settings;
 
 export default tabletopsSlice;

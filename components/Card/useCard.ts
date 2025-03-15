@@ -137,14 +137,36 @@ export default function useCard(
     [offsetPositions, props.offsetPosition],
   );
 
+  const initialTranslateX = offsetPosition?.x ?? 0;
+  const initialTranslateY = offsetPosition?.y ?? 0;
+  const initialRotation =
+    props.initialRotation ?? offsetPosition?.rotate ?? null;
+
   const isAnimatingRef = React.useRef<Record<string, boolean | undefined>>({});
-  const translateX = useSharedValue<number | null>(offsetPosition?.x ?? null);
-  const translateY = useSharedValue<number | null>(offsetPosition?.y ?? null);
+  const translateX = useSharedValue<number | null>(initialTranslateX);
+  const translateY = useSharedValue<number | null>(initialTranslateY);
   const opacity = useSharedValue<number | null>(null);
-  const rotate = useSharedValue<number | null>(
-    props.initialRotation ?? offsetPosition?.rotate ?? null,
+  const animatedInitialRotation = useSharedValue<number | null>(
+    initialRotation,
   );
+  const rotate = useSharedValue<number | null>(initialRotation);
   const scaleX = useSharedValue<number | null>(props.initialScaleX ?? null);
+
+  // These update when we change settings like "neat stacks"
+  React.useEffect(() => {
+    translateX.value = initialTranslateX;
+    translateY.value = initialTranslateY;
+    rotate.value = initialRotation;
+    animatedInitialRotation.value = initialRotation;
+  }, [
+    initialTranslateX,
+    initialTranslateY,
+    initialRotation,
+    animatedInitialRotation,
+    translateX,
+    translateY,
+    rotate,
+  ]);
 
   function getIsAnimating() {
     return Object.values(isAnimatingRef.current).some(
@@ -169,24 +191,17 @@ export default function useCard(
   const animationUpdateRef = React.useRef(animationUpdate);
   const heightRef = React.useRef(height);
   const widthRef = React.useRef(width);
-  const initialRotation = useSharedValue<number | null>(
-    offsetPosition?.rotate ?? null,
-  );
 
   animationUpdateRef.current = animationUpdate;
   heightRef.current = height;
   widthRef.current = width;
-
-  React.useEffect(() => {
-    initialRotation.value = offsetPosition?.rotate ?? null;
-  }, [initialRotation, offsetPosition?.rotate]);
 
   const animateFlipOut = React.useCallback<CardRef["animateFlipOut"]>(() => {
     const animateKey = "flip";
 
     animationUpdateRef.current(animateKey, true);
 
-    rotate.value = initialRotation.value ?? 0;
+    rotate.value = animatedInitialRotation.value ?? 0;
     scaleX.value = 1;
 
     return new Promise((resolve) => {
@@ -200,7 +215,7 @@ export default function useCard(
         });
       });
     }).finally(() => animationUpdateRef.current(animateKey, false));
-  }, [canAnimate, rotate, scaleX, initialRotation]);
+  }, [canAnimate, rotate, scaleX, animatedInitialRotation]);
 
   const animateFlipIn = React.useCallback<CardRef["animateFlipIn"]>(() => {
     const animateKey = "flipIn";
@@ -217,7 +232,7 @@ export default function useCard(
 
       scaleX.value = withTiming(1, { duration: flipScaleDuration }, () => {
         rotate.value = withTiming(
-          initialRotation.value ?? 0,
+          animatedInitialRotation.value ?? 0,
           { duration: flipRotationDuration },
           () => {
             runOnJS(resolve)(undefined);
@@ -227,9 +242,9 @@ export default function useCard(
     }).finally(() => {
       animationUpdateRef.current(animateKey, false);
       scaleX.value = null;
-      rotate.value = initialRotation.value ?? null;
+      rotate.value = animatedInitialRotation.value ?? null;
     });
-  }, [canAnimate, scaleX, rotate, initialRotation]);
+  }, [canAnimate, scaleX, rotate, animatedInitialRotation]);
 
   const animateOut = React.useCallback<CardRef["animateOut"]>(
     async ({

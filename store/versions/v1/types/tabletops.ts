@@ -36,10 +36,24 @@ export interface HistoryState {
 
 type History = CreateHistoryHelper<HistoryState>;
 
+/**
+ * Settings the user can change for this specific tabletop
+ */
+export interface Settings {
+  preferNeatStacks?: boolean;
+  defaultCardSide?: CardSide;
+  /**
+   * Store the number the user sees (so not 0 indexed)
+   */
+  newCardsJoinStack?: number;
+  newCardsGoToTopOfStack?: boolean;
+}
+
 export interface Props {
   id: Id;
   availableDecks: DeckId[];
   history: History;
+  settings?: Settings;
 }
 
 export interface State {
