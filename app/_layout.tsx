@@ -4,6 +4,9 @@ import { getDeckName } from "@/app/deck/[deckId]/(tabs)/_layout";
 import text from "@/constants/text";
 import { withApp } from "@/components/App";
 import useFlag from "@/hooks/useFlag";
+import { Image } from "expo-image";
+import { Platform, StyleSheet, View } from "react-native";
+import { useTextLogo } from "@/hooks/useLogo";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
@@ -19,6 +22,7 @@ type NavOptions = {
 function RootLayout() {
   const freezeOnBlur = useFlag("SCREENS_FREEZE_ON_BLUR");
   const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
+  const logo = useTextLogo();
 
   const navOptions = React.useMemo(
     (): NavOptions => ({
@@ -28,7 +32,16 @@ function RootLayout() {
       index: {
         headerShown: true,
         headerBackVisible: false,
-        headerTitle: text["screen.decks.title"],
+        headerTitle: () => (
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.image}
+              contentFit="contain"
+              contentPosition="left center"
+              source={logo}
+            />
+          </View>
+        ),
         animation: animateStack ? "slide_from_left" : "none",
       },
       deck: ({ route: { params } }) => ({
@@ -41,7 +54,7 @@ function RootLayout() {
         animation: animateStack ? "slide_from_right" : "none",
       }),
     }),
-    [animateStack, freezeOnBlur],
+    [animateStack, freezeOnBlur, logo],
   );
 
   return (
@@ -52,5 +65,19 @@ function RootLayout() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  imageContainer: {
+    flex: 1,
+    height: "100%",
+    width: 200,
+  },
+  image: {
+    flex: 1,
+    width: "100%",
+    marginLeft: Platform.OS === "web" ? -30 : 60,
+    transform: [{ scale: Platform.OS === "web" ? 0.8 : 1.7 }],
+  },
+});
 
 export default withApp(RootLayout);

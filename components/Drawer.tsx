@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, ScrollView, View } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Touchable,
+  TouchableOpacity,
+} from "react-native";
 import ThemedView from "./ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppSelector } from "@/store/hooks";
@@ -10,6 +16,9 @@ import SettingsApp from "./SettingsApp";
 import SettingsDeck from "./SettingsDeck";
 import FieldSet from "./FieldSet";
 import SettingsTabletop from "./SettingsTabletop";
+import { useTextLogo } from "@/hooks/useLogo";
+import { Image } from "expo-image";
+import { Link } from "expo-router";
 
 export interface DrawerProps {
   deckId?: string | null;
@@ -29,6 +38,7 @@ type Collapsed = {
 };
 
 export default function Drawer(props: DrawerProps): React.ReactNode {
+  const textLogo = useTextLogo();
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
 
@@ -106,6 +116,15 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 )}
               </FieldSet>
             </View>
+            <Link href="https://www.dex.playface.fun" asChild>
+              <TouchableOpacity>
+                <Image
+                  style={styles.logo}
+                  source={textLogo}
+                  contentFit="contain"
+                />
+              </TouchableOpacity>
+            </Link>
             <Version />
           </View>
         </SafeAreaView>
@@ -117,6 +136,11 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  logo: {
+    // width: 50,
+    height: 80,
+    marginVertical: 20,
   },
   content: {
     flex: 1,
