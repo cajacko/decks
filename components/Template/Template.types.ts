@@ -1,19 +1,17 @@
-import { Templates } from "@/store/types";
+import { Markup, Templates } from "@/store/types";
 
-export type Data = Templates.Data;
-
-export interface TemplateProps<D extends Data = Data> {
+export interface TemplateProps {
   values?: Values | null;
-  markup: Templates.Markup<D>;
+  markup: Templates.Markup;
 }
 
-export interface MarkupElementProps {
-  element: Templates.MarkupElement<Data>;
+export interface MarkupNodeProps {
+  node: Markup.Node;
   cacheKey: string;
 }
 
 export interface MarkupChildrenProps {
-  elements: Templates.MarkupElement<Data>[];
+  nodes: Markup.Node[];
   cacheKey: string;
 }
 

@@ -1,14 +1,24 @@
 import React from "react";
 import { Drawer } from "react-native-drawer-layout";
-import DrawerContent from "@/components/Drawer";
+import DrawerContent, {
+  DrawerProps as _DrawerProps,
+} from "@/components/Drawer";
 import AppError from "@/classes/AppError";
+import { useFocusEffect } from "expo-router";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
-const Context = React.createContext<{
+export type DrawerProps = Omit<_DrawerProps, "isOpen" | "closeDrawer">;
+
+interface ContextValue {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   open: () => void;
   close: () => void;
-} | null>(null);
+  drawerProps: DrawerProps;
+  setDrawerProps: (props: DrawerProps) => void;
+}
+
+const Context = React.createContext<ContextValue | null>(null);
 
 export function useDrawer() {
   const context = React.useContext(Context);
@@ -20,8 +30,20 @@ export function useDrawer() {
   return context;
 }
 
+export function useSetDrawerProps(drawerProps?: DrawerProps) {
+  const { setDrawerProps } = useDrawer() ?? {};
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setDrawerProps?.(drawerProps ?? {});
+    }, [drawerProps, setDrawerProps]),
+  );
+}
+
 export function DrawerProvider(props: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [drawerProps, setDrawerProps] = React.useState<DrawerProps>({});
+  const backgroundColor = useThemeColor("background");
 
   const open = React.useCallback(() => {
     setIsOpen(true);
@@ -31,14 +53,30 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
     setIsOpen(false);
   }, []);
 
-  const value = React.useMemo(
+  const value = React.useMemo<ContextValue>(
     () => ({
       isOpen,
       setIsOpen,
       open,
       close,
+      drawerProps,
+      setDrawerProps,
     }),
-    [open, close, isOpen],
+    [open, close, isOpen, drawerProps],
+  );
+
+  const renderDrawerContent = React.useCallback(
+    () => (
+      <DrawerContent isOpen={isOpen} closeDrawer={close} {...drawerProps} />
+    ),
+    [drawerProps, isOpen, close],
+  );
+
+  const drawerStyle = React.useMemo(
+    () => ({
+      backgroundColor,
+    }),
+    [backgroundColor],
   );
 
   return (
@@ -47,15 +85,11 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
         onOpen={open}
         open={isOpen}
         onClose={close}
-        // Having a function allows hot reloading to work
-        renderDrawerContent={
-          process.env.NODE_ENV === "development"
-            ? () => <DrawerContent />
-            : DrawerContent
-        }
+        renderDrawerContent={renderDrawerContent}
         drawerPosition="right"
-        drawerType="slide"
+        drawerType="front"
         swipeEnabled={false}
+        drawerStyle={drawerStyle}
       >
         {props.children}
       </Drawer>

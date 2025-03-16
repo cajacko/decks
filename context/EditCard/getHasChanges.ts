@@ -1,7 +1,7 @@
-export default function getHasChanges(a: unknown, b: unknown) {
-  // If both values are falsy, they are considered equal
-  // We had some issues with null/ undefined and it was a bit tricky to sync these efforts
-  if (!a && !b) return false;
+import { Templates } from "@/store/types";
 
+type Value = Templates.ValidatedValue["value"] | undefined;
+
+export default function getHasChanges(a: Value, b: Value) {
   return a !== b;
 }

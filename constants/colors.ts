@@ -4,53 +4,89 @@
  */
 import { Theme as NavigationTheme } from "@react-navigation/native";
 import Color from "color";
+import playfaceColors from "./playfaceColors.json";
 
 const colors = {
-  black: "#000",
-  white: "#fff",
-  grey: "grey",
+  ...playfaceColors,
+};
+
+const dragBarPassiveDark = Color(colors.black).lighten(0.5).hex();
+const dragBarPassiveLight = Color(colors.white).darken(0.1).hex();
+
+const lightBackground = Color(colors.white).darken(0.01).hex();
+
+const textureBackground = {
+  stop1: "#b0bfdb",
+  stop2: "#5d6683",
+  stop3: "#3b4258",
 };
 
 export const themes = {
   light: {
-    text: "#11181C",
-    link: "#0a7ea4",
-    background: colors.white,
-    buttonBackground: "#0a7ea4",
-    buttonText: colors.white,
-    drawerDragBarPassive: "#e5e5e5",
-    drawerDragBarActive: "#c5c5c5",
-    inputOutline: "#c5c5c5",
-    placeholder: colors.black,
+    primary: colors.blue,
+    text: colors.darkBlue,
+    link: colors.red,
+    background: lightBackground,
+    buttonBackground: lightBackground,
+    buttonText: colors.darkBlue,
+    drawerDragBarPassive: dragBarPassiveLight,
+    drawerDragBarActive: Color(lightBackground).darken(0.2).hex(),
+    inputOutline: colors.darkBlue,
+    placeholder: colors.darkBlue,
+    changesIndicator: colors.blue,
+    switchTrackTrue: colors.darkBlue,
+    switchTrackFalse: dragBarPassiveLight,
+    switchThumb: lightBackground,
+    textureBackgroundStop1: Color(textureBackground.stop1).lighten(0.2).hex(),
+    textureBackgroundStop2: Color(textureBackground.stop2).lighten(0.6).hex(),
+    textureBackgroundStop3: Color(textureBackground.stop3).lighten(0.7).hex(),
+    emptyStackBorder: Color(colors.darkBlue).lighten(0.5).hex(),
   },
   dark: {
-    text: "#ECEDEE",
-    link: "#0a7ea4",
-    background: "#151718",
+    primary: colors.yellow,
+    text: colors.white,
+    link: colors.yellow,
+    background: colors.black,
     buttonBackground: colors.black,
     buttonText: colors.white,
-    drawerDragBarPassive: "#404040",
-    drawerDragBarActive: "#6e6e6e",
-    inputOutline: "#ccc",
+    drawerDragBarPassive: dragBarPassiveDark,
+    drawerDragBarActive: Color(colors.black).lighten(0.25).hex(),
+    inputOutline: colors.white,
     placeholder: colors.white,
+    changesIndicator: colors.yellow,
+    switchTrackTrue: colors.yellow,
+    switchTrackFalse: dragBarPassiveDark,
+    switchThumb: colors.white,
+    textureBackgroundStop1: textureBackground.stop1,
+    textureBackgroundStop2: textureBackground.stop2,
+    textureBackgroundStop3: textureBackground.stop3,
+    emptyStackBorder: colors.white,
   },
 };
 
+export type ThemeObject = typeof themes.light & typeof themes.dark;
+export type ThemeObjectKey = keyof ThemeObject;
+export type ThemeObjectValue<K extends ThemeObjectKey> = ThemeObject[K];
+
 export const fixed = {
   shadow: Color(colors.black).alpha(0.5).rgb().string(),
-  emptyStackBorder: colors.white,
   cardPresets: {
     black: colors.black,
     white: colors.white,
-    grey: colors.grey,
-    yellow: "#ffd151",
+    // For when the user unsets a smart default we set
+    builtInTemplatesFallbackColor: colors.yellow,
     // Kinda want this to stand out against the other preset options
-    newDeck: "#D1F8EF",
-  },
-  textureBackground: {
-    stop1: "#b0bfdb",
-    stop2: "#5d6683",
-    stop3: "#3b4258",
+    newDeck: colors.turquoise,
+    smartNewDeckColors: [
+      "#C5F263",
+      "#CBDBA7",
+      "#F2D857",
+      "#ECC199",
+      "#F27979",
+      "#F2358D",
+      "#85B4F2",
+      "#76C1C3",
+    ],
   },
   modalBackground: {
     default: Color(colors.black).alpha(0.5).rgb().string(),
@@ -63,18 +99,18 @@ export type Theme = keyof typeof themes;
 export const navigationColors: Record<Theme, NavigationTheme["colors"]> = {
   light: {
     background: themes.light.background,
-    border: "rgb(199, 199, 204)",
+    border: themes.light.inputOutline,
     card: themes.light.background,
-    notification: "rgb(255, 69, 58)",
-    primary: "rgb(10, 126, 164)",
+    notification: themes.light.changesIndicator,
+    primary: themes.light.primary,
     text: themes.light.text,
   },
   dark: {
     background: themes.dark.background,
-    border: "rgb(199, 199, 204)",
+    border: themes.dark.inputOutline,
     card: themes.dark.background,
-    notification: "rgb(255, 69, 58)",
-    primary: "rgb(10, 126, 164)",
+    notification: themes.dark.changesIndicator,
+    primary: themes.dark.primary,
     text: themes.dark.text,
   },
 };

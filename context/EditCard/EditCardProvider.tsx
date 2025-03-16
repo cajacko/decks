@@ -4,6 +4,7 @@ import { context as Context } from "./useContextSelector";
 import { _useTarget } from "./useTarget";
 import { _useSide } from "./useEditCardSide";
 import useEditCardState from "./useEditCardState";
+import debugLog from "./debugLog";
 
 export default function EditCardProvider({
   onCreateCard = null,
@@ -19,12 +20,20 @@ export default function EditCardProvider({
   });
 
   const [side, setSide] = _useSide({ side: propsSide, onChangeSide });
-  const [state, editState] = useEditCardState(target);
+  const { state, updateEditingDataItem } = useEditCardState(target);
 
-  const value = React.useMemo<Types.EditCardContext>(
-    () => ({ state, editState, onCreateCard, setTarget, side, setSide }),
-    [state, editState, onCreateCard, setTarget, side, setSide],
-  );
+  const value = React.useMemo<Types.EditCardContext>(() => {
+    debugLog(`${EditCardProvider.name} - context change`, state);
+
+    return {
+      state,
+      onCreateCard,
+      setTarget,
+      side,
+      setSide,
+      updateEditingDataItem,
+    };
+  }, [state, onCreateCard, setTarget, side, setSide, updateEditingDataItem]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

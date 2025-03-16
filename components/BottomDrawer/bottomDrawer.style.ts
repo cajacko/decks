@@ -21,6 +21,7 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: dragBuffer,
+    cursor: "pointer",
   },
   dragBox: {
     alignItems: "center",
@@ -30,6 +31,7 @@ export default StyleSheet.create({
     borderRadius: 10,
     zIndex: 2,
     position: "relative",
+    cursor: "pointer",
   },
   dragHeader: {
     marginTop: -dragOverlap,
@@ -39,9 +41,11 @@ export default StyleSheet.create({
     width: "100%",
     zIndex: 1,
     position: "relative",
+    cursor: "pointer",
   },
   dragIcon: {
     fontSize: 20,
+    cursor: "pointer",
   },
   drawer: {
     position: "absolute",

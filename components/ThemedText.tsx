@@ -1,4 +1,10 @@
-import { Text, type TextProps, StyleSheet } from "react-native";
+import {
+  Text,
+  type TextProps,
+  StyleSheet,
+  TextStyle,
+  StyleProp,
+} from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
   Theme as NavigationTheme,
@@ -8,9 +14,11 @@ import React from "react";
 
 export type ThemedTextVariant =
   | "h1"
+  | "h2"
   | "h3"
   | "h4"
   | "body1"
+  | "body2"
   | "button"
   | "link";
 
@@ -23,14 +31,16 @@ export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
 export function useThemedTextStyle({
   type = "body1",
   style: styleProp,
-}: Partial<ThemedTextProps>) {
+}: Partial<ThemedTextProps>): StyleProp<TextStyle> {
   const color = useThemeColor(type === "link" ? "link" : "text");
 
   const style = React.useMemo(
     () => [
       { color },
       type === "body1" ? styles.body1 : undefined,
+      type === "body2" ? styles.body2 : undefined,
       type === "h1" ? styles.h1 : undefined,
+      type === "h2" ? styles.h2 : undefined,
       type === "h3" ? styles.h3 : undefined,
       type === "h4" ? styles.h4 : undefined,
       type === "button" ? styles.button : undefined,
@@ -56,13 +66,22 @@ export default function ThemedText({
   return <Text {...rest} style={style} />;
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   body1: {
     fontSize: 16,
     lineHeight: 24,
   },
+  body2: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
   h1: {
     fontSize: 30,
+    fontWeight: "normal",
+  },
+  h2: {
+    fontSize: 24,
+    lineHeight: 28,
     fontWeight: "normal",
   },
   h3: {

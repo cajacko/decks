@@ -22,10 +22,11 @@ export default function StackList({
       stacks = stackIds.slice(0, minStackCount);
     }
 
-    return stacks?.map((stackId) => (
+    return stacks?.map((stackId, i) => (
       <Stack
         key={stackId}
         stackId={stackId}
+        canShowEditDeck={i === 0}
         leftStackId={stackIds[stackIds.indexOf(stackId) - 1]}
         rightStackId={stackIds[stackIds.indexOf(stackId) + 1]}
         stackListRef={stackListRef}

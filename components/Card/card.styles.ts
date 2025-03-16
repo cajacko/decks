@@ -1,14 +1,14 @@
-import { StyleSheet, Animated, ViewStyle } from "react-native";
+import { StyleSheet, ViewStyle, StyleProp } from "react-native";
 import {
   CardProps,
-  AnimatedViewStyle,
   OffsetPosition,
-  RequiredRefObject,
   CardSize,
   CardMMDimensions,
   CardSizeProps,
 } from "./Card.types";
 import { fixed } from "@/constants/colors";
+import { DefaultStyle } from "react-native-reanimated/lib/typescript/hook/commonTypes";
+import { AnimatedStyle } from "react-native-reanimated";
 
 export function parseCardSize(cardSize: CardSize | CardSizeProps) {
   const height =
@@ -127,11 +127,7 @@ const scalingStyles = {
  */
 export function getOffsetPositions(cardSize: CardSizeProps): OffsetPosition[] {
   return [
-    {
-      rotate: 0,
-      x: 0,
-      y: 0,
-    },
+    null,
     {
       y: -scalingStyles.offsetPositions[1].y(cardSize),
       x: scalingStyles.offsetPositions[1].x(cardSize),
@@ -164,7 +160,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     width: "100%",
-    backgroundColor: fixed.cardPresets.white,
+    // NOTE: On dark cards we see this background when they are rotated. So ensure background colors
+    // are always passed in.
+    // backgroundColor: fixed.cardPresets.white,
     overflow: "hidden",
   },
 });
@@ -187,37 +185,18 @@ export function getInnerStyle(
 export function getContainerStyle(
   props: CardSizeProps & {
     style?: CardProps["style"];
-    opacity: RequiredRefObject<Animated.Value>;
-    translateX: RequiredRefObject<Animated.Value>;
-    translateY: RequiredRefObject<Animated.Value>;
-    scaleX: RequiredRefObject<Animated.Value>;
     zIndex?: number;
     offsetPosition?: number;
-    rotate: RequiredRefObject<Animated.Value>;
+    animationStyle: Pick<DefaultStyle, "transform" | "opacity">;
   },
-): AnimatedViewStyle {
-  const rotate = props.rotate.current.interpolate({
-    inputRange: [0, 360],
-    outputRange: ["0deg", "360deg"],
-  });
-
-  const animationStyle: AnimatedViewStyle = {
-    transform: [
-      { translateX: props.translateX.current },
-      { translateY: props.translateY.current },
-      { scaleX: props.scaleX.current },
-      { rotate },
-    ],
-    opacity: props.opacity.current,
-  };
-
-  return StyleSheet.flatten<AnimatedViewStyle>([
+): StyleProp<AnimatedStyle<ViewStyle>> {
+  return [
     {
       zIndex: props.zIndex,
       width: props.dpWidth,
       height: props.dpHeight,
     },
-    animationStyle,
+    props.animationStyle,
     props.style,
-  ]);
+  ];
 }

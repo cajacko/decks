@@ -1,5 +1,7 @@
 import { ExampleDeck } from "./types";
-import playingCards from "@/constants/builtInTemplates/playingCards";
+import playingCards, {
+  dataIds as templateDataIds,
+} from "@/constants/builtInTemplates/playingCards";
 import back from "@/constants/builtInTemplates/back";
 
 const suits = [{ name: "❤️" }, { name: "♦️" }, { name: "♣️" }, { name: "♠️" }];
@@ -17,14 +19,63 @@ const values = [
   { value: "10", count: 10 },
 ];
 
-const deck: ExampleDeck<{
-  suit: string;
-  value: string;
-}> = {
+const dataIds = {
+  suit: "suit",
+  value: "value",
+  color: "color",
+};
+
+const deck: ExampleDeck<
+  Record<typeof dataIds.suit | typeof dataIds.value, string>
+> = {
   name: "Playing Cards",
   description: "A standard deck of 52 playing cards",
-  frontTemplateId: playingCards.templateId,
-  backTemplateId: back.templateId,
+  templates: {
+    back: {
+      templateId: back.templateId,
+      dataTemplateMapping: {
+        [templateDataIds.color]: {
+          dataId: dataIds.color,
+          templateDataId: back.schema.color.id,
+        },
+      },
+    },
+    front: {
+      dataTemplateMapping: {
+        [templateDataIds.suit]: {
+          dataId: dataIds.suit,
+          templateDataId: templateDataIds.suit,
+        },
+        [templateDataIds.value]: {
+          dataId: dataIds.value,
+          templateDataId: templateDataIds.value,
+        },
+        [templateDataIds.color]: {
+          dataId: dataIds.color,
+          templateDataId: templateDataIds.color,
+        },
+      },
+      templateId: playingCards.templateId,
+    },
+  },
+  dataSchema: {
+    [dataIds.suit]: {
+      id: dataIds.suit,
+      type: "text",
+    },
+    [dataIds.value]: {
+      id: dataIds.value,
+      type: "text",
+    },
+    [dataIds.color]: {
+      id: dataIds.color,
+      type: "color",
+      defaultValidatedValue: {
+        type: "color",
+        value: "#D4F6FF",
+      },
+    },
+  },
   cards: [],
 };
 

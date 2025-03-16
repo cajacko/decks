@@ -1,63 +1,43 @@
 import React from "react";
 import { Pressable, StyleSheet, ViewStyle, View } from "react-native";
 import CardSide from "@/components/CardSide";
-import EditCardModal from "./EditCardModal";
 import { Target } from "@/utils/cardTarget";
 import { selectCanEditCard } from "@/store/combinedSelectors/cards";
 import { useAppSelector } from "@/store/hooks";
+import { selectCanEditDeck } from "@/store/slices/decks";
 
-export interface DeckCardProps {
-  cardId: string;
-  quantity: number;
+export type DeckCardProps = Target & {
+  quantity?: number;
   style?: ViewStyle;
   skeleton?: boolean;
-}
+  editCard: (target: Target) => void;
+};
 
 export default function DeckCard({
-  cardId,
+  id,
+  type,
   style,
   skeleton,
+  editCard,
 }: DeckCardProps): React.ReactNode {
-  const [showEditModal, setShowEditModal] = React.useState(false);
+  const target = React.useMemo<Target>(() => ({ id, type }), [id, type]);
 
-  const canEditCard = useAppSelector((state) =>
-    selectCanEditCard(state, { cardId }),
+  const canEdit = useAppSelector((state) =>
+    target?.type === "card"
+      ? selectCanEditCard(state, { cardId: target.id })
+      : target?.type === "new-card-in-deck"
+        ? selectCanEditDeck(state, { deckId: target.id })
+        : false,
   );
 
-  const target = React.useMemo(
-    (): Target => ({ type: "card", id: cardId }),
-    [cardId],
-  );
+  const cardSide = <CardSide {...target} side="front" skeleton={skeleton} />;
 
-  const close = React.useCallback(() => {
-    setShowEditModal(false);
-  }, []);
-
-  const open = React.useCallback(() => {
-    setShowEditModal(true);
-  }, []);
-
-  const cardSide = (
-    <CardSide id={cardId} type="card" side="front" skeleton={skeleton} />
-  );
+  const open = React.useCallback(() => editCard(target), [editCard, target]);
 
   return (
     <>
-      {!skeleton && (
-        <EditCardModal
-          target={target}
-          initialSide="front"
-          onRequestClose={close}
-          visible={showEditModal}
-          onDelete={close}
-        />
-      )}
-      {canEditCard ? (
-        <Pressable
-          key={cardId}
-          onPress={skeleton ? undefined : open}
-          style={style}
-        >
+      {canEdit ? (
+        <Pressable onPress={skeleton ? undefined : open} style={style}>
           {cardSide}
         </Pressable>
       ) : (

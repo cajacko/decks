@@ -8,42 +8,53 @@ import { StackProps } from "./stack.types";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
-import { getOffsetPositions } from "@/components/Card/card.styles";
-import {
-  getCardSizes,
-  defaultCardDpWidth,
-  defaultCardDimensions,
-} from "../Card/cardSizes";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
-import { deleteStack } from "@/store/slices/tabletop";
-
-// These dummy values aren't getting used, we just want the length and doing it this way to keep a
-// single source of truth for the number of offset positions.
-const offsetPositionsCount = getOffsetPositions(
-  getCardSizes({
-    constraints: { width: defaultCardDpWidth },
-    proportions: defaultCardDimensions,
-  }),
-).length;
+import {
+  deleteStack,
+  selectDoesTabletopHaveCardInstances,
+} from "@/store/slices/tabletop";
+import { useRouter } from "expo-router";
+import useFlag from "@/hooks/useFlag";
+import useOffsetPositions from "@/components/Card/useOffsetPositions";
+import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
+import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/tabletops";
+import text from "@/constants/text";
 
 export default function useStack({
   stackId,
   stackListRef,
   canDelete = false,
+  canShowEditDeck = false,
 }: StackProps) {
+  // we just want the length and doing it this way to keep a
+  // single source of truth for the number of offset positions
+  const offsetPositions = useOffsetPositions();
+  // Our fallback needs to be enough for see a card behind when animating
+  const offsetPositionsCount = offsetPositions ? offsetPositions.length : 2;
+
+  const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
   const dispatch = useAppDispatch();
-  const { tabletopId, stackWidth } = useTabletopContext();
+  const { tabletopId, stackWidth, deckId } = useTabletopContext();
   const width = useSharedValue(stackWidth);
   const opacity = useSharedValue(1);
   const rotation = useSharedValue(0);
-  const [showActions, setShowActions] = React.useState(true);
+  const { navigate } = useRouter();
+  const doesTabletopHaveCards = useAppSelector((state) =>
+    selectDoesTabletopHaveCardInstances(state, { tabletopId }),
+  );
+  const doesTabletopHaveAvailableCards = useAppSelector((state) =>
+    selectDoesTabletopHaveAvailableCards(state, { tabletopId }),
+  );
 
   React.useEffect(() => {
     width.value = stackWidth;
   }, [width, stackWidth]);
 
   const { getCardOffsetPosition, onUpdateCardList, stackCountLimit } =
-    React.useMemo(() => withStackOffsetPositions(offsetPositionsCount), []);
+    React.useMemo(
+      () => withStackOffsetPositions(offsetPositionsCount),
+      [offsetPositionsCount],
+    );
 
   const cardInstancesIds = useAppSelector((state) =>
     selectFirstXCardInstances(state, {
@@ -54,55 +65,103 @@ export default function useStack({
   );
 
   const handleShuffle = React.useCallback(async () => {
-    rotation.value = 0;
-    setShowActions(false);
+    let promise: Promise<unknown> | undefined;
 
-    const duration = 500;
+    if (canAnimateCards) {
+      rotation.value = 0;
 
-    const promise = new Promise<void>((resolve) => {
-      rotation.value = withTiming(360, { duration }, () => {
-        runOnJS(resolve)();
+      const duration = 500;
+
+      promise = new Promise<void>((resolve) => {
+        rotation.value = withTiming(360, { duration }, () => {
+          runOnJS(resolve)();
+        });
       });
-    });
-
-    await new Promise((resolve) => setTimeout(resolve, duration / 2));
+    }
 
     dispatch(
       setStackOrder({
         stackId,
         allCardInstancesState: "noChange",
         tabletopId,
-        seed: generateSeed(),
+        method: { type: "shuffle", seed: generateSeed() },
       }),
     );
 
     await promise;
-
-    setShowActions(true);
-  }, [dispatch, stackId, tabletopId, rotation]);
+  }, [dispatch, stackId, tabletopId, rotation, canAnimateCards]);
 
   onUpdateCardList(cardInstancesIds ?? []);
 
-  const handleDeleteStack = React.useMemo(() => {
-    if (!canDelete) return;
+  const handleDeleteStack = React.useCallback(async () => {
+    const scroll = stackListRef.current?.scrollPrev?.();
 
-    return async () => {
-      const scroll = stackListRef.current?.scrollPrev?.();
-
-      const transform = new Promise<void>((resolve) => {
+    const transform = new Promise<void>((resolve) => {
+      if (canAnimateCards) {
         const toValue = withTiming(0, { duration: 500 }, () => {
           runOnJS(resolve)();
         });
 
         opacity.value = toValue;
         width.value = toValue;
-      });
+      } else {
+        opacity.value = 0;
+        width.value = 0;
 
-      await Promise.all([scroll, transform]);
+        resolve();
+      }
+    });
 
-      dispatch(deleteStack({ tabletopId, stackId: stackId }));
+    await Promise.all([scroll, transform]);
+
+    dispatch(deleteStack({ tabletopId, stackId: stackId }));
+  }, [
+    stackId,
+    width,
+    tabletopId,
+    dispatch,
+    stackListRef,
+    opacity,
+    canAnimateCards,
+  ]);
+
+  const emptyStackButton = React.useMemo(() => {
+    if (canDelete) {
+      return {
+        action: handleDeleteStack,
+        title: text["stack.actions.delete"],
+      };
+    }
+
+    if (doesTabletopHaveCards) return null;
+    if (!canShowEditDeck) return null;
+
+    if (doesTabletopHaveAvailableCards) {
+      return {
+        action: () => {
+          dispatch(resetTabletopHelper({ tabletopId }));
+        },
+        title: text["tabletop.reset.title"],
+      };
+    }
+
+    return {
+      action: () => {
+        navigate(`/deck/${deckId}`);
+      },
+      title: text["stack.actions.edit_deck"],
     };
-  }, [stackId, width, tabletopId, dispatch, stackListRef, opacity, canDelete]);
+  }, [
+    handleDeleteStack,
+    canDelete,
+    doesTabletopHaveCards,
+    canShowEditDeck,
+    doesTabletopHaveAvailableCards,
+    deckId,
+    dispatch,
+    tabletopId,
+    navigate,
+  ]);
 
   return {
     opacity,
@@ -110,8 +169,7 @@ export default function useStack({
     cardInstancesIds,
     getCardOffsetPosition,
     handleShuffle,
-    showActions,
     rotation,
-    handleDeleteStack,
+    emptyStackButton,
   };
 }

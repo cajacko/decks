@@ -6,8 +6,44 @@ const deck: ExampleDeck = {
   name: "Morning Pages Prompts",
   description:
     "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started.",
-  backTemplateId: back.templateId,
-  frontTemplateId: front.templateId,
+  templates: {
+    back: {
+      templateId: back.templateId,
+      dataTemplateMapping: {
+        color: {
+          dataId: "color",
+          templateDataId: back.schema.color.id,
+        },
+      },
+    },
+    front: {
+      dataTemplateMapping: {
+        title: {
+          dataId: "title",
+          templateDataId: front.schema.title.id,
+        },
+        description: {
+          dataId: "description",
+          templateDataId: front.schema.description.id,
+        },
+        color: {
+          dataId: "color",
+          templateDataId: front.schema.color.id,
+        },
+      },
+      templateId: front.templateId,
+    },
+  },
+  dataSchema: {
+    color: {
+      id: "color",
+      type: "color",
+      defaultValidatedValue: {
+        type: "color",
+        value: "#B7B1F2",
+      },
+    },
+  },
   cards: [
     {
       title: "What's on your mind?",

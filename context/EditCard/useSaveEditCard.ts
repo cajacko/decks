@@ -10,14 +10,19 @@ import {
 import getUpdateCardData from "./getUpdateCardData";
 import uuid from "@/utils/uuid";
 import AppError from "@/classes/AppError";
-import { getHasChanges } from "./useHasEditCardChanges";
 import useAutoSave from "@/hooks/useAutoSave";
+import debugLog from "./debugLog";
 
 /**
  * Must be used within the EditCard context and with a valid target. Otherwise why is this component
  * rendering?
  */
-export default function useSaveEditCard(autoSave = false) {
+export default function useSaveEditCard(options?: {
+  autoSave?: boolean;
+  onAutoSave?: () => void;
+}) {
+  const autoSave = !!options?.autoSave;
+  const onAutoSave = options?.onAutoSave;
   const dispatch = useAppDispatch();
   const onCreateCard = useContextSelector((context) => context?.onCreateCard);
   const setTarget = useRequiredContextSelector((context) => context?.setTarget);
@@ -26,11 +31,19 @@ export default function useSaveEditCard(autoSave = false) {
     (context) => context?.state?.getContextState,
   );
 
+  const getHasChanges = useRequiredContextSelector(
+    (context) => context?.state?.getHasChanges,
+  );
+
   const save = React.useCallback((): null => {
     const contextState = getContextState();
 
+    onAutoSave?.();
+
     switch (contextState.target.type) {
       case "card": {
+        debugLog(`${useSaveEditCard.name} - update card`);
+
         dispatch(
           updateCardHelper({
             cardId: contextState.target.id,
@@ -41,6 +54,7 @@ export default function useSaveEditCard(autoSave = false) {
         return null;
       }
       case "new-card-in-deck": {
+        debugLog(`${useSaveEditCard.name} - new card`);
         const newCardId = uuid();
 
         dispatch(
@@ -58,6 +72,8 @@ export default function useSaveEditCard(autoSave = false) {
         return null;
       }
       case "deck-defaults": {
+        debugLog(`${useSaveEditCard.name} - update deck default`);
+
         dispatch(
           setDeckCardDefaults({
             deckId: contextState.target.id,
@@ -68,20 +84,19 @@ export default function useSaveEditCard(autoSave = false) {
         return null;
       }
       default:
+        debugLog(`${useSaveEditCard.name} - unknown target`);
+
         throw new AppError(
           `${useSaveEditCard.name} could not save card, unexpected target type: ${contextState.target.type}`,
           contextState.target,
         );
     }
-  }, [getContextState, dispatch, onCreateCard, setTarget]);
+  }, [getContextState, dispatch, onCreateCard, setTarget, onAutoSave]);
 
   useAutoSave({
     save,
     autoSave,
-    hasChanges: React.useCallback(
-      () => getHasChanges(getContextState().hasChanges),
-      [getContextState],
-    ),
+    hasChanges: getHasChanges,
   });
 
   return {

@@ -23,7 +23,9 @@ export default function ColorInput(props: ColorInputProps): React.ReactNode {
     <TextInput
       rightAdornment={
         <View style={colorStyle}>
-          {isValidColor ? null : <IconSymbol name="error" size={30} />}
+          {isValidColor === false ? (
+            <IconSymbol name="error" size={30} />
+          ) : null}
         </View>
       }
       {...props}

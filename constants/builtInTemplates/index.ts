@@ -4,6 +4,10 @@ import back from "./back";
 import playingCards from "./playingCards";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 
+export * as playingCards from "./playingCards";
+export * as front from "./front";
+export * as back from "./back";
+
 const builtInTemplates = {
   front,
   back,

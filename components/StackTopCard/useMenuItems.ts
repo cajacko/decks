@@ -1,107 +1,77 @@
 import React from "react";
-import { StackTopCardProps, StackTopCardMenuItem } from "./types";
+import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
 import { selectCanEditCard } from "@/store/combinedSelectors/cards";
 import { useAppSelector } from "@/store/hooks";
+import { MenuItems, MenuItem } from "../HoldMenu";
+import withHoldMenuItem from "./withHoldMenuItem";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
   const canEditCard = useAppSelector((_state) =>
     selectCanEditCard(_state, { cardId: state.cardId }),
   );
-  const {
-    buttonSize,
-    cardSizes: { dpHeight: cardHeight, dpWidth: cardWidth },
-  } = useTabletopContext();
+  const { buttonSize } = useTabletopContext();
   const [showEditModal, setShowEditModal] = React.useState(false);
 
   const closeEditModal = React.useCallback(() => {
     setShowEditModal(false);
   }, []);
 
-  const menuItems = React.useMemo(() => {
-    const centerLeft = cardWidth / 2 - buttonSize / 2;
-    const top = -buttonSize / 2;
-    const bottom = cardHeight - buttonSize / 2;
-    const left = -buttonSize / 2;
-    const right = cardWidth - buttonSize / 2;
-    // const sideTop = cardHeight / 2 - buttonSize * 1.25;
-    // const sideBottom = sideTop + buttonSize * 1.5;
-    const sideMiddle = cardHeight / 2 - buttonSize / 2;
-    const verticalLeft = cardWidth / 2 - buttonSize * 1.5;
-    const verticalRight = cardWidth / 2 + buttonSize * 0.5;
+  const menuItems = React.useMemo((): MenuItems => {
+    const bottom: MenuItem = {
+      height: buttonSize,
+      width: buttonSize,
+      component: withHoldMenuItem("flip", state.handleFlipCard),
+      handleAction: state.handleFlipCard,
+    };
 
-    const items: StackTopCardMenuItem[] = [
-      {
-        key: "flip",
-        top: bottom,
-        left: canEditCard ? verticalLeft : centerLeft,
-        height: buttonSize,
-        width: buttonSize,
-        icon: "flip",
-        onPress: state.handleFlipCard,
-      },
-    ];
+    const top: MenuItem | undefined = state.handleMoveToBottom && {
+      height: buttonSize,
+      width: buttonSize,
+      component: withHoldMenuItem(
+        "vertical-align-top",
+        state.handleMoveToBottom,
+      ),
+      handleAction: state.handleMoveToBottom,
+    };
 
-    if (canEditCard) {
-      items.push({
-        key: "edit",
-        top: bottom,
-        left: verticalRight,
-        height: buttonSize,
-        width: buttonSize,
-        icon: "edit-document",
-        onPress: () => setShowEditModal(true),
-      });
-    }
+    const right: MenuItem | undefined = state.moveRight && {
+      height: buttonSize,
+      width: buttonSize,
+      component: withHoldMenuItem("chevron-right", state.moveRight.top),
+      handleAction: state.moveRight.top,
+    };
 
-    if (state.handleMoveToBottom) {
-      items.push({
-        key: "bottom",
-        top: top,
-        left: centerLeft,
-        height: buttonSize,
-        width: buttonSize,
-        icon: "vertical-align-bottom",
-        onPress: state.handleMoveToBottom,
-      });
-    }
+    const left: MenuItem | undefined = state.moveLeft && {
+      height: buttonSize,
+      width: buttonSize,
+      component: withHoldMenuItem("chevron-left", state.moveLeft.top),
+      handleAction: state.moveLeft.top,
+    };
 
-    if (state.moveRight) {
-      items.push({
-        key: "Rt",
-        top: sideMiddle,
-        left: right,
-        height: buttonSize,
-        width: buttonSize,
-        icon: "chevron-right",
-        onPress: state.moveRight.top,
-      });
-    }
-
-    if (state.moveLeft) {
-      items.push({
-        key: "Lt",
-        top: sideMiddle,
-        left: left,
-        height: buttonSize,
-        width: buttonSize,
-        icon: "chevron-left",
-        onPress: state.moveLeft.top,
-      });
-    }
-
-    return items;
+    return {
+      bottom,
+      top,
+      right,
+      left,
+    };
   }, [
     buttonSize,
-    cardHeight,
-    cardWidth,
     state.handleFlipCard,
     state.handleMoveToBottom,
     state.moveRight,
     state.moveLeft,
   ]);
+
+  const handlePress = React.useMemo(() => {
+    if (!canEditCard) return undefined;
+
+    return () => {
+      setShowEditModal(true);
+    };
+  }, [canEditCard, setShowEditModal]);
 
   return {
     cardId: state.cardId,
@@ -112,5 +82,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     showEditModal,
     closeEditModal,
     side: state.side,
+    handlePress,
+    animatedToBack: state.animatedToBack,
   };
 }

@@ -6,9 +6,17 @@
 // NOTE: First option is the default
 export const flagMap = {
   // User control flags go here
-  HOLD_MENU_BEHAVIOUR: ["hold", "tap"],
+  PERFORMANCE_MODE: ["disabled", "enabled"],
+  HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
 
   // Dev flags
+  CARD_ANIMATE_SEND_TO_BACK: ["enabled", "disabled"],
+  CARD_ANIMATE_OUT_BEHAVIOUR: ["linear", "bezier"],
+  HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],
+  BOTTOM_DRAWER_ANIMATE: ["enabled", "disabled"],
+  BOTTOM_DRAWER_DRAG: ["enabled", "disabled"],
+  CARD_ACTIONS_ALWAYS_VISIBLE: [false, true],
+  EDIT_CARD_MORE_INFO: ["disabled", "enabled"],
   USE_DEV_INITIAL_REDUX_STATE: [false, true],
   CARD_ANIMATIONS: ["enabled", "disabled"],
   SKELETON_LOADER: ["enabled", "disabled"],
@@ -31,6 +39,8 @@ export const flagMap = {
   // Debug logs
   DEBUG_BOTTOM_DRAWER: [false, true],
   DEBUG_AUTO_SAVE: [false, true],
+  DEBUG_EDIT_CARD: [false, true],
+  DEBUG_RESOLVE_CARD_DATA: [false, true],
 } as const;
 
 type _FlagMap = typeof flagMap;
@@ -47,5 +57,10 @@ export type FlagsState = {
 };
 
 export interface State {
+  theme?: "system" | "light" | "dark";
   flags?: FlagsState;
 }
+
+export type UserSettingKey = keyof State;
+export type UserSettingValue<K extends UserSettingKey = UserSettingKey> =
+  State[K];

@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { StackDimensions } from "./stack.types";
 import { getCardSizes } from "@/components/Card/cardSizes";
 import { CardSizeProps, CardMMDimensions } from "@/components/Card/Card.types";
@@ -27,12 +27,10 @@ function getExampleStackDimensions(
 
   // The padding around the card in a stack, which needs to have room for the action buttons that
   // get absolutely positioned around the card/ stack
-  const stackPadding = Math.max(
-    // The shuffle/ stack actions are a bit further out than card actions
-    Math.round(buttonSize / 1.5),
-    // Card actions are half on/ half off the card
-    Math.round(buttonSize / 2),
-  );
+  // Card actions are half on/ half off the card
+  const stackHorizontalPadding = Math.round(buttonSize / 2);
+  // The shuffle/ stack actions are a bit further out than card actions (but only vertically)
+  const stackVerticalPadding = Math.round((buttonSize * 3) / 2);
 
   let stackWidth: number;
   let stackHeight: number;
@@ -44,18 +42,20 @@ function getExampleStackDimensions(
     stackWidth = props.stackWidth;
 
     const cardWidth =
-      stackWidth - stackPadding * 2 - Math.round(spaceBetweenStacks / 2);
+      stackWidth -
+      stackHorizontalPadding * 2 -
+      Math.round(spaceBetweenStacks / 2);
 
     cardSizes = getCardSizes({
       constraints: { width: cardWidth },
       proportions: props.cardProportions,
     });
 
-    stackHeight = cardSizes.dpHeight + stackPadding * 2;
+    stackHeight = cardSizes.dpHeight + stackVerticalPadding * 2;
   } else {
     stackHeight = props.stackHeight;
 
-    const cardHeight = stackHeight - stackPadding * 2;
+    const cardHeight = stackHeight - stackVerticalPadding * 2;
 
     cardSizes = getCardSizes({
       constraints: { height: cardHeight },
@@ -63,13 +63,16 @@ function getExampleStackDimensions(
     });
 
     stackWidth =
-      cardSizes.dpWidth + stackPadding * 2 + Math.round(spaceBetweenStacks / 2);
+      cardSizes.dpWidth +
+      stackHorizontalPadding * 2 +
+      Math.round(spaceBetweenStacks / 2);
   }
 
   return {
     buttonSize,
     spaceBetweenStacks,
-    stackPadding,
+    stackHorizontalPadding,
+    stackVerticalPadding,
     stackHeight,
     stackWidth,
     cardSizes,
@@ -114,13 +117,17 @@ export function getStackDimensions(props: {
   });
 }
 
-export function getShuffleStyle(props: { stackPadding: number }) {
+export function getShuffleStyle(props: {
+  buttonSize: number;
+}): StyleProp<ViewStyle> {
   return StyleSheet.flatten([
-    styles.shuffleButton,
+    styles.shuffleContainer,
     {
       zIndex: 1,
-      bottom: -props.stackPadding,
-      left: -props.stackPadding,
+      bottom: (-props.buttonSize * 3) / 2,
+      left: 0,
+      right: 0,
+      alignItems: "center",
     },
   ]);
 }
@@ -130,6 +137,8 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   inner: {
+    zIndex: 2,
+    position: "relative",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -137,9 +146,11 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 1,
   },
-  shuffleButton: {
+  shuffleContainer: {
     position: "absolute",
+    opacity: 0.5,
   },
+  shuffleButton: {},
   card: {
     position: "absolute",
   },

@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, useNavigation, useLocalSearchParams } from "expo-router";
+import { Tabs, useNavigation } from "expo-router";
 import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { store } from "@/store/store";
@@ -8,6 +8,7 @@ import IconSymbol from "@/components/IconSymbol";
 import useFlag from "@/hooks/useFlag";
 import { TabAnimationName } from "@react-navigation/bottom-tabs/lib/typescript/commonjs/src/types";
 import { useAppSelector } from "@/store/hooks";
+import useScreenDeckId from "@/hooks/useScreenDeckId";
 
 type NavOptions = {
   default?: React.ComponentProps<typeof Tabs>["screenOptions"];
@@ -48,9 +49,12 @@ function useSetDeckName(deckId: string | null) {
   }, [navigation, deckId]);
 }
 
+export const paramKeys = {
+  deckId: "deckId",
+};
+
 export default function DeckLayout() {
-  const params = useLocalSearchParams();
-  const deckId = typeof params.deckId === "string" ? params.deckId : undefined;
+  const deckId = useScreenDeckId("layout", null);
   const canEditDeck = useAppSelector((state) =>
     deckId ? selectCanEditDeck(state, { deckId }) : false,
   );
@@ -88,14 +92,30 @@ export default function DeckLayout() {
             size={size}
           />
         ),
+        href: deckId
+          ? {
+              pathname: "/deck/[deckId]/(tabs)",
+              params: {
+                deckId,
+              },
+            }
+          : undefined,
       },
       play: {
         headerShown: false,
         tabBarLabel: text["screen.deck.play.title"],
         tabBarIcon: ({ size }) => <IconSymbol name="play-arrow" size={size} />,
+        href: deckId
+          ? {
+              pathname: "/deck/[deckId]/(tabs)/play",
+              params: {
+                deckId,
+              },
+            }
+          : undefined,
       },
     }),
-    [animation, freezeOnBlur, canEditDeck],
+    [animation, freezeOnBlur, canEditDeck, deckId],
   );
 
   return (

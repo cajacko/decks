@@ -1,6 +1,6 @@
-import { Cards, Templates } from "@/store/types";
+import { Cards } from "@/store/types";
 import { Target } from "@/utils/cardTarget";
-import builtInTemplates from "@/constants/builtInTemplates";
+import builtInTemplates, { back } from "@/constants/builtInTemplates";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 import text from "./text";
 import { fixed } from "./colors";
@@ -24,11 +24,11 @@ export const newDeckCard: Cards.Props = {
   canEdit: false,
   data: {
     [dataSchemaIds.title]: {
-      type: Templates.DataType.Text,
+      type: "text",
       value: text["decks_screen.my_decks.new"],
     },
     [dataSchemaIds.color]: {
-      type: Templates.DataType.Color,
+      type: "color",
       value: fixed.cardPresets.newDeck,
     },
   },
@@ -38,25 +38,25 @@ export const newDeckCard: Cards.Props = {
     front: {
       dataTemplateMapping: {
         [builtInTemplates.front.schema.title.id]: {
-          dataSchemaItemId: dataSchemaIds.title,
-          templateSchemaItemId: builtInTemplates.front.schema.title.id,
+          dataId: dataSchemaIds.title,
+          templateDataId: builtInTemplates.front.schema.title.id,
         },
         [builtInTemplates.front.schema.color.id]: {
-          dataSchemaItemId: dataSchemaIds.color,
-          templateSchemaItemId: builtInTemplates.front.schema.color.id,
+          dataId: dataSchemaIds.color,
+          templateDataId: builtInTemplates.front.schema.color.id,
         },
       },
       templateId: builtInTemplates.front.templateId,
     },
     back: {
       dataTemplateMapping: {
-        [builtInTemplates.back.schema.text.id]: {
-          dataSchemaItemId: dataSchemaIds.title,
-          templateSchemaItemId: builtInTemplates.back.schema.text.id,
+        [builtInTemplates.back.schema[back.dataIds.text].id]: {
+          dataId: dataSchemaIds.title,
+          templateDataId: builtInTemplates.back.schema[back.dataIds.text].id,
         },
         [builtInTemplates.back.schema.color.id]: {
-          dataSchemaItemId: dataSchemaIds.color,
-          templateSchemaItemId: builtInTemplates.back.schema.color.id,
+          dataId: dataSchemaIds.color,
+          templateDataId: builtInTemplates.back.schema.color.id,
         },
       },
       templateId: builtInTemplates.back.templateId,

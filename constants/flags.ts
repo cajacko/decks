@@ -7,6 +7,8 @@
  */
 
 import { UserSettings } from "@/store/types";
+import { Platform } from "react-native";
+import * as DevClient from "expo-dev-client";
 
 // If set, this value will be used
 export const flagOverrides: Partial<UserSettings.FlagMap> = {};
@@ -14,11 +16,32 @@ export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though
 export const flagRelationships: FlagRelationships = {
+  BOTTOM_DRAWER_ANIMATE: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
+  BOTTOM_DRAWER_DRAG: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
+  HOLD_MENU_BEHAVIOUR: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ||
+    getFlag("CARD_ACTIONS_ALWAYS_VISIBLE") === true
+      ? "always-visible"
+      : value,
+  CARD_ACTIONS_ALWAYS_VISIBLE: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? true : value,
+  CARD_ANIMATIONS: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
+  GENERAL_LAYOUT_ANIMATIONS: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
+  SKELETON_LOADER: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "enabled" : value,
   NAVIGATION_TAB_ANIMATIONS: (value, getFlag) =>
     getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   NAVIGATION_STACK_ANIMATIONS: (value, getFlag) =>
     getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   SCREEN_ANIMATIONS: (value, getValue) => {
+    if (getValue("PERFORMANCE_MODE") === "enabled") {
+      return "disabled";
+    }
+
     switch (value) {
       case "custom-fade-in-content":
       case "custom-fade-out-top-background": {
@@ -33,15 +56,20 @@ export const flagRelationships: FlagRelationships = {
 };
 
 // The default value is the first defined option
-export const defaultFlags: UserSettings.FlagMap = Object.entries(
-  UserSettings.flagMap,
-).reduce(
-  (acc, [key, [defaultValue]]) => ({
-    ...acc,
-    [key]: defaultValue,
-  }),
-  {} as UserSettings.FlagMap,
-);
+export const defaultFlags: UserSettings.FlagMap = {
+  ...Object.entries(UserSettings.flagMap).reduce(
+    (acc, [key, [defaultValue]]) => ({
+      ...acc,
+      [key]: defaultValue,
+    }),
+    {} as UserSettings.FlagMap,
+  ),
+  DEV_MODE:
+    process.env.NODE_ENV === "development" || DevClient.isDevelopmentBuild()
+      ? true
+      : false,
+  CARD_ANIMATE_OUT_BEHAVIOUR: Platform.OS === "web" ? "linear" : "bezier",
+};
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,

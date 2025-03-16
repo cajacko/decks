@@ -5,9 +5,12 @@
   },
   "build": {
     "development": {
-      "extends": "preview",
+      "distribution": "internal",
       "developmentClient": true,
-      "channel": "development"
+      "channel": "development",
+      "env": {
+        "APP_VARIANT": "development"
+      }
     },
     "preview": {
       "distribution": "internal",
@@ -15,11 +18,17 @@
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"
       },
-      "channel": "preview"
+      "channel": "preview",
+      "env": {
+        "APP_VARIANT": "preview"
+      }
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "APP_VARIANT": "production"
+      }
     }
   },
   "submit": {

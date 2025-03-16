@@ -1,20 +1,39 @@
-export type MenuItem<P extends object = object> = P & {
-  key: string;
-  top: number;
-  left: number;
+import React from "react";
+import { StyleProp, ViewStyle } from "react-native";
+import { GestureType } from "react-native-gesture-handler";
+import { AnimatedStyle } from "react-native-reanimated";
+
+export interface MenuItemComponentProps {
+  isHighlighted?: boolean;
+}
+export interface MenuItem {
   height: number;
   width: number;
-  touchBuffer?: number;
+  handleAction: () => void;
+  component:
+    | React.ReactNode
+    | ((props: MenuItemComponentProps) => React.ReactNode);
+}
+
+export interface MenuItemProps extends MenuItem {
+  position: MenuPosition;
+  style?: AnimatedStyle<ViewStyle>;
+  contentStyle?: AnimatedStyle<ViewStyle>;
+  isHighlighted?: boolean;
+  tapGesture: GestureType;
+}
+
+export type MenuPosition = "top" | "bottom" | "left" | "right";
+
+export type MenuItems = {
+  [K in MenuPosition]?: MenuItem;
 };
 
-export type RenderItemMenuItem<P extends MenuItem> = P & {
-  highlight: boolean;
-  holdMenuBehaviour: "hold" | "tap";
-};
-
-export interface HoldMenuProps<I extends MenuItem> {
-  renderItem: (item: RenderItemMenuItem<I>) => React.ReactNode;
-  handleAction: (item: I) => void;
-  menuItems: I[];
+export interface HoldMenuProps {
+  handlePress?: () => void;
+  menuItems: MenuItems;
   touchBuffer?: number;
+  children?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  hideActions?: boolean;
 }

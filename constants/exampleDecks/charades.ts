@@ -6,8 +6,52 @@ const deck: ExampleDeck = {
   name: "Charades",
   description:
     "A fun game where players act out a word or phrase without speaking.",
-  backTemplateId: back.templateId,
-  frontTemplateId: front.templateId,
+  templates: {
+    back: {
+      templateId: back.templateId,
+      dataTemplateMapping: {
+        color: {
+          dataId: "color",
+          templateDataId: back.schema.color.id,
+        },
+      },
+    },
+    front: {
+      dataTemplateMapping: {
+        title: {
+          dataId: "title",
+          templateDataId: front.schema.title.id,
+        },
+        description: {
+          dataId: "description",
+          templateDataId: front.schema.description.id,
+        },
+        color: {
+          dataId: "color",
+          templateDataId: front.schema.color.id,
+        },
+      },
+      templateId: front.templateId,
+    },
+  },
+  dataSchema: {
+    description: {
+      id: "description",
+      type: "text",
+      defaultValidatedValue: {
+        type: "null",
+        value: null,
+      },
+    },
+    color: {
+      id: "color",
+      type: "color",
+      defaultValidatedValue: {
+        type: "color",
+        value: "#FFDCCC",
+      },
+    },
+  },
   cards: [
     { title: "Elephant" },
     { title: "Cupcake" },

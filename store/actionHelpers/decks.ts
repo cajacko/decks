@@ -5,19 +5,28 @@ import { Cards, Decks, Tabletops } from "../types";
 import uuid from "@/utils/uuid";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { createInitStacks } from "@/utils/minStacks";
-import text from "@/constants/text";
+import text, { TextKey } from "@/constants/text";
 import { selectTabletop } from "../slices/tabletop";
 import { getBuiltInState } from "../utils/withBuiltInState";
 import { selectCard } from "../slices/cards";
+import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
+import {
+  selectDeckDefaultColors,
+  selectDeckNames,
+} from "../combinedSelectors/decks";
+import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
+import { fixed } from "@/constants/colors";
+import { getResetHistoryState } from "./tabletop";
+import { cloneDeep } from "lodash";
 
 export function deleteDeckHelper(props: {
-  deckId: Decks.DeckId;
-  cardIds?: Cards.CardId[];
-  tabletopId?: string;
+  deckId: Decks.Id;
+  cardIds?: Cards.Id[];
+  tabletopId?: Tabletops.Id;
 }) {
   const deck = selectDeck(store.getState(), props);
 
-  const cardIds: Cards.CardId[] =
+  const cardIds: Cards.Id[] =
     props.cardIds ?? deck?.cards.map(({ cardId }) => cardId) ?? [];
 
   const tabletopId = deck?.defaultTabletopId ?? props.tabletopId ?? null;
@@ -25,27 +34,88 @@ export function deleteDeckHelper(props: {
   return deleteDeck({ cardIds, deckId: props.deckId, tabletopId });
 }
 
-export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
+type ValidNumbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type ValidatedTextKey<K extends TextKey> = K;
+type UnvalidatedTextKey<T extends number = number> =
+  `deck.new.title.append.${T}`;
+// This validates that our appended key is an actual TextKey
+export type Test = ValidatedTextKey<UnvalidatedTextKey<ValidNumbers>>;
+
+function getNewDeckNameAppend(
+  textMap: Record<string, string | undefined>,
+  i: number,
+): string | null {
+  const key: UnvalidatedTextKey = `deck.new.title.append.${i}`;
+
+  return textMap[key] ?? null;
+}
+
+export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
   const tabletopId = uuid();
+  const deckDefaultColors = selectDeckDefaultColors(store.getState());
+  const deckNames = selectDeckNames(store.getState());
+
+  let deckName = text["deck.new.title"];
+  let i = 0;
+  let copy = 1;
+
+  while (deckNames.includes(deckName)) {
+    const newDeckNameAppend = getNewDeckNameAppend(text, i);
+
+    if (newDeckNameAppend) {
+      deckName = `${text["deck.new.title"]}${newDeckNameAppend}`;
+
+      i += 1;
+    } else {
+      deckName = `${deckName} (${copy})`;
+
+      copy += 1;
+    }
+  }
+
+  const color = pickLeastUsedColor({
+    availableColors: fixed.cardPresets.smartNewDeckColors,
+    usedColors: deckDefaultColors,
+    fallback: fixed.cardPresets.newDeck,
+  });
 
   const deck: Decks.Props = {
     id: deckId,
     cards: [],
-    dataSchema: {},
+    dataSchema: {
+      [ReservedDataSchemaIds.Color]: {
+        id: ReservedDataSchemaIds.Color,
+        type: "color",
+        defaultValidatedValue: {
+          type: "color",
+          value: color,
+        },
+      },
+    },
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
-    name: text["deck.new.title"],
+    name: deckName,
     description: text["deck.new.description"],
     status: "creating",
     canEdit: true,
-    cardSize: Decks.CardSize.Poker,
+    cardSize: Cards.Size.Poker,
     templates: {
       back: {
-        dataTemplateMapping: {},
+        dataTemplateMapping: {
+          [builtInTemplates.back.schema.color.id]: {
+            dataId: ReservedDataSchemaIds.Color,
+            templateDataId: builtInTemplates.back.schema.color.id,
+          },
+        },
         templateId: builtInTemplates.back.templateId,
       },
       front: {
-        dataTemplateMapping: {},
+        dataTemplateMapping: {
+          [builtInTemplates.front.schema.color.id]: {
+            dataId: ReservedDataSchemaIds.Color,
+            templateDataId: builtInTemplates.front.schema.color.id,
+          },
+        },
         templateId: builtInTemplates.front.templateId,
       },
     },
@@ -53,7 +123,12 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
 
   const cards: Cards.Props[] = [];
 
-  const { stacksIds, stacksById } = createInitStacks();
+  const tabletopSettings: Tabletops.Props["settings"] = undefined;
+
+  const { stacksIds, stacksById } = createInitStacks(
+    null,
+    tabletopSettings ?? null,
+  );
 
   const defaultTabletop: Tabletops.Props = {
     id: tabletopId,
@@ -67,6 +142,8 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
         stacksIds,
       },
     },
+    settings: tabletopSettings,
+    missingCardIds: [],
   };
 
   return createDeck({
@@ -77,8 +154,8 @@ export function createDeckHelper({ deckId }: { deckId: Decks.DeckId }) {
 }
 
 export function copyDeckHelper(props: {
-  deckId: Decks.DeckId;
-  newDeckId: string;
+  deckId: Decks.Id;
+  newDeckId: Decks.Id;
 }) {
   const deckToCopy = selectDeck(store.getState(), props);
 
@@ -88,13 +165,13 @@ export function copyDeckHelper(props: {
     return createDeckHelper({ deckId });
   }
 
-  const tabletopId = uuid();
-  const cardIdMap = new Map<Cards.CardId, Cards.CardId>();
+  const newTabletopId = uuid();
+  const cardIdMap = new Map<Cards.Id, Cards.Id>();
 
   const cards: Cards.Props[] = [];
   const deckCards: Decks.Card[] = [];
 
-  function copyCard(existingCardId: Cards.CardId): string | null {
+  function copyCard(existingCardId: Cards.Id): Cards.Id | null {
     const existingCard = selectCard(store.getState(), {
       cardId: existingCardId,
     });
@@ -145,7 +222,7 @@ export function copyDeckHelper(props: {
       ([cardInstanceId, cardInstance]) => {
         if (!cardInstance) return;
 
-        let newCardId: string;
+        let newCardId: Cards.Id;
 
         const mappedCardId = cardIdMap.get(cardInstance.cardId);
 
@@ -174,28 +251,28 @@ export function copyDeckHelper(props: {
         past: [],
         present: {
           cardInstancesById,
-          stacksById: existingTabletop.history.present.stacksById,
-          stacksIds: existingTabletop.history.present.stacksIds,
+          stacksById: cloneDeep(existingTabletop.history.present.stacksById),
+          stacksIds: cloneDeep(existingTabletop.history.present.stacksIds),
         },
       },
-      id: tabletopId,
+      id: newTabletopId,
       availableDecks: [deckId],
+      settings: existingTabletop.settings,
+      missingCardIds: existingTabletop.missingCardIds,
     };
   } else {
-    const { stacksIds, stacksById } = createInitStacks();
-
+    // We have no existing tabletop to copy from, so we need to create a new one
     defaultTabletop = {
-      id: tabletopId,
+      id: newTabletopId,
       availableDecks: [deckId],
+      settings: undefined,
       history: {
         future: [],
         past: [],
-        present: {
-          cardInstancesById: {},
-          stacksById,
-          stacksIds,
-        },
+        // Uses the same logic as the reset
+        present: getResetHistoryState(deckCards, null),
       },
+      missingCardIds: [],
     };
   }
 
@@ -209,7 +286,7 @@ export function copyDeckHelper(props: {
     name: `${deckToCopy.name}${text["deck.copied.append"]}`,
     description: deckToCopy.description,
     id: deckId,
-    defaultTabletopId: tabletopId,
+    defaultTabletopId: newTabletopId,
     status: "creating",
     canEdit: true,
   };

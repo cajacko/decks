@@ -13,7 +13,9 @@ const colorHelpers = [
 
 type ColorFunctionKeys = (typeof colorHelpers)[number];
 
-function customFunction<N extends ColorFunctionKeys>(name: N): `color-${N}` {
+function customColorFunctionName<N extends ColorFunctionKeys>(
+  name: N,
+): `color-${N}` {
   return `color-${name}`;
 }
 
@@ -22,7 +24,7 @@ export function colorFunction(
   dataValueId: string,
   param: number,
 ): string {
-  return `{{${customFunction(name)} ${dataValueId} ${param}}}`;
+  return `{{${customColorFunctionName(name)} ${dataValueId} ${param}}}`;
 }
 
 function init() {
@@ -35,7 +37,7 @@ function init() {
 
   colorHelpers.forEach((colorHelper) => {
     Handlebars.registerHelper(
-      customFunction(colorHelper),
+      customColorFunctionName(colorHelper),
       function (value, param) {
         try {
           const color = Color(value);
@@ -76,8 +78,18 @@ function compileTemplate(props: {
     return cached;
   }
 
-  const template = Handlebars.compile(props.text, { noEscape: true });
-  const value = template(props.values);
+  let value = props.text;
+
+  const hasTemplate = value.includes("{{");
+
+  if (hasTemplate) {
+    // Loop twice as our variables can be handlebar strings as well
+    for (let i = 0; i < 2; i++) {
+      const template = Handlebars.compile(value, { noEscape: true });
+
+      value = template(props.values);
+    }
+  }
 
   if (cacheKey) {
     handlebarsCache.set(cacheKey, value);

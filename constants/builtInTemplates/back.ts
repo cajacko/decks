@@ -13,38 +13,62 @@ import { colorFunction } from "@/components/Template/handlebars";
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
 
-const dataItemIds = {
+export const dataIds = {
   text: dataItemId("text"),
   color: ReservedDataSchemaIds.Color,
   emoji: dataItemId("emoji"),
-};
+  backgroundColor: dataItemId("backgroundColor"),
+  textColor: dataItemId("textColor"),
+} as const;
 
-const template: Templates.Props = {
+type DataId = (typeof dataIds)[keyof typeof dataIds];
+
+const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.back.title"],
-  schemaOrder: [dataItemIds.text, dataItemIds.color],
+  schemaOrder: [
+    dataIds.text,
+    dataIds.emoji,
+    dataIds.color,
+    dataIds.backgroundColor,
+    dataIds.textColor,
+  ],
   schema: {
-    [dataItemIds.text]: {
-      id: dataItemIds.text,
+    [dataIds.text]: {
+      id: dataIds.text,
       name: text["template.built_in.back.text"],
-      type: Templates.DataType.Text,
+      type: "text",
+      defaultValidatedValue: {
+        type: "text",
+        value: `{{${deckTemplateIds.name}}}`,
+      },
     },
-    [dataItemIds.emoji]: {
-      id: dataItemIds.emoji,
+    [dataIds.emoji]: {
+      id: dataIds.emoji,
       name: text["template.built_in.back.emoji"],
-      type: Templates.DataType.Text,
+      type: "text",
     },
-    [dataItemIds.color]: {
+    [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
-        value: fixed.cardPresets.yellow,
-        type: Templates.DataType.Color,
+        value: fixed.cardPresets.builtInTemplatesFallbackColor,
+        type: "color",
       },
+    },
+    [dataIds.backgroundColor]: {
+      id: dataIds.backgroundColor,
+      type: "color",
+      name: text["template.built_in.back.background_color"],
+    },
+    [dataIds.textColor]: {
+      id: dataIds.textColor,
+      type: "color",
+      name: text["template.built_in.back.text_color"],
     },
   },
   markup: [
     {
-      type: "view",
+      type: "View",
       style: {
         flex: 1,
         justifyContent: "center",
@@ -55,22 +79,23 @@ const template: Templates.Props = {
       },
       children: [
         {
-          type: "text",
-          text: `{{${dataItemIds.emoji}}}`,
-          conditional: `{{${dataItemIds.emoji}}}`,
+          type: "Text",
+          text: `{{${dataIds.emoji}}}`,
+          conditional: `{{${dataIds.emoji}}}`,
           style: {
             fontSize: 24,
             textAlign: "center",
             zIndex: 2,
             position: "relative",
-            opacity: 0.5,
+            opacity: 0.75,
           },
         },
         {
-          type: "text",
-          text: `{{#if ${dataItemIds.text}}}{{${dataItemIds.text}}}{{else}}{{${deckTemplateIds.name}}}{{/if}}`,
+          type: "Text",
+          text: `{{${dataIds.text}}}`,
+          conditional: `{{${dataIds.text}}}`,
           style: {
-            color: colorFunction("lightness", dataItemIds.color, 15),
+            color: `{{#if ${dataIds.textColor}}}{{${dataIds.textColor}}}{{else}}${colorFunction("lightness", dataIds.color, 15)}{{/if}}`,
             fontSize: 10,
             textAlign: "center",
             zIndex: 2,
@@ -79,7 +104,7 @@ const template: Templates.Props = {
           },
         },
         {
-          type: "view",
+          type: "View",
           style: {
             position: "absolute",
             top: "-100%",
@@ -87,35 +112,27 @@ const template: Templates.Props = {
             right: "-100%",
             bottom: "-100%",
             zIndex: 1,
-            backgroundColor: colorFunction("lightness", dataItemIds.color, 70),
+            backgroundColor: `{{#if ${dataIds.backgroundColor}}}${colorFunction("lighten", dataIds.backgroundColor, 0.2)}{{else}}${colorFunction("lightness", dataIds.color, 70)}{{/if}}`,
             transform: [{ rotate: "-45deg" }, { translateX: "-10%" }],
           },
           children: [
             {
-              type: "view",
+              type: "View",
               style: {
                 flex: 1,
                 flexDirection: "row",
-                backgroundColor: colorFunction(
-                  "lightness",
-                  dataItemIds.color,
-                  80,
-                ),
+                backgroundColor: `{{#if ${dataIds.backgroundColor}}}{{${dataIds.backgroundColor}}}{{else}}${colorFunction("lightness", dataIds.color, 80)}{{/if}}`,
               },
               children: [
                 {
-                  type: "view",
+                  type: "View",
                   style: {
                     flex: 1,
-                    backgroundColor: colorFunction(
-                      "lightness",
-                      dataItemIds.color,
-                      65,
-                    ),
+                    backgroundColor: `{{#if ${dataIds.backgroundColor}}}${colorFunction("darken", dataIds.backgroundColor, 0.2)}{{else}}${colorFunction("lightness", dataIds.color, 65)}{{/if}}`,
                   },
                 },
                 {
-                  type: "view",
+                  type: "View",
                   style: {
                     flex: 1,
                   },
@@ -123,7 +140,7 @@ const template: Templates.Props = {
               ],
             },
             {
-              type: "view",
+              type: "View",
               style: {
                 flex: 1,
               },
@@ -133,6 +150,6 @@ const template: Templates.Props = {
       ],
     },
   ],
-} as const satisfies Templates.Props;
+};
 
 export default template;

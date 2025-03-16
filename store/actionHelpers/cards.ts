@@ -1,4 +1,4 @@
-import { Cards, Decks } from "../types";
+import { Cards, Decks, Tabletops } from "../types";
 import AppError from "@/classes/AppError";
 import { selectCard } from "../slices/cards";
 import {
@@ -8,14 +8,14 @@ import {
   CreateCardActionPayload,
 } from "../combinedActions/cards";
 import { store } from "../store";
-import { CardDataItem } from "../combinedActions/types";
+import { SetCardData } from "../combinedActions/types";
 import uuid from "@/utils/uuid";
 import { selectDeck } from "../slices/decks";
 
 export function updateCardHelper(props: {
-  cardId: string;
-  data: CardDataItem[];
-  deckId?: Decks.DeckId;
+  cardId: Cards.Id;
+  data: SetCardData;
+  deckId?: Decks.Id;
 }) {
   const deckId = props.deckId ?? selectCard(store.getState(), props)?.deckId;
 
@@ -29,9 +29,9 @@ export function updateCardHelper(props: {
 }
 
 export function deleteCardHelper(props: {
-  cardId: string;
-  deckId?: string;
-  tabletopIds?: string[];
+  cardId: Cards.Id;
+  deckId?: Decks.Id;
+  tabletopIds?: Tabletops.Id[];
 }) {
   const deckId =
     props.deckId ?? selectCard(store.getState(), props)?.deckId ?? null;
@@ -40,21 +40,25 @@ export function deleteCardHelper(props: {
 }
 
 export function createCardHelper(props: {
-  cardId: Cards.CardId;
-  deckId: Decks.DeckId;
-  data: CardDataItem[];
+  cardId: Cards.Id;
+  deckId: Decks.Id;
+  data: SetCardData;
 }) {
   const tabletops: CreateCardActionPayload["tabletops"] = [];
-  const deck = selectDeck(store.getState(), props)?.defaultTabletopId;
+  const defaultTabletopId = selectDeck(
+    store.getState(),
+    props,
+  )?.defaultTabletopId;
 
-  if (deck) {
+  // NOTE: The tabletop reducer decides whether to add the card instance or not and where based on
+  // it's settings, we don't need to do that here
+  if (defaultTabletopId) {
     tabletops.push({
-      tabletopId: deck,
+      tabletopId: defaultTabletopId,
       cardInstances: [
         {
           cardId: props.cardId,
           cardInstanceId: uuid(),
-          side: "front",
         },
       ],
     });

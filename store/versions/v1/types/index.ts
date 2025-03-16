@@ -3,10 +3,14 @@ import * as Decks from "./decks";
 import * as Tabletops from "./tabletops";
 import * as Cards from "./cards";
 import * as Templates from "./templates";
+import * as Markup from "./markup";
 
 export * from "./helpers";
 
-export { UserSettings, Decks, Tabletops, Cards, Templates };
+// Don't re-export everything, each file should re-export what it needs in a more semantic way
+// export * from "./types";
+
+export { UserSettings, Decks, Tabletops, Cards, Templates, Markup };
 
 export enum SliceName {
   UserSettings = "userSettings",

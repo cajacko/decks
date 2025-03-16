@@ -1,24 +1,19 @@
 import { History as CreateHistoryHelper } from "./helpers";
-import * as Cards from "./cards";
-import * as Decks from "./decks";
+import {
+  CardInstanceId,
+  StackId,
+  TabletopId as Id,
+  CardSide,
+  CardId,
+  DeckId,
+} from "./types";
 
-export type TabletopId = string;
-export type StackId = string;
-export type CardInstanceId = string;
-
-export enum MoveCardInstanceMethod {
-  topFaceUp = "topFaceUp",
-  topFaceDown = "topFaceDown",
-  topNoChange = "topNoChange",
-  bottomFaceUp = "bottomFaceUp",
-  bottomFaceDown = "bottomFaceDown",
-  bottomNoChange = "bottomNoChange",
-}
+export type { CardInstanceId, StackId, Id };
 
 export interface CardInstance {
   cardInstanceId: CardInstanceId;
-  cardId: Cards.CardId;
-  side: Cards.Side;
+  cardId: CardId;
+  side: CardSide;
 }
 
 export interface Stack {
@@ -41,12 +36,30 @@ export interface HistoryState {
 
 type History = CreateHistoryHelper<HistoryState>;
 
+/**
+ * Settings the user can change for this specific tabletop
+ */
+export interface Settings {
+  preferNeatStacks?: boolean;
+  defaultCardSide?: CardSide;
+  /**
+   * Store the number the user sees (so not 0 indexed)
+   */
+  newCardsJoinStackNumber?: number;
+  newCardsGoToTopOfStack?: boolean;
+  doNotAddNewCardsAutomatically?: boolean;
+}
+
 export interface Props {
-  id: TabletopId;
-  availableDecks: Decks.DeckId[];
+  id: Id;
+  availableDecks: DeckId[];
   history: History;
+  // Undefined forces us to make a decision of what value to set here in our builders for example
+  // decks etc
+  settings: Settings | undefined;
+  missingCardIds: CardId[] | undefined;
 }
 
 export interface State {
-  tabletopsById: Record<TabletopId, Props | undefined>;
+  tabletopsById: Record<Id, Props | undefined>;
 }

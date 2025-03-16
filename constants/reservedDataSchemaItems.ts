@@ -10,32 +10,23 @@ export enum ReservedDataSchemaIds {
   Title = "title",
   Description = "description",
   Color = "color", // This describes the whole color theme of the card
-  Emoji = "emoji",
 }
 
 export const reservedDataSchemaItems = {
   [ReservedDataSchemaIds.Title]: {
     id: ReservedDataSchemaIds.Title,
     name: text["template.reserved_data_item.title.name"],
-    type: Templates.DataType.Text,
-    description: text["template.reserved_data_item.title.description"],
+    type: "text",
   },
   [ReservedDataSchemaIds.Description]: {
     id: ReservedDataSchemaIds.Description,
     name: text["template.reserved_data_item.description.name"],
-    type: Templates.DataType.Text,
-    description: text["template.reserved_data_item.description.description"],
+    type: "text",
   },
   [ReservedDataSchemaIds.Color]: {
     id: ReservedDataSchemaIds.Color,
     name: text["template.reserved_data_item.color.name"],
-    type: Templates.DataType.Color,
+    type: "color",
     description: text["template.reserved_data_item.color.description"],
   },
-  [ReservedDataSchemaIds.Emoji]: {
-    id: ReservedDataSchemaIds.Emoji,
-    name: text["template.reserved_data_item.emoji.name"],
-    type: Templates.DataType.Text,
-    description: text["template.reserved_data_item.emoji.description"],
-  },
-} as const satisfies Templates.Data<ReservedDataSchemaIds>;
+} as const satisfies Templates.Data;

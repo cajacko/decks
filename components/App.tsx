@@ -11,7 +11,7 @@ import { store, persistor } from "@/store/store";
 import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { init as initMousePointer } from "@/utils/mousePosition";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import useColorScheme from "@/hooks/useColorScheme";
 import { ModalProvider } from "@/context/Modal";
 import { navigationColors } from "@/constants/colors";
 import { navigationFonts } from "@/components/ThemedText";
@@ -54,6 +54,7 @@ function useNavigationTheme(): NavigationTheme {
 }
 
 function HasStore({ children }: { children: React.ReactNode }) {
+  const navigationTheme = useNavigationTheme();
   const [loadedFonts] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Zain: AbrilFatface_400Regular,
@@ -95,25 +96,23 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
   return (
     <PersistGate loading={null} persistor={persistor}>
-      <ModalProvider>
-        <DrawerProvider>
-          {children}
-          <StatusBar style="auto" />
-        </DrawerProvider>
-      </ModalProvider>
+      <NavigationThemeProvider value={navigationTheme}>
+        <ModalProvider>
+          <DrawerProvider>
+            {children}
+            <StatusBar style="auto" />
+          </DrawerProvider>
+        </ModalProvider>
+      </NavigationThemeProvider>
     </PersistGate>
   );
 }
 
 export default function App({ children }: { children: React.ReactNode }) {
-  const navigationTheme = useNavigationTheme();
-
   return (
-    <NavigationThemeProvider value={navigationTheme}>
-      <ReduxProvider store={store}>
-        <HasStore>{children}</HasStore>
-      </ReduxProvider>
-    </NavigationThemeProvider>
+    <ReduxProvider store={store}>
+      <HasStore>{children}</HasStore>
+    </ReduxProvider>
   );
 }
 

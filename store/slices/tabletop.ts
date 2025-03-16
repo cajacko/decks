@@ -9,6 +9,7 @@ import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
+import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -16,7 +17,14 @@ export type TabletopHistoryState = Tabletops.HistoryState;
 export type Stack = Tabletops.Stack;
 export type CardInstance = Tabletops.CardInstance;
 
-export const MoveCardInstanceMethod = Tabletops.MoveCardInstanceMethod;
+export enum MoveCardInstanceMethod {
+  topFaceUp = "topFaceUp",
+  topFaceDown = "topFaceDown",
+  topNoChange = "topNoChange",
+  bottomFaceUp = "bottomFaceUp",
+  bottomFaceDown = "bottomFaceDown",
+  bottomNoChange = "bottomNoChange",
+}
 
 const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.tabletops
@@ -47,6 +55,50 @@ function removeCardInstancesFromStacks(
   });
 }
 
+function addCardInstancesToTabletop(
+  tabletop: WritableDraft<Tabletop>,
+  cardInstances: Omit<Tabletops.CardInstance, "side">[],
+) {
+  const present = tabletop.history.present;
+
+  const stackId = getStackIdForNewCardsAndReset(
+    present.stacksIds,
+    tabletop.settings,
+  );
+
+  // We have no where to add them! Shouldn't happen
+  if (!stackId) return;
+
+  const stack = present.stacksById[stackId];
+
+  if (!stack) return;
+
+  let didEdit = false;
+
+  cardInstances.forEach((cardInstance) => {
+    didEdit = true;
+
+    present.cardInstancesById[cardInstance.cardInstanceId] = {
+      ...cardInstance,
+      side: tabletop.settings?.defaultCardSide ?? "front",
+    };
+
+    if (tabletop.settings?.newCardsGoToTopOfStack) {
+      stack.cardInstances.unshift(cardInstance.cardInstanceId);
+    } else {
+      stack.cardInstances.push(cardInstance.cardInstanceId);
+    }
+  });
+
+  // It feels like a bit of a cluster fuck to try and support. As they can then undo a card
+  // getting in the tabletop and then have a lost card until they reset. If we add a batter
+  // solution we can change this
+  if (didEdit) {
+    tabletop.history.past = [];
+    tabletop.history.future = [];
+  }
+}
+
 export const tabletopsSlice = createSlice({
   name: SliceName.Tabletops,
   initialState,
@@ -67,52 +119,24 @@ export const tabletopsSlice = createSlice({
         state,
         action: PayloadAction<{
           tabletopId: string;
-          cardInstanceId: string;
-          toStackId: string;
-          newStackDirection: "start" | "end";
+          moveTarget: { cardInstanceId: string } | { stackId: string | null };
+          toTarget: { stackId: string; newStackDirection?: "start" | "end" };
           // Do we specify the method, or let the stack define it? Or both? If specified here it's
           // more specific, otherwise do what the stack it's going to says
-          method: Tabletops.MoveCardInstanceMethod;
+          method: MoveCardInstanceMethod;
         }>,
       ) => {
-        const { cardInstanceId, method, toStackId, newStackDirection } =
-          action.payload;
-        const toStack = state.stacksById[toStackId];
-        const cardInstance = state.cardInstancesById[cardInstanceId];
+        const {
+          moveTarget,
+          method,
+          toTarget: { stackId: toStackId, newStackDirection },
+        } = action.payload;
 
-        if (!cardInstance) return;
-
-        // Update the card instance state based on the method
-        switch (method) {
-          case MoveCardInstanceMethod.topFaceUp:
-          case MoveCardInstanceMethod.bottomFaceUp: {
-            if (cardInstance.side !== "front") {
-              cardInstance.side = "front";
-            }
-            break;
-          }
-          case MoveCardInstanceMethod.topFaceDown:
-          case MoveCardInstanceMethod.bottomFaceDown: {
-            if (cardInstance.side !== "back") {
-              cardInstance.side = "back";
-            }
-            break;
-          }
-          case MoveCardInstanceMethod.topNoChange:
-          case MoveCardInstanceMethod.bottomNoChange:
-          default:
-            // Nothing needed here, this is just to remind us that this is on purpose
-            break;
-        }
-
-        // Helps prevent duplicates if the action has got confused somehow
-        removeCardInstancesFromStacks(state, [cardInstanceId]);
-
-        // It's a new stack, lets add it
-        if (!toStack) {
+        // Create our new stack (empty for now) then we can follow the rest of the logic
+        if (newStackDirection) {
           const newStack: Stack = {
             id: toStackId,
-            cardInstances: [cardInstanceId],
+            cardInstances: [],
           };
 
           state.stacksById[toStackId] = newStack;
@@ -122,22 +146,87 @@ export const tabletopsSlice = createSlice({
           } else {
             state.stacksIds.push(toStackId);
           }
-
-          return;
         }
+
+        const toStack = state.stacksById[toStackId];
+
+        if (!toStack) return;
+
+        let cardInstanceIdsToAdd: string[] = [];
+
+        function clearStackAndAddCardInstancesToMove(stackId: string) {
+          // Don't touch the cards in the stack we're moving to
+          if (stackId === toStackId) return;
+
+          const fromStack = state.stacksById[stackId];
+
+          if (!fromStack) return;
+
+          cardInstanceIdsToAdd.push(...fromStack.cardInstances);
+          fromStack.cardInstances = [];
+        }
+
+        if ("cardInstanceId" in moveTarget) {
+          cardInstanceIdsToAdd = [moveTarget.cardInstanceId];
+          removeCardInstancesFromStacks(state, cardInstanceIdsToAdd);
+        } else if (moveTarget.stackId) {
+          clearStackAndAddCardInstancesToMove(moveTarget.stackId);
+        } else {
+          // Move all the cards from all stacks. clearStackAndAddCardInstancesToMove will skip the
+          // target move to stack, so we can just run this on all
+          state.stacksIds.forEach(clearStackAndAddCardInstancesToMove);
+        }
+
+        // There are no cards to move, so we don't have to do anything else
+        if (cardInstanceIdsToAdd.length <= 0) return;
+
+        // Helps prevent duplicates if the action has got confused somehow
+        removeCardInstancesFromStacks(state, cardInstanceIdsToAdd);
+
+        // NOTE: At this point we have removed the target cardInstance ID's from all stacks. So
+        // we're in a clean state to add them
+
+        cardInstanceIdsToAdd.forEach((cardInstanceId) => {
+          const cardInstance = state.cardInstancesById[cardInstanceId];
+
+          if (!cardInstance) return;
+
+          // Update the card instance state based on the method
+          switch (method) {
+            case MoveCardInstanceMethod.topFaceUp:
+            case MoveCardInstanceMethod.bottomFaceUp: {
+              if (cardInstance.side !== "front") {
+                cardInstance.side = "front";
+              }
+              break;
+            }
+            case MoveCardInstanceMethod.topFaceDown:
+            case MoveCardInstanceMethod.bottomFaceDown: {
+              if (cardInstance.side !== "back") {
+                cardInstance.side = "back";
+              }
+              break;
+            }
+            case MoveCardInstanceMethod.topNoChange:
+            case MoveCardInstanceMethod.bottomNoChange:
+            default:
+              // Nothing needed here, this is just to remind us that this is on purpose
+              break;
+          }
+        });
 
         // Add to the new stack
         switch (method) {
           case MoveCardInstanceMethod.topFaceUp:
           case MoveCardInstanceMethod.topFaceDown:
           case MoveCardInstanceMethod.topNoChange: {
-            toStack.cardInstances.unshift(cardInstanceId);
+            toStack.cardInstances.unshift(...cardInstanceIdsToAdd);
             break;
           }
           case MoveCardInstanceMethod.bottomFaceUp:
           case MoveCardInstanceMethod.bottomFaceDown:
           case MoveCardInstanceMethod.bottomNoChange: {
-            toStack.cardInstances.push(cardInstanceId);
+            toStack.cardInstances.push(...cardInstanceIdsToAdd);
             break;
           }
         }
@@ -148,16 +237,32 @@ export const tabletopsSlice = createSlice({
         state,
         action: PayloadAction<{
           tabletopId: string;
-          cardInstanceId: string;
           side: Cards.Side;
+          target: { cardInstanceId: string } | { stackId: string | null };
         }>,
       ) => {
-        const cardInstance =
-          state.cardInstancesById[action.payload.cardInstanceId];
+        const target = action.payload.target;
 
-        if (!cardInstance) return;
+        function changeCardState(cardInstanceId: string) {
+          const cardInstance = state.cardInstancesById[cardInstanceId];
 
-        cardInstance.side = action.payload.side;
+          if (!cardInstance) return;
+
+          cardInstance.side = action.payload.side;
+        }
+
+        if ("cardInstanceId" in target) {
+          changeCardState(target.cardInstanceId);
+        } else {
+          Object.entries(state.stacksById).forEach(([stackId, stack]) => {
+            if (!stack) return;
+            if (target.stackId && stackId !== target.stackId) {
+              return;
+            }
+
+            stack.cardInstances.forEach(changeCardState);
+          });
+        }
       },
     ),
     setStackOrder: history.withHistory(
@@ -165,29 +270,47 @@ export const tabletopsSlice = createSlice({
         state,
         action: PayloadAction<{
           tabletopId: string;
-          stackId: string;
-          seed: number | string;
+          stackId: string | null;
+          method: { type: "shuffle"; seed: string } | { type: "reverse" };
           allCardInstancesState: Cards.Side | "noChange";
         }>,
       ) => {
-        const stack = state?.stacksById[action.payload.stackId];
+        const method = action.payload.method;
 
-        if (!stack) return;
+        Object.entries(state.stacksById).forEach(([stackId, stack]) => {
+          if (!stack) return;
+          if (action.payload.stackId && stackId !== action.payload.stackId) {
+            return;
+          }
 
-        const allCardInstancesState = action.payload.allCardInstancesState;
+          const allCardInstancesState = action.payload.allCardInstancesState;
 
-        if (allCardInstancesState !== "noChange") {
-          stack.cardInstances.forEach((cardInstanceId) => {
-            const cardInstance = state.cardInstancesById[cardInstanceId];
+          if (allCardInstancesState !== "noChange") {
+            stack.cardInstances.forEach((cardInstanceId) => {
+              const cardInstance = state.cardInstancesById[cardInstanceId];
 
-            if (!cardInstance) return;
-            if (cardInstance.side === allCardInstancesState) return;
+              if (!cardInstance) return;
+              if (cardInstance.side === allCardInstancesState) return;
 
-            cardInstance.side = allCardInstancesState;
-          });
-        }
+              cardInstance.side = allCardInstancesState;
+            });
+          }
 
-        stack.cardInstances.sort(withSeededShuffleSort(action.payload.seed));
+          switch (method.type) {
+            case "shuffle": {
+              stack.cardInstances.sort(
+                // This ensures we don't do the same sort operation for stacks of the same length,
+                // because we passed only 1 seed
+                withSeededShuffleSort(method.seed + stackId),
+              );
+              break;
+            }
+            case "reverse": {
+              stack.cardInstances.reverse();
+              break;
+            }
+          }
+        });
       },
     ),
     deleteStack: history.withHistory(
@@ -216,13 +339,46 @@ export const tabletopsSlice = createSlice({
         state.cardInstancesById = action.payload.historyState.cardInstancesById;
       },
     ),
+    addMissingTabletopCards: (
+      state,
+      action: PayloadAction<{
+        tabletopId: string;
+        cardInstances: Omit<Tabletops.CardInstance, "side">[];
+      }>,
+    ) => {
+      const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+      if (!tabletop) return;
+
+      tabletop.missingCardIds = [];
+
+      addCardInstancesToTabletop(tabletop, action.payload.cardInstances);
+    },
+    setTabletopSetting: <K extends keyof Tabletops.Settings>(
+      state: WritableDraft<TabletopState>,
+      action: PayloadAction<{
+        tabletopId: string;
+        key: K;
+        value: Tabletops.Settings[K];
+      }>,
+    ) => {
+      const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+      if (!tabletop) return;
+
+      if (!tabletop.settings) {
+        tabletop.settings = {};
+      }
+
+      tabletop.settings[action.payload.key] = action.payload.value;
+    },
   },
   extraReducers: (builder) => {
     function deleteCards(
       state: WritableDraft<TabletopState>,
       props: {
-        deckId: Decks.DeckId;
-        cardIds: Cards.CardId[];
+        deckId: Decks.Id;
+        cardIds: Cards.Id[];
       },
     ) {
       const { deckId, cardIds } = props;
@@ -297,33 +453,17 @@ export const tabletopsSlice = createSlice({
 
         if (!tabletop) return;
 
-        const present = tabletop.history.present;
+        if (tabletop.settings?.doNotAddNewCardsAutomatically) {
+          if (!tabletop.missingCardIds) {
+            tabletop.missingCardIds = [];
+          }
 
-        let didEdit = false;
+          tabletop.missingCardIds.push(actions.payload.cardId);
 
-        cardInstances.forEach((cardInstance) => {
-          didEdit = true;
-
-          present.cardInstancesById[cardInstance.cardInstanceId] = cardInstance;
-
-          const stackId = present.stacksIds[0];
-
-          if (!stackId) return;
-
-          const stack = present.stacksById[stackId];
-
-          if (!stack) return;
-
-          stack.cardInstances.push(cardInstance.cardInstanceId);
-        });
-
-        // It feels like a bit of a cluster fuck to try and support. As they can then undo a card
-        // getting in the tabletop and then have a lost card until they reset. If we add a batter
-        // solution we can change this
-        if (didEdit) {
-          tabletop.history.past = [];
-          tabletop.history.future = [];
+          return;
         }
+
+        addCardInstancesToTabletop(tabletop, cardInstances);
       });
     });
   },
@@ -338,6 +478,8 @@ export const {
   deleteStack,
   resetTabletop,
   setTabletop,
+  setTabletopSetting,
+  addMissingTabletopCards,
 } = tabletopsSlice.actions;
 
 export const selectTabletop = (
@@ -403,5 +545,28 @@ export const selectFirstXCardInstances = createCachedSelector<
     return sliced;
   },
 )((_, props) => `${props.stackId}-${props.limit}`);
+
+export const selectDoesTabletopHaveCardInstances = createCachedSelector(
+  selectPresentState,
+  (presentState): boolean => {
+    if (!presentState) {
+      return false;
+    }
+
+    for (const stackId of presentState.stacksIds) {
+      const stack = presentState.stacksById[stackId];
+
+      if (!stack) continue;
+
+      for (const cardInstanceId of stack.cardInstances) {
+        if (presentState.cardInstancesById[cardInstanceId]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  },
+)((_, props: { tabletopId: string }) => props.tabletopId);
 
 export default tabletopsSlice;

@@ -1,14 +1,14 @@
 import { CardMMDimensions } from "@/components/Card/Card.types";
-import { Decks } from "@/store/types";
+import { Cards } from "@/store/types";
 
 const cardDimensions = {
-  [Decks.CardSize.Poker]: {
+  [Cards.Size.Poker]: {
     mmBorderRadius: 3.5,
     mmHeight: 88.9,
     mmWidth: 63.5,
   },
-} satisfies Record<Decks.CardSize, CardMMDimensions>;
+} satisfies Record<Cards.Size, CardMMDimensions>;
 
-export const defaultCardDimensions = cardDimensions[Decks.CardSize.Poker];
+export const defaultCardDimensions = cardDimensions[Cards.Size.Poker];
 
 export default cardDimensions;

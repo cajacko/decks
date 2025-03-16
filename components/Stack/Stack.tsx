@@ -15,13 +15,12 @@ export default function Stack(props: StackProps): React.ReactNode {
 
   const {
     cardInstancesIds,
-    showActions,
     getCardOffsetPosition,
     handleShuffle,
     rotation,
     width,
-    handleDeleteStack,
     opacity,
+    emptyStackButton,
   } = useStack(props);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -44,8 +43,11 @@ export default function Stack(props: StackProps): React.ReactNode {
   );
 
   const shuffleStyle = React.useMemo(
-    () => getShuffleStyle({ stackPadding: dimensions.stackPadding }),
-    [dimensions.stackPadding],
+    () =>
+      getShuffleStyle({
+        buttonSize: dimensions.buttonSize,
+      }),
+    [dimensions.buttonSize],
   );
 
   const cardInstances = React.useMemo(() => {
@@ -81,22 +83,24 @@ export default function Stack(props: StackProps): React.ReactNode {
           <View style={styles.cardInstances}>
             <CardSpacer />
             {cardInstances}
-
-            {cardInstances.length > 1 && showActions && (
-              <CardAction
-                icon="shuffle"
-                style={shuffleStyle}
-                onPress={handleShuffle}
-              />
-            )}
           </View>
         )}
 
         <EmptyStack
           style={styles.empty}
-          handleDeleteStack={props.skeleton ? undefined : handleDeleteStack}
+          buttonTitle={props.skeleton ? undefined : emptyStackButton?.title}
+          buttonAction={props.skeleton ? undefined : emptyStackButton?.action}
         />
       </Animated.View>
+      {cardInstances && cardInstances.length > 1 && (
+        <View style={shuffleStyle}>
+          <CardAction
+            icon="shuffle"
+            style={styles.shuffleButton}
+            onPress={handleShuffle}
+          />
+        </View>
+      )}
     </Animated.View>
   );
 }

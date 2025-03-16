@@ -5,107 +5,79 @@ import {
   useContextSelector,
 } from "./useContextSelector";
 import * as Types from "./EditCard.types";
-import getHasChanges from "./getHasChanges";
-
-function withOnChange(props: {
-  editState: Types.EditState;
-  side: Cards.Side;
-  templateId: Templates.TemplateId;
-  templateSchemaItemId: Templates.DataItemId;
-}): Types.UseEditCardTemplateSchemaItemReturn["onChange"] {
-  const { editState, templateId } = props;
-
-  return <T extends Templates.DataType>(value: Types.PartialDataValue<T>) => {
-    editState((draft) => {
-      const editingItemDraft = draft[props.side][props.templateSchemaItemId];
-
-      const newEditingItem: Types.EditingDataValues<T> = {
-        templateId: editingItemDraft?.templateId ?? templateId,
-        cardDataItemId: null,
-        templateItemId:
-          editingItemDraft?.templateItemId ?? props.templateSchemaItemId,
-        type: value.type,
-        editValue: value.value ?? null,
-        savedValue: null,
-      };
-
-      // If the item doesn't exist, it's new so add it
-      if (!editingItemDraft) {
-        // There's no new value to set anyways so return.
-        if (!value.value) return;
-
-        draft[props.side][props.templateSchemaItemId] = newEditingItem;
-        draft.hasChanges[props.side][props.templateSchemaItemId] = true;
-
-        return;
-      }
-
-      // Don't update something that has no changes
-      if (editingItemDraft.editValue === value.value) return;
-
-      // NOTE: We should never get to here, it's only if something updated from the api like a
-      // new data type change or something. Best never to change data types, just create new
-      // ones?
-      if (editingItemDraft.type !== value.type) {
-        draft[props.side][props.templateSchemaItemId] = newEditingItem;
-        draft.hasChanges[props.side][props.templateSchemaItemId] = true;
-
-        return;
-      }
-
-      // The value is different and the same type, lets update it normally
-
-      editingItemDraft.editValue = value.value ?? null;
-
-      const hasChanges = getHasChanges(
-        editingItemDraft.savedValue,
-        editingItemDraft.editValue,
-      );
-
-      // Update if we have changes or not
-      draft.hasChanges[props.side][props.templateSchemaItemId] = hasChanges;
-    });
-  };
-}
+import createCardDataSchemaId from "@/store/utils/createCardDataSchemaId";
+import { getHasChanges } from "./getUpdateCardData";
 
 export default function useEditCardTemplateSchemaItem(props: {
   side: Cards.Side;
-  templateSchemaItemId: string;
+  templateDataId: Templates.DataId;
+  templateId: Templates.Id;
 }): Types.UseEditCardTemplateSchemaItemReturn {
-  const editingItem = useRequiredContextSelector(
-    (context) => context?.state?.[props.side][props.templateSchemaItemId],
+  const cardDataItemId =
+    useContextSelector(
+      (context) =>
+        context?.state?.dataIdByTemplateDataId[props.side][
+          props.templateDataId
+        ],
+    ) ??
+    createCardDataSchemaId({
+      side: props.side,
+      templateDataItemId: props.templateDataId,
+    });
+
+  const resolvedValidatedValue = useContextSelector((context) =>
+    cardDataItemId
+      ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+          ?.resolvedValidatedValue
+      : undefined,
   );
 
-  const hasChanges = useContextSelector(
-    (context) =>
-      context?.state?.hasChanges[props.side][props.templateSchemaItemId],
+  const savedValidatedValue = useContextSelector((context) =>
+    cardDataItemId
+      ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+          ?.savedValidatedValue
+      : undefined,
   );
 
-  const editState = useRequiredContextSelector((context) => context?.editState);
+  const fallbackValidatedValue = useContextSelector((context) =>
+    cardDataItemId
+      ? context?.state?.dataByCardDataId[props.side][cardDataItemId]
+          ?.fallbackValidatedValue
+      : undefined,
+  );
 
-  const onChange = React.useMemo<
+  const hasChanges = React.useMemo(
+    () =>
+      getHasChanges({
+        resolvedValidatedValue,
+        savedValidatedValue,
+      }),
+    [resolvedValidatedValue, savedValidatedValue],
+  );
+
+  const updateEditingDataItem = useRequiredContextSelector(
+    (context) => context?.updateEditingDataItem,
+  );
+
+  const onChange = React.useCallback<
     Types.UseEditCardTemplateSchemaItemReturn["onChange"]
   >(
-    () =>
-      withOnChange({
-        editState,
+    (validatedValue) =>
+      updateEditingDataItem({
         side: props.side,
-        templateId: editingItem.templateId,
-        templateSchemaItemId: props.templateSchemaItemId,
+        templateDataId: props.templateDataId,
+        validatedValue,
       }),
-    [props.side, props.templateSchemaItemId, editState, editingItem.templateId],
+    [updateEditingDataItem, props.side, props.templateDataId],
   );
-
-  const validatedValue = React.useMemo<Types.PartialDataValue>(() => {
-    return {
-      type: editingItem.type,
-      value: editingItem.editValue,
-    } as Types.PartialDataValue;
-  }, [editingItem.type, editingItem.editValue]);
 
   return {
     onChange,
-    validatedValue,
+    validatedValue: resolvedValidatedValue,
     hasChanges: !!hasChanges,
+    usingFallback:
+      resolvedValidatedValue?.origin === fallbackValidatedValue?.origin
+        ? (fallbackValidatedValue?.origin ?? "template")
+        : null,
   };
 }

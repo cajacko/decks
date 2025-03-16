@@ -21,6 +21,11 @@ export default function useDispatchActions({
 }: StackTopCardProps) {
   const { tabletopId } = useTabletopContext();
 
+  const animateSendToBack = useFlag("CARD_ANIMATE_SEND_TO_BACK") === "enabled";
+  const [animatedToBack, setAnimatedToBack] = React.useState<string | null>(
+    null,
+  );
+
   const { cardId, side } = useRequiredAppSelector(
     (state) => selectCardInstance(state, { tabletopId, cardInstanceId }),
     useDispatchActions.name,
@@ -43,7 +48,7 @@ export default function useDispatchActions({
     dispatch(
       changeCardState({
         tabletopId,
-        cardInstanceId,
+        target: { cardInstanceId },
         side: side === "back" ? "front" : "back",
       }),
     );
@@ -63,10 +68,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: rightStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
+            toTarget: rightStackId
+              ? { stackId: rightStackId }
+              : { stackId: uuid(), newStackDirection: "end" },
             method: MoveCardInstanceMethod.bottomNoChange,
-            newStackDirection: "end",
           }),
         );
       },
@@ -82,10 +88,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: rightStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
+            toTarget: rightStackId
+              ? { stackId: rightStackId }
+              : { stackId: uuid(), newStackDirection: "end" },
             method: MoveCardInstanceMethod.topNoChange,
-            newStackDirection: "end",
           }),
         );
       },
@@ -116,10 +123,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: leftStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
             method: MoveCardInstanceMethod.bottomNoChange,
-            newStackDirection: "start",
+            toTarget: leftStackId
+              ? { stackId: leftStackId }
+              : { stackId: uuid(), newStackDirection: "start" },
           }),
         );
       },
@@ -135,10 +143,11 @@ export default function useDispatchActions({
         dispatch(
           moveCard({
             tabletopId,
-            cardInstanceId,
-            toStackId: leftStackId ?? uuid(),
+            moveTarget: { cardInstanceId },
             method: MoveCardInstanceMethod.topNoChange,
-            newStackDirection: "start",
+            toTarget: leftStackId
+              ? { stackId: leftStackId }
+              : { stackId: uuid(), newStackDirection: "start" },
           }),
         );
       },
@@ -160,6 +169,11 @@ export default function useDispatchActions({
         try {
           await cardInstanceRef.current.animateOut({
             direction: "top",
+            animateBack: animateSendToBack
+              ? async () => {
+                  setAnimatedToBack(cardInstanceId);
+                }
+              : undefined,
           });
         } catch {}
       }
@@ -167,14 +181,14 @@ export default function useDispatchActions({
       dispatch(
         moveCard({
           tabletopId,
-          cardInstanceId,
-          toStackId: stackId,
+          moveTarget: { cardInstanceId },
           method: MoveCardInstanceMethod.bottomNoChange,
-          newStackDirection: "end",
+          toTarget: { stackId: stackId },
         }),
       );
     };
   }, [
+    animateSendToBack,
     dispatch,
     cardInstanceId,
     stackId,
@@ -195,5 +209,6 @@ export default function useDispatchActions({
     handleMoveToBottom,
     setIsAnimating,
     hideActions: isAnimating,
+    animatedToBack,
   };
 }

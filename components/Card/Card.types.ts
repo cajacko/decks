@@ -1,14 +1,19 @@
 import React from "react";
-import { StyleProp, ViewStyle, Animated } from "react-native";
+import { StyleProp, ViewStyle } from "react-native";
+import { AnimatedStyle } from "react-native-reanimated";
 
-export type OffsetPosition = { x: number; y: number; rotate: number };
+export type OffsetPosition = null | {
+  x: number | null;
+  y: number | null;
+  rotate: number | null;
+};
 
-export type AnimatedViewStyle = Animated.WithAnimatedValue<ViewStyle>;
+export type AnimatedViewStyle = AnimatedStyle<ViewStyle>;
 
 export type RequiredRefObject<T> = { current: T };
 
 export interface CardProps extends Partial<CardSizeContextProps> {
-  style?: StyleProp<AnimatedViewStyle>;
+  style?: StyleProp<ViewStyle>;
   innerStyle?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onAnimationChange?: (isAnimating: boolean) => void;
@@ -27,6 +32,8 @@ export interface CardProps extends Partial<CardSizeContextProps> {
   initialRotation?: number;
   initialScaleX?: number;
   overlay?: React.ReactNode;
+  opacity?: number;
+  transform?: ViewStyle["transform"];
   ref?: React.Ref<CardRef>;
 }
 
@@ -34,6 +41,7 @@ export interface AnimateOutProps {
   direction: "top" | "right" | "bottom" | "left";
   duration?: number;
   animateOpacity?: boolean;
+  animateBack?: () => Promise<void>;
 }
 
 export interface CardRef {
@@ -41,7 +49,6 @@ export interface CardRef {
   animateFlipOut: () => Promise<unknown>;
   animateFlipIn: () => Promise<unknown>;
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
-  prepareForFlipIn: () => void;
 }
 
 export type AnimationUpdate = (key: string, isAnimating: boolean) => void;

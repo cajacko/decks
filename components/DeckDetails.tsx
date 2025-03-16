@@ -65,6 +65,7 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
             style={styles.name}
             textVariant={titleType}
             variant="display"
+            multiline
           />
           <TextInput
             value={description}

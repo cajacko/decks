@@ -1,26 +1,14 @@
-import { useGlobalSearchParams } from "expo-router";
 import React from "react";
 import DeckScreen from "@/components/DeckScreen";
-import AppError from "@/classes/AppError";
 import { StyleSheet } from "react-native";
-import { useNavigation } from "expo-router";
 import TextureBackground from "@/components/TextureBackground";
 import Screen from "@/components/Screen";
-
-export const paramKeys = {
-  deckId: "deckId",
-};
+import useScreenDeckId from "@/hooks/useScreenDeckId";
 
 export default function DeckRoute() {
-  const params = useGlobalSearchParams();
-  const deckId = params[paramKeys.deckId];
-  const navigation = useNavigation();
+  const deckId = useScreenDeckId("screen", DeckRoute.name);
 
-  if (typeof deckId !== "string") {
-    if (navigation.isFocused()) {
-      new AppError(`${DeckRoute.name}: deckId must be a string`).log("error");
-    }
-
+  if (!deckId) {
     return null;
   }
 

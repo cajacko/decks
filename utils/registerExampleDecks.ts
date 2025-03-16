@@ -1,12 +1,5 @@
 import exampleDecks from "@/constants/exampleDecks";
-import {
-  RootState,
-  SliceName,
-  Decks,
-  Tabletops,
-  Cards,
-  Templates,
-} from "@/store/types";
+import { RootState, SliceName, Decks, Tabletops, Cards } from "@/store/types";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
@@ -15,6 +8,37 @@ type State = Pick<
   RootState,
   SliceName.Decks | SliceName.Cards | SliceName.Tabletops
 >;
+
+function getValidatedValueType(
+  value: string | boolean | null,
+): Cards.Data[string] {
+  let data: Cards.Data[string];
+
+  // TODO: Validate the card types here.
+  switch (typeof value) {
+    case "string":
+      data = {
+        value: value,
+        type: "text",
+      };
+      break;
+    case "boolean":
+      data = {
+        value: value,
+        type: "boolean",
+      };
+      break;
+    default:
+      if (value === null) {
+        data = {
+          type: "null",
+          value: null,
+        };
+      }
+  }
+
+  return data;
+}
 
 export default function registerExampleDecks() {
   const state: State = {
@@ -38,32 +62,27 @@ export default function registerExampleDecks() {
     const stack1Id = ids.stackId("1");
     const stack2Id = ids.stackId("2");
 
+    const dataSchema = exampleDeck.dataSchema ?? {};
+
     const deck: Decks.Props = {
       id: deckId,
       name: exampleDeck.name,
       description: exampleDeck.description,
       cards: [],
-      cardSize: Decks.CardSize.Poker,
-      dataSchema: {},
-      dataSchemaOrder: [],
+      cardSize: Cards.Size.Poker,
+      dataSchema,
+      dataSchemaOrder: Object.keys(dataSchema),
       defaultTabletopId: tabletopId,
       status: "active",
       canEdit: false,
-      templates: {
-        back: {
-          dataTemplateMapping: {},
-          templateId: exampleDeck.backTemplateId,
-        },
-        front: {
-          dataTemplateMapping: {},
-          templateId: exampleDeck.frontTemplateId,
-        },
-      },
+      templates: exampleDeck.templates,
     };
 
     const tabletop: Tabletops.Props = {
       id: tabletopId,
       availableDecks: [deckId],
+      settings: exampleDeck.tabletopSettings,
+      missingCardIds: [],
       history: {
         future: [],
         past: [],
@@ -87,8 +106,6 @@ export default function registerExampleDecks() {
     exampleDeck.cards.forEach((cardProps, index) => {
       const cardId = ids.cardId(`${index + 1}`);
       const cardInstanceId = ids.cardInstanceId(cardId);
-      // const titleId = ReservedDataSchemaIds.Title;
-      // const descriptionId = ReservedDataSchemaIds.Description;
 
       const card: Cards.Props = {
         cardId,
@@ -98,22 +115,12 @@ export default function registerExampleDecks() {
         status: "active",
       };
 
-      Object.entries(cardProps).forEach(([dataSchemaId, value]) => {
-        // TODO: Validate the card types here.
-        card.data[dataSchemaId] =
-          typeof value === "string"
-            ? {
-                value: value,
-                type: Templates.DataType.Text,
-              }
-            : {
-                value: value,
-                type: Templates.DataType.Boolean,
-              };
+      Object.entries(cardProps).forEach(([dataId, value]) => {
+        card.data[dataId] = getValidatedValueType(value);
 
-        deck.templates.front.dataTemplateMapping[dataSchemaId] = {
-          dataSchemaItemId: dataSchemaId,
-          templateSchemaItemId: builtInTemplates.front.schema.title.id,
+        deck.templates.front.dataTemplateMapping[dataId] = {
+          dataId: dataId,
+          templateDataId: builtInTemplates.front.schema.title.id,
         };
       });
 

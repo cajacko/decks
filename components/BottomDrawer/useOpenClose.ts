@@ -8,6 +8,7 @@ import {
 import { BottomDrawerRef } from "./BottomDrawer.types";
 import { autoAnimateConfig, dragHeight } from "./bottomDrawer.style";
 import debugLog from "./debugLog";
+import useFlag from "@/hooks/useFlag";
 
 /**
  * Set up useImperativeHandle handler for any controls that other components may need regarding the
@@ -25,27 +26,39 @@ export default function useOpenClose(
   },
   ref: React.Ref<BottomDrawerRef>,
 ) {
+  const canAnimate = useFlag("BOTTOM_DRAWER_ANIMATE") === "enabled";
+
   const { height, maxAutoHeight, minHeight, hasGotMaxHeight } = props;
 
   const open = React.useCallback((): Promise<void> => {
     debugLog(`set height.value:${Math.round(maxAutoHeight)} (open)`);
 
     return new Promise((resolve) => {
+      if (!canAnimate) {
+        height.value = maxAutoHeight;
+        return resolve();
+      }
+
       height.value = withSpring(maxAutoHeight, autoAnimateConfig, () => {
         runOnJS(resolve)();
       });
     });
-  }, [height, maxAutoHeight]);
+  }, [height, maxAutoHeight, canAnimate]);
 
   const close = React.useCallback((): Promise<void> => {
     debugLog(`set height.value:${Math.round(minHeight)} (close)`);
 
     return new Promise((resolve) => {
+      if (!canAnimate) {
+        height.value = minHeight;
+        return resolve();
+      }
+
       height.value = withSpring(minHeight, autoAnimateConfig, () => {
         runOnJS(resolve)();
       });
     });
-  }, [height, minHeight]);
+  }, [height, minHeight, canAnimate]);
 
   React.useImperativeHandle(ref, () => ({
     open,
@@ -65,6 +78,11 @@ export default function useOpenClose(
       const bottomValue = 0;
 
       debugLog(`set bottom.value: ${bottomValue} (animateIn)`);
+
+      if (!canAnimate) {
+        bottom.value = bottomValue;
+        return;
+      }
 
       bottom.value = withSpring(bottomValue, autoAnimateConfig);
     };
@@ -89,7 +107,14 @@ export default function useOpenClose(
 
     debugLog(`call open (openOnMount)`);
     open();
-  }, [open, props.openOnMount, hasGotMaxHeight, props.animateIn, bottom]);
+  }, [
+    open,
+    props.openOnMount,
+    hasGotMaxHeight,
+    props.animateIn,
+    bottom,
+    canAnimate,
+  ]);
 
   return { open, close, bottom };
 }

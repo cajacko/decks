@@ -6,7 +6,11 @@ import { CardMMDimensions } from "@/components/Card/Card.types";
 import AppError from "@/classes/AppError";
 import { defaultCardDimensions } from "@/components/Card/cardSizes";
 
-export type TabletopContextProps = StackDimensions & { tabletopId: string };
+export type TabletopContextProps = StackDimensions & {
+  tabletopId: string;
+  // Only one for now, refactor and figure out how to handle more when we need to change it
+  deckId: string;
+};
 
 export const Context = createContext<TabletopContextProps | undefined>(
   undefined,
@@ -31,6 +35,7 @@ export function useTabletopContext(): TabletopContextProps {
         cardProportions: defaultCardDimensions,
       }),
       tabletopId: "",
+      deckId: "",
     };
   }, [context]);
 }
@@ -47,6 +52,7 @@ export interface TabletopProviderProps {
   availableWidth: number;
   tabletopId: string;
   cardProportions: CardMMDimensions;
+  deckId: string;
 }
 
 export function TabletopProvider({
@@ -55,6 +61,7 @@ export function TabletopProvider({
   availableWidth,
   tabletopId,
   cardProportions,
+  deckId,
 }: TabletopProviderProps) {
   const value = React.useMemo(
     () => ({
@@ -64,8 +71,9 @@ export function TabletopProvider({
         cardProportions,
       }),
       tabletopId,
+      deckId,
     }),
-    [availableHeight, availableWidth, tabletopId, cardProportions],
+    [availableHeight, availableWidth, tabletopId, cardProportions, deckId],
   );
 
   const child = React.useMemo(

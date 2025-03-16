@@ -1,4 +1,4 @@
-import { Templates } from "@/store/types";
+import { Templates, Markup } from "@/store/types";
 import builtInTemplateIds from "@/utils/builtInTemplateIds";
 import text from "@/constants/text";
 import { fixed } from "@/constants/colors";
@@ -11,19 +11,21 @@ import { colorFunction } from "@/components/Template/handlebars";
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { templateId, dataItemId } = builtInTemplateIds("playing-cards");
 
-const dataItemIds = {
+export const dataIds = {
   suit: dataItemId("suit"),
   value: dataItemId("value"),
   color: ReservedDataSchemaIds.Color,
-};
+} as const;
+
+type DataId = (typeof dataIds)[keyof typeof dataIds];
 
 const mainSuitSize = 10;
 const faceCardOffset = 2;
 const iconOpacity = 0.75;
 
-const corner: Templates.Markup = [
+const corner: Markup.Nodes = [
   {
-    type: "view",
+    type: "View",
     style: {
       justifyContent: "center",
       alignItems: "center",
@@ -31,18 +33,18 @@ const corner: Templates.Markup = [
     },
     children: [
       {
-        type: "text",
-        text: `{{${dataItemIds.value}}}`,
+        type: "Text",
+        text: `{{${dataIds.value}}}`,
         style: {
           fontSize: 8,
           textAlign: "center",
-          color: colorFunction("lightness", dataItemIds.color, 30),
+          color: colorFunction("lightness", dataIds.color, 30),
         },
       },
       {
-        type: "text",
-        text: `{{${dataItemIds.suit}}}`,
-        conditional: dataItemIds.suit,
+        type: "Text",
+        text: `{{${dataIds.suit}}}`,
+        conditional: dataIds.suit,
         style: {
           fontSize: 6,
           textAlign: "center",
@@ -53,12 +55,12 @@ const corner: Templates.Markup = [
   },
 ];
 
-function singleIcon(value: string): Templates.Markup {
+function singleIcon(value: string): Markup.Nodes {
   let text: string;
 
   switch (value.toLowerCase().trim()) {
     case "a":
-      text = `{{${dataItemIds.suit}}}`;
+      text = `{{${dataIds.suit}}}`;
       break;
     case "j":
       text = "👨";
@@ -75,19 +77,19 @@ function singleIcon(value: string): Templates.Markup {
 
   return [
     {
-      type: "view",
-      conditional: `{{equals ${dataItemIds.value} "${value}"}}`,
+      type: "View",
+      conditional: `{{equals ${dataIds.value} "${value}"}}`,
       style: {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        borderColor: colorFunction("lightness", dataItemIds.color, 30),
+        borderColor: colorFunction("lightness", dataIds.color, 30),
         borderWidth: 0.5,
       },
       children: [
         {
-          type: "text",
-          text: `{{${dataItemIds.suit}}}`,
+          type: "Text",
+          text: `{{${dataIds.suit}}}`,
           style: {
             fontSize: mainSuitSize,
             position: "absolute",
@@ -96,15 +98,15 @@ function singleIcon(value: string): Templates.Markup {
           },
         },
         {
-          type: "text",
+          type: "Text",
           text,
           style: {
             fontSize: 30,
           },
         },
         {
-          type: "text",
-          text: `{{${dataItemIds.suit}}}`,
+          type: "Text",
+          text: `{{${dataIds.suit}}}`,
           style: {
             fontSize: mainSuitSize,
             transform: [{ rotate: "180deg" }],
@@ -149,25 +151,25 @@ const numberPatterns = [
   ],
 ];
 
-function repeatSuit(count: number): Templates.Markup {
+function repeatSuit(count: number): Markup.Nodes {
   const numberPattern = numberPatterns[count - 1];
 
   if (!numberPattern) return [];
 
-  const columns: Templates.Markup = [];
+  const columns: Markup.Nodes = [];
 
   numberPattern.forEach((column, i) => {
     const isFirstColumn = i === 0;
     const isLastColumn = i === numberPattern.length - 1;
-    const rows: Templates.Markup = [];
+    const rows: Markup.Nodes = [];
 
     column.forEach((hasSuitIcon, i) => {
       // If the row is in the bottom half of rows (middle counts as top), flip the suit icon
       const shouldFlip = i >= Math.ceil(column.length / 2);
 
       rows.push({
-        type: "text",
-        text: hasSuitIcon ? `{{${dataItemIds.suit}}}` : "",
+        type: "Text",
+        text: hasSuitIcon ? `{{${dataIds.suit}}}` : "",
         style: {
           fontSize: mainSuitSize,
           textAlign: "center",
@@ -177,7 +179,7 @@ function repeatSuit(count: number): Templates.Markup {
     });
 
     columns.push({
-      type: "view",
+      type: "View",
       style: {
         flexDirection: "column",
         justifyContent:
@@ -191,8 +193,8 @@ function repeatSuit(count: number): Templates.Markup {
 
   return [
     {
-      type: "view",
-      conditional: `{{equals ${dataItemIds.value} ${count === 1 ? `"A"` : count}}}`,
+      type: "View",
+      conditional: `{{equals ${dataIds.value} ${count === 1 ? `"A"` : count}}}`,
       style: {
         flex: 1,
         flexDirection: "row",
@@ -203,45 +205,45 @@ function repeatSuit(count: number): Templates.Markup {
   ];
 }
 
-const template = {
+const template: Templates.Props<DataId> = {
   templateId,
   name: text["template.built_in.playing-cards.name"],
-  schemaOrder: [dataItemIds.value, dataItemIds.suit, dataItemIds.color],
+  schemaOrder: [dataIds.value, dataIds.suit, dataIds.color],
   schema: {
-    [dataItemIds.value]: {
-      id: dataItemIds.value,
+    [dataIds.value]: {
+      id: dataIds.value,
       name: text["template.built_in.playing-cards.value.name"],
-      type: Templates.DataType.Text,
+      type: "text",
     },
-    [dataItemIds.suit]: {
-      id: dataItemIds.suit,
+    [dataIds.suit]: {
+      id: dataIds.suit,
       name: text["template.built_in.playing-cards.suit.name"],
-      type: Templates.DataType.Text,
+      type: "text",
     },
-    [dataItemIds.color]: {
+    [dataIds.color]: {
       ...reservedDataSchemaItems[ReservedDataSchemaIds.Color],
       defaultValidatedValue: {
-        value: fixed.cardPresets.yellow,
-        type: Templates.DataType.Color,
+        value: fixed.cardPresets.builtInTemplatesFallbackColor,
+        type: "color",
       },
     },
   },
   markup: [
     {
-      type: "view",
+      type: "View",
       style: {
         flex: 1,
-        backgroundColor: colorFunction("lightness", dataItemIds.color, 98),
+        backgroundColor: colorFunction("lightness", dataIds.color, 98),
       },
       children: [
         {
-          type: "view",
+          type: "View",
           style: {
             flex: 1,
           },
           children: [
             {
-              type: "view",
+              type: "View",
               children: corner,
               style: {
                 transform: "rotate(180deg)",
@@ -251,7 +253,7 @@ const template = {
               },
             },
             {
-              type: "view",
+              type: "View",
               children: corner,
               style: {
                 position: "absolute",
@@ -260,7 +262,7 @@ const template = {
               },
             },
             {
-              type: "view",
+              type: "View",
               style: {
                 flex: 1,
                 padding: 10,
@@ -287,6 +289,6 @@ const template = {
       ],
     },
   ],
-} as const satisfies Templates.Props;
+};
 
 export default template;
