@@ -42,7 +42,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   icon: "./assets/images/app-icon.png",
   scheme: "dex",
-  userInterfaceStyle: "automatic",
+  // Default here, but users can always override in settings
+  userInterfaceStyle: "dark",
+  backgroundColor: colors.black,
   newArchEnabled: true,
   platforms: ["ios", "android", "web"],
   ios: {
@@ -53,10 +55,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     // versionCode // TODO: Auto increment
-    // adaptiveIcon: {
-    //   foregroundImage: "./assets/images/adaptive-icon.png",
-    //   backgroundColor: "#ffffff",
-    // },
+    adaptiveIcon: {
+      foregroundImage: "./assets/images/android-adaptive-icon-foreground.png",
+      backgroundImage: "./assets/images/android-adaptive-icon-background.png",
+      monochromeImage: "./assets/images/android-adaptive-icon-monochrome.png",
+      backgroundColor: colors.black,
+    },
     package: getUniqueIdentifier(),
   },
   web: {
