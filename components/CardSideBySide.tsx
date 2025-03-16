@@ -47,15 +47,8 @@ export default function CardSideBySide({
           {...props}
           CardProps={{
             ...props.CardProps,
-            style: [
-              styles.card,
-              styles.frontCard,
-              {
-                transform: [{ rotate: "-5deg" }],
-                ...top,
-              },
-              props.CardProps?.style,
-            ],
+            initialRotation: -5,
+            style: [styles.card, styles.frontCard, top, props.CardProps?.style],
           }}
           side={topSide}
         />
@@ -63,13 +56,11 @@ export default function CardSideBySide({
           {...props}
           CardProps={{
             ...props.CardProps,
+            initialRotation: 5,
             style: [
               styles.card,
               styles.backCard,
-              {
-                transform: [{ rotate: "5deg" }],
-                ...bottom,
-              },
+              bottom,
               props.CardProps?.style,
             ],
           }}
