@@ -3,15 +3,16 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
+    "start": "APP_VARIANT=development expo start",
+    "android": "APP_VARIANT=development expo start --android",
+    "ios": "APP_VARIANT=development expo start --ios",
+    "web": "APP_VARIANT=development expo start --web",
     "test": "jest --watchAll",
     "test:ci": "jest --ci --coverage",
     "lint": "expo lint",
-    "build:android:development": "eas build -p android --profile development",
-    "build:android:preview": "eas build -p android --profile development",
+    "build:android:development": "eas build --platform android --profile development",
+    "build:android:preview": "eas build --platform android --profile preview",
+    "build:android:production": "eas build --platform android --profile production",
     "publish:go": "eas update --branch=main"
   },
   "jest": {

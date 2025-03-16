@@ -1,23 +1,53 @@
 import { ExpoConfig, ConfigContext } from "expo/config";
 
-const bundleId = `fun.playface.dex.www`;
+const IS_DEV = process.env.APP_VARIANT === "development";
+const IS_PREVIEW = process.env.APP_VARIANT === "preview";
+
+const getUniqueIdentifier = () => {
+  if (IS_DEV) {
+    return "fun.playface.dex.www.dev";
+  }
+
+  if (IS_PREVIEW) {
+    return "fun.playface.dex.www.preview";
+  }
+
+  return "fun.playface.dex.www";
+};
+
+const getAppName = () => {
+  if (IS_DEV) {
+    return "Dex (Dev)";
+  }
+
+  if (IS_PREVIEW) {
+    return "Dex (Preview)";
+  }
+
+  // Dex: Play, Discover & Create Card Games with Dex by Playface
+  return "Dex: Play, Discover & Create Card Games with Dex by Playface";
+};
+
+// On the home screen
+// const appDisplayName = "Dex";
+// const bundleId = `fun.playface.dex.www`;
 // const domain = `www.dex.playface.fun`;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "Dex: Play, Discover & Create Card Games with Dex by Playface", // Actual app name
+  name: getAppName(), // Actual app name
   slug: "decks", // Only used in expo for identifying the project
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
-  // scheme: "myapp",
+  scheme: "dex",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   platforms: ["ios", "android", "web"],
   ios: {
     // buildNumber // TODO: Auto increment
     supportsTablet: true,
-    bundleIdentifier: bundleId,
+    bundleIdentifier: getUniqueIdentifier(),
     // associatedDomains: [`applinks:${domain}`],
   },
   android: {
@@ -26,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: "./assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    package: bundleId,
+    package: getUniqueIdentifier(),
   },
   web: {
     bundler: "metro",
