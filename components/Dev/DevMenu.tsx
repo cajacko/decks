@@ -8,6 +8,7 @@ import FieldSet, { FieldSetProps } from "@/components/FieldSet";
 import { useRouter } from "expo-router";
 import exampleDecks from "@/constants/exampleDecks";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
+import * as DevClient from "expo-dev-client";
 import Collapsible from "../Collapsible";
 
 export interface DevMenuProps extends FieldSetProps {
@@ -41,6 +42,8 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       });
   }, []);
 
+  const isDevClient = DevClient.isDevelopmentBuild();
+
   return (
     <FieldSet
       title={text["settings.dev_mode.title"]}
@@ -49,6 +52,27 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       titleProps={titleProps}
       {...props}
     >
+      <FieldSet
+        title={`Is Dev Client: ${String(isDevClient)}`}
+        collapsible={isDevClient}
+        titleProps={{ type: "body1" }}
+      >
+        {isDevClient && (
+          <Button
+            title="Open Dev Client Menu"
+            onPress={DevClient.openMenu}
+            variant="outline"
+          />
+        )}
+        {isDevClient && (
+          <Button
+            title="Close Dev Client Menu"
+            onPress={DevClient.closeMenu}
+            variant="outline"
+          />
+        )}
+      </FieldSet>
+
       <Button
         title={`Purge Store${purgeStatus ? ` (${purgeStatus})` : ""}`}
         onPress={purgeStore}

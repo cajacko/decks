@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Pressable, Platform, ViewStyle } from "react-native";
 import { nativeApplicationVersion, nativeBuildVersion } from "expo-application";
 import ThemedText from "./ThemedText";
-import { expo } from "@/app.json";
+import app from "@/constants/app";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectFlag } from "@/store/combinedSelectors/flags";
 import { setUserFlag } from "@/store/slices/userSettings";
@@ -11,7 +11,7 @@ import text from "@/constants/text";
 
 const version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`
-  : expo.version;
+  : app.version;
 
 export default function Version(props: { style?: ViewStyle }): React.ReactNode {
   const dispatch = useAppDispatch();
