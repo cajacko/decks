@@ -64,6 +64,7 @@
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
     "scheduler": "^0.25.0",
+    "ts-node": "^10.9.2",
     "use-context-selector": "^2.0.0"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 import { ExpoConfig, ConfigContext } from "expo/config";
+import colors from "./constants/playfaceColors.json";
 
 const IS_DEV = process.env.APP_VARIANT === "development";
 const IS_PREVIEW = process.env.APP_VARIANT === "preview";
@@ -24,8 +25,8 @@ const getAppName = () => {
     return "Dex (Preview)";
   }
 
-  // Dex: Play, Discover & Create Card Games with Dex by Playface
-  return "Dex: Play, Discover & Create Card Games with Dex by Playface";
+  // Dex: Play, Discover & Create Card Games
+  return "Dex: Play, Discover & Create Card Games";
 };
 
 // On the home screen
@@ -39,7 +40,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: "decks", // Only used in expo for identifying the project
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/images/icon.png",
+  icon: "./assets/images/app-icon.png",
   scheme: "dex",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -52,10 +53,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     // versionCode // TODO: Auto increment
-    adaptiveIcon: {
-      foregroundImage: "./assets/images/adaptive-icon.png",
-      backgroundColor: "#ffffff",
-    },
+    // adaptiveIcon: {
+    //   foregroundImage: "./assets/images/adaptive-icon.png",
+    //   backgroundColor: "#ffffff",
+    // },
     package: getUniqueIdentifier(),
   },
   web: {
@@ -78,10 +79,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         image: "./assets/images/splash-icon.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff",
+        backgroundColor: colors.black,
         // dark: {
-        //   image: "./assets/splash-icon-dark.png",
-        //   backgroundColor: "#000000",
+        //   backgroundColor: themes.dark.background,
         // },
       },
     ],

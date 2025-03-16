@@ -3,6 +3,7 @@ import { View, ViewStyle, StyleSheet } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { fixed } from "@/constants/colors";
 import uuid from "@/utils/uuid";
+import { useThemeColors } from "@/hooks/useThemeColor";
 
 export interface TextureBackgroundProps {
   style?: ViewStyle;
@@ -14,6 +15,7 @@ export default function TextureBackground({
   children,
 }: TextureBackgroundProps): React.ReactNode {
   const id = React.useRef(uuid()).current;
+  const colors = useThemeColors();
 
   return (
     <View style={React.useMemo(() => [styles.container, style], [style])}>
@@ -32,17 +34,17 @@ export default function TextureBackground({
             >
               <Stop
                 offset="0%"
-                stopColor={fixed.textureBackground.stop1}
+                stopColor={colors.textureBackgroundStop1}
                 stopOpacity="1"
               />
               <Stop
                 offset="70%"
-                stopColor={fixed.textureBackground.stop2}
+                stopColor={colors.textureBackgroundStop2}
                 stopOpacity="1"
               />
               <Stop
                 offset="100%"
-                stopColor={fixed.textureBackground.stop3}
+                stopColor={colors.textureBackgroundStop3}
                 stopOpacity="1"
               />
             </RadialGradient>

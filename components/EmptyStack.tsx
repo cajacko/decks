@@ -5,6 +5,7 @@ import { useTabletopContext } from "./Tabletop/Tabletop.context";
 import Button from "./Button";
 import { fixed } from "@/constants/colors";
 import { defaultOpacity } from "./CardAction";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export type EmptyStackProps = {
   style?: CardProps["style"];
@@ -20,6 +21,7 @@ export default function EmptyStack({
   buttonTitle,
 }: EmptyStackProps): React.ReactNode {
   const context = useTabletopContext();
+  const borderColor = useThemeColor("emptyStackBorder");
 
   return (
     <Card
@@ -30,7 +32,7 @@ export default function EmptyStack({
       <View
         style={StyleSheet.flatten([
           styles.content,
-          { borderRadius: getBorderRadius(context.cardSizes) },
+          { borderRadius: getBorderRadius(context.cardSizes), borderColor },
         ])}
       >
         {buttonAction && buttonTitle && (
@@ -66,7 +68,6 @@ const styles = StyleSheet.create({
     right: "2%",
     bottom: "2%",
     borderWidth: 2,
-    borderColor: fixed.emptyStackBorder,
     borderStyle: "dashed",
     verticalAlign: "middle",
     justifyContent: "center",

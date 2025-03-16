@@ -12,6 +12,7 @@ import FieldSet, { FieldSetProps } from "./FieldSet";
 import text from "@/constants/text";
 import SwitchField from "./SwitchField";
 import useFlag from "@/hooks/useFlag";
+import { defaultTheme } from "@/hooks/useColorScheme";
 
 type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
@@ -26,7 +27,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
 
   const theme =
     useAppSelector((state) => selectUserSetting(state, { key: "theme" })) ??
-    "system";
+    defaultTheme;
 
   const performanceModeEnabled = useFlag("PERFORMANCE_MODE") === "enabled";
   const holdMenuAlwaysVisible =
