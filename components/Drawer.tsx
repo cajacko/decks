@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Touchable,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
 import ThemedView from "./ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppSelector } from "@/store/hooks";
@@ -19,6 +13,8 @@ import SettingsTabletop from "./SettingsTabletop";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
+import ThemedText from "./ThemedText";
+import text from "@/constants/text";
 
 export interface DrawerProps {
   deckId?: string | null;
@@ -125,6 +121,16 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 />
               </TouchableOpacity>
             </Link>
+            <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
+            <Link href="https://www.playface.fun" asChild>
+              <TouchableOpacity>
+                <Image
+                  style={styles.playface}
+                  source={require("../assets/images/playface-circle-logo-text-right.png")}
+                  contentFit="contain"
+                />
+              </TouchableOpacity>
+            </Link>
             <Version />
           </View>
         </SafeAreaView>
@@ -137,10 +143,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  playface: {
+    height: 50,
+    marginBottom: 10,
+  },
+  by: {
+    marginBottom: 10,
+    textAlign: "center",
+  },
   logo: {
     // width: 50,
     height: 80,
-    marginVertical: 20,
+    marginBottom: 10,
   },
   content: {
     flex: 1,
