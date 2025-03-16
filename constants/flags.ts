@@ -8,6 +8,7 @@
 
 import { UserSettings } from "@/store/types";
 import { Platform } from "react-native";
+import * as DevClient from "expo-dev-client";
 
 // If set, this value will be used
 export const flagOverrides: Partial<UserSettings.FlagMap> = {};
@@ -63,7 +64,10 @@ export const defaultFlags: UserSettings.FlagMap = {
     }),
     {} as UserSettings.FlagMap,
   ),
-  DEV_MODE: process.env.NODE_ENV === "development" ? true : false,
+  DEV_MODE:
+    process.env.NODE_ENV === "development" || DevClient.isDevelopmentBuild()
+      ? true
+      : false,
   CARD_ANIMATE_OUT_BEHAVIOUR: Platform.OS === "web" ? "linear" : "bezier",
 };
 

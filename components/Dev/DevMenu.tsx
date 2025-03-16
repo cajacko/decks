@@ -10,6 +10,8 @@ import exampleDecks from "@/constants/exampleDecks";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import * as DevClient from "expo-dev-client";
 import Collapsible from "../Collapsible";
+import * as Haptics from "expo-haptics";
+import Field from "@/components/Field";
 
 export interface DevMenuProps extends FieldSetProps {
   closeDrawer: () => void;
@@ -52,33 +54,69 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       titleProps={titleProps}
       {...props}
     >
-      <FieldSet
-        title={`Is Dev Client: ${String(isDevClient)}`}
-        collapsible={isDevClient}
-        titleProps={{ type: "body1" }}
-      >
-        {isDevClient && (
-          <Button
-            title="Open Dev Client Menu"
-            onPress={DevClient.openMenu}
-            variant="outline"
-          />
-        )}
-        {isDevClient && (
-          <Button
-            title="Close Dev Client Menu"
-            onPress={DevClient.closeMenu}
-            variant="outline"
-          />
-        )}
-      </FieldSet>
+      {isDevClient && (
+        <Button
+          title="Open Dev Client Menu"
+          onPress={DevClient.openMenu}
+          variant="outline"
+        />
+      )}
 
       <Button
         title={`Purge Store${purgeStatus ? ` (${purgeStatus})` : ""}`}
         onPress={purgeStore}
         variant="outline"
       />
-      <Collapsible title="Example Decks" initialCollapsed>
+      <FieldSet title="Haptics" collapsible initialCollapsed>
+        <Button
+          title="Selection"
+          onPress={() => {
+            Haptics.selectionAsync();
+          }}
+          variant="outline"
+        />
+        <Button
+          title="Success"
+          onPress={() =>
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+          }
+        />
+        <Button
+          title="Error"
+          onPress={() =>
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+          }
+        />
+        <Button
+          title="Warning"
+          onPress={() =>
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
+          }
+        />
+        <Button
+          title="Light"
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        />
+        <Button
+          title="Medium"
+          onPress={() =>
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+          }
+        />
+        <Button
+          title="Heavy"
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)}
+        />
+        <Button
+          title="Rigid"
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid)}
+        />
+        <Button
+          title="Soft"
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
+        />
+      </FieldSet>
+      <FieldSet title="Example Deck Links" collapsible initialCollapsed>
         {Object.entries(exampleDecks).map(([id, { name }]) => (
           <Button
             key={id}
@@ -91,7 +129,7 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
             style={{ marginTop: 10 }}
           />
         ))}
-      </Collapsible>
+      </FieldSet>
       <Flags />
     </FieldSet>
   );
