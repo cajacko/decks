@@ -29,6 +29,14 @@ const getAppName = () => {
   return "Dex: Play, Discover & Create Card Games";
 };
 
+// Ensures works on dev client and standalone
+const splash: ExpoConfig["splash"] = {
+  image: "./assets/images/splash-icon.png",
+  imageWidth: 200,
+  resizeMode: "contain",
+  backgroundColor: colors.black,
+};
+
 // On the home screen
 // const appDisplayName = "Dex";
 // const bundleId = `fun.playface.dex.www`;
@@ -68,6 +76,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     output: "static",
     favicon: "./assets/images/favicon.png",
   },
+  splash,
   plugins: [
     "expo-font",
     [
@@ -77,18 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     "expo-router",
-    [
-      "expo-splash-screen",
-      {
-        image: "./assets/images/splash-icon.png",
-        imageWidth: 200,
-        resizeMode: "contain",
-        backgroundColor: colors.black,
-        // dark: {
-        //   backgroundColor: themes.dark.background,
-        // },
-      },
-    ],
+    ["expo-splash-screen", splash],
   ],
   experiments: {
     typedRoutes: true,
