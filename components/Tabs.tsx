@@ -11,6 +11,7 @@ import IconSymbol, { IconSymbolName } from "./IconSymbol";
 import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Link, LinkProps } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export interface TabsProps {
   children?: React.ReactNode;
@@ -26,11 +27,12 @@ export interface TabProps {
 
 export function Tab(props: TabProps): React.ReactNode {
   const colors = useThemeColor("primary");
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <Link href={props.href} asChild>
       <Pressable style={styles.tab}>
-        <View style={styles.tabContent}>
+        <View style={[styles.tabContent, { marginBottom: bottom }]}>
           <IconSymbol
             name={props.icon}
             color={props.isActive ? colors : undefined}
@@ -44,9 +46,16 @@ export function Tab(props: TabProps): React.ReactNode {
 
 export default function Tabs(props: TabsProps): React.ReactNode {
   const colors = useThemeColor("inputOutline");
+  const { bottom } = useSafeAreaInsets();
 
   return (
-    <ThemedView style={[styles.tabs, { borderTopColor: colors }, props.style]}>
+    <ThemedView
+      style={[
+        styles.tabs,
+        { borderTopColor: colors, height: 60 + bottom, maxHeight: 60 + bottom },
+        props.style,
+      ]}
+    >
       {props.children}
     </ThemedView>
   );
@@ -57,9 +66,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     borderTopWidth: 1,
-    height: 60,
     flex: 1,
-    maxHeight: 60,
     position: "relative",
   },
   tab: {

@@ -40,10 +40,10 @@ function getExampleStackDimensions(
         ? Math.round(props.stackWidth / 4.9)
         : Math.round(props.stackHeight / 6.4),
       // This is our minimum size for making it easy for the users
-      60,
+      40,
     ),
     // Never show buttons bigger than this, it looks silly
-    100,
+    80,
   );
 
   // The buttons are the closest things together, so base the space between stacks on them
@@ -54,7 +54,8 @@ function getExampleStackDimensions(
   // Card actions are half on/ half off the card
   const stackHorizontalPadding = Math.round(buttonSize / 2);
   // The shuffle/ stack actions are a bit further out than card actions (but only vertically)
-  const stackVerticalPadding = Math.round(buttonSize * 2);
+  // Must be more than 1 to allow the shuffle button to be there
+  const stackVerticalPadding = Math.round(buttonSize * 1.25);
 
   let stackWidth: number;
   let stackHeight: number;
@@ -106,7 +107,7 @@ function getExampleStackDimensions(
   };
 }
 
-const maxStackHeight = 10000;
+const maxStackHeight = 700;
 const maxStackWidth = maxStackHeight;
 const minStackHeight = 300;
 const minStackWidth = minStackHeight;
@@ -153,9 +154,6 @@ export function getShuffleStyle(props: {
     styles.shuffleContainer,
     {
       zIndex: 1,
-      bottom: (-props.buttonSize * 3) / 2,
-      left: 0,
-      right: 0,
       alignItems: "center",
     },
   ]);
@@ -164,6 +162,7 @@ export function getShuffleStyle(props: {
 const styles = StyleSheet.create({
   container: {
     position: "relative",
+    height: "100%",
   },
   inner: {
     zIndex: 2,
@@ -176,8 +175,10 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   shuffleContainer: {
-    position: "absolute",
     opacity: 0.5,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   shuffleButton: {},
   card: {

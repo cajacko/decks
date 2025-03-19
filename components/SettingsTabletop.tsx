@@ -37,9 +37,9 @@ export default function SettingsTabletop({
   const deckName = deckNameWithFallback(
     useAppSelector((state) => selectDeck(state, { deckId })?.name),
   );
-  const settings = useAppSelector(
-    (state) => selectTabletopSettings(state, { tabletopId }) ?? {},
-  );
+  const settings =
+    useAppSelector((state) => selectTabletopSettings(state, { tabletopId })) ??
+    {};
 
   const resetTabletop = React.useCallback(() => {
     dispatch(resetTabletopHelper({ tabletopId }));

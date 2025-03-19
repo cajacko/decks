@@ -79,7 +79,7 @@ export default function Tabletop({
       // Prevents us updating when the keyboard comes into view, which we don't want. Maybe there's
       // a better solution for this, that then allows window changes as well?
       if (hasLayout.current) {
-        return;
+        // return;
       }
 
       hasLayout.current = true;

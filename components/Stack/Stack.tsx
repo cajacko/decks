@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import EmptyStack from "@/components/EmptyStack";
 import CardAction from "@/components/CardAction";
@@ -44,7 +44,7 @@ export default function Stack(props: StackProps): React.ReactNode {
   );
 
   const containerStyle = React.useMemo(
-    () => StyleSheet.flatten([widthStyle, styles.container, props.style]),
+    () => [widthStyle, styles.container, props.style],
     [props.style, widthStyle],
   );
 
@@ -84,6 +84,7 @@ export default function Stack(props: StackProps): React.ReactNode {
 
   return (
     <Animated.View style={containerStyle}>
+      <View style={styles.shuffleContainer} />
       <Animated.View style={innerStyle}>
         {cardInstances && (
           <View style={styles.cardInstances}>
@@ -98,15 +99,16 @@ export default function Stack(props: StackProps): React.ReactNode {
           buttonAction={props.skeleton ? undefined : emptyStackButton?.action}
         />
       </Animated.View>
-      {cardInstances && cardInstances.length > 1 && (
-        <View style={shuffleStyle}>
+
+      <View style={shuffleStyle}>
+        {cardInstances && cardInstances.length > 1 && (
           <CardAction
             icon="shuffle"
             style={styles.shuffleButton}
             onPress={handleShuffle}
           />
-        </View>
-      )}
+        )}
+      </View>
     </Animated.View>
   );
 }
