@@ -21,9 +21,6 @@ export interface DrawerProps {
   tabletopId?: string | null;
   isOpen?: boolean;
   closeDrawer: () => void;
-  // stackId?: string | null;
-  // cardId?: string | null;
-  // cardInstanceId?: string | null;
 }
 
 type Collapsed = {

@@ -17,6 +17,7 @@ import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
+import ContentWidth from "@/components/ContentWidth";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -67,7 +68,7 @@ export default function ExpandedDeckListItem(
   return (
     <CardTargetProvider target={coverTarget}>
       <CardConstraintsProvider {...styles.cardConstraints}>
-        <View style={containerStyle}>
+        <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
           <Pressable onPress={play} style={styles.cards}>
             <CardSideBySide topSide="front" target={coverTarget} />
           </Pressable>
@@ -105,7 +106,7 @@ export default function ExpandedDeckListItem(
               />
             </View>
           </View>
-        </View>
+        </ContentWidth>
       </CardConstraintsProvider>
     </CardTargetProvider>
   );

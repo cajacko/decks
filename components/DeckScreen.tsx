@@ -15,10 +15,10 @@ import { useEditCardModal } from "./EditCardModal";
 import DeckToolbar from "./DeckToolbar";
 import IconButton from "./IconButton";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
-import { maxWidth } from "./DecksScreen";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/Loader";
 import { CardConstraintsProvider } from "./cards/context/CardSizeConstraints";
+import ContentWidth, { contentMaxWidth } from "@/components/ContentWidth";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -48,7 +48,9 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
 
   const numColumns = React.useRef(
     Math.max(
-      Math.round(Math.min(Dimensions.get("window").width, maxWidth) / 160),
+      Math.round(
+        Math.min(Dimensions.get("window").width, contentMaxWidth) / 160,
+      ),
       2,
     ),
   );
@@ -104,7 +106,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   return (
     <CardConstraintsProvider {...styles.constraints}>
       <DeckToolbar deckId={props.deckId} />
-      <View style={containerStyle}>
+      <ContentWidth style={containerStyle}>
         {component}
         <FlatList<FlatListData>
           data={cards}
@@ -126,7 +128,6 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           }
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          style={styles.list}
           // TODO: Can calculate this once and improve performance
           // getItemLayout={(data, index) => ({
           //   length: ITEM_HEIGHT,
@@ -134,10 +135,10 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           //   index,
           // })}
         />
-        {canEditDeck && (
-          <IconButton icon="add" onPress={addNew} style={styles.button} />
-        )}
-      </View>
+      </ContentWidth>
+      {canEditDeck && (
+        <IconButton icon="add" onPress={addNew} style={styles.button} />
+      )}
     </CardConstraintsProvider>
   );
 }
@@ -147,15 +148,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  list: {
-    maxWidth,
-    width: "100%",
-  },
   container: {
-    flex: 1,
-    alignItems: "center",
     position: "relative",
-    // overflow: "hidden",
   },
   columnWrapperStyle: {},
   item: {

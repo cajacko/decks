@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, KeyboardAvoidingView, Platform } from "react-native";
 import Animated from "react-native-reanimated";
 import {
   GestureDetector,
@@ -47,30 +47,35 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
     );
 
     return (
-      <Animated.View style={drawerStyle}>
-        <Animated.View style={drawerContainerStyle}>
-          <View style={styles.drawerContainer}>
-            <GestureDetector gesture={state.drag}>
-              <View style={styles.dragBar}>
-                <Animated.View style={dragBoxStyle}>
-                  <ThemedText style={styles.dragIcon}>====</ThemedText>
-                </Animated.View>
-                <Animated.View style={dragHeaderStyle} />
-              </View>
-            </GestureDetector>
-            {/* NOTE: This fixes an issue with not being able to tap inputs inside the scroll view due to the gesture detector playing silly buggers
+      <KeyboardAvoidingView
+        style={{ flex: 1, position: "relative" }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Animated.View style={drawerStyle}>
+          <Animated.View style={drawerContainerStyle}>
+            <View style={styles.drawerContainer}>
+              <GestureDetector gesture={state.drag}>
+                <View style={styles.dragBar}>
+                  <Animated.View style={dragBoxStyle}>
+                    <ThemedText style={styles.dragIcon}>====</ThemedText>
+                  </Animated.View>
+                  <Animated.View style={dragHeaderStyle} />
+                </View>
+              </GestureDetector>
+              {/* NOTE: This fixes an issue with not being able to tap inputs inside the scroll view due to the gesture detector playing silly buggers
             https://chatgpt.com/g/g-p-67b5e925ea4881918dabd87d2acc4eb1-decks/c/67c75846-7134-8004-b0c9-014f2277aa83 */}
-            <GestureHandlerRootView>
-              <ScrollView
-                style={contentStyle}
-                keyboardShouldPersistTaps="handled"
-              >
-                <View onLayout={state.onContentLayout}>{children}</View>
-              </ScrollView>
-            </GestureHandlerRootView>
-          </View>
+              <GestureHandlerRootView>
+                <ScrollView
+                  style={contentStyle}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  <View onLayout={state.onContentLayout}>{children}</View>
+                </ScrollView>
+              </GestureHandlerRootView>
+            </View>
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
+      </KeyboardAvoidingView>
     );
   },
 );

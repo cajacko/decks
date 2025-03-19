@@ -24,18 +24,6 @@ function RootLayout() {
     () => ({
       default: {
         freezeOnBlur,
-        // contentStyle: {
-        //   borderColor: "red",
-        //   borderWidth: 1,
-        //   borderStyle: "solid",
-        //   padding: 20,
-        //   margin: 20,
-        //   backgroundColor: "blue",
-        //   position: "relative",
-        //   flex: 1,
-        //   maxHeight: "100%",
-        //   overflow: "hidden",
-        // },
       },
       index: {
         headerShown: true,

@@ -1,5 +1,4 @@
 import React from "react";
-import ThemedView from "./ThemedView";
 import {
   StyleSheet,
   View,
@@ -12,6 +11,7 @@ import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Link, LinkProps } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ContentWidth from "./ContentWidth";
 
 export interface TabsProps {
   children?: React.ReactNode;
@@ -30,9 +30,14 @@ export function Tab(props: TabProps): React.ReactNode {
   const { bottom } = useSafeAreaInsets();
 
   return (
-    <Link href={props.href} asChild>
-      <Pressable style={styles.tab}>
-        <View style={[styles.tabContent, { marginBottom: bottom }]}>
+    <Link style={styles.tab} href={props.href} asChild>
+      <Pressable
+        style={StyleSheet.flatten([
+          styles.pressable,
+          { paddingBottom: bottom },
+        ])}
+      >
+        <View style={styles.tabContent}>
           <IconSymbol
             name={props.icon}
             color={props.isActive ? colors : undefined}
@@ -45,35 +50,48 @@ export function Tab(props: TabProps): React.ReactNode {
 }
 
 export default function Tabs(props: TabsProps): React.ReactNode {
+  const backgroundColor = useThemeColor("background");
   const colors = useThemeColor("inputOutline");
   const { bottom } = useSafeAreaInsets();
+  const height = 60 + bottom;
 
   return (
-    <ThemedView
+    <ContentWidth
       style={[
         styles.tabs,
-        { borderTopColor: colors, height: 60 + bottom, maxHeight: 60 + bottom },
+        {
+          backgroundColor,
+          borderTopColor: colors,
+          height,
+          maxHeight: height,
+        },
         props.style,
       ]}
+      contentContainerStyle={styles.content}
     >
       {props.children}
-    </ThemedView>
+    </ContentWidth>
   );
 }
 
 const styles = StyleSheet.create({
   tabs: {
     width: "100%",
-    flexDirection: "row",
     borderTopWidth: 1,
     flex: 1,
     position: "relative",
   },
   tab: {
     flex: 1,
-    paddingVertical: 15,
+  },
+  pressable: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  content: {
+    flexDirection: "row",
+    flex: 1,
   },
   tabContent: {
     flexDirection: "row",
