@@ -2,7 +2,6 @@ import React from "react";
 import { Image } from "expo-image";
 import { Platform, StyleSheet, View } from "react-native";
 import { useTextLogo } from "@/hooks/useLogo";
-import ThemedText from "./ThemedText";
 
 export default function HeaderLogo(): React.ReactNode {
   const logo = useTextLogo();
