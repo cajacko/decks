@@ -1,0 +1,78 @@
+import React from "react";
+import ThemedView from "./ThemedView";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
+import IconSymbol, { IconSymbolName } from "./IconSymbol";
+import ThemedText from "./ThemedText";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { Link, LinkProps } from "expo-router";
+
+export interface TabsProps {
+  children?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}
+
+export interface TabProps {
+  icon: IconSymbolName;
+  title: string;
+  isActive: boolean;
+  href: LinkProps["href"];
+}
+
+export function Tab(props: TabProps): React.ReactNode {
+  const colors = useThemeColor("primary");
+
+  return (
+    <Link href={props.href} asChild>
+      <Pressable style={styles.tab}>
+        <View style={styles.tabContent}>
+          <IconSymbol
+            name={props.icon}
+            color={props.isActive ? colors : undefined}
+          />
+          <ThemedText style={styles.tabText}>{props.title}</ThemedText>
+        </View>
+      </Pressable>
+    </Link>
+  );
+}
+
+export default function Tabs(props: TabsProps): React.ReactNode {
+  const colors = useThemeColor("inputOutline");
+
+  return (
+    <ThemedView style={[styles.tabs, { borderTopColor: colors }, props.style]}>
+      {props.children}
+    </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create({
+  tabs: {
+    width: "100%",
+    flexDirection: "row",
+    borderTopWidth: 1,
+    height: 60,
+    flex: 1,
+    maxHeight: 60,
+    position: "relative",
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  tabText: {
+    marginLeft: 10,
+  },
+});

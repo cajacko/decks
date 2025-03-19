@@ -10,12 +10,12 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
-import CardSideBySide from "./CardSideBySide";
-import { DeckCardSizeProvider } from "@/context/Deck";
+import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import ThemedText from "./ThemedText";
 import IconButton from "./IconButton";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
+import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -64,18 +64,10 @@ export default function ExpandedDeckListItem(
   }, [dispatch, props.deckId, navigate]);
 
   return (
-    <DeckCardSizeProvider
-      id={props.deckId}
-      idType="deck"
-      constraints={styles.cardConstraints}
-    >
+    <CardConstraintsProvider {...styles.cardConstraints}>
       <View style={containerStyle}>
         <Pressable onPress={play} style={styles.cards}>
-          <CardSideBySide
-            skeleton={props.skeleton}
-            topSide="front"
-            {...coverTarget}
-          />
+          <CardSideBySide topSide="front" target={coverTarget} />
         </Pressable>
         <View style={styles.details}>
           <View style={styles.text}>
@@ -112,7 +104,7 @@ export default function ExpandedDeckListItem(
           </View>
         </View>
       </View>
-    </DeckCardSizeProvider>
+    </CardConstraintsProvider>
   );
 }
 

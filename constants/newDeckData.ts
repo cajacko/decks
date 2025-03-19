@@ -22,6 +22,7 @@ const dataSchemaIds = {
 export const newDeckCard: Cards.Props = {
   cardId: newDeckCardTarget.id,
   canEdit: false,
+  size: Cards.Size.Poker,
   data: {
     [dataSchemaIds.title]: {
       type: "text",

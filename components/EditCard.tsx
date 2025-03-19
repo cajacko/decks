@@ -4,6 +4,7 @@ import {
   ViewStyle,
   View,
   Pressable,
+  Dimensions,
 } from "react-native";
 import Animated from "react-native-reanimated";
 import React from "react";
@@ -14,11 +15,13 @@ import BottonDrawer, {
   useMaxHeight,
 } from "@/components/BottomDrawer";
 import EditCardForm from "@/components/EditCardForm";
-import CardSides, { CardSidesRef } from "@/components/CardSides";
+import AnimatedCardSides, {
+  AnimatedCardSidesRef,
+} from "@/components/cards/connected/AnimatedCardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
-import { FullSizeCardProvider } from "@/context/Deck";
+import { TabletopCardSizeProvider } from "@/components/Tabletop/Tabletop.context";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
@@ -47,7 +50,7 @@ export default function EditCard({
   }, []);
 
   const [side, setSide] = React.useState<Cards.Side>(initialSide ?? "front");
-  const cardSidesRef = React.useRef<CardSidesRef>(null);
+  const cardSidesRef = React.useRef<AnimatedCardSidesRef>(null);
 
   const flipSide = React.useCallback(async () => {
     await cardSidesRef.current?.animateFlip();
@@ -66,9 +69,10 @@ export default function EditCard({
   );
 
   return (
-    <FullSizeCardProvider
-      id={props.target.id}
-      idType={props.target.type === "card" ? "card" : "deck"}
+    <TabletopCardSizeProvider
+      availableHeight={Dimensions.get("window").height}
+      availableWidth={Dimensions.get("window").width}
+      target={props.target}
     >
       <EditCardProvider onChangeSide={setSide} side={side} {...props}>
         <BottomDrawerWrapper
@@ -82,7 +86,11 @@ export default function EditCard({
           >
             <View style={styles.scrollContent}>
               <Pressable onPress={onPress}>
-                <CardSides ref={cardSidesRef} {...props.target} side={side} />
+                <AnimatedCardSides
+                  ref={cardSidesRef}
+                  target={props.target}
+                  side={side}
+                />
               </Pressable>
             </View>
             <Animated.View style={bufferStyle} />
@@ -106,7 +114,7 @@ export default function EditCard({
           </BottonDrawer>
         </BottomDrawerWrapper>
       </EditCardProvider>
-    </FullSizeCardProvider>
+    </TabletopCardSizeProvider>
   );
 }
 

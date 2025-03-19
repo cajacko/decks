@@ -1,7 +1,5 @@
 import React from "react";
-import { CardProps, CardRef } from "./Card.types";
-import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
-import { useCardSizes } from "./CardSize.context";
+import { AnimatedCardProps, AnimatedCardRef } from "./AnimatedCard.types";
 import useFlag from "@/hooks/useFlag";
 import {
   runOnJS,
@@ -12,6 +10,8 @@ import {
   WithTimingConfig,
 } from "react-native-reanimated";
 import useOffsetPositions from "./useOffsetPositions";
+import { UseMmToDpProps } from "../../context/PhysicalMeasures";
+import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
 
 export const flipScaleDuration = 200;
 export const flipRotationDuration = Math.round(flipScaleDuration / 4);
@@ -111,23 +111,25 @@ function linear({
   };
 }
 
-export default function useCard(
+export default function useAnimatedCard(
   props: Pick<
-    CardProps,
-    | "onAnimationChange"
+    AnimatedCardProps,
+    | "height"
+    | "width"
     | "offsetPosition"
     | "initialRotation"
     | "initialScaleX"
-    | "constraints"
-    | "proportions"
+    | "onAnimationChange"
+    | keyof UseMmToDpProps
   >,
-  ref: React.ForwardedRef<CardRef>,
+  ref: React.ForwardedRef<AnimatedCardRef>,
 ) {
   const animateOutBehaviour = useFlag("CARD_ANIMATE_OUT_BEHAVIOUR");
   const canAnimate = useFlag("CARD_ANIMATIONS") === "enabled";
-  const cardSizes = useCardSizes(props);
-  const height = cardSizes.dpHeight;
-  const width = cardSizes.dpWidth;
+  // const cardSizes = useCardSizes(props);
+  const height = props.height;
+  const width = props.width;
+
   const offsetPositions = useOffsetPositions(props);
 
   const offsetPosition = React.useMemo(
@@ -196,7 +198,9 @@ export default function useCard(
   heightRef.current = height;
   widthRef.current = width;
 
-  const animateFlipOut = React.useCallback<CardRef["animateFlipOut"]>(() => {
+  const animateFlipOut = React.useCallback<
+    AnimatedCardRef["animateFlipOut"]
+  >(() => {
     const animateKey = "flip";
 
     animationUpdateRef.current(animateKey, true);
@@ -217,7 +221,9 @@ export default function useCard(
     }).finally(() => animationUpdateRef.current(animateKey, false));
   }, [canAnimate, rotate, scaleX, animatedInitialRotation]);
 
-  const animateFlipIn = React.useCallback<CardRef["animateFlipIn"]>(() => {
+  const animateFlipIn = React.useCallback<
+    AnimatedCardRef["animateFlipIn"]
+  >(() => {
     const animateKey = "flipIn";
 
     animationUpdateRef.current(animateKey, true);
@@ -246,7 +252,7 @@ export default function useCard(
     });
   }, [canAnimate, scaleX, rotate, animatedInitialRotation]);
 
-  const animateOut = React.useCallback<CardRef["animateOut"]>(
+  const animateOut = React.useCallback<AnimatedCardRef["animateOut"]>(
     async ({
       animateOpacity = true,
       duration = 300,
@@ -401,6 +407,5 @@ export default function useCard(
     translateY,
     scaleX,
     rotate,
-    cardSizes,
   };
 }

@@ -1,17 +1,18 @@
 import React from "react";
-import CardSides, {
-  CardSidesRef,
-  CardSidesProps,
-} from "@/components/CardSides";
+import AnimatedCardSides, {
+  AnimatedCardSidesRef,
+  AnimatedCardSidesProps,
+} from "@/components/cards/connected/AnimatedCardSides";
 import { selectCardInstance } from "@/store/slices/tabletop";
 import { useRequiredAppSelector } from "@/store/hooks";
 import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { Target } from "@/utils/cardTarget";
 
-export interface CardInstanceProps extends Partial<CardSidesProps> {
+export interface CardInstanceProps extends Partial<AnimatedCardSidesProps> {
   cardInstanceId: string;
 }
 
-export default React.forwardRef<CardSidesRef, CardInstanceProps>(
+export default React.forwardRef<AnimatedCardSidesRef, CardInstanceProps>(
   function CardInstance({ cardInstanceId, ...cardSidesProps }, ref) {
     const { tabletopId } = useTabletopContext();
 
@@ -24,12 +25,19 @@ export default React.forwardRef<CardSidesRef, CardInstanceProps>(
       selectCardInstance.name,
     );
 
+    const target = React.useMemo(
+      (): Target => ({
+        id: cardInstance.cardId,
+        type: "card",
+      }),
+      [cardInstance.cardId],
+    );
+
     return (
-      <CardSides
+      <AnimatedCardSides
         ref={ref}
         side={cardInstance.side}
-        id={cardInstance.cardId}
-        type="card"
+        target={target}
         {...cardSidesProps}
       />
     );

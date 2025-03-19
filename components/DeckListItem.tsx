@@ -10,13 +10,11 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckCards, selectDeckLastScreen } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
-import CardSideBySide from "./CardSideBySide";
-import { DeckCardSizeProvider } from "@/context/Deck";
-import { CardSizeProvider } from "@/components/Card/CardSize.context";
-import { defaultCardDimensions } from "@/constants/cardDimensions";
+import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import { newDeckCardTarget } from "@/constants/newDeckData";
 import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
+import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
 
 export interface DeckListItemProps {
   deckId: string | null;
@@ -38,9 +36,9 @@ export default function DeckListItem(
     props.deckId ? selectDeckLastScreen(state, { deckId: props.deckId }) : null,
   );
 
-  const coverTarget = React.useMemo((): Target | null => {
+  const target = React.useMemo((): Target => {
     if (!props.deckId) {
-      return null;
+      return newDeckCardTarget;
     }
 
     return firstDeckCardId
@@ -71,53 +69,14 @@ export default function DeckListItem(
     [props.style],
   );
 
-  let cards: React.ReactNode;
-
-  if (coverTarget) {
-    cards = (
-      <CardSideBySide
-        skeleton={props.skeleton}
-        topSide="back"
-        {...coverTarget}
-      />
-    );
-  } else {
-    cards = (
-      <CardSideBySide
-        skeleton={props.skeleton}
-        topSide="back"
-        {...newDeckCardTarget}
-      />
-    );
-  }
-
-  const children = (
-    <View style={containerStyle}>
-      <Pressable onPress={onPress} style={styles.cards}>
-        {cards}
-      </Pressable>
-    </View>
-  );
-
-  if (!props.deckId) {
-    return (
-      <CardSizeProvider
-        proportions={defaultCardDimensions}
-        constraints={styles.cardConstraints}
-      >
-        {children}
-      </CardSizeProvider>
-    );
-  }
-
   return (
-    <DeckCardSizeProvider
-      id={props.deckId}
-      idType="deck"
-      constraints={styles.cardConstraints}
-    >
-      {children}
-    </DeckCardSizeProvider>
+    <CardConstraintsProvider {...styles.cardConstraints}>
+      <View style={containerStyle}>
+        <Pressable style={styles.cards} onPress={onPress}>
+          <CardSideBySide topSide="back" target={target} />
+        </Pressable>
+      </View>
+    </CardConstraintsProvider>
   );
 }
 

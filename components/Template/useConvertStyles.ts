@@ -1,6 +1,6 @@
 import React from "react";
 import { Markup } from "@/store/types";
-import { usePhysicalMeasures } from "@/context/PhysicalMeasures";
+import { useMmToDp } from "@/components/cards/context/PhysicalMeasures";
 import { Values } from "./Template.types";
 import { replaceVariables } from "./handlebars";
 
@@ -41,7 +41,7 @@ export default function useConvertStyles(props: {
   values?: Values | null;
   cacheKey: string;
 }) {
-  const { mmToDp } = usePhysicalMeasures();
+  const mmToDp = useMmToDp();
 
   /**
    * All distance values in these style objects are defined in mm, we need to convert them to dp in

@@ -1,12 +1,14 @@
 import React from "react";
 import DeckScreen from "@/components/DeckScreen";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import TextureBackground from "@/components/TextureBackground";
 import Screen from "@/components/Screen";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
 
 export default function DeckRoute() {
   const deckId = useScreenDeckId("screen", DeckRoute.name);
+
+  // return <View style={{ backgroundColor: "red", flex: 1 }} />;
 
   if (!deckId) {
     return null;

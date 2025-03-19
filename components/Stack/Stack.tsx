@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import EmptyStack from "@/components/EmptyStack";
 import CardAction from "@/components/CardAction";
-import CardSpacer from "@/components/CardSpacer";
+import CardSpacer from "@/components/cards/connected/CardSpacer";
 import { StackProps } from "./stack.types";
 import styles, { getShuffleStyle } from "./stack.style";
 import useStack from "./useStack";

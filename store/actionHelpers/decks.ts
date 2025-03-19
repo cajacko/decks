@@ -183,6 +183,7 @@ export function copyDeckHelper(props: {
     cardIdMap.set(existingCardId, newCardId);
 
     cards.push({
+      size: null,
       templates: existingCard.templates,
       cardId: newCardId,
       data: existingCard.data,

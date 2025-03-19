@@ -27,7 +27,6 @@ export const flagMap = {
     "custom-fade-out-top-background",
   ],
   NAVIGATION_STACK_ANIMATIONS: ["disabled", "slide"],
-  NAVIGATION_TAB_ANIMATIONS: ["disabled", "shift", "fade"],
   // Does not play nicely with reanimated effects. When we navigated to tabletop, then to deck edit
   // and then back to tabletop, the stacks wouldn't show. The reanimated opacity value seems to have
   // reset and wouldn't set back to 1

@@ -14,11 +14,11 @@ import DeckCard from "./DeckCard";
 import { useEditCardModal } from "./EditCardModal";
 import DeckToolbar from "./DeckToolbar";
 import IconButton from "./IconButton";
-import { DeckCardSizeProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import { maxWidth } from "./DecksScreen";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/Loader";
+import { CardConstraintsProvider } from "./cards/context/CardSizeConstraints";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -102,11 +102,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   }, [open, props.deckId]);
 
   return (
-    <DeckCardSizeProvider
-      id={props.deckId}
-      idType="deck"
-      constraints={styles.constraints}
-    >
+    <CardConstraintsProvider {...styles.constraints}>
       <DeckToolbar deckId={props.deckId} />
       <View style={containerStyle}>
         {component}
@@ -142,7 +138,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           <IconButton icon="add" onPress={addNew} style={styles.button} />
         )}
       </View>
-    </DeckCardSizeProvider>
+    </CardConstraintsProvider>
   );
 }
 
@@ -158,6 +154,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    position: "relative",
+    // overflow: "hidden",
   },
   columnWrapperStyle: {},
   item: {

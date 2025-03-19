@@ -17,6 +17,7 @@ export interface Props {
   canEdit: boolean;
   deckId: DeckId | null;
   data: Data;
+  size: Size | null;
   /**
    * Advanced override for when an individual card has a different template from all the others.
    * Usually it's best to create multiple decks and combine them in collections, or use templates

@@ -1,5 +1,5 @@
 import React from "react";
-import CardInstance, { CardInstanceProps } from "@/components/CardInstance";
+import CardInstance from "@/components/cards/connected/CardInstance";
 import { StackTopCardProps } from "./types";
 import HoldMenu from "../HoldMenu";
 import useMenuItems from "./useMenuItems";
@@ -14,14 +14,6 @@ export default function StackTopCard({
   ...props
 }: StackTopCardProps): React.ReactNode {
   const state = useMenuItems(props);
-
-  const cardProps = React.useMemo(
-    (): CardInstanceProps["CardProps"] => ({
-      ...props.CardProps,
-      onAnimationChange: state.setIsAnimating,
-    }),
-    [props.CardProps, state.setIsAnimating],
-  );
 
   const target = React.useMemo(
     (): Target => ({ id: state.cardId, type: "card" }),
@@ -45,7 +37,7 @@ export default function StackTopCard({
         <CardInstance
           {...props}
           ref={state.cardInstanceRef}
-          CardProps={cardProps}
+          onAnimationChange={state.setIsAnimating}
         />
       </HoldMenu>
       <EditCardModal
