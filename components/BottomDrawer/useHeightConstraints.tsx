@@ -2,10 +2,41 @@ import { withSpring } from "react-native-reanimated";
 import { defaultProps, BottomDrawerProps } from "./BottomDrawer.types";
 import { dragBuffer, dragHeight, dragOverlap } from "./bottomDrawer.style";
 import React from "react";
-import { ScrollViewProps } from "react-native";
+import { ScrollViewProps, Keyboard, Platform } from "react-native";
 import debugLog from "./debugLog";
 import AppError from "@/classes/AppError";
 import { autoAnimateConfig } from "./bottomDrawer.style";
+
+function useIosKeyboardHeight() {
+  const [iosKeyboardHeight, setIosKeyboardHeight] = React.useState(0);
+
+  React.useEffect(() => {
+    if (Platform.OS !== "ios") {
+      return;
+    }
+
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        setIosKeyboardHeight(event.endCoordinates.height);
+      },
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIosKeyboardHeight(0);
+      },
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  return iosKeyboardHeight;
+}
 
 /**
  * Handles the height constraints for the drawer
@@ -26,9 +57,12 @@ export default function useHeightConstraints(
   const customMaxHeight: number | null =
     maxHeightProp === undefined ? defaultProps.maxHeight : maxHeightProp;
 
+  const iosKeyboardHeight = useIosKeyboardHeight();
+
   const { minHeight, maxHeight, maxAutoHeight, hasGotMaxHeight } =
     React.useMemo(() => {
-      const minHeight: number = minHeightProp ?? defaultProps.minHeight;
+      const minHeight: number =
+        (minHeightProp ?? defaultProps.minHeight) + iosKeyboardHeight;
       let maxHeight: number;
       let maxAvailableSpace: number | null;
       let maxHeightForContent: number | null;
@@ -109,7 +143,12 @@ maxAutoHeight: ${Math.round(maxAutoHeight)}`);
         maxAutoHeight,
         hasGotMaxHeight,
       };
-    }, [customMaxHeight, drawerContentHeight, minHeightProp]);
+    }, [
+      customMaxHeight,
+      drawerContentHeight,
+      minHeightProp,
+      iosKeyboardHeight,
+    ]);
 
   // Gets the drawer content size, as we don't need to show a bottom drawer higher than this
   const onContentLayout = React.useCallback<
