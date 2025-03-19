@@ -35,17 +35,18 @@ export function useThemedTextStyle({
   const color = useThemeColor(type === "link" ? "link" : "text");
 
   const style = React.useMemo(
-    () => [
-      { color },
-      type === "body1" ? styles.body1 : undefined,
-      type === "body2" ? styles.body2 : undefined,
-      type === "h1" ? styles.h1 : undefined,
-      type === "h2" ? styles.h2 : undefined,
-      type === "h3" ? styles.h3 : undefined,
-      type === "h4" ? styles.h4 : undefined,
-      type === "button" ? styles.button : undefined,
-      styleProp,
-    ],
+    () =>
+      StyleSheet.flatten([
+        { color },
+        type === "body1" ? styles.body1 : undefined,
+        type === "body2" ? styles.body2 : undefined,
+        type === "h1" ? styles.h1 : undefined,
+        type === "h2" ? styles.h2 : undefined,
+        type === "h3" ? styles.h3 : undefined,
+        type === "h4" ? styles.h4 : undefined,
+        type === "button" ? styles.button : undefined,
+        styleProp,
+      ]),
     [styleProp, type, color],
   );
 
