@@ -14,7 +14,7 @@ const offsetConfig = {
   roundToNumberOfDecimals: 1,
 };
 
-const offsetSpread = 1;
+const offsetSpread = 0.5;
 
 /**
  * Define the minimum amount needed for a stack to look good, so we're not rendering loads of cards
