@@ -54,12 +54,10 @@ function getExampleStackDimensions(
   // Card actions are half on/ half off the card
   const stackHorizontalPadding = Math.round(buttonSize / 2);
   // The shuffle/ stack actions are a bit further out than card actions (but only vertically)
-  const stackVerticalPadding = Math.round((buttonSize * 3) / 2);
+  const stackVerticalPadding = Math.round(buttonSize * 2);
 
   let stackWidth: number;
   let stackHeight: number;
-  let cardWidth: number;
-  let cardHeight: number;
   let scale: Scale;
 
   // When adjusting things in one of these statements it's very important to check the logic on the
@@ -67,26 +65,32 @@ function getExampleStackDimensions(
   if ("stackWidth" in props) {
     stackWidth = props.stackWidth;
 
-    cardWidth =
+    const cardWidth =
       stackWidth -
       stackHorizontalPadding * 2 -
       Math.round(spaceBetweenStacks / 2);
 
     scale = { dpDistance: cardWidth, mmDistance: props.physicalSize.mmWidth };
 
-    cardHeight = getSizesFromWidth(cardWidth, props.physicalSize).dpHeight;
+    const cardHeight = getSizesFromWidth(
+      cardWidth,
+      props.physicalSize,
+    ).dpHeight;
 
     stackHeight = cardHeight + stackVerticalPadding * 2;
   } else {
     stackHeight = props.stackHeight;
 
-    cardHeight = stackHeight - stackVerticalPadding * 2;
+    const cardHeight = stackHeight - stackVerticalPadding * 2;
     scale = { dpDistance: cardHeight, mmDistance: props.physicalSize.mmHeight };
 
-    cardWidth = getSizesFromHeight(cardHeight, props.physicalSize).dpHeight;
+    const cardWidth = getSizesFromHeight(
+      cardHeight,
+      props.physicalSize,
+    ).dpWidth;
 
     stackWidth =
-      getSizesFromHeight(cardHeight, props.physicalSize).dpWidth +
+      cardWidth +
       stackHorizontalPadding * 2 +
       Math.round(spaceBetweenStacks / 2);
   }
@@ -98,13 +102,11 @@ function getExampleStackDimensions(
     stackVerticalPadding,
     stackHeight,
     stackWidth,
-    cardWidth,
-    cardHeight,
     scale,
   };
 }
 
-const maxStackHeight = 600;
+const maxStackHeight = 10000;
 const maxStackWidth = maxStackHeight;
 const minStackHeight = 300;
 const minStackWidth = minStackHeight;
@@ -133,13 +135,15 @@ export function getStackDimensions(props: {
     return dimensions;
   }
 
-  return getExampleStackDimensions({
+  dimensions = getExampleStackDimensions({
     physicalSize: props.physicalSize,
     stackHeight: Math.max(
       Math.min(props.availableHeight, maxStackHeight),
       minStackHeight,
     ),
   });
+
+  return dimensions;
 }
 
 export function getShuffleStyle(props: {

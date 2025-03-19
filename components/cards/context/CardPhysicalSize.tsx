@@ -12,6 +12,7 @@ import cardDimensions, {
 import { useAppSelector } from "@/store/hooks";
 import { selectCardSize } from "@/store/combinedSelectors/cards";
 import { NullBehaviour } from "../types";
+import { useCardTarget } from "@/utils/cardTarget";
 
 export type { CardPhysicalSize };
 
@@ -34,11 +35,13 @@ const Context = React.createContext<ContextState | null>(null);
 
 function _useCardsPhysicalSize({
   physicalSize: physicalSizeProp,
-  target,
+  target: targetProp,
   sizePreset: sizePresetProp,
 }: Omit<UseCardsPhysicalSizeProps, "debugLocation">):
   | CardPhysicalSize
   | undefined {
+  const target = useCardTarget({ target: targetProp });
+
   const sizePreset =
     useAppSelector((state) =>
       target ? selectCardSize(state, target) : undefined,

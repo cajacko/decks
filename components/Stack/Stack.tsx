@@ -9,9 +9,15 @@ import styles, { getShuffleStyle } from "./stack.style";
 import useStack from "./useStack";
 import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
 import StackListItem from "@/components/StackListItem";
+import { Target } from "@/utils/cardTarget";
 
 export default function Stack(props: StackProps): React.ReactNode {
   const dimensions = useTabletopContext();
+
+  const target = React.useMemo(
+    (): Target => ({ id: dimensions.deckId, type: "deck-defaults" }),
+    [dimensions.deckId],
+  );
 
   const {
     cardInstancesIds,
@@ -81,7 +87,7 @@ export default function Stack(props: StackProps): React.ReactNode {
       <Animated.View style={innerStyle}>
         {cardInstances && (
           <View style={styles.cardInstances}>
-            <CardSpacer />
+            <CardSpacer target={target} />
             {cardInstances}
           </View>
         )}

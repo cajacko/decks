@@ -3,7 +3,6 @@ import UIAnimatedCardSides, {
   AnimatedCardSidesRef,
   AnimatedCardSidesProps as UIAnimatedCardSidesProps,
 } from "@/components/cards/ui/AnimatedCardSides";
-import { CardPhysicalSizeProvider } from "../context/CardPhysicalSize";
 import { useCardProps } from "@/components/cards/connected/Card";
 import { AnimatedCardProps } from "@/components/cards/connected/AnimatedCard";
 import { Cards } from "@/store/types";
@@ -22,18 +21,13 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
     const back = useCardProps({ ...props, style: cardStyle, side: "back" });
 
     return (
-      <CardPhysicalSizeProvider
-        target={props.target}
-        debugLocation={AnimatedCardSides.name}
-      >
-        <UIAnimatedCardSides
-          ref={ref}
-          side={side}
-          back={back}
-          front={front}
-          style={style}
-        />
-      </CardPhysicalSizeProvider>
+      <UIAnimatedCardSides
+        ref={ref}
+        side={side}
+        back={back}
+        front={front}
+        style={style}
+      />
     );
   },
 );

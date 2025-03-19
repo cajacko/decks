@@ -41,7 +41,8 @@ export default function EditCard({
   ...props
 }: EditCardProps) {
   const height = useHeight();
-  const { maxHeight, onContainerLayout } = useMaxHeight();
+  const { maxHeight, onContainerLayout, containerHeight, containerWidth } =
+    useMaxHeight();
 
   const bottomDrawer = React.useRef<BottomDrawerRef>(null);
 
@@ -70,8 +71,8 @@ export default function EditCard({
 
   return (
     <TabletopCardSizeProvider
-      availableHeight={Dimensions.get("window").height}
-      availableWidth={Dimensions.get("window").width}
+      availableHeight={containerHeight ?? Dimensions.get("window").height}
+      availableWidth={containerWidth ?? Dimensions.get("window").width}
       target={props.target}
     >
       <EditCardProvider onChangeSide={setSide} side={side} {...props}>

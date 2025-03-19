@@ -119,7 +119,7 @@ export function getCardScaleFromConstraints(props: {
 function useScaleFromConstraints({
   constraints: constraintsProp,
   ...props
-}: UseScaleFromConstraintsProps): Scale {
+}: UseScaleFromConstraintsProps): Scale | null {
   const constraints = useCardSizeConstraints(constraintsProp);
   const physicalSize = useCardsPhysicalSize({
     debugLocation: useScaleFromConstraints.name,
@@ -129,19 +129,13 @@ function useScaleFromConstraints({
   return React.useMemo(() => {
     const scale = getCardScaleFromConstraints({ constraints, physicalSize });
 
-    if (!scale) {
-      new AppError(
-        "Could not determine scale from constraints and physical size",
-      ).log("warn");
-    }
-
-    return scale ?? defaultScale;
+    return scale;
   }, [constraints, physicalSize]);
 }
 
 export function useMmToDp({ scale, ...props }: UseMmToDpProps = {}): MmToDp {
-  const constraintsScale = useScaleFromConstraints(props);
   const context = React.useContext(Context);
+  const constraintsScale = useScaleFromConstraints(props);
 
   return React.useMemo<MmToDp>((): MmToDp => {
     // Most specific, we passed something to use
@@ -154,9 +148,20 @@ export function useMmToDp({ scale, ...props }: UseMmToDpProps = {}): MmToDp {
       return withMmToDp(context);
     }
 
-    // NOTE: We always have values for these, even if they are defaults, the other hooks handle
-    // logging that
-    return withMmToDp(constraintsScale);
+    if (constraintsScale) {
+      return withMmToDp(constraintsScale);
+    }
+
+    new AppError(
+      `${useMmToDp.name} could not find a scale from props of context, using default`,
+      {
+        scale,
+        context,
+        constraintsScale,
+      },
+    ).log("warn");
+
+    return withMmToDp(defaultScale);
   }, [scale, context, constraintsScale]);
 }
 

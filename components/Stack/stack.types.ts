@@ -20,7 +20,5 @@ export type StackDimensions = {
   stackHorizontalPadding: number;
   stackVerticalPadding: number;
   spaceBetweenStacks: number;
-  cardHeight: number;
-  cardWidth: number;
   scale: Scale;
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, ViewStyle, ScrollView, View } from "react-native";
 import { useAppDispatch } from "@/store/hooks";
 import IconButton from "./IconButton";
-import { useRouter, Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import DecksToolbar from "@/components/DecksToolbar";
@@ -31,14 +31,6 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
     () => [styles.container, props.style],
     [props.style],
   );
-
-  // return (
-  //   <View style={{ backgroundColor: "red", flex: 1 }}>
-  //     <Link href="/deck/123" style={{ fontSize: 40 }}>
-  //       Link
-  //     </Link>
-  //   </View>
-  // );
 
   return (
     <>

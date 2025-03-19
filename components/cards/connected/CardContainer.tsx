@@ -1,26 +1,25 @@
 import React from "react";
-import { useMmToDp, UseMmToDpProps } from "../context/PhysicalMeasures";
+import { useMmToDp } from "../context/PhysicalMeasures";
 import UICardContainer, {
   CardContainerProps as UICardContainerProps,
   CardSize,
 } from "../ui/CardContainer";
+import { useCardsPhysicalSize } from "../context/CardPhysicalSize";
 import {
-  useCardsPhysicalSize,
-  UseCardsPhysicalSizeProps,
-} from "../context/CardPhysicalSize";
-import { CardPhysicalSizeProvider } from "../context/CardPhysicalSize";
+  withCardTargetProvider,
+  Target,
+} from "@/components/cards/context/CardTarget";
 
-export interface UseCardContainerSizeProps
-  extends UseMmToDpProps,
-    UseCardsPhysicalSizeProps {
+export interface UseCardContainerSizeProps {
   // If you're passing a size prop, don't use the connected card
   // size?: CardSize;
   shadow?: boolean;
+  target: Target;
 }
 
 export interface CardContainerProps
   extends Partial<Omit<UICardContainerProps, "shadow">>,
-    Omit<UseCardContainerSizeProps, "debugLocation"> {}
+    UseCardContainerSizeProps {}
 
 const boxShadowConfig = {
   min: 1,
@@ -29,10 +28,14 @@ const boxShadowConfig = {
 
 export function useCardContainerSizeProps({
   shadow = true,
-  ...props
+  target,
 }: UseCardContainerSizeProps): CardSize {
-  const { mmBorderRadius, mmHeight, mmWidth } = useCardsPhysicalSize(props);
-  const mmToDp = useMmToDp(props);
+  const { mmBorderRadius, mmHeight, mmWidth } = useCardsPhysicalSize({
+    debugLocation: useCardContainerSizeProps.name,
+    target,
+  });
+
+  const mmToDp = useMmToDp();
 
   return React.useMemo<CardSize>(
     () => ({
@@ -51,29 +54,17 @@ export function useCardContainerSizeProps({
   );
 }
 
-export default function CardContainer({
-  physicalSize,
-  sizePreset,
+function CardContainer({
   shadow,
   target,
   ...props
 }: CardContainerProps): React.ReactNode {
   const cardSize = useCardContainerSizeProps({
-    physicalSize,
-    sizePreset,
     shadow,
     target,
-    debugLocation: CardContainer.name,
   });
 
-  return (
-    <CardPhysicalSizeProvider
-      physicalSize={physicalSize}
-      target={target}
-      sizePreset={sizePreset}
-      debugLocation={CardContainer.name}
-    >
-      <UICardContainer {...cardSize} {...props} />
-    </CardPhysicalSizeProvider>
-  );
+  return <UICardContainer {...cardSize} {...props} />;
 }
+
+export default withCardTargetProvider(CardContainer);

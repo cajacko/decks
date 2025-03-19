@@ -3,14 +3,13 @@ import { Dimensions } from "react-native";
 import { StackDimensions } from "@/components/Stack/stack.types";
 import { getStackDimensions } from "@/components/Stack/stack.style";
 import AppError from "@/classes/AppError";
-import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
 import { PhysicalMeasuresProvider } from "../cards/context/PhysicalMeasures";
-import {
-  CardPhysicalSizeProvider,
-  useCardsPhysicalSize,
-} from "@/components/cards/context/CardPhysicalSize";
+import { useCardsPhysicalSize } from "@/components/cards/context/CardPhysicalSize";
 import { defaultCardDimensions } from "@/constants/cardDimensions";
-import { Target } from "@/utils/cardTarget";
+import {
+  Target,
+  CardTargetProvider,
+} from "@/components/cards/context/CardTarget";
 
 export type TabletopContextProps = StackDimensions & {
   tabletopId: string;
@@ -82,8 +81,6 @@ export function TabletopProvider({
     [availableHeight, availableWidth, physicalSize],
   );
 
-  console.log(stackDimensions);
-
   const value = React.useMemo(
     () => ({
       ...stackDimensions,
@@ -95,9 +92,11 @@ export function TabletopProvider({
 
   return (
     <Context.Provider value={value}>
-      <PhysicalMeasuresProvider {...stackDimensions.scale}>
-        {children}
-      </PhysicalMeasuresProvider>
+      <CardTargetProvider target={target}>
+        <PhysicalMeasuresProvider {...stackDimensions.scale}>
+          {children}
+        </PhysicalMeasuresProvider>
+      </CardTargetProvider>
     </Context.Provider>
   );
 }

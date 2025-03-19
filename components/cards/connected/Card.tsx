@@ -1,6 +1,5 @@
 import React from "react";
 import UICard, { CardProps as UICardProps } from "@/components/cards/ui/Card";
-import { Target } from "@/utils/cardTarget";
 import {
   useCardContainerSizeProps,
   UseCardContainerSizeProps,
@@ -16,10 +15,12 @@ import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { createCachedSelector } from "re-reselect";
 import { RootState } from "@/store/store";
 import { Cards } from "@/store/types";
-import { CardPhysicalSizeProvider } from "../context/CardPhysicalSize";
+import {
+  withCardTargetProvider,
+  Target,
+} from "@/components/cards/context/CardTarget";
 
-export interface ConnectedCardProps
-  extends Pick<UseCardContainerSizeProps, "shadow"> {
+export interface ConnectedCardProps extends UseCardContainerSizeProps {
   target: Target;
   side: Cards.Side;
   values?: UICardProps["values"];
@@ -56,9 +57,8 @@ export function useCardProps<P extends Partial<UICardProps>>({
   ...uiCardProps
 }: ConnectedCardProps & Omit<P, "shadow">): UICardProps {
   const cardSize = useCardContainerSizeProps({
-    target,
     shadow,
-    debugLocation: useCardProps.name,
+    target,
   });
 
   const deckValues = useAppSelector((state) => selectDeckValues(state, target));
@@ -86,12 +86,10 @@ export function useCardProps<P extends Partial<UICardProps>>({
   };
 }
 
-export default function Card(props: CardProps): React.ReactNode {
+function Card(props: CardProps): React.ReactNode {
   const uiCardProps = useCardProps(props);
 
-  return (
-    <CardPhysicalSizeProvider target={props.target} debugLocation={Card.name}>
-      <UICard {...uiCardProps} />
-    </CardPhysicalSizeProvider>
-  );
+  return <UICard {...uiCardProps} />;
 }
+
+export default withCardTargetProvider(Card);

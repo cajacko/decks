@@ -15,6 +15,7 @@ import { newDeckCardTarget } from "@/constants/newDeckData";
 import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
+import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 
 export interface DeckListItemProps {
   deckId: string | null;
@@ -70,13 +71,15 @@ export default function DeckListItem(
   );
 
   return (
-    <CardConstraintsProvider {...styles.cardConstraints}>
-      <View style={containerStyle}>
-        <Pressable style={styles.cards} onPress={onPress}>
-          <CardSideBySide topSide="back" target={target} />
-        </Pressable>
-      </View>
-    </CardConstraintsProvider>
+    <CardTargetProvider target={target}>
+      <CardConstraintsProvider {...styles.cardConstraints}>
+        <View style={containerStyle}>
+          <Pressable style={styles.cards} onPress={onPress}>
+            <CardSideBySide topSide="back" target={target} />
+          </Pressable>
+        </View>
+      </CardConstraintsProvider>
+    </CardTargetProvider>
   );
 }
 

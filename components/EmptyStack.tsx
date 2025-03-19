@@ -6,6 +6,8 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import CardContainer, {
   CardContainerProps,
 } from "@/components/cards/connected/CardContainer";
+import { useTabletopContext } from "./Tabletop/Tabletop.context";
+import { Target } from "@/utils/cardTarget";
 
 export type EmptyStackProps = {
   style?: CardContainerProps["style"];
@@ -19,11 +21,17 @@ export default function EmptyStack({
   buttonTitle,
 }: EmptyStackProps): React.ReactNode {
   const borderColor = useThemeColor("emptyStackBorder");
+  const { deckId } = useTabletopContext();
+  const target = React.useMemo(
+    (): Target => ({ id: deckId, type: "deck-defaults" }),
+    [deckId],
+  );
 
   return (
     <CardContainer
       style={StyleSheet.flatten([styles.container, { borderColor }, style])}
       shadow={false}
+      target={target}
     >
       {buttonAction && buttonTitle && (
         <Button
