@@ -7,7 +7,6 @@ import { useNavigation } from "expo-router";
 import TextureBackground from "@/components/TextureBackground";
 import Screen from "@/components/Screen";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
-import { View } from "react-native";
 
 export default function DeckTabletopScreen() {
   const navigation = useNavigation();
@@ -16,8 +15,6 @@ export default function DeckTabletopScreen() {
   const defaultTabletopId = useAppSelector((state) =>
     deckId ? selectDeck(state, { deckId })?.defaultTabletopId : undefined,
   );
-
-  // return <View style={{ backgroundColor: "red", flex: 1 }} />;
 
   if (!defaultTabletopId || !deckId) {
     if (navigation.isFocused()) {

@@ -4,8 +4,9 @@ import {
   View,
   ViewStyle,
   FlatList,
-  Dimensions,
   FlatListProps,
+  ViewProps,
+  Platform,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectCanEditDeck, selectDeckCards } from "@/store/slices/decks";
@@ -18,7 +19,7 @@ import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/Loader";
 import { CardConstraintsProvider } from "./cards/context/CardSizeConstraints";
-import ContentWidth, { contentMaxWidth } from "@/components/ContentWidth";
+import ContentWidth from "@/components/ContentWidth";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -33,10 +34,69 @@ type FlatListData = null | {
 const keyExtractor: FlatListProps<FlatListData>["keyExtractor"] = (item) =>
   item?.cardId ?? "null";
 
+const cardWidth = 100;
+const minCardHorizontalMargin = 10;
 const initialRows = 4;
 
+function useDeckCardListProps(): {
+  onLayout: ViewProps["onLayout"];
+  cardListProps: null | {
+    cardWidth: number;
+    flatList: Pick<
+      FlatListProps<FlatListData>,
+      | "numColumns"
+      | "getItemLayout"
+      | "initialNumToRender"
+      | "windowSize"
+      | "maxToRenderPerBatch"
+      | "removeClippedSubviews"
+    >;
+  };
+} {
+  const [contentWidth, setContentWidth] = React.useState<number | null>(null);
+
+  const onLayout = React.useCallback<NonNullable<ViewProps["onLayout"]>>(
+    (event) => {
+      setContentWidth(event.nativeEvent.layout.width);
+    },
+    [],
+  );
+
+  if (contentWidth === null) {
+    return {
+      onLayout,
+      cardListProps: null,
+    };
+  }
+
+  const numColumns = Math.floor(
+    contentWidth / (cardWidth + minCardHorizontalMargin),
+  );
+
+  return {
+    // We can't dynamically update the number of columns
+    // based on the width of the container, so we don't need to
+    // update the layout
+    onLayout: undefined,
+    cardListProps: {
+      cardWidth,
+      flatList: {
+        numColumns,
+        windowSize: 5,
+        maxToRenderPerBatch: numColumns * 2,
+        initialNumToRender: numColumns * initialRows,
+        // TODO: Can calculate this once and improve performance
+        // getItemLayout={(data, index) => ({
+        //   length: ITEM_HEIGHT,
+        //   offset: ITEM_HEIGHT * index,
+        //   index,
+        // })}
+      },
+    },
+  };
+}
+
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
-  const skeleton = useScreenSkeleton(DeckScreen.name);
   const canEditDeck = useAppSelector((state) =>
     selectCanEditDeck(state, { deckId: props.deckId }),
   );
@@ -46,14 +106,9 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     screen: "deck",
   });
 
-  const numColumns = React.useRef(
-    Math.max(
-      Math.round(
-        Math.min(Dimensions.get("window").width, contentMaxWidth) / 160,
-      ),
-      2,
-    ),
-  );
+  const { onLayout, cardListProps } = useDeckCardListProps();
+
+  const skeleton = useScreenSkeleton(DeckScreen.name) && cardListProps !== null;
 
   const cardsState = useAppSelector((state) =>
     selectDeckCards(state, { deckId: props.deckId }),
@@ -104,42 +159,43 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   }, [open, props.deckId]);
 
   return (
-    <CardConstraintsProvider {...styles.constraints}>
+    <>
       <DeckToolbar deckId={props.deckId} />
-      <ContentWidth style={containerStyle}>
-        {component}
-        <FlatList<FlatListData>
-          data={cards}
-          numColumns={numColumns.current}
-          initialNumToRender={numColumns.current * initialRows}
-          columnWrapperStyle={styles.columnWrapperStyle}
-          windowSize={5}
-          maxToRenderPerBatch={numColumns.current * 2}
-          removeClippedSubviews={true}
-          ListHeaderComponent={
-            <>
-              <DeckDetails deckId={props.deckId} skeleton={skeleton} />
-              {skeleton && (
-                <View style={styles.loader}>
-                  <Loader />
-                </View>
-              )}
-            </>
-          }
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          // TODO: Can calculate this once and improve performance
-          // getItemLayout={(data, index) => ({
-          //   length: ITEM_HEIGHT,
-          //   offset: ITEM_HEIGHT * index,
-          //   index,
-          // })}
-        />
+      <ContentWidth
+        style={containerStyle}
+        contentContainerStyle={styles.container}
+      >
+        <View style={styles.inner} onLayout={onLayout}>
+          {component}
+          {cardListProps && (
+            <CardConstraintsProvider width={cardListProps.cardWidth}>
+              <FlatList<FlatListData>
+                {...cardListProps.flatList}
+                data={cards}
+                columnWrapperStyle={styles.columnWrapperStyle}
+                style={styles.scroll}
+                showsVerticalScrollIndicator={Platform.OS !== "web"}
+                ListHeaderComponent={
+                  <>
+                    <DeckDetails deckId={props.deckId} skeleton={skeleton} />
+                    {skeleton && (
+                      <View style={styles.loader}>
+                        <Loader />
+                      </View>
+                    )}
+                  </>
+                }
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
+              />
+            </CardConstraintsProvider>
+          )}
+        </View>
       </ContentWidth>
       {canEditDeck && (
         <IconButton icon="add" onPress={addNew} style={styles.button} />
       )}
-    </CardConstraintsProvider>
+    </>
   );
 }
 
@@ -150,6 +206,14 @@ const styles = StyleSheet.create({
   },
   container: {
     position: "relative",
+    flex: 1,
+  },
+  scroll: {
+    // flex: 1,
+    maxHeight: "100%",
+  },
+  inner: {
+    flex: 1,
   },
   columnWrapperStyle: {},
   item: {
@@ -157,10 +221,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
-  },
-  constraints: {
-    maxWidth: Dimensions.get("window").width / 3 - 20,
-    maxHeight: 200,
   },
   button: {
     flex: 1,

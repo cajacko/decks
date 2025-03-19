@@ -36,20 +36,22 @@ type WithMmToDp = (scale: Scale) => (
 export const withMmToDp: WithMmToDp =
   (scale) =>
   (mm, options = {}) => {
+    const { max, min, roundToNumberOfDecimals = 1 } = options;
+
     let value = (mm / scale.mmDistance) * scale.dpDistance;
 
-    if (options?.roundToNumberOfDecimals) {
+    if (roundToNumberOfDecimals) {
       value =
-        Math.round(value * 10 ** options.roundToNumberOfDecimals) /
-        10 ** options.roundToNumberOfDecimals;
+        Math.round(value * 10 ** roundToNumberOfDecimals) /
+        10 ** roundToNumberOfDecimals;
     }
 
-    if (options?.min) {
-      value = Math.max(value, options.min);
+    if (min) {
+      value = Math.max(value, min);
     }
 
-    if (options?.max) {
-      value = Math.min(value, options.max);
+    if (max) {
+      value = Math.min(value, max);
     }
 
     return value;

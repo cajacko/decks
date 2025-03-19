@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  Pressable,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
@@ -15,7 +9,6 @@ import ThemedText from "./ThemedText";
 import IconButton from "./IconButton";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 import ContentWidth from "@/components/ContentWidth";
 
@@ -67,56 +60,50 @@ export default function ExpandedDeckListItem(
 
   return (
     <CardTargetProvider target={coverTarget}>
-      <CardConstraintsProvider {...styles.cardConstraints}>
-        <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
-          <Pressable onPress={play} style={styles.cards}>
-            <CardSideBySide topSide="front" target={coverTarget} />
-          </Pressable>
-          <View style={styles.details}>
-            <View style={styles.text}>
-              {name && (
-                <ThemedText type="h3" style={styles.title}>
-                  {name}
-                </ThemedText>
-              )}
-              {description && (
-                <ThemedText type="body1" numberOfLines={4}>
-                  {description}
-                </ThemedText>
-              )}
-            </View>
-            <View style={styles.actions}>
-              <IconButton
-                icon="remove-red-eye"
-                onPress={view}
-                size={iconSize}
-                variant="transparent"
-              />
-              <IconButton
-                icon="play-arrow"
-                onPress={play}
-                size={iconSize}
-                variant="transparent"
-              />
-              <IconButton
-                icon="content-copy"
-                size={iconSize}
-                onPress={copyDeck}
-                variant="transparent"
-              />
-            </View>
+      <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
+        <Pressable onPress={play} style={styles.cards}>
+          <CardSideBySide topSide="front" target={coverTarget} />
+        </Pressable>
+        <View style={styles.details}>
+          <View style={styles.text}>
+            {name && (
+              <ThemedText type="h3" style={styles.title}>
+                {name}
+              </ThemedText>
+            )}
+            {description && (
+              <ThemedText type="body1" numberOfLines={4}>
+                {description}
+              </ThemedText>
+            )}
           </View>
-        </ContentWidth>
-      </CardConstraintsProvider>
+          <View style={styles.actions}>
+            <IconButton
+              icon="remove-red-eye"
+              onPress={view}
+              size={iconSize}
+              variant="transparent"
+            />
+            <IconButton
+              icon="play-arrow"
+              onPress={play}
+              size={iconSize}
+              variant="transparent"
+            />
+            <IconButton
+              icon="content-copy"
+              size={iconSize}
+              onPress={copyDeck}
+              variant="transparent"
+            />
+          </View>
+        </View>
+      </ContentWidth>
     </CardTargetProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  cardConstraints: {
-    maxHeight: Math.min(200, Dimensions.get("window").height / 3),
-    maxWidth: Dimensions.get("window").width - 30,
-  },
   container: {
     flex: 1,
     flexDirection: "row",

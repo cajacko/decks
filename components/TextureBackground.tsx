@@ -1,7 +1,6 @@
 import React from "react";
 import { View, ViewStyle, StyleSheet } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
-import { fixed } from "@/constants/colors";
 import uuid from "@/utils/uuid";
 import { useThemeColors } from "@/hooks/useThemeColor";
 

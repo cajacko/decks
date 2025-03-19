@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  Pressable,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckCards, selectDeckLastScreen } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
@@ -14,7 +8,6 @@ import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import { newDeckCardTarget } from "@/constants/newDeckData";
 import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
-import { CardConstraintsProvider } from "@/components/cards/context/CardSizeConstraints";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 
 export interface DeckListItemProps {
@@ -72,22 +65,16 @@ export default function DeckListItem(
 
   return (
     <CardTargetProvider target={target}>
-      <CardConstraintsProvider {...styles.cardConstraints}>
-        <View style={containerStyle}>
-          <Pressable style={styles.cards} onPress={onPress}>
-            <CardSideBySide topSide="back" target={target} />
-          </Pressable>
-        </View>
-      </CardConstraintsProvider>
+      <View style={containerStyle}>
+        <Pressable style={styles.cards} onPress={onPress}>
+          <CardSideBySide topSide="back" target={target} />
+        </Pressable>
+      </View>
     </CardTargetProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  cardConstraints: {
-    maxHeight: Math.min(200, Dimensions.get("window").height / 3),
-    maxWidth: Dimensions.get("window").width - 30,
-  },
   container: {
     flex: 1,
     maxWidth: 300,

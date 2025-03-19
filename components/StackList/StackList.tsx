@@ -63,5 +63,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     alignItems: "center",
+    minWidth: "100%",
+    justifyContent: "center",
   },
 });
