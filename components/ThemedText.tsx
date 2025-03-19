@@ -71,33 +71,40 @@ export const styles = StyleSheet.create({
   body1: {
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: "Roboto, sans-serif",
   },
   body2: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: "Roboto, sans-serif",
   },
   h1: {
     fontSize: 30,
     fontWeight: "normal",
+    fontFamily: "Roboto, sans-serif",
   },
   h2: {
     fontSize: 24,
     lineHeight: 28,
     fontWeight: "normal",
+    fontFamily: "Roboto, sans-serif",
   },
   h3: {
     fontSize: 20,
     lineHeight: 24,
     fontWeight: "normal",
+    fontFamily: "Roboto, sans-serif",
   },
   h4: {
     fontSize: 18,
     lineHeight: 20,
     fontWeight: "normal",
+    fontFamily: "Roboto, sans-serif",
   },
   button: {
     lineHeight: 30,
     fontSize: 16,
     textTransform: "uppercase",
+    fontFamily: "Roboto, sans-serif",
   },
 });

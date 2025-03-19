@@ -16,7 +16,8 @@ import { ModalProvider } from "@/context/Modal";
 import { navigationColors } from "@/constants/colors";
 import { navigationFonts } from "@/components/ThemedText";
 import { enableFreeze } from "react-native-screens";
-import { AbrilFatface_400Regular } from "@expo-google-fonts/abril-fatface";
+import { LuckiestGuy_400Regular } from "@expo-google-fonts/luckiest-guy";
+import { Roboto_400Regular } from "@expo-google-fonts/roboto";
 import { DrawerProvider } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
 import { useHasRehydrated } from "@/store/hooks";
@@ -57,7 +58,8 @@ function HasStore({ children }: { children: React.ReactNode }) {
   const navigationTheme = useNavigationTheme();
   const [loadedFonts] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    Zain: AbrilFatface_400Regular,
+    Roboto: Roboto_400Regular,
+    LuckiestGuy: LuckiestGuy_400Regular,
   });
 
   const [isStoreReady, setIsStoreReady] = React.useState(false);

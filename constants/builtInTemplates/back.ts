@@ -100,7 +100,7 @@ const template: Templates.Props<DataId> = {
             textAlign: "center",
             zIndex: 2,
             position: "relative",
-            fontFamily: "Zain",
+            fontFamily: "LuckiestGuy",
           },
         },
         {

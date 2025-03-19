@@ -878,10 +878,15 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.57.1.tgz#de633db3ec2ef6a3c89e2f19038063e8a122e2c2"
   integrity sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==
 
-"@expo-google-fonts/abril-fatface@^0.2.3":
+"@expo-google-fonts/luckiest-guy@^0.2.3":
   version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@expo-google-fonts/abril-fatface/-/abril-fatface-0.2.3.tgz#242096ecfec0d9e5a569d41adb3bcdec33fa94bd"
-  integrity sha512-MDvetAkmAQ9p+DbYP6LbEeykR1fNYwMWfyLqxwj7Ver7+jf9Pe3eQ0RBBcMI8gXmozsvjHmiA1l8ym6cw5ILrQ==
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/luckiest-guy/-/luckiest-guy-0.2.3.tgz#4a4387bb795257a86e5daf7308346dc3a503b840"
+  integrity sha512-+TRPvSEfbvA100BTD9yCJML4i+o2xjNhLCu7U6B/nSQ0J6JuKwqY4iNhwW+gVo8i9iSSfvP/BEQCEmY2PcQVNg==
+
+"@expo-google-fonts/roboto@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/roboto/-/roboto-0.2.3.tgz#c103422a3c8f461aaada33acaf06418f6650dc19"
+  integrity sha512-PF6S//ZYWeXfpYTwvY2oEe0d5RnqwR5KMsGjuTgg6y9p/CPK/IkWL+wsbkzjfd+Jck1Q1pRlWOoe5uz42sQFRg==
 
 "@expo/bunyan@^4.0.0":
   version "4.0.1"
