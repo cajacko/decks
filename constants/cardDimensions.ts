@@ -1,5 +1,10 @@
-import { CardMMDimensions } from "@/components/Card/Card.types";
 import { Cards } from "@/store/types";
+
+export interface CardPhysicalSize {
+  mmHeight: number;
+  mmWidth: number;
+  mmBorderRadius: number;
+}
 
 const cardDimensions = {
   [Cards.Size.Poker]: {
@@ -7,8 +12,10 @@ const cardDimensions = {
     mmHeight: 88.9,
     mmWidth: 63.5,
   },
-} satisfies Record<Cards.Size, CardMMDimensions>;
+} satisfies Record<Cards.Size, CardPhysicalSize>;
 
-export const defaultCardDimensions = cardDimensions[Cards.Size.Poker];
+export const defaultCardSize = Cards.Size.Poker;
+
+export const defaultCardDimensions = cardDimensions[defaultCardSize];
 
 export default cardDimensions;

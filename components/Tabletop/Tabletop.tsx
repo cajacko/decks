@@ -8,7 +8,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { DeckTabletopProvider } from "@/context/Deck";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import useEnsureTabletop from "@/hooks/useEnsureTabletop";
@@ -16,6 +15,8 @@ import useFlag from "@/hooks/useFlag";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectTabletopNeedsResetting } from "@/store/combinedSelectors/tabletops";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
+import { TabletopProvider } from "./Tabletop.context";
+import { Target } from "@/utils/cardTarget";
 
 export default function Tabletop({
   tabletopId,
@@ -78,7 +79,7 @@ export default function Tabletop({
       // Prevents us updating when the keyboard comes into view, which we don't want. Maybe there's
       // a better solution for this, that then allows window changes as well?
       if (hasLayout.current) {
-        return;
+        // return;
       }
 
       hasLayout.current = true;
@@ -95,18 +96,24 @@ export default function Tabletop({
     [animatedStyle],
   );
 
+  const target = React.useMemo(
+    (): Target => ({ id: deckId, type: "deck-defaults" }),
+    [deckId],
+  );
+
   return (
-    <DeckTabletopProvider
+    <TabletopProvider
       availableHeight={size.height}
       availableWidth={size.width}
       tabletopId={tabletopId}
       deckId={deckId}
+      target={target}
     >
       <TabletopToolbar tabletopId={tabletopId} deckId={deckId} />
       <Animated.View style={contentStyle} onLayout={handleLayout}>
         {!skeleton && <StackList skeleton={skeleton} />}
       </Animated.View>
-    </DeckTabletopProvider>
+    </TabletopProvider>
   );
 }
 

@@ -17,6 +17,7 @@ import Animated, {
   withSequence,
 } from "react-native-reanimated";
 import useFlag from "@/hooks/useFlag";
+import ContentWidth from "./ContentWidth";
 
 export type EditCardFormProps = Target & {
   flipSide: () => void;
@@ -98,7 +99,7 @@ export default function EditCardForm({
   );
 
   return (
-    <View style={styles.container}>
+    <ContentWidth padding="standard" contentContainerStyle={styles.container}>
       {component}
       <View style={styles.buttonContainer}>
         <IconButton
@@ -142,13 +143,13 @@ export default function EditCardForm({
           title={!!frontTemplate ? text["card.templates.back.title"] : null}
         />
       )}
-    </View>
+    </ContentWidth>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    paddingVertical: 20,
   },
   buttonContainer: {
     marginBottom: 20,

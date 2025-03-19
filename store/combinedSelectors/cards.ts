@@ -172,3 +172,13 @@ export const selectCanEditCard = (state: RootState, props: CardIdProps) =>
   selectCard(state, props)?.canEdit ??
   selectDeckByCard(state, props)?.canEdit ??
   false;
+
+export const selectCardSize = (state: RootState, props: Target) => {
+  const deckSize = selectDeck(state, props)?.cardSize;
+
+  if (props.type === "card") {
+    return selectCard(state, { cardId: props.id })?.size ?? deckSize;
+  }
+
+  return deckSize;
+};

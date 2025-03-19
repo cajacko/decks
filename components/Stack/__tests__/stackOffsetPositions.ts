@@ -1,4 +1,4 @@
-import { OffsetPosition } from "@/components/Card/Card.types";
+import { OffsetPosition } from "@/components/cards/ui/AnimatedCard/AnimatedCard.types";
 import {
   getOffsetPosition,
   withStackOffsetPositions,

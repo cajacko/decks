@@ -1,4 +1,4 @@
-import { CardInstanceProps } from "@/components/CardInstance";
+import { CardInstanceProps } from "@/components/cards/connected/CardInstance";
 
 export interface StackTopCardProps extends CardInstanceProps {
   stackId: string;

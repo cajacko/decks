@@ -33,8 +33,6 @@ export const flagRelationships: FlagRelationships = {
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   SKELETON_LOADER: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ? "enabled" : value,
-  NAVIGATION_TAB_ANIMATIONS: (value, getFlag) =>
-    getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   NAVIGATION_STACK_ANIMATIONS: (value, getFlag) =>
     getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   SCREEN_ANIMATIONS: (value, getValue) => {

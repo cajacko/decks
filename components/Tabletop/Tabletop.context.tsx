@@ -2,9 +2,14 @@ import React, { createContext } from "react";
 import { Dimensions } from "react-native";
 import { StackDimensions } from "@/components/Stack/stack.types";
 import { getStackDimensions } from "@/components/Stack/stack.style";
-import { CardMMDimensions } from "@/components/Card/Card.types";
 import AppError from "@/classes/AppError";
-import { defaultCardDimensions } from "@/components/Card/cardSizes";
+import { PhysicalMeasuresProvider } from "../cards/context/PhysicalMeasures";
+import { useCardsPhysicalSize } from "@/components/cards/context/CardPhysicalSize";
+import { defaultCardDimensions } from "@/constants/cardDimensions";
+import {
+  Target,
+  CardTargetProvider,
+} from "@/components/cards/context/CardTarget";
 
 export type TabletopContextProps = StackDimensions & {
   tabletopId: string;
@@ -32,7 +37,7 @@ export function useTabletopContext(): TabletopContextProps {
       ...getStackDimensions({
         availableHeight: dimensions.height,
         availableWidth: dimensions.width,
-        cardProportions: defaultCardDimensions,
+        physicalSize: defaultCardDimensions,
       }),
       tabletopId: "",
       deckId: "",
@@ -45,14 +50,12 @@ export function useOptionalTabletopContext(): TabletopContextProps | undefined {
 }
 
 export interface TabletopProviderProps {
-  children:
-    | React.ReactNode
-    | ((context: TabletopContextProps) => React.ReactNode);
   availableHeight: number;
   availableWidth: number;
+  children: React.ReactNode;
   tabletopId: string;
-  cardProportions: CardMMDimensions;
   deckId: string;
+  target: Target;
 }
 
 export function TabletopProvider({
@@ -60,26 +63,54 @@ export function TabletopProvider({
   availableHeight,
   availableWidth,
   tabletopId,
-  cardProportions,
   deckId,
+  target,
 }: TabletopProviderProps) {
-  const value = React.useMemo(
-    () => ({
-      ...getStackDimensions({
+  const physicalSize = useCardsPhysicalSize({
+    target,
+    debugLocation: TabletopProvider.name,
+  });
+
+  const stackDimensions = React.useMemo(
+    () =>
+      getStackDimensions({
         availableHeight,
         availableWidth,
-        cardProportions,
+        physicalSize,
       }),
+    [availableHeight, availableWidth, physicalSize],
+  );
+
+  const value = React.useMemo(
+    () => ({
+      ...stackDimensions,
       tabletopId,
       deckId,
     }),
-    [availableHeight, availableWidth, tabletopId, cardProportions, deckId],
+    [stackDimensions, tabletopId, deckId],
   );
 
-  const child = React.useMemo(
-    () => (typeof children === "function" ? children(value) : children),
-    [children, value],
+  return (
+    <Context.Provider value={value}>
+      <CardTargetProvider target={target}>
+        <PhysicalMeasuresProvider {...stackDimensions.scale}>
+          {children}
+        </PhysicalMeasuresProvider>
+      </CardTargetProvider>
+    </Context.Provider>
   );
+}
 
-  return <Context.Provider value={value}>{child}</Context.Provider>;
+/**
+ * For when you want to use the same card size as being used in the tabletop
+ */
+export function TabletopCardSizeProvider(
+  props: Pick<
+    TabletopProviderProps,
+    "availableHeight" | "availableWidth" | "children" | "target"
+  >,
+) {
+  // We're only using this for the card size so we don't need to worry about the tabletopId or
+  // deckId right now, would be nice to refactor this to be more generic
+  return <TabletopProvider {...props} deckId="" tabletopId="" />;
 }

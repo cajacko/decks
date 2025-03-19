@@ -1,11 +1,35 @@
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { StackDimensions } from "./stack.types";
-import { getCardSizes } from "@/components/Card/cardSizes";
-import { CardSizeProps, CardMMDimensions } from "@/components/Card/Card.types";
+import { CardPhysicalSize } from "../cards/context/CardPhysicalSize";
+import { Scale } from "../cards/context/PhysicalMeasures";
+
+function getSizesFromWidth(dpWidth: number, physicalSize: CardPhysicalSize) {
+  const { mmHeight, mmWidth } = physicalSize;
+  const dpHeight = (mmHeight / mmWidth) * dpWidth;
+
+  return {
+    dpHeight,
+    dpWidth,
+    mmHeight,
+    mmWidth,
+  };
+}
+
+function getSizesFromHeight(dpHeight: number, physicalSize: CardPhysicalSize) {
+  const { mmHeight, mmWidth } = physicalSize;
+  const dpWidth = (mmWidth / mmHeight) * dpHeight;
+
+  return {
+    dpHeight,
+    dpWidth,
+    mmHeight,
+    mmWidth,
+  };
+}
 
 function getExampleStackDimensions(
   props: ({ stackWidth: number } | { stackHeight: number }) & {
-    cardProportions: CardMMDimensions;
+    physicalSize: CardPhysicalSize;
   },
 ): StackDimensions {
   const buttonSize = Math.min(
@@ -16,10 +40,10 @@ function getExampleStackDimensions(
         ? Math.round(props.stackWidth / 4.9)
         : Math.round(props.stackHeight / 6.4),
       // This is our minimum size for making it easy for the users
-      60,
+      40,
     ),
     // Never show buttons bigger than this, it looks silly
-    100,
+    80,
   );
 
   // The buttons are the closest things together, so base the space between stacks on them
@@ -30,11 +54,12 @@ function getExampleStackDimensions(
   // Card actions are half on/ half off the card
   const stackHorizontalPadding = Math.round(buttonSize / 2);
   // The shuffle/ stack actions are a bit further out than card actions (but only vertically)
-  const stackVerticalPadding = Math.round((buttonSize * 3) / 2);
+  // Must be more than 1 to allow the shuffle button to be there
+  const stackVerticalPadding = Math.round(buttonSize * 1.25);
 
   let stackWidth: number;
   let stackHeight: number;
-  let cardSizes: CardSizeProps;
+  let scale: Scale;
 
   // When adjusting things in one of these statements it's very important to check the logic on the
   // other side
@@ -46,24 +71,27 @@ function getExampleStackDimensions(
       stackHorizontalPadding * 2 -
       Math.round(spaceBetweenStacks / 2);
 
-    cardSizes = getCardSizes({
-      constraints: { width: cardWidth },
-      proportions: props.cardProportions,
-    });
+    scale = { dpDistance: cardWidth, mmDistance: props.physicalSize.mmWidth };
 
-    stackHeight = cardSizes.dpHeight + stackVerticalPadding * 2;
+    const cardHeight = getSizesFromWidth(
+      cardWidth,
+      props.physicalSize,
+    ).dpHeight;
+
+    stackHeight = cardHeight + stackVerticalPadding * 2;
   } else {
     stackHeight = props.stackHeight;
 
     const cardHeight = stackHeight - stackVerticalPadding * 2;
+    scale = { dpDistance: cardHeight, mmDistance: props.physicalSize.mmHeight };
 
-    cardSizes = getCardSizes({
-      constraints: { height: cardHeight },
-      proportions: props.cardProportions,
-    });
+    const cardWidth = getSizesFromHeight(
+      cardHeight,
+      props.physicalSize,
+    ).dpWidth;
 
     stackWidth =
-      cardSizes.dpWidth +
+      cardWidth +
       stackHorizontalPadding * 2 +
       Math.round(spaceBetweenStacks / 2);
   }
@@ -75,14 +103,14 @@ function getExampleStackDimensions(
     stackVerticalPadding,
     stackHeight,
     stackWidth,
-    cardSizes,
+    scale,
   };
 }
 
-export const maxStackWidth = 500;
-const minStackWidth = 300;
-export const maxStackHeight = 800;
-const minStackHeight = 500;
+const maxStackHeight = 700;
+const maxStackWidth = maxStackHeight;
+const minStackHeight = 300;
+const minStackWidth = minStackHeight;
 
 // Get dimensions at 100% availableWidth or the max width (whichever is smaller)
 // if the stack height is bigger than availableHeight or max height
@@ -91,10 +119,10 @@ const minStackHeight = 500;
 export function getStackDimensions(props: {
   availableWidth: number;
   availableHeight: number;
-  cardProportions: CardMMDimensions;
+  physicalSize: CardPhysicalSize;
 }): StackDimensions {
   let dimensions = getExampleStackDimensions({
-    cardProportions: props.cardProportions,
+    physicalSize: props.physicalSize,
     stackWidth: Math.max(
       Math.min(props.availableWidth, maxStackWidth),
       minStackWidth,
@@ -108,13 +136,15 @@ export function getStackDimensions(props: {
     return dimensions;
   }
 
-  return getExampleStackDimensions({
-    cardProportions: props.cardProportions,
+  dimensions = getExampleStackDimensions({
+    physicalSize: props.physicalSize,
     stackHeight: Math.max(
       Math.min(props.availableHeight, maxStackHeight),
       minStackHeight,
     ),
   });
+
+  return dimensions;
 }
 
 export function getShuffleStyle(props: {
@@ -124,9 +154,6 @@ export function getShuffleStyle(props: {
     styles.shuffleContainer,
     {
       zIndex: 1,
-      bottom: (-props.buttonSize * 3) / 2,
-      left: 0,
-      right: 0,
       alignItems: "center",
     },
   ]);
@@ -135,6 +162,7 @@ export function getShuffleStyle(props: {
 const styles = StyleSheet.create({
   container: {
     position: "relative",
+    height: "100%",
   },
   inner: {
     zIndex: 2,
@@ -147,8 +175,10 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   shuffleContainer: {
-    position: "absolute",
     opacity: 0.5,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   shuffleButton: {},
   card: {

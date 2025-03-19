@@ -1,8 +1,7 @@
 import React from "react";
 import { Tabletops } from "@/store/types";
 import { StyleSheet } from "react-native";
-import { CardProps } from "@/components/Card";
-import CardInstance from "@/components/CardInstance";
+import CardInstance from "@/components/cards/connected/CardInstance";
 import StackTopCard from "@/components/StackTopCard";
 
 export interface StackListItemProps {
@@ -20,14 +19,6 @@ export default function StackListItem(
   props: StackListItemProps,
 ): React.ReactNode {
   const { cardInstanceId, zIndex, isTopCard, cardOffsetPosition } = props;
-
-  const cardProps = React.useMemo(
-    (): CardProps => ({
-      offsetPosition: cardOffsetPosition,
-      zIndex,
-    }),
-    [cardOffsetPosition, zIndex],
-  );
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.card, { zIndex }]),
@@ -48,7 +39,7 @@ export default function StackListItem(
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}
         canMoveToBottom={props.canMoveToBottom}
-        CardProps={cardProps}
+        offsetPosition={cardOffsetPosition}
       />
     );
   }
@@ -58,7 +49,7 @@ export default function StackListItem(
       style={style}
       key={cardInstanceId}
       cardInstanceId={cardInstanceId}
-      CardProps={cardProps}
+      offsetPosition={cardOffsetPosition}
     />
   );
 }

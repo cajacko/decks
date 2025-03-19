@@ -1,12 +1,12 @@
 import React from "react";
-import { CardRef } from "@/components/Card";
-import { CardSidesRef } from "./CardSides.types";
+import { AnimatedCardRef } from "@/components/cards/connected/AnimatedCard";
+import { AnimatedCardSidesRef } from "./AnimatedCardSides.types";
 import { Cards } from "@/store/types";
 import useFlag from "@/hooks/useFlag";
 
-export default function useCardSides(
+export default function useAnimatedAnimatedSides(
   sideProp: Cards.Side,
-  ref: React.Ref<CardSidesRef>,
+  ref: React.Ref<AnimatedCardSidesRef>,
 ) {
   const animateCards = useFlag("CARD_ANIMATIONS") === "enabled";
 
@@ -23,8 +23,8 @@ export default function useCardSides(
   const side = React.useRef(sideProp);
   side.current = sideProp;
 
-  const faceUpRef = React.useRef<CardRef>(null);
-  const faceDownRef = React.useRef<CardRef>(null);
+  const faceUpRef = React.useRef<AnimatedCardRef>(null);
+  const faceDownRef = React.useRef<AnimatedCardRef>(null);
 
   // We can set flip state to null after we've flipped and the card instance prop has been set to
   // the correct size. If we don't update the component prop then we may get into a bit of a funky

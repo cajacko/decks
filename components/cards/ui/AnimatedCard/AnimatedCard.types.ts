@@ -1,6 +1,8 @@
-import React from "react";
+// import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { AnimatedStyle } from "react-native-reanimated";
+import { CardProps } from "@/components/cards/ui/Card";
+import { UseMmToDpProps } from "@/components/cards/context/PhysicalMeasures";
 
 export type OffsetPosition = null | {
   x: number | null;
@@ -8,16 +10,20 @@ export type OffsetPosition = null | {
   rotate: number | null;
 };
 
-export type AnimatedViewStyle = AnimatedStyle<ViewStyle>;
-
 export type RequiredRefObject<T> = { current: T };
 
-export interface CardProps extends Partial<CardSizeContextProps> {
-  style?: StyleProp<ViewStyle>;
-  innerStyle?: StyleProp<ViewStyle>;
-  children?: React.ReactNode;
+// "height"
+// | "width"
+// | "offsetPosition"
+// | "initialRotation"
+// | "initialScaleX"
+// | "onAnimationChange"
+
+export interface AnimatedCardProps
+  extends Omit<CardProps, "style">,
+    UseMmToDpProps {
+  style?: StyleProp<AnimatedStyle<ViewStyle>>;
   onAnimationChange?: (isAnimating: boolean) => void;
-  hidden?: boolean;
   /**
    * We take this and map to a specific slight difference in x/y and rotate position to make cards
    * in a stack to look more natural and not perfectly aligned. We do it here so we can more
@@ -28,13 +34,17 @@ export interface CardProps extends Partial<CardSizeContextProps> {
    * locations. Wrap in views if something needs to do a completely new type of transform
    */
   offsetPosition?: number;
-  zIndex?: number;
   initialRotation?: number;
   initialScaleX?: number;
-  overlay?: React.ReactNode;
-  opacity?: number;
-  transform?: ViewStyle["transform"];
-  ref?: React.Ref<CardRef>;
+  cardStyle?: CardProps["style"];
+
+  // innerStyle?: StyleProp<ViewStyle>;
+  // hidden?: boolean;
+  // zIndex?: number;
+  // overlay?: React.ReactNode;
+  // opacity?: number;
+  // transform?: ViewStyle["transform"];
+  // ref?: React.Ref<AnimatedCardRef>;
 }
 
 export interface AnimateOutProps {
@@ -44,7 +54,7 @@ export interface AnimateOutProps {
   animateBack?: () => Promise<void>;
 }
 
-export interface CardRef {
+export interface AnimatedCardRef {
   getIsAnimating: () => boolean;
   animateFlipOut: () => Promise<unknown>;
   animateFlipIn: () => Promise<unknown>;
@@ -52,34 +62,3 @@ export interface CardRef {
 }
 
 export type AnimationUpdate = (key: string, isAnimating: boolean) => void;
-
-export interface CardMMDimensions {
-  mmWidth: number;
-  mmHeight: number;
-  mmBorderRadius: number;
-}
-
-export type CardSize =
-  | { height: number; width: number }
-  | { cardHeight: number; cardWidth: number };
-
-export type CardSizeProps = {
-  dpBorderRadius: number;
-  dpHeight: number;
-  dpWidth: number;
-  mmHeight: number;
-  mmWidth: number;
-  mmBorderRadius: number;
-};
-
-export type CardSizeConstraints = {
-  height?: number;
-  width?: number;
-  maxHeight?: number;
-  maxWidth?: number;
-};
-
-export type CardSizeContextProps = {
-  proportions: CardMMDimensions;
-  constraints: CardSizeConstraints;
-};

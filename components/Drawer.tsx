@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
+import { StyleSheet, ScrollView, View, Pressable } from "react-native";
 import ThemedView from "./ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppSelector } from "@/store/hooks";
@@ -21,9 +21,6 @@ export interface DrawerProps {
   tabletopId?: string | null;
   isOpen?: boolean;
   closeDrawer: () => void;
-  // stackId?: string | null;
-  // cardId?: string | null;
-  // cardInstanceId?: string | null;
 }
 
 type Collapsed = {
@@ -113,23 +110,23 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
               </FieldSet>
             </View>
             <Link href="https://www.dex.playface.fun" asChild>
-              <TouchableOpacity>
+              <Pressable>
                 <Image
                   style={styles.logo}
                   source={textLogo}
                   contentFit="contain"
                 />
-              </TouchableOpacity>
+              </Pressable>
             </Link>
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
-            <Link href="https://www.playface.fun" asChild>
-              <TouchableOpacity>
+            <Link href="https://www.playface.fun" target="_blank" asChild>
+              <Pressable>
                 <Image
                   style={styles.playface}
                   source={require("../assets/images/playface-circle-logo-text-right.png")}
                   contentFit="contain"
                 />
-              </TouchableOpacity>
+              </Pressable>
             </Link>
             <Version />
           </View>
