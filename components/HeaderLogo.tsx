@@ -2,6 +2,7 @@ import React from "react";
 import { Image } from "expo-image";
 import { Platform, StyleSheet, View } from "react-native";
 import { useTextLogo } from "@/hooks/useLogo";
+import ThemedText from "./ThemedText";
 
 export default function HeaderLogo(): React.ReactNode {
   const logo = useTextLogo();
@@ -27,7 +28,13 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     width: "100%",
-    marginLeft: Platform.OS === "web" ? -30 : 60,
-    transform: [{ scale: Platform.OS === "web" ? 0.8 : 1.7 }],
+    marginLeft: Platform.select({
+      web: -30,
+      android: 60,
+    }),
+    transform: Platform.select({
+      web: [{ scale: 0.8 }],
+      android: [{ scale: 1.7 }],
+    }),
   },
 });
