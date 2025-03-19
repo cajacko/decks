@@ -1,21 +1,16 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  Pressable,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
-import CardSideBySide from "./CardSideBySide";
-import { DeckCardSizeProvider } from "@/context/Deck";
+import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import ThemedText from "./ThemedText";
 import IconButton from "./IconButton";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
+import { CardTargetProvider } from "@/components/cards/context/CardTarget";
+import ContentWidth from "@/components/ContentWidth";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -64,18 +59,10 @@ export default function ExpandedDeckListItem(
   }, [dispatch, props.deckId, navigate]);
 
   return (
-    <DeckCardSizeProvider
-      id={props.deckId}
-      idType="deck"
-      constraints={styles.cardConstraints}
-    >
-      <View style={containerStyle}>
+    <CardTargetProvider target={coverTarget}>
+      <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
         <Pressable onPress={play} style={styles.cards}>
-          <CardSideBySide
-            skeleton={props.skeleton}
-            topSide="front"
-            {...coverTarget}
-          />
+          <CardSideBySide topSide="front" target={coverTarget} />
         </Pressable>
         <View style={styles.details}>
           <View style={styles.text}>
@@ -111,16 +98,12 @@ export default function ExpandedDeckListItem(
             />
           </View>
         </View>
-      </View>
-    </DeckCardSizeProvider>
+      </ContentWidth>
+    </CardTargetProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  cardConstraints: {
-    maxHeight: Math.min(200, Dimensions.get("window").height / 3),
-    maxWidth: Dimensions.get("window").width - 30,
-  },
   container: {
     flex: 1,
     flexDirection: "row",

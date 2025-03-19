@@ -108,6 +108,7 @@ export default function registerExampleDecks() {
       const cardInstanceId = ids.cardInstanceId(cardId);
 
       const card: Cards.Props = {
+        size: null,
         cardId,
         canEdit: false,
         deckId,

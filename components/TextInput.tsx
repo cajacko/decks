@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Platform,
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
   StyleSheet,
@@ -38,6 +39,7 @@ export default function TextInput({
   variant = "outline",
   rightAdornment,
   textInputStyle: textInputStyleProp,
+  multiline,
   ...props
 }: TextInputProps) {
   const placeholderColor = useThemeColor("placeholder");
@@ -46,21 +48,28 @@ export default function TextInput({
   const [value, setValue] = React.useState(valueProp);
 
   const style = React.useMemo(
-    () => [
-      styles.container,
-      styles[variant],
-      textStyle,
-      variant === "outline" && { borderColor },
-      styleProp,
-    ],
-    [styleProp, textStyle, variant, borderColor],
+    () =>
+      StyleSheet.flatten([
+        styles.container,
+        styles[variant],
+        variant === "outline" && { borderColor },
+        styleProp,
+      ]),
+    [styleProp, variant, borderColor],
   );
 
   const inputVariant: `${Variant}Input` = `${variant}Input`;
 
   const textInputStyle = React.useMemo(
-    () => [textStyle, styles.input, styles[inputVariant], textInputStyleProp],
-    [textInputStyleProp, inputVariant, textStyle],
+    () =>
+      StyleSheet.flatten([
+        textStyle,
+        styles.input,
+        styles[inputVariant],
+        textInputStyleProp,
+        !multiline && Platform.OS === "ios" && { lineHeight: "normal" },
+      ]),
+    [textInputStyleProp, inputVariant, textStyle, multiline],
   );
 
   const onChangeText = React.useCallback(
@@ -82,6 +91,7 @@ export default function TextInput({
     <View style={style}>
       <RNTextInput
         {...props}
+        multiline={multiline}
         style={textInputStyle}
         value={value ?? ""}
         onChangeText={onChangeText}

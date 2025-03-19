@@ -25,8 +25,9 @@ const getAppName = () => {
     return "Dex (Preview)";
   }
 
+  // 30 chars for iOS
   // Dex: Play, Discover & Create Card Games
-  return "Dex: Play, Discover & Create Card Games";
+  return "Dex: Play & Create Card Games";
 };
 
 // Ensures works on dev client and standalone
@@ -60,6 +61,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier: getUniqueIdentifier(),
     // associatedDomains: [`applinks:${domain}`],
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
+    },
+    config: {},
   },
   android: {
     // versionCode // TODO: Auto increment

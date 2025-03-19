@@ -1,6 +1,6 @@
 import { StyleProp, ViewStyle } from "react-native";
 import { StackListRef } from "@/components/StackList/StackList.types";
-import { CardSizeProps } from "@/components/Card/Card.types";
+import { Scale } from "../cards/context/PhysicalMeasures";
 
 export interface StackProps {
   stackId: string;
@@ -20,5 +20,5 @@ export type StackDimensions = {
   stackHorizontalPadding: number;
   stackVerticalPadding: number;
   spaceBetweenStacks: number;
-  cardSizes: CardSizeProps;
+  scale: Scale;
 };

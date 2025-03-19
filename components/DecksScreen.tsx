@@ -1,19 +1,38 @@
 import React from "react";
-import { StyleSheet, ViewStyle, ScrollView, View } from "react-native";
+import { StyleSheet, ViewStyle, ScrollView } from "react-native";
 import { useAppDispatch } from "@/store/hooks";
 import IconButton from "./IconButton";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import DecksToolbar from "@/components/DecksToolbar";
-import MyDecks from "./MyDecks";
-import PreBuiltDecks from "./PreBuiltDecks";
+import MyDecks from "@/components/MyDecks";
+import PreBuiltDecks from "@/components/PreBuiltDecks";
+import useDeviceSize from "@/hooks/useDeviceSize";
+import { CardConstraintsProvider } from "./cards/context/CardSizeConstraints";
+
+const minCardListWidth = 100;
+const maxCardListWidth = 150;
+
+function useCardListWidth(): number {
+  const { width } = useDeviceSize({ listenTo: { width: true, height: false } });
+
+  const idealWidth = width / 3;
+
+  if (idealWidth > maxCardListWidth) {
+    return maxCardListWidth;
+  }
+
+  if (idealWidth < minCardListWidth) {
+    return minCardListWidth;
+  }
+
+  return idealWidth;
+}
 
 export interface DecksScreenProps {
   style?: ViewStyle;
 }
-
-export const maxWidth = 1000;
 
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const { navigate } = useRouter();
@@ -32,17 +51,17 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
     [props.style],
   );
 
+  const cardWidth = useCardListWidth();
+
   return (
-    <>
+    <CardConstraintsProvider width={cardWidth}>
       <DecksToolbar />
       <ScrollView style={containerStyle}>
         <MyDecks style={styles.myDecks} />
-        <View style={styles.preBuiltContainer}>
-          <PreBuiltDecks style={styles.preBuiltDecks} />
-        </View>
+        <PreBuiltDecks style={styles.preBuiltDecks} />
       </ScrollView>
       <IconButton icon="add" onPress={createDeck} style={styles.action} />
-    </>
+    </CardConstraintsProvider>
   );
 }
 
@@ -55,11 +74,6 @@ const styles = StyleSheet.create({
   },
   myDecks: {
     marginTop: 20,
-  },
-  preBuiltContainer: {
-    maxWidth: maxWidth,
-    width: "100%",
-    alignItems: "center",
   },
   preBuiltDecks: {
     marginTop: 20,

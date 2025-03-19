@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, ViewStyle, View } from "react-native";
-import CardSide from "@/components/CardSide";
+import Card from "@/components/cards/connected/Card";
 import { Target } from "@/utils/cardTarget";
 import { selectCanEditCard } from "@/store/combinedSelectors/cards";
 import { useAppSelector } from "@/store/hooks";
@@ -30,7 +30,7 @@ export default function DeckCard({
         : false,
   );
 
-  const cardSide = <CardSide {...target} side="front" skeleton={skeleton} />;
+  const cardSide = <Card target={target} side="front" skeleton={skeleton} />;
 
   const open = React.useCallback(() => editCard(target), [editCard, target]);
 

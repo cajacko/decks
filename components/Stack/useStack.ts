@@ -15,7 +15,7 @@ import {
 } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
 import useFlag from "@/hooks/useFlag";
-import useOffsetPositions from "@/components/Card/useOffsetPositions";
+import useOffsetPositions from "@/components/cards/ui/AnimatedCard/useOffsetPositions";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/tabletops";
 import text from "@/constants/text";

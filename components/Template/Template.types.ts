@@ -15,10 +15,6 @@ export interface MarkupChildrenProps {
   cacheKey: string;
 }
 
-export type DeckValues = null | {
-  name: string;
-};
-
 export type Values = {
   [Key: string]: string | number | boolean | undefined | null | Values;
 };

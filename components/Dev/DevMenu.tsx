@@ -9,9 +9,7 @@ import { useRouter } from "expo-router";
 import exampleDecks from "@/constants/exampleDecks";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import * as DevClient from "expo-dev-client";
-import Collapsible from "../Collapsible";
 import * as Haptics from "expo-haptics";
-import Field from "@/components/Field";
 
 export interface DevMenuProps extends FieldSetProps {
   closeDrawer: () => void;

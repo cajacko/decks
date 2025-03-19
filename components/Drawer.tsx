@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Pressable,
+  Platform,
+} from "react-native";
 import ThemedView from "./ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppSelector } from "@/store/hooks";
@@ -12,7 +18,7 @@ import FieldSet from "./FieldSet";
 import SettingsTabletop from "./SettingsTabletop";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { ExternalPathString, Link } from "expo-router";
 import ThemedText from "./ThemedText";
 import text from "@/constants/text";
 
@@ -21,9 +27,6 @@ export interface DrawerProps {
   tabletopId?: string | null;
   isOpen?: boolean;
   closeDrawer: () => void;
-  // stackId?: string | null;
-  // cardId?: string | null;
-  // cardInstanceId?: string | null;
 }
 
 type Collapsed = {
@@ -59,6 +62,12 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
 
     setCollapsed(initialCollapsed);
   }, [initialCollapsed]);
+
+  const dexWebLink: ExternalPathString | null = Platform.select({
+    ios: "https://www.playface.fun/s/dexwebios",
+    android: "https://www.playface.fun/s/dexwebandroid",
+    default: null,
+  });
 
   return (
     <ScrollView
@@ -112,24 +121,34 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 )}
               </FieldSet>
             </View>
-            <Link href="https://www.dex.playface.fun" asChild>
-              <TouchableOpacity>
-                <Image
-                  style={styles.logo}
-                  source={textLogo}
-                  contentFit="contain"
-                />
-              </TouchableOpacity>
-            </Link>
+            {dexWebLink && (
+              <Link href={dexWebLink} asChild>
+                <Pressable>
+                  <Image
+                    style={styles.logo}
+                    source={textLogo}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              </Link>
+            )}
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
-            <Link href="https://www.playface.fun" asChild>
-              <TouchableOpacity>
+            <Link
+              href={Platform.select({
+                ios: "https://www.playface.fun/s/065ad6ab",
+                android: "https://www.playface.fun/s/ff5a0418",
+                default: "https://www.playface.fun/s/103404f4",
+              })}
+              target="_blank"
+              asChild
+            >
+              <Pressable>
                 <Image
                   style={styles.playface}
                   source={require("../assets/images/playface-circle-logo-text-right.png")}
                   contentFit="contain"
                 />
-              </TouchableOpacity>
+              </Pressable>
             </Link>
             <Version />
           </View>
