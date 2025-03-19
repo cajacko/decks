@@ -35,7 +35,8 @@
     "production": {
       "ios": {
         "appleId": "cajacko@icloud.com",
-        "appleTeamId": "Y7FZ2VUQ32"
+        "appleTeamId": "Y7FZ2VUQ32",
+        "ascAppId": "6743489300"
       }
     }
   }
