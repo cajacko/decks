@@ -62,59 +62,63 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
       {props.children && (
         <Animated.View style={childrenStyle}>{props.children}</Animated.View>
       )}
-      {props.menuItems.top && (
-        <MenuItem
-          {...props.menuItems.top}
-          tapGesture={state.menuTaps.top}
-          position="top"
-          style={menuItemStyle}
-          isHighlighted={state.highlightedPosition === "top"}
-        />
-      )}
-      {props.menuItems.bottom && (
-        <MenuItem
-          {...props.menuItems.bottom}
-          tapGesture={state.menuTaps.bottom}
-          position="bottom"
-          style={menuItemStyle}
-          isHighlighted={state.highlightedPosition === "bottom"}
-        />
-      )}
-      {props.menuItems.left && (
-        <MenuItem
-          {...props.menuItems.left}
-          tapGesture={state.menuTaps.left}
-          position="left"
-          style={menuItemStyle}
-          isHighlighted={state.highlightedPosition === "left"}
-        />
-      )}
-      {props.menuItems.right && (
-        <MenuItem
-          {...props.menuItems.right}
-          tapGesture={state.menuTaps.right}
-          position="right"
-          style={menuItemStyle}
-          isHighlighted={state.highlightedPosition === "right"}
-        />
-      )}
-
-      {state.devIndicator && (
+      {!props.hideActions && (
         <>
-          <Animated.View
-            style={[
-              styles.devIndicator,
-              styles.devIndicatorStart,
-              devIndicatorStartStyle,
-            ]}
-          />
-          <Animated.View
-            style={[
-              styles.devIndicator,
-              styles.devIndicatorEnd,
-              devIndicatorEndStyle,
-            ]}
-          />
+          {props.menuItems.top && (
+            <MenuItem
+              {...props.menuItems.top}
+              tapGesture={state.menuTaps.top}
+              position="top"
+              style={menuItemStyle}
+              isHighlighted={state.highlightedPosition === "top"}
+            />
+          )}
+          {props.menuItems.bottom && (
+            <MenuItem
+              {...props.menuItems.bottom}
+              tapGesture={state.menuTaps.bottom}
+              position="bottom"
+              style={menuItemStyle}
+              isHighlighted={state.highlightedPosition === "bottom"}
+            />
+          )}
+          {props.menuItems.left && (
+            <MenuItem
+              {...props.menuItems.left}
+              tapGesture={state.menuTaps.left}
+              position="left"
+              style={menuItemStyle}
+              isHighlighted={state.highlightedPosition === "left"}
+            />
+          )}
+          {props.menuItems.right && (
+            <MenuItem
+              {...props.menuItems.right}
+              tapGesture={state.menuTaps.right}
+              position="right"
+              style={menuItemStyle}
+              isHighlighted={state.highlightedPosition === "right"}
+            />
+          )}
+
+          {state.devIndicator && (
+            <>
+              <Animated.View
+                style={[
+                  styles.devIndicator,
+                  styles.devIndicatorStart,
+                  devIndicatorStartStyle,
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.devIndicator,
+                  styles.devIndicatorEnd,
+                  devIndicatorEndStyle,
+                ]}
+              />
+            </>
+          )}
         </>
       )}
     </Animated.View>
