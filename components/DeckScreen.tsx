@@ -144,6 +144,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
         quantity={item?.quantity}
         skeleton={skeleton}
         editCard={open}
+        deckId={props.deckId}
       />
     ),
     [skeleton, props.deckId, open],

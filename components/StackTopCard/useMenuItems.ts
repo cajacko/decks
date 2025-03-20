@@ -6,12 +6,16 @@ import { selectCanEditCard } from "@/store/combinedSelectors/cards";
 import { useAppSelector } from "@/store/hooks";
 import { MenuItems, MenuItem } from "../HoldMenu";
 import withHoldMenuItem from "./withHoldMenuItem";
+import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
   const canEditCard = useAppSelector((_state) =>
     selectCanEditCard(_state, { cardId: state.cardId }),
   );
+  const { open: openCopyAlert, component: copyAlert } = useCopyToEditAlert({
+    deckId: state.deckId,
+  });
   const { buttonSize } = useTabletopContext();
   const [showEditModal, setShowEditModal] = React.useState(false);
 
@@ -65,13 +69,13 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.moveLeft,
   ]);
 
-  const handlePress = React.useMemo(() => {
-    if (!canEditCard) return undefined;
-
-    return () => {
+  const handlePress = React.useCallback(() => {
+    if (canEditCard) {
       setShowEditModal(true);
-    };
-  }, [canEditCard, setShowEditModal]);
+    } else {
+      openCopyAlert();
+    }
+  }, [canEditCard, setShowEditModal, openCopyAlert]);
 
   return {
     cardId: state.cardId,
@@ -84,5 +88,6 @@ export default function useMenuItems(props: StackTopCardProps) {
     side: state.side,
     handlePress,
     animatedToBack: state.animatedToBack,
+    copyAlert,
   };
 }

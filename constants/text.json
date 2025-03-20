@@ -14,6 +14,8 @@
   "deck.actions.play": "Play",
   "deck.copied.append": " (Copy)",
   "deck.copy.title": "Copy/ Edit Deck",
+  "deck.copy_alert.message": "You need to copy this deck to edit it. This will create a new deck in \"My Decks\" with the same cards and settings.",
+  "deck.copy_alert.button": "Copy Deck",
   "deck.delete.message": "Are you sure you want to delete this deck? If you delete this deck, all cards in this deck will be deleted as well.",
   "deck.delete.title": "Delete Deck",
   "deck.edit.description.placeholder": "Description",

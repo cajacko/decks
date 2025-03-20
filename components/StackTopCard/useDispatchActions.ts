@@ -19,7 +19,7 @@ export default function useDispatchActions({
   leftStackId,
   rightStackId,
 }: StackTopCardProps) {
-  const { tabletopId } = useTabletopContext();
+  const { tabletopId, deckId } = useTabletopContext();
 
   const animateSendToBack = useFlag("CARD_ANIMATE_SEND_TO_BACK") === "enabled";
   const [animatedToBack, setAnimatedToBack] = React.useState<string | null>(
@@ -199,6 +199,7 @@ export default function useDispatchActions({
   ]);
 
   return {
+    deckId,
     side,
     tabletopId,
     cardId,
