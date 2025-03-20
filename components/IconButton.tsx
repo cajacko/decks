@@ -16,10 +16,12 @@ export interface IconButtonProps extends TouchableOpacityProps {
   variant?: "filled" | "transparent";
 }
 
+const defaultSize = 80;
+
 export default function IconButton({
   icon,
   style: styleProp,
-  size = 80,
+  size = defaultSize,
   variant = "filled",
   ...props
 }: IconButtonProps): React.ReactNode {
@@ -51,10 +53,23 @@ export default function IconButton({
   );
 }
 
-const styles = StyleSheet.create({
+const floatingButtonOffset = 20;
+
+export function getFloatingButtonVerticalAllowance({
+  size = defaultSize,
+}: Pick<IconButtonProps, "size"> = {}): number {
+  return size + floatingButtonOffset * 2;
+}
+
+export const styles = StyleSheet.create({
   filled: {
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+  },
+  floating: {
+    position: "absolute",
+    bottom: floatingButtonOffset,
+    right: floatingButtonOffset,
   },
 });

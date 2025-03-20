@@ -1,7 +1,10 @@
 import React from "react";
 import { StyleSheet, ViewStyle, ScrollView } from "react-native";
 import { useAppDispatch } from "@/store/hooks";
-import IconButton from "./IconButton";
+import IconButton, {
+  getFloatingButtonVerticalAllowance,
+  styles as iconButtonStyles,
+} from "./IconButton";
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
@@ -56,11 +59,18 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   return (
     <CardConstraintsProvider width={cardWidth}>
       <DecksToolbar />
-      <ScrollView style={containerStyle}>
+      <ScrollView
+        style={containerStyle}
+        contentContainerStyle={styles.contentContainerStyle}
+      >
         <MyDecks style={styles.myDecks} />
         <PreBuiltDecks style={styles.preBuiltDecks} />
       </ScrollView>
-      <IconButton icon="add" onPress={createDeck} style={styles.action} />
+      <IconButton
+        icon="add"
+        onPress={createDeck}
+        style={iconButtonStyles.floating}
+      />
     </CardConstraintsProvider>
   );
 }
@@ -72,15 +82,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  contentContainerStyle: {
+    paddingBottom: getFloatingButtonVerticalAllowance(),
+  },
   myDecks: {
     marginTop: 20,
   },
   preBuiltDecks: {
     marginTop: 20,
-  },
-  action: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
   },
 });

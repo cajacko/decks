@@ -14,7 +14,10 @@ import DeckDetails from "@/components/DeckDetails";
 import DeckCard from "./DeckCard";
 import { useEditCardModal } from "./EditCardModal";
 import DeckToolbar from "./DeckToolbar";
-import IconButton from "./IconButton";
+import IconButton, {
+  getFloatingButtonVerticalAllowance,
+  styles as iconButtonStyles,
+} from "./IconButton";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/Loader";
@@ -172,8 +175,8 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
               <FlatList<FlatListData>
                 {...cardListProps.flatList}
                 data={cards}
-                columnWrapperStyle={styles.columnWrapperStyle}
                 style={styles.scroll}
+                contentContainerStyle={styles.contentContainerStyle}
                 showsVerticalScrollIndicator={Platform.OS !== "web"}
                 ListHeaderComponent={
                   <>
@@ -193,7 +196,11 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
         </View>
       </ContentWidth>
       {canEditDeck && (
-        <IconButton icon="add" onPress={addNew} style={styles.button} />
+        <IconButton
+          icon="add"
+          onPress={addNew}
+          style={iconButtonStyles.floating}
+        />
       )}
     </>
   );
@@ -208,25 +215,19 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
   },
+  contentContainerStyle: {
+    paddingBottom: getFloatingButtonVerticalAllowance(),
+  },
   scroll: {
-    // flex: 1,
     maxHeight: "100%",
   },
   inner: {
     flex: 1,
   },
-  columnWrapperStyle: {},
   item: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
-  },
-  button: {
-    flex: 1,
-    paddingHorizontal: 10,
-    position: "absolute",
-    bottom: 20,
-    right: 20,
   },
 });
