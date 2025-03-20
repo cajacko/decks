@@ -50,6 +50,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
             style={styles.action}
             title={text["deck.actions.default"]}
             variant="transparent"
+            vibrate
           />
         </>
       ) : (
@@ -58,6 +59,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
           onPressOut={copyDeck}
           variant="transparent"
           style={styles.action}
+          vibrate
         />
       )}
     </Toolbar>

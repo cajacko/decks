@@ -58,6 +58,7 @@
   "settings.dev_mode.title": "Dev Settings",
   "settings.flags.title": "Dev Flags",
   "settings.hold_menu.always_show": "Always Show Card Actions",
+  "settings.card_actions_haptics": "Enable Vibrations",
   "settings.neat_stack.helper": "Align cards within stacks so you definitely can't see what's behind the first card.",
   "settings.neat_stack": "Neat Stacks",
   "settings.default_face_up_cards": "Default Cards To Face Up",

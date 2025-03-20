@@ -33,6 +33,8 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
   const holdMenuAlwaysVisible =
     useFlag("HOLD_MENU_BEHAVIOUR") === "always-visible";
 
+  const vibrate = useFlag("CARD_ACTIONS_HAPTICS") === "enabled";
+
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
       dispatch(setUserSetting({ key: "theme", value }));
@@ -58,6 +60,18 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         setUserFlag({
           key: "HOLD_MENU_BEHAVIOUR",
           value: value ? "always-visible" : "hold/hover",
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const onChangeVibrate = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setUserFlag({
+          key: "CARD_ACTIONS_HAPTICS",
+          value: value ? "enabled" : "disabled",
         }),
       );
     },
@@ -91,6 +105,11 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         label={text["settings.hold_menu.always_show"]}
         value={holdMenuAlwaysVisible}
         onValueChange={onChangeHoldMenu}
+      />
+      <SwitchField
+        label={text["settings.card_actions_haptics"]}
+        value={vibrate}
+        onValueChange={onChangeVibrate}
       />
     </FieldSet>
   );

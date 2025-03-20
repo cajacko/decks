@@ -67,6 +67,7 @@ export default function SettingsDeck({
           title={text["deck.copy.title"]}
           onPress={copyDeck}
           variant="outline"
+          vibrate
         />
         {canEditDeck && (
           <Button

@@ -8,12 +8,14 @@ import {
 } from "react-native";
 import IconSymbol, { IconSymbolName } from "@/components/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import useVibrate from "@/hooks/useVibrate";
 
 export interface IconButtonProps extends TouchableOpacityProps {
   icon: IconSymbolName;
   style?: StyleProp<ViewStyle>;
   size?: number;
   variant?: "filled" | "transparent";
+  vibrate?: boolean;
 }
 
 const defaultSize = 80;
@@ -23,8 +25,11 @@ export default function IconButton({
   style: styleProp,
   size = defaultSize,
   variant = "filled",
+  vibrate: shouldVibrate = false,
+  onPress: onPressProp,
   ...props
 }: IconButtonProps): React.ReactNode {
+  const { vibrate } = useVibrate();
   const { background, text } = useThemeColors();
 
   const style = React.useMemo(
@@ -42,8 +47,22 @@ export default function IconButton({
     [styleProp, size, background, variant],
   );
 
+  const onPress = React.useMemo<IconButtonProps["onPress"]>(
+    () =>
+      onPressProp
+        ? (event) => {
+            if (shouldVibrate) {
+              vibrate?.(`CardAction (${icon})`);
+            }
+
+            return onPressProp(event);
+          }
+        : undefined,
+    [onPressProp, vibrate, shouldVibrate, icon],
+  );
+
   return (
-    <TouchableOpacity {...props} style={style}>
+    <TouchableOpacity {...props} onPress={onPress} style={style}>
       <IconSymbol
         name={icon}
         color={text}

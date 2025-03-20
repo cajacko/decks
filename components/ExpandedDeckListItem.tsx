@@ -11,6 +11,7 @@ import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 import ContentWidth from "@/components/ContentWidth";
+import useVibrate from "@/hooks/useVibrate";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -23,6 +24,7 @@ const iconSize = 40;
 export default function ExpandedDeckListItem(
   props: ExpandedDeckListItemProps,
 ): React.ReactNode {
+  const { vibrate } = useVibrate();
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
   const firstDeckCardId = useAppSelector(
@@ -58,10 +60,15 @@ export default function ExpandedDeckListItem(
     navigate(`/deck/${newDeckId}`);
   }, [dispatch, props.deckId, navigate]);
 
+  const onPressCards = React.useCallback(() => {
+    vibrate?.("ExpandedDeckListItem");
+    play();
+  }, [play, vibrate]);
+
   return (
     <CardTargetProvider target={coverTarget}>
       <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
-        <Pressable onPress={play} style={styles.cards}>
+        <Pressable onPress={onPressCards} style={styles.cards}>
           <CardSideBySide topSide="front" target={coverTarget} />
         </Pressable>
         <View style={styles.details}>

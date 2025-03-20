@@ -108,6 +108,7 @@ export default function EditCardForm({
           style={styles.iconButton}
           onPress={flipSide}
           variant="transparent"
+          vibrate
         />
         <IconButton
           icon="delete"
@@ -115,6 +116,7 @@ export default function EditCardForm({
           style={styles.iconButton}
           onPress={open}
           variant="transparent"
+          vibrate
         />
         <Animated.View style={saveStyle}>
           <IconButton
@@ -122,6 +124,7 @@ export default function EditCardForm({
             size={iconSize}
             onPress={onSave}
             variant="transparent"
+            vibrate
           />
         </Animated.View>
       </View>

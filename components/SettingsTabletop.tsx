@@ -129,12 +129,14 @@ export default function SettingsTabletop({
             onPress={undo}
             variant="outline"
             style={{ opacity: undo ? 1 : 0.5 }}
+            vibrate
           />
           <Button
             title={text["general.redo"]}
             onPress={redo}
             variant="outline"
             style={{ opacity: redo ? 1 : 0.5 }}
+            vibrate
           />
           <Button
             title={text["tabletop.reset.title"]}

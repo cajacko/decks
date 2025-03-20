@@ -8,6 +8,7 @@ import {
   runOnJS,
 } from "react-native-reanimated";
 import { Gesture } from "react-native-gesture-handler";
+import useVibrate from "@/hooks/useVibrate";
 
 const maxDistanceForTap = 10;
 const minDistanceForDirection = maxDistanceForTap * 4;
@@ -41,23 +42,62 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
   const [highlightedPosition, setHighlightedPosition] =
     React.useState<MenuPosition | null>(null);
 
+  const { clearPendingVibrations, vibrate } = useVibrate();
+
+  const throttledVibrate = React.useCallback(
+    (debugKey: string, delay?: number) => {
+      vibrate?.(debugKey, {
+        delay,
+        throttle: 300,
+      });
+    },
+    [vibrate],
+  );
+
+  const onPress = React.useMemo(
+    () =>
+      handlePress
+        ? () => {
+            throttledVibrate("press");
+            handlePress();
+          }
+        : undefined,
+    [handlePress, throttledVibrate],
+  );
+
+  const onTouch = React.useCallback(
+    () => throttledVibrate("touch", 150),
+    [throttledVibrate],
+  );
+
+  const onHighlight = React.useCallback(
+    (activeDirection: string) =>
+      throttledVibrate(`highlight: ${activeDirection}`),
+    [throttledVibrate],
+  );
+
+  const onAction = React.useCallback(
+    () => throttledVibrate("action"),
+    [throttledVibrate],
+  );
+
   // Gestures
 
   // Run handlePress on tap
   const tap = React.useMemo(
     () =>
       Gesture.Tap()
-        .enabled(!!handlePress)
+        .enabled(!!onPress)
         .maxDuration(maxTimeoutForTap)
         .maxDistance(10000)
         .shouldCancelWhenOutside(false)
         .onEnd(() => {
-          if (!handlePress) return;
+          if (!onPress) return;
 
-          runOnJS(handlePress)();
+          runOnJS(onPress)();
         }),
 
-    [handlePress],
+    [onPress],
   );
 
   // Scale the card up when touching
@@ -71,6 +111,8 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
         isTouching.value = true;
         scaleUpFinished.value = false;
 
+        runOnJS(onTouch)();
+
         scale.value = withTiming(scaleSize, { duration: scaleDuration }, () => {
           scaleUpFinished.value = true;
 
@@ -82,11 +124,23 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
       .onEnd(() => {
         isTouching.value = false;
 
+        if (clearPendingVibrations) {
+          runOnJS(clearPendingVibrations)();
+        }
+
         if (!scaleUpFinished.value) return;
 
         scale.value = withTiming(1, { duration: scaleDuration });
       });
-  }, [holdMenuBehaviour, canAnimateCards, scaleUpFinished, isTouching, scale]);
+  }, [
+    holdMenuBehaviour,
+    canAnimateCards,
+    scaleUpFinished,
+    isTouching,
+    scale,
+    onTouch,
+    clearPendingVibrations,
+  ]);
 
   // Show the menu on hover
   const hover = React.useMemo(
@@ -175,6 +229,14 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
         if (activeDirectionSharedValue.value !== activeDirection) {
           runOnJS(setHighlightedPosition)(activeDirection);
           activeDirectionSharedValue.value = activeDirection;
+
+          if (activeDirection) {
+            const selectedActionItem = menuItems[activeDirection];
+
+            if (selectedActionItem) {
+              runOnJS(onHighlight)(activeDirection);
+            }
+          }
         }
       })
       .onEnd(() => {
@@ -198,6 +260,7 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
         // We have dragged and selected an action, run it
         if (selectedActionItem) {
           runOnJS(selectedActionItem.handleAction)();
+          runOnJS(onAction)();
         }
 
         // Clear up
@@ -213,6 +276,8 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
     devStartIndicator,
     menuOpacity,
     menuItems,
+    onHighlight,
+    onAction,
   ]);
 
   // Defines the priorities of gestures and how they work together
@@ -234,6 +299,7 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
           if (!menuItems.top) return;
 
           runOnJS(menuItems.top.handleAction)();
+          runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
       bottom: Gesture.Tap()
@@ -242,6 +308,7 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
           if (!menuItems.bottom) return;
 
           runOnJS(menuItems.bottom.handleAction)();
+          runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
       left: Gesture.Tap()
@@ -250,6 +317,7 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
           if (!menuItems.left) return;
 
           runOnJS(menuItems.left.handleAction)();
+          runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
       right: Gesture.Tap()
@@ -258,10 +326,11 @@ export default function useHoldMenu({ handlePress, menuItems }: HoldMenuProps) {
           if (!menuItems.right) return;
 
           runOnJS(menuItems.right.handleAction)();
+          runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
     }),
-    [menuItems, gesture],
+    [menuItems, gesture, onAction],
   );
 
   return {

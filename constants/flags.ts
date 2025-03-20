@@ -16,6 +16,8 @@ export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though
 export const flagRelationships: FlagRelationships = {
+  CARD_ACTIONS_HAPTICS: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   STACK_LIST_ITEM_BEHAVIOUR: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ? "top-touchable" : value,
   BOTTOM_DRAWER_ANIMATE: (value, getFlag) =>

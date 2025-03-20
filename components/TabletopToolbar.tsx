@@ -24,6 +24,7 @@ export default function TabletopToolbar(
         variant="transparent"
         onPressOut={undo}
         style={StyleSheet.flatten([styles.action, { opacity: undo ? 1 : 0.5 }])}
+        vibrate
       />
       <IconButton
         icon="redo"
@@ -31,6 +32,7 @@ export default function TabletopToolbar(
         variant="transparent"
         onPressOut={redo}
         style={StyleSheet.flatten([styles.action, { opacity: redo ? 1 : 0.5 }])}
+        vibrate
       />
     </Toolbar>
   );

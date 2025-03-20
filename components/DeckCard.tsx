@@ -6,6 +6,7 @@ import { selectCanEditCard } from "@/store/combinedSelectors/cards";
 import { useAppSelector } from "@/store/hooks";
 import { selectCanEditDeck } from "@/store/slices/decks";
 import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
+import useVibrate from "@/hooks/useVibrate";
 
 export type DeckCardProps = Target & {
   quantity?: number;
@@ -23,6 +24,7 @@ export default function DeckCard({
   editCard,
   deckId,
 }: DeckCardProps): React.ReactNode {
+  const { vibrate } = useVibrate();
   const target = React.useMemo<Target>(() => ({ id, type }), [id, type]);
   const { open: openCopyDeck, component } = useCopyToEditAlert({ deckId });
 
@@ -37,12 +39,14 @@ export default function DeckCard({
   const cardSide = <Card target={target} side="front" skeleton={skeleton} />;
 
   const open = React.useCallback(() => {
+    vibrate?.("DeckCard");
+
     if (canEdit) {
       editCard(target);
     } else {
       openCopyDeck();
     }
-  }, [editCard, target, openCopyDeck, canEdit]);
+  }, [editCard, target, openCopyDeck, canEdit, vibrate]);
 
   return (
     <>

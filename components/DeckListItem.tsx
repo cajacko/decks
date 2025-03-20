@@ -9,6 +9,7 @@ import { newDeckCardTarget } from "@/constants/newDeckData";
 import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
+import useVibrate from "@/hooks/useVibrate";
 
 export interface DeckListItemProps {
   deckId: string | null;
@@ -19,6 +20,7 @@ export interface DeckListItemProps {
 export default function DeckListItem(
   props: DeckListItemProps,
 ): React.ReactNode {
+  const { vibrate } = useVibrate();
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
   const firstDeckCardId = useAppSelector((state) =>
@@ -41,6 +43,8 @@ export default function DeckListItem(
   }, [firstDeckCardId, props.deckId]);
 
   const onPress = React.useCallback(() => {
+    vibrate?.("DeckListItem");
+
     if (!props.deckId) {
       const deckId = uuid();
 
@@ -56,7 +60,7 @@ export default function DeckListItem(
         ? `/deck/${props.deckId}`
         : `/deck/${props.deckId}/play`,
     );
-  }, [props.deckId, navigate, lastScreen, dispatch]);
+  }, [props.deckId, navigate, lastScreen, dispatch, vibrate]);
 
   const containerStyle = React.useMemo(
     () => [styles.container, props.style],

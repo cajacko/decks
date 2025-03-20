@@ -1,6 +1,7 @@
 import React from "react";
 import Alert, { AlertButton } from "@/components/Alert";
 import text from "@/constants/text";
+import useVibrate from "./useVibrate";
 
 export interface UseDeleteWarningProps {
   handleDelete: () => void;
@@ -8,6 +9,7 @@ export interface UseDeleteWarningProps {
   message?: string;
   buttons?: AlertButton[];
   deleteButtonText?: string;
+  vibrate?: boolean;
 }
 
 export default function useDeleteWarning({
@@ -16,7 +18,9 @@ export default function useDeleteWarning({
   message,
   title,
   deleteButtonText,
+  vibrate: shouldVibrate = true,
 }: UseDeleteWarningProps) {
+  const { vibrate } = useVibrate();
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
   const open = React.useCallback(() => {
@@ -33,13 +37,16 @@ export default function useDeleteWarning({
       {
         text: deleteButtonText ?? text["general.delete"],
         onPress: () => {
+          if (shouldVibrate) {
+            vibrate?.(title ?? text["general.delete"]);
+          }
           handleDelete();
           close();
         },
         style: "destructive",
       },
     ],
-    [close, handleDelete, deleteButtonText],
+    [close, handleDelete, deleteButtonText, vibrate, shouldVibrate, title],
   );
 
   return {

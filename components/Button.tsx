@@ -6,11 +6,13 @@ import {
   TouchableOpacityProps,
 } from "react-native";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import useVibrate from "@/hooks/useVibrate";
 
 export interface ButtonProps extends TouchableOpacityProps {
   title: string;
   color?: "primary" | "secondary" | "danger";
   variant?: "filled" | "transparent" | "outline";
+  vibrate?: boolean;
 }
 
 export default function Button({
@@ -18,9 +20,12 @@ export default function Button({
   style,
   color = "primary",
   variant = "filled",
+  vibrate: shouldVibrate = false,
+  onPress: onPressProp,
   ...props
 }: ButtonProps): React.ReactNode {
   const { buttonBackground, buttonText, inputOutline } = useThemeColors();
+  const { vibrate } = useVibrate();
 
   const { button, text } = React.useMemo(
     () => ({
@@ -48,8 +53,22 @@ export default function Button({
     [buttonText, buttonBackground, style, variant, inputOutline],
   );
 
+  const onPress = React.useMemo<ButtonProps["onPress"]>(
+    () =>
+      onPressProp
+        ? (event) => {
+            if (shouldVibrate) {
+              vibrate?.(`Button (${title})`);
+            }
+
+            return onPressProp(event);
+          }
+        : undefined,
+    [onPressProp, vibrate, shouldVibrate, title],
+  );
+
   return (
-    <TouchableOpacity {...props} style={button}>
+    <TouchableOpacity {...props} onPress={onPress} style={button}>
       <ThemedText style={text} type="button">
         {title}
       </ThemedText>

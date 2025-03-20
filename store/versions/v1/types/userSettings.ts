@@ -8,6 +8,7 @@ export const flagMap = {
   // User control flags go here
   PERFORMANCE_MODE: ["disabled", "enabled"],
   HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
+  CARD_ACTIONS_HAPTICS: ["enabled", "disabled"],
 
   // Dev flags
   STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],

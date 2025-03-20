@@ -202,21 +202,25 @@ export default function StackActions({
         title={`Shuffle ${selectedStackName}`}
         variant="outline"
         onPress={shuffle}
+        vibrate
       />
       <Button
         title={`Reverse ${selectedStackName}`}
         variant="outline"
         onPress={reverseStack}
+        vibrate
       />
       <Button
         title={`Flip ${selectedStackName} Face Down`}
         variant="outline"
         onPress={flipFaceDown}
+        vibrate
       />
       <Button
         title={`Flip ${selectedStackName} Face Up`}
         variant="outline"
         onPress={flipFaceDownUp}
+        vibrate
       />
 
       <FieldSet
@@ -260,6 +264,7 @@ export default function StackActions({
             title={`Move ${selectedStackName} on top of ${selectedMoveToStackName}`}
             variant="outline"
             onPress={moveTop}
+            vibrate
           />
         </Field>
         <Field
@@ -273,6 +278,7 @@ export default function StackActions({
             title={`Move ${selectedStackName} below ${selectedMoveToStackName}`}
             variant="outline"
             onPress={moveBottom}
+            vibrate
           />
         </Field>
       </FieldSet>
