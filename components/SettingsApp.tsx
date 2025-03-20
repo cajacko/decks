@@ -81,7 +81,11 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
   return (
     <FieldSet title={text["settings.title"]} titleProps={titleProps} {...props}>
       <Field label={text["settings.theme"]}>
-        <Picker<Theme> onValueChange={onChangeTheme} selectedValue={theme}>
+        <Picker<Theme>
+          onValueChange={onChangeTheme}
+          selectedValue={theme}
+          iosButtonTitle={text[`settings.theme.${theme}`]}
+        >
           <PickerItem<Theme>
             label={text["settings.theme.system"]}
             value="system"
@@ -110,6 +114,9 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         label={text["settings.card_actions_haptics"]}
         value={vibrate}
         onValueChange={onChangeVibrate}
+        FieldProps={{
+          subLabel: text["settings.card_actions_haptics.helper"],
+        }}
       />
     </FieldSet>
   );

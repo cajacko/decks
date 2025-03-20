@@ -30,6 +30,7 @@ function Flag(props: { flagKey: UserSettings.FlagKey; style?: ViewStyle }) {
     >
       <Picker
         selectedValue={userSettingsValue}
+        iosButtonTitle={String(userSettingsValue)}
         onValueChange={(value) =>
           dispatch(
             setUserFlag({

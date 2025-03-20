@@ -187,6 +187,7 @@ export default function StackActions({
         <Picker
           selectedValue={selectedStackId}
           onValueChange={setSelectedStackId}
+          iosButtonTitle={stackName(stackIds, selectedStackId)}
         >
           <PickerItem label="All Stacks" value={null} />
           {stackIds?.map((stackId) => (
@@ -233,6 +234,7 @@ export default function StackActions({
           <Picker
             selectedValue={selectedMoveToStackId}
             onValueChange={setSelectedMoveToStackId}
+            iosButtonTitle={stackName(stackIds, selectedMoveToStackId)}
           >
             {stackIds
               ?.filter((stackId) => stackId !== selectedStackId)

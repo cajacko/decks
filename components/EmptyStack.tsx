@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Button from "./Button";
 import { defaultOpacity } from "./CardAction";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   action: {
-    marginTop: 20,
     opacity: defaultOpacity,
   },
 });

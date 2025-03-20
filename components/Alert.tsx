@@ -76,16 +76,16 @@ export default function Alert(props: AlertProps): React.ReactNode {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
   modalView: {
     maxWidth: 400,
     width: "100%",
-    margin: 20,
     borderRadius: 5,
     padding: 20,
   },

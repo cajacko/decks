@@ -1,5 +1,5 @@
 import React from "react";
-import ThemedText from "./ThemedText";
+import ThemedText, { ThemedTextProps } from "./ThemedText";
 import {
   TouchableOpacity,
   StyleSheet,
@@ -7,12 +7,15 @@ import {
 } from "react-native";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import useVibrate from "@/hooks/useVibrate";
+import IconSymbol, { IconSymbolName } from "./IconSymbol";
 
 export interface ButtonProps extends TouchableOpacityProps {
   title: string;
   color?: "primary" | "secondary" | "danger";
   variant?: "filled" | "transparent" | "outline";
   vibrate?: boolean;
+  rightIcon?: IconSymbolName;
+  ThemedTextProps?: Partial<ThemedTextProps>;
 }
 
 export default function Button({
@@ -22,10 +25,13 @@ export default function Button({
   variant = "filled",
   vibrate: shouldVibrate = false,
   onPress: onPressProp,
+  rightIcon,
+  ThemedTextProps,
   ...props
 }: ButtonProps): React.ReactNode {
   const { buttonBackground, buttonText, inputOutline } = useThemeColors();
   const { vibrate } = useVibrate();
+  const hasRightIcon = !!rightIcon;
 
   const { button, text } = React.useMemo(
     () => ({
@@ -42,15 +48,25 @@ export default function Button({
           borderColor: inputOutline,
         },
         style,
+        { justifyContent: hasRightIcon ? "space-between" : "center" },
       ],
       text: [
         styles.text,
         {
           color: buttonText,
         },
+        ThemedTextProps?.style,
       ],
     }),
-    [buttonText, buttonBackground, style, variant, inputOutline],
+    [
+      buttonText,
+      buttonBackground,
+      style,
+      variant,
+      inputOutline,
+      ThemedTextProps?.style,
+      hasRightIcon,
+    ],
   );
 
   const onPress = React.useMemo<ButtonProps["onPress"]>(
@@ -69,9 +85,10 @@ export default function Button({
 
   return (
     <TouchableOpacity {...props} onPress={onPress} style={button}>
-      <ThemedText style={text} type="button">
+      <ThemedText type="button" {...ThemedTextProps} style={text}>
         {title}
       </ThemedText>
+      {rightIcon && <IconSymbol name={rightIcon} size={20} />}
     </TouchableOpacity>
   );
 }
@@ -79,6 +96,9 @@ export default function Button({
 export const styles = StyleSheet.create({
   button: {
     borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   padding: {
     paddingVertical: 6,
