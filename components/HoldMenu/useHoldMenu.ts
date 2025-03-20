@@ -14,7 +14,7 @@ const minDistanceForDirection = maxDistanceForTap * 4;
 const maxTimeoutForTap = 500;
 const fadeInDuration = 500;
 const fadeOutDuration = 200;
-const scaleSize = 1.05;
+const scaleSize = 1.02;
 const scaleDuration = 200;
 const showMenuDelay = 200;
 

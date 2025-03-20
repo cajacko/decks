@@ -3,6 +3,7 @@ import { Tabletops } from "@/store/types";
 import { StyleSheet } from "react-native";
 import CardInstance from "@/components/cards/connected/CardInstance";
 import StackTopCard from "@/components/StackTopCard";
+import useFlag from "@/hooks/useFlag";
 
 export interface StackListItemProps {
   cardInstanceId: Tabletops.CardInstanceId;
@@ -19,6 +20,7 @@ export default function StackListItem(
   props: StackListItemProps,
 ): React.ReactNode {
   const { cardInstanceId, zIndex, isTopCard, cardOffsetPosition } = props;
+  const allTouchable = useFlag("STACK_LIST_ITEM_BEHAVIOUR") === "all-touchable";
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.card, { zIndex }]),
@@ -29,7 +31,7 @@ export default function StackListItem(
   // rename that component to something like StackCard.
   // It may prevent some remounting and improv some animations? As we're not switching
   // between components
-  if (isTopCard) {
+  if (isTopCard || allTouchable) {
     return (
       <StackTopCard
         style={style}

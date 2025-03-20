@@ -118,7 +118,7 @@ const deck: ExampleDeck<Record<typeof dataIds.title, string>> = {
     },
   },
   cards: [
-    { title: "Who is most likely to go to prison?" },
+    { title: "Who is most likely to get stuck in a bathroom stall?" },
     { title: "Who is the biggest drama queen?" },
     { title: "Who is most likely to trip over their own feet?" },
     { title: "Who is most likely to talk their way out of a speeding ticket?" },
@@ -130,7 +130,6 @@ const deck: ExampleDeck<Record<typeof dataIds.title, string>> = {
     { title: "Who is most likely to get kicked out of a bar?" },
     { title: "Who is most likely to order the weirdest thing on the menu?" },
     { title: "Who is most likely to send a drunk text they regret?" },
-    { title: "Who is most likely to get stuck in a bathroom stall?" },
     { title: "Who is most likely to cry at a Pixar movie?" },
     { title: "Who is most likely to go viral for an embarrassing reason?" },
     { title: "Who is most likely to join a reality TV show?" },

@@ -10,6 +10,7 @@ export const flagMap = {
   HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
 
   // Dev flags
+  STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],
   CARD_ANIMATE_SEND_TO_BACK: ["enabled", "disabled"],
   CARD_ANIMATE_OUT_BEHAVIOUR: ["linear", "bezier"],
   HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],
