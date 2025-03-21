@@ -17,6 +17,7 @@ const dataIds = {
 
 const deck: ExampleDeck<Record<typeof dataIds.title, string>> = {
   name: "Most Likely",
+  devOnly: false,
   description:
     "Who's the most likely to do something? Find out with this fun game!\n\nDraw a card, read aloud, and on the count of 5 everyone points to the person they think is most likely to do that thing. The person with the most fingers pointed at them wins the round!",
   templates: {

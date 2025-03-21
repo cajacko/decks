@@ -4,6 +4,7 @@ import back from "@/constants/builtInTemplates/back";
 
 const deck: ExampleDeck<{ title: string; emoji?: string }> = {
   name: "Charades",
+  devOnly: false,
   description:
     "A fun game where players act out a word or phrase without speaking.",
   templates: {

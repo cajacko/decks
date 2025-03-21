@@ -4,6 +4,7 @@ import back from "@/constants/builtInTemplates/back";
 
 const deck: ExampleDeck = {
   name: "Morning Pages Prompts",
+  devOnly: false,
   description:
     "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started.",
   templates: {

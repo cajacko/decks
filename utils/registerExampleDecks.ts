@@ -3,6 +3,7 @@ import { RootState, SliceName, Decks, Tabletops, Cards } from "@/store/types";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
+import { getFlag } from "@/store/combinedSelectors/flags";
 
 type State = Pick<
   RootState,
@@ -55,6 +56,10 @@ export default function registerExampleDecks() {
   };
 
   Object.entries(exampleDecks).forEach(([deckKey, exampleDeck]) => {
+    const isDev = getFlag("DEV_MODE") === true;
+
+    if (exampleDeck.devOnly && !isDev) return;
+
     const ids = exampleDeckIds(deckKey);
 
     const deckId = ids.deckId;
@@ -104,6 +109,8 @@ export default function registerExampleDecks() {
     };
 
     exampleDeck.cards.forEach((cardProps, index) => {
+      if (cardProps.devOnly && !isDev) return;
+
       const cardId = ids.cardId(`${index + 1}`);
       const cardInstanceId = ids.cardInstanceId(cardId);
 

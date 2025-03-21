@@ -4,6 +4,7 @@ import back from "@/constants/builtInTemplates/back";
 
 const deck: ExampleDeck = {
   name: "Juggling Practice",
+  devOnly: false,
   description:
     "A deck for practicing juggling. Practice the top card for 5 minutes, discard it and move on to the next card. When you've done them all, shuffle the deck and start again. Add new cards as you learn new tricks and remove cards you don't enjoy.",
   templates: {
