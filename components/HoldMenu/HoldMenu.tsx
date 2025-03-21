@@ -57,10 +57,28 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
     ],
   }));
 
+  const longPressStyle = useAnimatedStyle(() => ({
+    opacity: state.longPressTransition.value / 10,
+    transform: [{ scale: state.longPressTransition.value }],
+  }));
+
+  const childrenProp = props.children;
+
+  const children = React.useMemo((): React.ReactNode | undefined => {
+    if (typeof childrenProp === "function") {
+      return childrenProp({
+        longPressSharedValue: state.longPressTransition,
+        longPressStyle,
+      });
+    }
+
+    return childrenProp;
+  }, [childrenProp, longPressStyle, state.longPressTransition]);
+
   const component = (
     <Animated.View style={containerStyle}>
-      {props.children && (
-        <Animated.View style={childrenStyle}>{props.children}</Animated.View>
+      {children && (
+        <Animated.View style={childrenStyle}>{children}</Animated.View>
       )}
       {!props.hideActions && (
         <>

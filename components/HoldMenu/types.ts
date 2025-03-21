@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { GestureType } from "react-native-gesture-handler";
-import { AnimatedStyle } from "react-native-reanimated";
+import { AnimatedStyle, SharedValue } from "react-native-reanimated";
 
 export interface MenuItemComponentProps {
   isHighlighted?: boolean;
@@ -29,11 +29,17 @@ export type MenuItems = {
   [K in MenuPosition]?: MenuItem;
 };
 
+export type RenderChildren = (props: {
+  longPressSharedValue: SharedValue<number>;
+  longPressStyle: AnimatedStyle<ViewStyle>;
+}) => React.ReactNode;
+
 export interface HoldMenuProps {
-  handlePress?: () => void;
+  handleLongPress?: () => void;
+  handleDoubleTap?: () => void;
   menuItems: MenuItems;
   touchBuffer?: number;
-  children?: React.ReactNode;
+  children?: React.ReactNode | RenderChildren;
   style?: StyleProp<ViewStyle>;
   hideActions?: boolean;
 }
