@@ -122,10 +122,6 @@ const deck: ExampleDeck<Record<typeof dataIds.title, string>> = {
     { title: "Who is the biggest drama queen?" },
     { title: "Who is most likely to trip over their own feet?" },
     { title: "Who is most likely to talk their way out of a speeding ticket?" },
-    {
-      title:
-        "Who is most likely to accidentally text the wrong person something embarrassing?",
-    },
     { title: "Who is most likely to laugh at the worst possible moment?" },
     { title: "Who is most likely to get kicked out of a bar?" },
     { title: "Who is most likely to order the weirdest thing on the menu?" },

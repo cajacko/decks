@@ -1,8 +1,8 @@
 import { ExampleDeck } from "./types";
-import front from "@/constants/builtInTemplates/front";
+import front, { dataIds } from "@/constants/builtInTemplates/front";
 import back from "@/constants/builtInTemplates/back";
 
-const deck: ExampleDeck = {
+const deck: ExampleDeck<{ title: string; emoji?: string }> = {
   name: "Charades",
   description:
     "A fun game where players act out a word or phrase without speaking.",
@@ -18,23 +18,35 @@ const deck: ExampleDeck = {
     },
     front: {
       dataTemplateMapping: {
-        title: {
+        [dataIds.title]: {
           dataId: "title",
-          templateDataId: front.schema.title.id,
+          templateDataId: dataIds.title,
         },
-        description: {
+        [dataIds.description]: {
           dataId: "description",
-          templateDataId: front.schema.description.id,
+          templateDataId: dataIds.description,
         },
-        color: {
+        [dataIds.emoji]: {
+          dataId: "emoji",
+          templateDataId: dataIds.emoji,
+        },
+        [dataIds.color]: {
           dataId: "color",
-          templateDataId: front.schema.color.id,
+          templateDataId: dataIds.color,
         },
       },
       templateId: front.templateId,
     },
   },
   dataSchema: {
+    title: {
+      id: "title",
+      type: "text",
+    },
+    emoji: {
+      id: "emoji",
+      type: "text",
+    },
     description: {
       id: "description",
       type: "text",
@@ -53,7 +65,7 @@ const deck: ExampleDeck = {
     },
   },
   cards: [
-    { title: "Elephant" },
+    { title: "Elephant", emoji: "🐘" },
     { title: "Cupcake" },
     { title: "Superman" },
     { title: "Pirate" },
