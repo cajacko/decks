@@ -23,6 +23,9 @@ import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/Loader";
 import { CardConstraintsProvider } from "./cards/context/CardSizeConstraints";
 import ContentWidth from "@/components/ContentWidth";
+import DeckDefaults from "@/components/DeckDefaults";
+import ThemedText from "./ThemedText";
+import text from "@/constants/text";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -180,14 +183,24 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
                 contentContainerStyle={styles.contentContainerStyle}
                 showsVerticalScrollIndicator={Platform.OS !== "web"}
                 ListHeaderComponent={
-                  <>
+                  <ContentWidth padding="standard">
                     <DeckDetails deckId={props.deckId} skeleton={skeleton} />
-                    {skeleton && (
+                    {skeleton ? (
                       <View style={styles.loader}>
                         <Loader />
                       </View>
+                    ) : (
+                      <>
+                        <DeckDefaults
+                          style={styles.deckDefaults}
+                          deckId={props.deckId}
+                        />
+                        <ThemedText style={styles.cardsHeader} type="h2">
+                          {text["deck_screen.cards.title"]}
+                        </ThemedText>
+                      </>
                     )}
-                  </>
+                  </ContentWidth>
                 }
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
@@ -212,6 +225,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  deckDefaults: {
+    marginTop: 10,
+    marginBottom: 30,
+  },
   container: {
     position: "relative",
     flex: 1,
@@ -224,6 +241,9 @@ const styles = StyleSheet.create({
   },
   inner: {
     flex: 1,
+  },
+  cardsHeader: {
+    marginBottom: 10,
   },
   item: {
     flex: 1,

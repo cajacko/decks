@@ -71,6 +71,7 @@ export const defaultFlags: UserSettings.FlagMap = {
       ? true
       : false,
   CARD_ANIMATE_OUT_BEHAVIOUR: Platform.OS === "web" ? "linear" : "bezier",
+  CARD_ACTIONS_HAPTICS: Platform.OS === "web" ? "disabled" : "enabled",
 };
 
 export type GetFlag = <FlagKey extends UserSettings.FlagKey>(

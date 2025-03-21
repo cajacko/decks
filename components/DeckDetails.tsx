@@ -93,7 +93,6 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
     marginBottom: 10,
   },
   name: {

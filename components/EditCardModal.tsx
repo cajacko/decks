@@ -2,6 +2,7 @@ import React from "react";
 import EditCard, { EditCardProps } from "./EditCard";
 import Modal, { styles } from "./Modal";
 import { Target } from "@/utils/cardTarget";
+import { Cards } from "@/store/types";
 
 export interface EditCardModalProps extends EditCardProps {
   visible?: boolean;
@@ -9,7 +10,7 @@ export interface EditCardModalProps extends EditCardProps {
 }
 
 export function useEditCardModal(initialTargetProp: Target): {
-  open: (target?: Target) => void;
+  open: (target?: Target, options?: { initialSide?: Cards.Side }) => void;
   close: () => void;
   target: Target;
   visible: boolean;
@@ -25,14 +26,19 @@ export function useEditCardModal(initialTargetProp: Target): {
   );
 
   const [target, setTarget] = React.useState<Target>(initialTarget);
+  const [initialSide, setInitialSide] = React.useState<Cards.Side>("front");
   const [visible, setVisible] = React.useState(false);
 
   const close = React.useCallback(() => setVisible(false), []);
 
   const open = React.useCallback(
-    (openTarget?: Target) => {
+    (openTarget?: Target, options?: { initialSide?: Cards.Side }) => {
       setTarget(openTarget ?? initialTarget);
       setVisible(true);
+
+      if (options?.initialSide) {
+        setInitialSide(options.initialSide);
+      }
     },
     [initialTarget],
   );
@@ -46,8 +52,9 @@ export function useEditCardModal(initialTargetProp: Target): {
         setTarget(newTarget ?? initialTarget);
       },
       onDelete: close,
+      initialSide,
     }),
-    [close, initialTarget, target, visible],
+    [close, initialTarget, target, visible, initialSide],
   );
 
   const component = React.useMemo(
