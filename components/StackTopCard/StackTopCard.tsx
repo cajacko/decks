@@ -61,7 +61,6 @@ export default function StackTopCard({
         initialSide={state.side}
         onDelete={state.closeEditModal}
       />
-      {state.copyAlert}
     </>
   );
 }

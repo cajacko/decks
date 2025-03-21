@@ -1,6 +1,9 @@
 import { createCachedSelector } from "re-reselect";
 import { selectCard } from "../slices/cards";
-import { selectDeck as selectDeckByDeckId } from "../slices/decks";
+import {
+  selectCanEditDeck,
+  selectDeck as selectDeckByDeckId,
+} from "../slices/decks";
 import { selectTemplate } from "../slices/templates";
 import { RootState, Decks, Cards } from "../types";
 import { getIsCardId, Target } from "@/utils/cardTarget";
@@ -172,6 +175,14 @@ export const selectCanEditCard = (state: RootState, props: CardIdProps) =>
   selectCard(state, props)?.canEdit ??
   selectDeckByCard(state, props)?.canEdit ??
   false;
+
+export const selectCanEdit = (state: RootState, props: Target) => {
+  if (getIsCardId(props)) {
+    return selectCanEditCard(state, { cardId: props.id });
+  }
+
+  return selectCanEditDeck(state, { deckId: props.id });
+};
 
 export const selectCardSize = (state: RootState, props: Target) => {
   const deckSize = selectDeck(state, props)?.cardSize;

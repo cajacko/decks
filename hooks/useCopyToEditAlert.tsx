@@ -47,6 +47,7 @@ export default function useCopyToEditAlert({ deckId }: UseCopyToEditAlert) {
   );
 
   return {
+    copyDeck,
     open,
     close,
     visible: showAlert,

@@ -2,20 +2,11 @@ import React from "react";
 import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
 import { useTabletopContext } from "../Tabletop/Tabletop.context";
-import { selectCanEditCard } from "@/store/combinedSelectors/cards";
-import { useAppSelector } from "@/store/hooks";
 import { MenuItems, MenuItem } from "../HoldMenu";
 import withHoldMenuItem from "./withHoldMenuItem";
-import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
-  const canEditCard = useAppSelector((_state) =>
-    selectCanEditCard(_state, { cardId: state.cardId }),
-  );
-  const { open: openCopyAlert, component: copyAlert } = useCopyToEditAlert({
-    deckId: state.deckId,
-  });
   const { buttonSize } = useTabletopContext();
   const [showEditModal, setShowEditModal] = React.useState(false);
 
@@ -70,12 +61,8 @@ export default function useMenuItems(props: StackTopCardProps) {
   ]);
 
   const handlePress = React.useCallback(() => {
-    if (canEditCard) {
-      setShowEditModal(true);
-    } else {
-      openCopyAlert();
-    }
-  }, [canEditCard, setShowEditModal, openCopyAlert]);
+    setShowEditModal(true);
+  }, [setShowEditModal]);
 
   return {
     cardId: state.cardId,
@@ -88,6 +75,5 @@ export default function useMenuItems(props: StackTopCardProps) {
     side: state.side,
     handlePress,
     animatedToBack: state.animatedToBack,
-    copyAlert,
   };
 }

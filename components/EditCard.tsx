@@ -22,6 +22,13 @@ import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
 import { TabletopCardSizeProvider } from "@/components/Tabletop/Tabletop.context";
+import { selectCanEdit } from "@/store/combinedSelectors/cards";
+import { useAppSelector, useRequiredAppSelector } from "@/store/hooks";
+import ThemedText from "./ThemedText";
+import Button from "./Button";
+import text from "@/constants/text";
+import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
+import { selectDeckId } from "@/store/combinedSelectors/decks";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
@@ -40,6 +47,12 @@ export default function EditCard({
   backgroundStyle: backgroundStyleProp,
   ...props
 }: EditCardProps) {
+  const deckId = useRequiredAppSelector(
+    (state) => selectDeckId(state, props.target),
+    selectDeckId.name,
+  );
+  const { copyDeck } = useCopyToEditAlert({ deckId });
+  const canEdit = useAppSelector((state) => selectCanEdit(state, props.target));
   const height = useHeight();
   const { maxHeight, onContainerLayout, containerHeight, containerWidth } =
     useMaxHeight();
@@ -105,13 +118,26 @@ export default function EditCard({
             animateIn
             openOnMount
           >
-            <EditCardForm
-              flipSide={flipSide}
-              onDelete={props.onDelete}
-              handleClose={onPressBackground}
-              activeSide={side}
-              {...props.target}
-            />
+            {canEdit ? (
+              <EditCardForm
+                flipSide={flipSide}
+                onDelete={props.onDelete}
+                handleClose={onPressBackground}
+                activeSide={side}
+                {...props.target}
+              />
+            ) : (
+              <View style={styles.copyContainer}>
+                <ThemedText style={styles.copyText}>
+                  {text["deck.copy_alert.message"]}
+                </ThemedText>
+                <Button
+                  title={text["deck.copy_alert.button"]}
+                  variant="outline"
+                  onPress={copyDeck}
+                />
+              </View>
+            )}
           </BottonDrawer>
         </BottomDrawerWrapper>
       </EditCardProvider>
@@ -126,6 +152,15 @@ const dragHeaderHeight = Math.max(30, borderRadius);
 const dragHeight = dragHeaderHeight + dragOverlap + dragBuffer;
 
 const styles = StyleSheet.create({
+  copyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  copyText: {
+    marginBottom: 20,
+    textAlign: "center",
+  },
   container: {
     flex: 1,
     overflow: "hidden",
