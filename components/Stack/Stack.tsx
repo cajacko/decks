@@ -107,7 +107,8 @@ export default function Stack(props: StackProps): React.ReactNode {
             icon="shuffle"
             style={styles.shuffleButton}
             onPress={handleShuffle}
-            vibrate
+            // Vibrate covered by handleShuffle as it gets called programmatically on shake
+            vibrate={false}
           />
         )}
       </View>

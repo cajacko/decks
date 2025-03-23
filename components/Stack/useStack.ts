@@ -20,6 +20,7 @@ import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/tabletops";
 import text from "@/constants/text";
 import useShakeEffect from "@/hooks/useShakeEffect";
+import useVibrate from "@/hooks/useVibrate";
 
 export default function useStack({
   stackId,
@@ -39,6 +40,7 @@ export default function useStack({
   const dispatch = useAppDispatch();
   const { tabletopId, stackWidth, deckId } = useTabletopContext();
   const width = useSharedValue(stackWidth);
+  const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
   const rotation = useSharedValue(0);
   const { navigate } = useRouter();
@@ -70,6 +72,8 @@ export default function useStack({
   const handleShuffle = React.useCallback(async () => {
     let promise: Promise<unknown> | undefined;
 
+    vibrate?.("handleShuffle");
+
     if (canAnimateCards) {
       rotation.value = 0;
 
@@ -96,7 +100,7 @@ export default function useStack({
     );
 
     await promise;
-  }, [dispatch, stackId, tabletopId, rotation, canAnimateCards]);
+  }, [dispatch, stackId, tabletopId, rotation, canAnimateCards, vibrate]);
 
   const shakeToShuffleActive: boolean =
     isFocussed &&
