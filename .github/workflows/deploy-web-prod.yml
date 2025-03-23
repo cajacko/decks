@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Fetch prebuild data
+        run: yarn fetch-decks
+
       - name: Export Web
         run: npx expo export --platform web
 
