@@ -9,6 +9,7 @@ export const flagMap = {
   PERFORMANCE_MODE: ["disabled", "enabled"],
   HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
   CARD_ACTIONS_HAPTICS: ["enabled", "disabled"],
+  SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
   STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],

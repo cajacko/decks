@@ -13,6 +13,7 @@ import text from "@/constants/text";
 import SwitchField from "./SwitchField";
 import useFlag from "@/hooks/useFlag";
 import { defaultTheme } from "@/hooks/useColorScheme";
+import { Platform } from "react-native";
 
 type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
@@ -34,6 +35,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
     useFlag("HOLD_MENU_BEHAVIOUR") === "always-visible";
 
   const vibrate = useFlag("CARD_ACTIONS_HAPTICS") === "enabled";
+  const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
 
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
@@ -78,6 +80,18 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
     [dispatch],
   );
 
+  const onChangeShakeToShuffle = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setUserFlag({
+          key: "SHAKE_TO_SHUFFLE",
+          value: value ? "enabled" : "disabled",
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   return (
     <FieldSet title={text["settings.title"]} titleProps={titleProps} {...props}>
       <Field label={text["settings.theme"]}>
@@ -110,14 +124,23 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         value={holdMenuAlwaysVisible}
         onValueChange={onChangeHoldMenu}
       />
-      <SwitchField
-        label={text["settings.card_actions_haptics"]}
-        value={vibrate}
-        onValueChange={onChangeVibrate}
-        FieldProps={{
-          subLabel: text["settings.card_actions_haptics.helper"],
-        }}
-      />
+      {Platform.OS !== "web" && (
+        <>
+          <SwitchField
+            label={text["settings.shake_shuffle"]}
+            value={shakeToShuffle}
+            onValueChange={onChangeShakeToShuffle}
+          />
+          <SwitchField
+            label={text["settings.card_actions_haptics"]}
+            value={vibrate}
+            onValueChange={onChangeVibrate}
+            FieldProps={{
+              subLabel: text["settings.card_actions_haptics.helper"],
+            }}
+          />
+        </>
+      )}
     </FieldSet>
   );
 }

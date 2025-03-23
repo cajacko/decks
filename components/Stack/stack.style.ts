@@ -31,7 +31,7 @@ function getExampleStackDimensions(
   props: ({ stackWidth: number } | { stackHeight: number }) & {
     physicalSize: CardPhysicalSize;
   },
-): StackDimensions {
+): Omit<StackDimensions, "canOnlyFit1Stack"> {
   const buttonSize = Math.min(
     Math.max(
       // Math.round(cardWidth / 3.75),
@@ -107,6 +107,16 @@ function getExampleStackDimensions(
   };
 }
 
+function getCanOnlyFit1Stack({
+  availableWidth,
+  stackWidth,
+}: {
+  stackWidth: number;
+  availableWidth: number;
+}): boolean {
+  return availableWidth / stackWidth < 2;
+}
+
 const maxStackHeight = 700;
 const maxStackWidth = maxStackHeight;
 const minStackHeight = 300;
@@ -133,7 +143,13 @@ export function getStackDimensions(props: {
     dimensions.stackHeight <= maxStackHeight &&
     dimensions.stackHeight <= props.availableHeight
   ) {
-    return dimensions;
+    return {
+      ...dimensions,
+      canOnlyFit1Stack: getCanOnlyFit1Stack({
+        availableWidth: props.availableWidth,
+        stackWidth: dimensions.stackWidth,
+      }),
+    };
   }
 
   dimensions = getExampleStackDimensions({
@@ -144,7 +160,13 @@ export function getStackDimensions(props: {
     ),
   });
 
-  return dimensions;
+  return {
+    ...dimensions,
+    canOnlyFit1Stack: getCanOnlyFit1Stack({
+      availableWidth: props.availableWidth,
+      stackWidth: dimensions.stackWidth,
+    }),
+  };
 }
 
 export function getShuffleStyle(props: {

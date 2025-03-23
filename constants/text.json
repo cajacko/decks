@@ -63,6 +63,7 @@
   "settings.dev_mode.title": "Dev Settings",
   "settings.flags.title": "Dev Flags",
   "settings.hold_menu.always_show": "Always Show Card Actions",
+  "settings.shake_shuffle": "Enable Shake to Shuffle",
   "settings.card_actions_haptics": "Enable Vibrations",
   "settings.card_actions_haptics.helper": "If you're device has vibration/ haptics turned off, this setting may not work.",
   "settings.neat_stack.helper": "Align cards within stacks so you definitely can't see what's behind the first card.",

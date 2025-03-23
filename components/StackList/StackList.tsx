@@ -11,7 +11,8 @@ export default function StackList({
   style,
   skeleton,
 }: StackListProps): React.ReactNode {
-  const { animatedRef, interval, stackIds, stackListRef } = useStackList();
+  const { animatedRef, interval, stackIds, stackListRef, focussedStackId } =
+    useStackList();
 
   const children = React.useMemo(() => {
     if (!stackIds) return undefined;
@@ -24,6 +25,7 @@ export default function StackList({
 
     return stacks?.map((stackId, i) => (
       <Stack
+        isFocussed={focussedStackId === stackId}
         key={stackId}
         stackId={stackId}
         canShowEditDeck={i === 0}
@@ -34,7 +36,7 @@ export default function StackList({
         skeleton={skeleton}
       />
     ));
-  }, [stackIds, stackListRef, skeleton]);
+  }, [stackIds, stackListRef, skeleton, focussedStackId]);
 
   const scrollViewStyle = React.useMemo(
     () => StyleSheet.flatten([styles.scrollView, style]),

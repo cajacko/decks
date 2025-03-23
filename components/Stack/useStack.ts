@@ -19,12 +19,14 @@ import useOffsetPositions from "@/components/cards/ui/AnimatedCard/useOffsetPosi
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/tabletops";
 import text from "@/constants/text";
+import useShakeEffect from "@/hooks/useShakeEffect";
 
 export default function useStack({
   stackId,
   stackListRef,
   canDelete = false,
   canShowEditDeck = false,
+  isFocussed = false,
 }: StackProps) {
   // we just want the length and doing it this way to keep a
   // single source of truth for the number of offset positions
@@ -33,6 +35,7 @@ export default function useStack({
   const offsetPositionsCount = offsetPositions ? offsetPositions.length : 2;
 
   const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
+  const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
   const dispatch = useAppDispatch();
   const { tabletopId, stackWidth, deckId } = useTabletopContext();
   const width = useSharedValue(stackWidth);
@@ -70,12 +73,16 @@ export default function useStack({
     if (canAnimateCards) {
       rotation.value = 0;
 
-      const duration = 500;
+      const duration = 1200;
 
       promise = new Promise<void>((resolve) => {
-        rotation.value = withTiming(360, { duration }, () => {
-          runOnJS(resolve)();
-        });
+        rotation.value = withTiming(
+          (Math.round(1500 / 360) - 1) * 360,
+          { duration },
+          () => {
+            runOnJS(resolve)();
+          },
+        );
       });
     }
 
@@ -90,6 +97,14 @@ export default function useStack({
 
     await promise;
   }, [dispatch, stackId, tabletopId, rotation, canAnimateCards]);
+
+  const shakeToShuffleActive: boolean =
+    isFocussed &&
+    shakeToShuffle &&
+    !!cardInstancesIds &&
+    cardInstancesIds.length > 1;
+
+  useShakeEffect(shakeToShuffleActive ? handleShuffle : null);
 
   onUpdateCardList(cardInstancesIds ?? []);
 
@@ -171,5 +186,6 @@ export default function useStack({
     handleShuffle,
     rotation,
     emptyStackButton,
+    shakeToShuffleActive,
   };
 }

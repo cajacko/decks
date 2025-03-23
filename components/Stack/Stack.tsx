@@ -27,6 +27,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     width,
     opacity,
     emptyStackButton,
+    shakeToShuffleActive,
   } = useStack(props);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -101,7 +102,7 @@ export default function Stack(props: StackProps): React.ReactNode {
       </Animated.View>
 
       <View style={shuffleStyle}>
-        {cardInstances && cardInstances.length > 1 && (
+        {cardInstances && cardInstances.length > 1 && !shakeToShuffleActive && (
           <CardAction
             icon="shuffle"
             style={styles.shuffleButton}
