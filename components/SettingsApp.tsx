@@ -125,21 +125,21 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         onValueChange={onChangeHoldMenu}
       />
       {Platform.OS !== "web" && (
-        <>
-          <SwitchField
-            label={text["settings.shake_shuffle"]}
-            value={shakeToShuffle}
-            onValueChange={onChangeShakeToShuffle}
-          />
-          <SwitchField
-            label={text["settings.card_actions_haptics"]}
-            value={vibrate}
-            onValueChange={onChangeVibrate}
-            FieldProps={{
-              subLabel: text["settings.card_actions_haptics.helper"],
-            }}
-          />
-        </>
+        <SwitchField
+          label={text["settings.shake_shuffle"]}
+          value={shakeToShuffle}
+          onValueChange={onChangeShakeToShuffle}
+        />
+      )}
+      {Platform.OS !== "web" && (
+        <SwitchField
+          label={text["settings.card_actions_haptics"]}
+          value={vibrate}
+          onValueChange={onChangeVibrate}
+          FieldProps={{
+            subLabel: text["settings.card_actions_haptics.helper"],
+          }}
+        />
       )}
     </FieldSet>
   );
