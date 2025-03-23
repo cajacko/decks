@@ -10,9 +10,6 @@
       "channel": "development",
       "env": {
         "APP_VARIANT": "development"
-      },
-      "hooks": {
-        "prebuild": "yarn fetch-decks"
       }
     },
     "preview": {
@@ -24,9 +21,6 @@
       "channel": "preview",
       "env": {
         "APP_VARIANT": "preview"
-      },
-      "hooks": {
-        "prebuild": "yarn fetch-decks"
       }
     },
     "production": {
@@ -34,9 +28,6 @@
       "channel": "production",
       "env": {
         "APP_VARIANT": "production"
-      },
-      "hooks": {
-        "prebuild": "yarn fetch-decks"
       }
     }
   },

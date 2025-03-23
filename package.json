@@ -18,7 +18,8 @@
     "build:ios:production": "eas build --platform ios --profile production",
     "submit": "eas submit",
     "publish:go": "eas update --branch=main",
-    "fetch-decks": "ts-node .scripts/fetchDecks.ts"
+    "fetch-decks": "ts-node .scripts/fetchDecks.ts",
+    "eas-build-post-install": "yarn fetch-decks"
   },
   "jest": {
     "preset": "jest-expo"
