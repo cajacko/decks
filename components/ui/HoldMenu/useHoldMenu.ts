@@ -24,6 +24,7 @@ export default function useHoldMenu({
   handleLongPress,
   menuItems,
   handleDoubleTap,
+  hideActions,
 }: HoldMenuProps) {
   // Flags
   const devIndicator = useFlag("HOLD_MENU_DEV_INDICATOR") === "enabled";
@@ -33,8 +34,17 @@ export default function useHoldMenu({
     useFlag("CARD_ACTIONS_ALWAYS_VISIBLE") === true ||
     holdMenuBehaviour === "always-visible";
 
+  const _menuOpacityOverride = alwaysShowCardActions
+    ? 1
+    : hideActions
+      ? 0
+      : null;
+
   // Shared values
   const menuOpacity = useSharedValue(0);
+  const menuOpacityOverride = useSharedValue<null | number>(
+    _menuOpacityOverride,
+  );
   const devIndicatorOpacity = useSharedValue(0);
   const devEndIndicator = useSharedValue({ x: 0, y: 0 });
   const devStartIndicator = useSharedValue({ x: 0, y: 0 });
@@ -43,6 +53,10 @@ export default function useHoldMenu({
   const scaleUpFinished = useSharedValue(true);
   const isTouching = useSharedValue(false);
   const longPressTransition = useSharedValue(0);
+
+  React.useEffect(() => {
+    menuOpacityOverride.value = _menuOpacityOverride;
+  }, [_menuOpacityOverride, menuOpacityOverride]);
 
   // State
   const [highlightedPosition, setHighlightedPosition] =
@@ -409,5 +423,6 @@ export default function useHoldMenu({
     scale,
     menuTaps,
     longPressTransition,
+    menuOpacityOverride,
   };
 }

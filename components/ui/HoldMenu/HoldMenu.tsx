@@ -17,19 +17,12 @@ export const HoldMenuWrapper = GestureHandlerRootView;
 export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
   const state = useHoldMenu(props);
 
-  const _menuItemStyle = useAnimatedStyle(() => ({
-    opacity: state.menuOpacity.value,
+  const menuItemStyle = useAnimatedStyle(() => ({
+    opacity:
+      state.menuOpacityOverride.value === null
+        ? state.menuOpacity.value
+        : state.menuOpacityOverride.value,
   }));
-
-  let menuItemStyle: AnimatedStyle<ViewStyle> | undefined;
-
-  if (state.alwaysShowCardActions) {
-    menuItemStyle = undefined;
-  } else if (props.hideActions) {
-    menuItemStyle = styles.hideMenu;
-  } else {
-    menuItemStyle = _menuItemStyle;
-  }
 
   const scaleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: state.scale.value }],
