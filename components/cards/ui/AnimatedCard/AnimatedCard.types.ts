@@ -12,13 +12,6 @@ export type OffsetPosition = null | {
 
 export type RequiredRefObject<T> = { current: T };
 
-// "height"
-// | "width"
-// | "offsetPosition"
-// | "initialRotation"
-// | "initialScaleX"
-// | "onAnimationChange"
-
 export interface AnimatedCardProps
   extends Omit<CardProps, "style">,
     UseMmToDpProps {
@@ -37,14 +30,6 @@ export interface AnimatedCardProps
   initialRotation?: number;
   initialScaleX?: number;
   cardStyle?: CardProps["style"];
-
-  // innerStyle?: StyleProp<ViewStyle>;
-  // hidden?: boolean;
-  // zIndex?: number;
-  // overlay?: React.ReactNode;
-  // opacity?: number;
-  // transform?: ViewStyle["transform"];
-  // ref?: React.Ref<AnimatedCardRef>;
 }
 
 export interface AnimateOutProps {

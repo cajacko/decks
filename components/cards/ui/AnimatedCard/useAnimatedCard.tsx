@@ -126,7 +126,8 @@ export default function useAnimatedCard(
 ) {
   const animateOutBehaviour = useFlag("CARD_ANIMATE_OUT_BEHAVIOUR");
   const canAnimate = useFlag("CARD_ANIMATIONS") === "enabled";
-  // const cardSizes = useCardSizes(props);
+  const rotateCardsBeforeFlip =
+    useFlag("ROTATE_CARDS_BEFORE_FLIP") === "enabled";
   const height = props.height;
   const width = props.width;
 
@@ -200,12 +201,11 @@ export default function useAnimatedCard(
 
   const animateFlipOut = React.useCallback<
     AnimatedCardRef["animateFlipOut"]
-  >(() => {
+  >(async () => {
     const animateKey = "flip";
 
     animationUpdateRef.current(animateKey, true);
 
-    rotate.value = animatedInitialRotation.value ?? 0;
     scaleX.value = 1;
 
     return new Promise((resolve) => {
@@ -213,22 +213,31 @@ export default function useAnimatedCard(
         return resolve(undefined);
       }
 
-      rotate.value = withTiming(0, { duration: flipRotationDuration }, () => {
+      if (rotateCardsBeforeFlip) {
+        rotate.value = withTiming(0, { duration: flipRotationDuration }, () => {
+          scaleX.value = withTiming(0, { duration: flipScaleDuration }, () => {
+            runOnJS(resolve)(undefined);
+          });
+        });
+      } else {
         scaleX.value = withTiming(0, { duration: flipScaleDuration }, () => {
           runOnJS(resolve)(undefined);
         });
-      });
+      }
     }).finally(() => animationUpdateRef.current(animateKey, false));
-  }, [canAnimate, rotate, scaleX, animatedInitialRotation]);
+  }, [canAnimate, rotate, scaleX, rotateCardsBeforeFlip]);
 
   const animateFlipIn = React.useCallback<
     AnimatedCardRef["animateFlipIn"]
-  >(() => {
+  >(async () => {
     const animateKey = "flipIn";
 
     animationUpdateRef.current(animateKey, true);
 
-    rotate.value = 0;
+    if (rotateCardsBeforeFlip) {
+      rotate.value = 0;
+    }
+
     scaleX.value = 0;
 
     return new Promise((resolve) => {
@@ -236,21 +245,32 @@ export default function useAnimatedCard(
         return resolve(undefined);
       }
 
-      scaleX.value = withTiming(1, { duration: flipScaleDuration }, () => {
-        rotate.value = withTiming(
-          animatedInitialRotation.value ?? 0,
-          { duration: flipRotationDuration },
-          () => {
-            runOnJS(resolve)(undefined);
-          },
-        );
-      });
+      if (rotateCardsBeforeFlip) {
+        scaleX.value = withTiming(1, { duration: flipScaleDuration }, () => {
+          rotate.value = withTiming(
+            animatedInitialRotation.value ?? 0,
+            { duration: flipRotationDuration },
+            () => {
+              runOnJS(resolve)(undefined);
+            },
+          );
+        });
+      } else {
+        scaleX.value = withTiming(1, { duration: flipScaleDuration }, () => {
+          runOnJS(resolve)(undefined);
+        });
+      }
     }).finally(() => {
       animationUpdateRef.current(animateKey, false);
       scaleX.value = null;
-      rotate.value = animatedInitialRotation.value ?? null;
     });
-  }, [canAnimate, scaleX, rotate, animatedInitialRotation]);
+  }, [
+    canAnimate,
+    scaleX,
+    rotate,
+    animatedInitialRotation,
+    rotateCardsBeforeFlip,
+  ]);
 
   const animateOut = React.useCallback<AnimatedCardRef["animateOut"]>(
     async ({
