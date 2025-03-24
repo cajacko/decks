@@ -12,6 +12,7 @@ export const flagMap = {
   SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
+  SHUFFLE_ANIMATION: ["enabled", "disabled"],
   STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],
   CARD_ANIMATE_SEND_TO_BACK: ["enabled", "disabled"],
   CARD_ANIMATE_OUT_BEHAVIOUR: ["linear", "bezier"],

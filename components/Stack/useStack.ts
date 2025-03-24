@@ -37,6 +37,7 @@ export default function useStack({
 
   const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
+  const animateShuffle = useFlag("SHUFFLE_ANIMATION") === "enabled";
   const dispatch = useAppDispatch();
   const { tabletopId, stackWidth, deckId } = useTabletopContext();
   const width = useSharedValue(stackWidth);
@@ -74,7 +75,7 @@ export default function useStack({
 
     vibrate?.("handleShuffle");
 
-    if (canAnimateCards) {
+    if (animateShuffle) {
       rotation.value = 0;
 
       const duration = 1200;
@@ -100,7 +101,7 @@ export default function useStack({
     );
 
     await promise;
-  }, [dispatch, stackId, tabletopId, rotation, canAnimateCards, vibrate]);
+  }, [dispatch, stackId, tabletopId, rotation, animateShuffle, vibrate]);
 
   const shakeToShuffleActive: boolean =
     isFocussed &&
