@@ -1631,6 +1631,7 @@
     "devOnly": false,
     "gid": "920177326",
     "key": "categories",
+    "backTextSize": "9",
     "cards": [
       {
         "title": "Famous Actors",
@@ -2027,7 +2028,7 @@
     ]
   },
   {
-    "title": "Emojis! 🤡👍🐶",
+    "title": "Emojis!\n🤡👍🐶",
     "description": "All the emojis! Use these cards to play charades, pictionary, or any other game that needs a random emoji!",
     "color": "#F2358D",
     "devOnly": false,

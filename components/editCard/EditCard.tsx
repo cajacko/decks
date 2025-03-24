@@ -51,7 +51,8 @@ export default function EditCard({
     (state) => selectDeckId(state, props.target),
     selectDeckId.name,
   );
-  const { copyDeck } = useCopyToEditAlert({ deckId });
+  const { copyDeck: _copyDeck } = useCopyToEditAlert({ deckId });
+
   const canEdit = useAppSelector((state) => selectCanEdit(state, props.target));
   const height = useHeight();
   const { maxHeight, onContainerLayout, containerHeight, containerWidth } =
@@ -81,6 +82,11 @@ export default function EditCard({
     () => [styles.scrollBackground, backgroundStyleProp],
     [backgroundStyleProp],
   );
+
+  const copyDeck = React.useCallback(() => {
+    onPressBackground?.();
+    _copyDeck();
+  }, [_copyDeck, onPressBackground]);
 
   return (
     <TabletopCardSizeProvider

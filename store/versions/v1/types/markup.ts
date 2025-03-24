@@ -1,11 +1,26 @@
-import { TextStyle, ViewStyle } from "react-native";
+import { TextStyle as _TextStyle, ViewStyle as _ViewStyle } from "react-native";
 
 type NodeType = "View" | "Text";
 
-export type { ViewStyle, TextStyle };
+export type NumberTemplateProps = "fontSize";
 
-export type ValidStyles = TextStyle | ViewStyle;
-export type AllStyles = TextStyle & ViewStyle;
+type ValidRnStyles = _TextStyle | _ViewStyle;
+export type AllRnStyles = _TextStyle & _ViewStyle;
+
+//
+type RnStyleToTemplateStyle<T extends ValidRnStyles> = {
+  [K in keyof T]: K extends NumberTemplateProps ? number | string : T[K];
+};
+
+export type TemplateTextStyle = RnStyleToTemplateStyle<_TextStyle>;
+export type TemplateViewStyle = RnStyleToTemplateStyle<_ViewStyle>;
+
+export type TemplateValidStyles = TemplateTextStyle | TemplateViewStyle;
+export type TemplateAllStyles = TemplateTextStyle & TemplateViewStyle;
+
+export type TemplateStyleToRnStyle<
+  T extends TemplateValidStyles = TemplateValidStyles,
+> = T extends TemplateTextStyle ? _TextStyle : _ViewStyle;
 
 /**
  * A handlebar string that can be used to conditionally render a node, so can access template
@@ -18,7 +33,7 @@ type Conditional = string;
  */
 type CreateMarkupElementHelper<
   T extends NodeType,
-  P extends { style?: ValidStyles },
+  P extends { style?: TemplateValidStyles },
 > = {
   type: T;
   conditional?: Conditional;
@@ -28,13 +43,13 @@ type View = CreateMarkupElementHelper<
   "View",
   {
     children?: Node[];
-    style?: ViewStyle;
+    style?: TemplateViewStyle;
   }
 >;
 
 type Text = CreateMarkupElementHelper<
   "Text",
-  { text: string; style?: TextStyle }
+  { text: string; style?: TemplateTextStyle }
 >;
 
 export type Node = View | Text;

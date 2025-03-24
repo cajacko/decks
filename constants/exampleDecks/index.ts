@@ -23,6 +23,7 @@ const dataIds = {
   borderColor: "borderColor",
   textColor: "textColor",
   backText: "backText",
+  backTextSize: "backTextSize",
 };
 
 exampleDecks.forEach(
@@ -36,6 +37,7 @@ exampleDecks.forEach(
     backgroundColor,
     borderColor,
     textColor,
+    backTextSize,
   }) => {
     const prebuiltDeck = prebuildDecks[key];
 
@@ -75,6 +77,10 @@ exampleDecks.forEach(
             [backDataIds.backgroundColor]: {
               dataId: dataIds.backgroundColor,
               templateDataId: backDataIds.backgroundColor,
+            },
+            [backDataIds.textSize]: {
+              dataId: dataIds.backTextSize,
+              templateDataId: backDataIds.textSize,
             },
           },
         },
@@ -182,6 +188,16 @@ exampleDecks.forEach(
             ? {
                 type: "color",
                 value: textColor,
+              }
+            : undefined,
+        },
+        [dataIds.backTextSize]: {
+          id: dataIds.backTextSize,
+          type: "text",
+          defaultValidatedValue: backTextSize
+            ? {
+                type: "text",
+                value: backTextSize,
               }
             : undefined,
         },

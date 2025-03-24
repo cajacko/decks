@@ -18,6 +18,7 @@ type ExampleDeck = {
   backgroundColor?: string;
   textColor?: string;
   borderColor?: string;
+  backTextSize?: string;
 };
 
 const exampleDecks: ExampleDeck[] = _exampleDecks;
