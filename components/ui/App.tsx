@@ -57,7 +57,6 @@ function useNavigationTheme(): NavigationTheme {
 function HasStore({ children }: { children: React.ReactNode }) {
   const navigationTheme = useNavigationTheme();
   const [loadedFonts] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Roboto: Roboto_400Regular,
     LuckiestGuy: LuckiestGuy_400Regular,
   });

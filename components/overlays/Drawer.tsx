@@ -6,20 +6,20 @@ import {
   Pressable,
   Platform,
 } from "react-native";
-import ThemedView from "../ui/ThemedView";
+import ThemedView from "@/components/ui/ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppSelector } from "@/store/hooks";
 import { selectFlag } from "@/store/combinedSelectors/flags";
 import DevMenu from "@/components/settings/Dev/DevMenu";
 import Version from "@/components/settings/Version";
-import SettingsApp from "../settings/SettingsApp";
-import SettingsDeck from "../settings/SettingsDeck";
-import FieldSet from "../forms/FieldSet";
-import SettingsTabletop from "../settings/SettingsTabletop";
+import SettingsApp from "@/components/settings/SettingsApp";
+import SettingsDeck from "@/components/settings/SettingsDeck";
+import FieldSet from "@/components/forms/FieldSet";
+import SettingsTabletop from "@/components/settings/SettingsTabletop";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
 import { ExternalPathString, Link } from "expo-router";
-import ThemedText from "../ui/ThemedText";
+import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 
 export interface DrawerProps {
@@ -145,7 +145,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
               <Pressable>
                 <Image
                   style={styles.playface}
-                  source={require("../assets/images/playface-circle-logo-text-right.png")}
+                  source={require("../../assets/images/playface-circle-logo-text-right.png")}
                   contentFit="contain"
                 />
               </Pressable>
