@@ -24,7 +24,7 @@ type ContextState = {
 
 const Context = React.createContext<ContextState | undefined>(undefined);
 
-export const Modal = React.memo<ModalProps>(function Modal(props) {
+export function useModal(props: ModalProps) {
   const context = React.useContext(Context);
   const idRef = React.useRef(uuid());
 
@@ -57,6 +57,10 @@ export const Modal = React.memo<ModalProps>(function Modal(props) {
   );
 
   return null;
+}
+
+export const Modal = React.memo<ModalProps>(function Modal(props) {
+  return useModal(props);
 });
 
 const ModalItem = React.memo<ModalProps & { zIndex: number }>(

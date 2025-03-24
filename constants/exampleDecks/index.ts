@@ -22,6 +22,7 @@ const dataIds = {
   backgroundColor: "backgroundColor",
   borderColor: "borderColor",
   textColor: "textColor",
+  backText: "backText",
 };
 
 exampleDecks.forEach(
@@ -59,6 +60,10 @@ exampleDecks.forEach(
         back: {
           templateId: back.templateId,
           dataTemplateMapping: {
+            [backDataIds.text]: {
+              dataId: dataIds.backText,
+              templateDataId: backDataIds.text,
+            },
             [backDataIds.color]: {
               dataId: dataIds.color,
               templateDataId: backDataIds.color,
@@ -135,6 +140,10 @@ exampleDecks.forEach(
             type: "null",
             value: null,
           },
+        },
+        [dataIds.backText]: {
+          id: dataIds.backText,
+          type: "text",
         },
         [dataIds.color]: {
           id: dataIds.color,

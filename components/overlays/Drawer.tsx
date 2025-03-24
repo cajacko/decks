@@ -21,6 +21,8 @@ import { Image } from "expo-image";
 import { ExternalPathString, Link } from "expo-router";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
+import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
+import Button from "../forms/Button";
 
 export interface DrawerProps {
   deckId?: string | null;
@@ -38,6 +40,7 @@ type Collapsed = {
 
 export default function Drawer(props: DrawerProps): React.ReactNode {
   const textLogo = useTextLogo();
+  const updates = useApplyUpdateAlert();
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
 
@@ -119,9 +122,24 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                     }
                   />
                 )}
+                {updates.canApplyUpdate && (
+                  <View>
+                    <ThemedText style={styles.updateText} type="h2">
+                      {updates.title}
+                    </ThemedText>
+                    <ThemedText style={styles.updateText}>
+                      {updates.message}
+                    </ThemedText>
+                    <Button
+                      variant="outline"
+                      title={updates.buttonText}
+                      onPress={updates.reload}
+                    />
+                  </View>
+                )}
               </FieldSet>
             </View>
-            {dexWebLink && (
+            {dexWebLink ? (
               <Link href={dexWebLink} asChild>
                 <Pressable>
                   <Image
@@ -131,6 +149,12 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                   />
                 </Pressable>
               </Link>
+            ) : (
+              <Image
+                style={styles.logo}
+                source={textLogo}
+                contentFit="contain"
+              />
             )}
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
             <Link
@@ -161,6 +185,9 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  updateText: {
+    marginBottom: 20,
   },
   playface: {
     height: 50,

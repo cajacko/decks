@@ -22,6 +22,7 @@ import { DrawerProvider } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
 import { useHasRehydrated } from "@/store/hooks";
 import registerExampleDecks from "@/utils/registerExampleDecks";
+import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 
 enableFreeze();
 registerExampleDecks();
@@ -52,6 +53,17 @@ function useNavigationTheme(): NavigationTheme {
       colors: navigationColors.dark,
     };
   }, [colorScheme]);
+}
+
+function Content({ children }: { children: React.ReactNode }) {
+  const { component } = useApplyUpdateAlert();
+
+  return (
+    <>
+      {component}
+      {children}
+    </>
+  );
 }
 
 function HasStore({ children }: { children: React.ReactNode }) {
@@ -100,7 +112,7 @@ function HasStore({ children }: { children: React.ReactNode }) {
       <NavigationThemeProvider value={navigationTheme}>
         <ModalProvider>
           <DrawerProvider>
-            {children}
+            <Content>{children}</Content>
             <StatusBar style="auto" />
           </DrawerProvider>
         </ModalProvider>

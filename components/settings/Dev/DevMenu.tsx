@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 import exampleDecks from "@/constants/exampleDecks";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import * as DevClient from "expo-dev-client";
-import { useUpdates } from "expo-updates";
+import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 
@@ -70,6 +70,8 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       titleProps={titleProps}
       {...props}
     >
+      <Button title="Reload App" onPress={reloadAsync} variant="outline" />
+
       {isDevClient && (
         <Button
           title="Open Dev Client Menu"

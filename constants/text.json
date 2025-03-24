@@ -109,5 +109,8 @@
   "template.reserved_data_item.description.name": "Description",
   "template.reserved_data_item.title.name": "Title",
   "settings.stack_actions.move.new_stack_start": "New Stack (Start)",
-  "settings.stack_actions.move.new_stack_end": "New Stack (End)"
+  "settings.stack_actions.move.new_stack_end": "New Stack (End)",
+  "update_alert.title": "Update Downloaded",
+  "update_alert.message": "A new version of the app has just downloaded. Press the \"Reload\" button below to get the latest features and fixes",
+  "update_alert.button": "Reload"
 }
