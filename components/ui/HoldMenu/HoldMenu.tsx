@@ -1,11 +1,8 @@
 import React from "react";
-import { StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 import { HoldMenuProps } from "./types";
 import useHoldMenu from "./useHoldMenu";
-import Animated, {
-  useAnimatedStyle,
-  AnimatedStyle,
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import {
   GestureDetector,
   GestureHandlerRootView,

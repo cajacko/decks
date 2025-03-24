@@ -35,11 +35,11 @@ export default function Version(props: { style?: ViewStyle }): React.ReactNode {
 
   let updateIndicatorColor: string | null;
 
-  if (isChecking || isDownloading || isUpdatePending) {
+  if (isChecking || isDownloading) {
     updateIndicatorColor = colors.warning;
   } else if (checkError || downloadError || initializationError) {
     updateIndicatorColor = colors.error;
-  } else if (isUpdateAvailable) {
+  } else if (isUpdateAvailable || isUpdatePending) {
     updateIndicatorColor = colors.success;
   } else {
     updateIndicatorColor = null;
