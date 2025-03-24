@@ -1,9 +1,9 @@
 import React from "react";
 import CardInstance from "@/components/cards/connected/CardInstance";
 import { StackTopCardProps } from "./types";
-import HoldMenu from "../HoldMenu";
+import HoldMenu from "@/components/HoldMenu";
 import useMenuItems from "./useMenuItems";
-import EditCardModal from "../EditCardModal";
+import EditCardModal from "@/components/EditCardModal";
 import { Target } from "@/utils/cardTarget";
 import { StyleProp, ViewStyle } from "react-native";
 

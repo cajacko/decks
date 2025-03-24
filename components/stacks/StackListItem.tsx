@@ -2,7 +2,7 @@ import React from "react";
 import { Tabletops } from "@/store/types";
 import { StyleSheet } from "react-native";
 import CardInstance from "@/components/cards/connected/CardInstance";
-import StackTopCard from "@/components/StackTopCard";
+import StackTopCard from "@/components/stacks/StackTopCard";
 import useFlag from "@/hooks/useFlag";
 
 export interface StackListItemProps {

@@ -8,7 +8,7 @@ import { StackProps } from "./stack.types";
 import styles, { getShuffleStyle } from "./stack.style";
 import useStack from "./useStack";
 import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
-import StackListItem from "@/components/StackListItem";
+import StackListItem from "@/components/stacks/StackListItem";
 import { Target } from "@/utils/cardTarget";
 
 export default function Stack(props: StackProps): React.ReactNode {
