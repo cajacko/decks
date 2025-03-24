@@ -41,4 +41,4 @@ jobs:
         run: yarn eas-build-post-install
 
       - name: Deploy
-        run: eas update --channel production
+        run: eas update --auto --channel production
