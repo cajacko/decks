@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   logo: {
-    // width: 50,
+    marginTop: 20,
     height: 80,
     marginBottom: 10,
   },
