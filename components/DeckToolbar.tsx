@@ -7,7 +7,7 @@ import Button from "./Button";
 import { selectCanEditDeck } from "@/store/slices/decks";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import Toolbar, { styles } from "./Toolbar";
+import Toolbar, { styles, useOnPressProps } from "./Toolbar";
 import { useSetDrawerProps } from "@/context/Drawer";
 
 interface DeckToolbarProps {
@@ -40,26 +40,29 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     defaultCard.open();
   }, [defaultCard]);
 
+  const openProps = useOnPressProps(open);
+  const copyDeckProps = useOnPressProps(copyDeck);
+
   return (
     <Toolbar useParent>
       {canEditDeck ? (
         <>
           {defaultCard.component}
           <Button
-            onPressOut={open}
             style={styles.action}
             title={text["deck.actions.default"]}
             variant="transparent"
             vibrate
+            {...openProps}
           />
         </>
       ) : (
         <Button
           title={text["deck.copy.title"]}
-          onPressOut={copyDeck}
           variant="transparent"
           style={styles.action}
           vibrate
+          {...copyDeckProps}
         />
       )}
     </Toolbar>

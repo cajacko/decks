@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 // import { useRouter } from "expo-router";
 import { useHeaderRight as _useHeaderRight } from "@/hooks/useParentHeaderRight";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import IconButton from "./IconButton";
 import { useDrawer } from "@/context/Drawer";
+import { TouchableOpacityProps } from "react-native-gesture-handler";
 
 export const iconSize = 30;
 export const horizontalPadding = 16;
@@ -28,10 +29,30 @@ function useHeaderRight({ children, useParent }: ToolbarProps) {
   _useHeaderRight({ headerRight, useParent });
 }
 
+/**
+ * Buttons in the header work a bit strangely on mobile devices and the onPressOut works better.
+ * Whereas onPressOut on mobile web does not work for the drawer component. It ends up immediately
+ * triggering the close callback
+ */
+export function useOnPressProps(
+  callback?: () => void,
+): Pick<TouchableOpacityProps, "onPress" | "onPressOut"> {
+  if (Platform.OS === "web") {
+    return {
+      onPress: callback,
+    };
+  }
+
+  return {
+    onPressOut: callback,
+  };
+}
+
 // NOTE: This component will only re-render on prop changes, no state changes
 function HeaderRight(props: HeaderRightProps): React.ReactNode {
   const { open } = useDrawer() ?? {};
   const { entering, exiting } = useLayoutAnimations();
+  const openProps = useOnPressProps(open);
 
   return (
     <Animated.View
@@ -45,8 +66,8 @@ function HeaderRight(props: HeaderRightProps): React.ReactNode {
           icon="settings"
           size={iconSize}
           variant="transparent"
-          onPressOut={open}
           style={styles.action}
+          {...openProps}
         />
       )}
     </Animated.View>

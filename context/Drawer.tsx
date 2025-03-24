@@ -41,7 +41,7 @@ export function useSetDrawerProps(drawerProps?: DrawerProps) {
 }
 
 export function DrawerProvider(props: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(true);
   const [drawerProps, setDrawerProps] = React.useState<DrawerProps>({});
   const backgroundColor = useThemeColor("background");
 
