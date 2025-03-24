@@ -10,7 +10,7 @@ import Animated, {
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { selectStackIds } from "@/store/slices/tabletop";
 import { useAppSelector } from "@/store/hooks";
-import { StackListRef } from "./StackList.types";
+import { StackListRef, ScrollOptions } from "./StackList.types";
 
 const scrollPromise = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -48,27 +48,27 @@ export default function useStackList() {
   }, [scrollOffset]);
 
   const stackListRef = React.useRef<StackListRef>({
-    scrollNext: async () => {
+    scrollNext: async ({ animated = true }: ScrollOptions = {}) => {
       const nextOffset = scrollOffset.value + interval;
 
-      runOnUI(() => scrollTo(animatedRef, nextOffset, 0, true))();
+      runOnUI(() => scrollTo(animatedRef, nextOffset, 0, animated))();
 
       await scrollPromise();
     },
-    scrollPrev: async () => {
+    scrollPrev: async ({ animated = true }: ScrollOptions = {}) => {
       const prevOffset = scrollOffset.value - interval;
 
-      runOnUI(() => scrollTo(animatedRef, prevOffset, 0, true))();
+      runOnUI(() => scrollTo(animatedRef, prevOffset, 0, animated))();
 
       await scrollPromise();
     },
-    scrollToStart: async () => {
-      runOnUI(() => scrollTo(animatedRef, 0, 0, true))();
+    scrollToStart: async ({ animated = true }: ScrollOptions = {}) => {
+      runOnUI(() => scrollTo(animatedRef, 0, 0, animated))();
 
       await scrollPromise();
     },
-    scrollToEnd: async () => {
-      animatedRef.current?.scrollToEnd();
+    scrollToEnd: async ({ animated = true }: ScrollOptions = {}) => {
+      animatedRef.current?.scrollToEnd({ animated });
 
       await scrollPromise();
     },

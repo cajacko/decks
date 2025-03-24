@@ -18,6 +18,7 @@ export default function useDispatchActions({
   canMoveToBottom,
   leftStackId,
   rightStackId,
+  stackListRef,
 }: StackTopCardProps) {
   const { tabletopId, deckId } = useTabletopContext();
 
@@ -107,9 +108,6 @@ export default function useDispatchActions({
   ]);
 
   const moveLeft = React.useMemo(() => {
-    // Disabling this until we want to tackle the auto scrolling when editing number of stacks
-    if (!leftStackId) return undefined;
-
     return {
       bottom: async () => {
         if (cardInstanceRef.current && animateCardMovement) {
@@ -119,6 +117,8 @@ export default function useDispatchActions({
             });
           } catch {}
         }
+
+        const isNew = !leftStackId;
 
         dispatch(
           moveCard({
@@ -130,6 +130,10 @@ export default function useDispatchActions({
               : { stackId: uuid(), newStackDirection: "start" },
           }),
         );
+
+        if (isNew) {
+          stackListRef.current?.scrollNext?.({ animated: false });
+        }
       },
       top: async () => {
         if (cardInstanceRef.current && animateCardMovement) {
@@ -139,6 +143,8 @@ export default function useDispatchActions({
             });
           } catch {}
         }
+
+        const isNew = !leftStackId;
 
         dispatch(
           moveCard({
@@ -150,6 +156,10 @@ export default function useDispatchActions({
               : { stackId: uuid(), newStackDirection: "start" },
           }),
         );
+
+        if (isNew) {
+          stackListRef.current?.scrollNext?.({ animated: false });
+        }
       },
     };
   }, [
@@ -159,6 +169,7 @@ export default function useDispatchActions({
     cardInstanceRef,
     tabletopId,
     animateCardMovement,
+    stackListRef,
   ]);
 
   const handleMoveToBottom = React.useMemo(() => {

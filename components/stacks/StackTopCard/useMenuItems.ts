@@ -32,14 +32,14 @@ export default function useMenuItems(props: StackTopCardProps) {
       handleAction: state.handleMoveToBottom,
     };
 
-    const right: MenuItem | undefined = state.moveRight && {
+    const right: MenuItem = {
       height: buttonSize,
       width: buttonSize,
       component: withHoldMenuItem("chevron-right", state.moveRight.top),
       handleAction: state.moveRight.top,
     };
 
-    const left: MenuItem | undefined = state.moveLeft && {
+    const left: MenuItem = {
       height: buttonSize,
       width: buttonSize,
       component: withHoldMenuItem("chevron-left", state.moveLeft.top),

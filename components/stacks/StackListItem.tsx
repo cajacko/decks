@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import CardInstance from "@/components/cards/connected/CardInstance";
 import StackTopCard from "@/components/stacks/StackTopCard";
 import useFlag from "@/hooks/useFlag";
+import { StackListRef } from "@/components/stacks/StackList";
 
 export interface StackListItemProps {
   cardInstanceId: Tabletops.CardInstanceId;
@@ -14,6 +15,7 @@ export interface StackListItemProps {
   leftStackId?: string;
   rightStackId?: string;
   canMoveToBottom: boolean;
+  stackListRef: React.RefObject<StackListRef>;
 }
 
 export default function StackListItem(
@@ -43,6 +45,7 @@ export default function StackListItem(
         canMoveToBottom={props.canMoveToBottom}
         offsetPosition={cardOffsetPosition}
         hideActions={!isTopCard}
+        stackListRef={props.stackListRef}
       />
     );
   }

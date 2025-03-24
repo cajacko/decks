@@ -7,10 +7,14 @@ export interface StackListProps {
   skeleton?: boolean;
 }
 
+export type ScrollOptions = {
+  animated?: boolean;
+};
+
 export interface StackListRef {
-  scrollNext?: () => Promise<void>;
-  scrollPrev?: () => Promise<void>;
-  scrollToStart: () => Promise<void>;
-  scrollToEnd: () => Promise<void>;
+  scrollNext?: (options?: ScrollOptions) => Promise<void>;
+  scrollPrev?: (options?: ScrollOptions) => Promise<void>;
+  scrollToStart: (options?: ScrollOptions) => Promise<void>;
+  scrollToEnd: (options?: ScrollOptions) => Promise<void>;
   // scrollToStack: (stackId: string) => Promise<void>;
 }

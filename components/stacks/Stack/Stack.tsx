@@ -72,6 +72,7 @@ export default function Stack(props: StackProps): React.ReactNode {
         stackId={props.stackId}
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}
+        stackListRef={props.stackListRef}
       />
     ));
   }, [
@@ -81,6 +82,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     cardInstancesIds,
     getCardOffsetPosition,
     props.skeleton,
+    props.stackListRef,
   ]);
 
   return (
