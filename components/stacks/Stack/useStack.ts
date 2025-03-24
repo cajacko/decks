@@ -104,7 +104,7 @@ export default function useStack({
   }, [dispatch, stackId, tabletopId, rotation, animateShuffle, vibrate]);
 
   const shakeToShuffleActive: boolean =
-    isFocussed &&
+    isFocussed === true &&
     shakeToShuffle &&
     !!cardInstancesIds &&
     cardInstancesIds.length > 1;
@@ -114,6 +114,8 @@ export default function useStack({
   onUpdateCardList(cardInstancesIds ?? []);
 
   const handleDeleteStack = React.useCallback(async () => {
+    stackListRef.current?.onDeleteStack?.(stackId);
+
     const scroll = stackListRef.current?.scrollPrev?.();
 
     const transform = new Promise<void>((resolve) => {
@@ -134,7 +136,7 @@ export default function useStack({
 
     await Promise.all([scroll, transform]);
 
-    dispatch(deleteStack({ tabletopId, stackId: stackId }));
+    dispatch(deleteStack({ tabletopId, stackId }));
   }, [
     stackId,
     width,

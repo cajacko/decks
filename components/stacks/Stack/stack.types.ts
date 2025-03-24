@@ -15,7 +15,7 @@ export interface StackProps {
    * When this stack is a clear target/ focus for the user. If it's the only one in view then it is
    * focussed. But if multiple are then we may not have any focus.
    */
-  isFocussed?: boolean;
+  isFocussed: boolean | null;
 }
 
 export type StackDimensions = {

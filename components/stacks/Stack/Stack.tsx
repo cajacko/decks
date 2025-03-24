@@ -30,6 +30,15 @@ export default function Stack(props: StackProps): React.ReactNode {
     shakeToShuffleActive,
   } = useStack(props);
 
+  function getShouldShowShuffle(): boolean {
+    if (!cardInstances) return false;
+    if (cardInstances.length <= 1) return false;
+    if (shakeToShuffleActive) return false;
+    if (props.isFocussed === false) return false;
+
+    return true;
+  }
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
@@ -104,7 +113,7 @@ export default function Stack(props: StackProps): React.ReactNode {
       </Animated.View>
 
       <View style={shuffleStyle}>
-        {cardInstances && cardInstances.length > 1 && !shakeToShuffleActive && (
+        {getShouldShowShuffle() && (
           <CardAction
             icon="shuffle"
             style={styles.shuffleButton}
