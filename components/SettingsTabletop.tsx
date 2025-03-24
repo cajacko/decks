@@ -11,7 +11,7 @@ import {
   addMissingTabletopCardsHelper,
 } from "@/store/actionHelpers/tabletop";
 import SwitchField from "./SwitchField";
-import StackActions from "./StackActions";
+import StackActions from "./stacks/StackActions";
 import useTabletopHistory from "@/hooks/useTabletopHistory";
 import { setTabletopSetting } from "@/store/slices/tabletop";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";

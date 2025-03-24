@@ -1,7 +1,7 @@
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { StackDimensions } from "./stack.types";
-import { CardPhysicalSize } from "../cards/context/CardPhysicalSize";
-import { Scale } from "../cards/context/PhysicalMeasures";
+import { CardPhysicalSize } from "../../cards/context/CardPhysicalSize";
+import { Scale } from "../../cards/context/PhysicalMeasures";
 
 function getSizesFromWidth(dpWidth: number, physicalSize: CardPhysicalSize) {
   const { mmHeight, mmWidth } = physicalSize;

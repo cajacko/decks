@@ -1,6 +1,6 @@
 import { StyleProp, ViewStyle } from "react-native";
-import { StackListRef } from "@/components/StackList/StackList.types";
-import { Scale } from "../cards/context/PhysicalMeasures";
+import { StackListRef } from "@/components/stacks/StackList/StackList.types";
+import { Scale } from "../../cards/context/PhysicalMeasures";
 
 export interface StackProps {
   stackId: string;

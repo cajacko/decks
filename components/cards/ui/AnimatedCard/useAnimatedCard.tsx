@@ -11,7 +11,7 @@ import {
 } from "react-native-reanimated";
 import useOffsetPositions from "./useOffsetPositions";
 import { UseMmToDpProps } from "../../context/PhysicalMeasures";
-import { getOffsetPosition } from "@/components/Stack/stackOffsetPositions";
+import { getOffsetPosition } from "@/components/stacks/Stack/stackOffsetPositions";
 
 export const flipScaleDuration = 200;
 export const flipRotationDuration = Math.round(flipScaleDuration / 4);

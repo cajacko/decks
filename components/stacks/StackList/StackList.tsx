@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import Stack from "@/components/Stack";
+import Stack from "@/components/stacks/Stack";
 import Animated from "react-native-reanimated";
 import { StackListProps } from "./StackList.types";
 import useStackList from "./useStackList";

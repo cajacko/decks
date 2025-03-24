@@ -2,7 +2,7 @@ import React from "react";
 import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
 import TabletopToolbar from "@/components/TabletopToolbar";
 import { TabletopProps } from "@/components/Tabletop/Tabletop.types";
-import StackList from "@/components/StackList";
+import StackList from "@/components/stacks/StackList";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,

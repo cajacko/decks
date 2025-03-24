@@ -1,7 +1,7 @@
 import React, { createContext } from "react";
 import { Dimensions } from "react-native";
-import { StackDimensions } from "@/components/Stack/stack.types";
-import { getStackDimensions } from "@/components/Stack/stack.style";
+import { StackDimensions } from "@/components/stacks/Stack/stack.types";
+import { getStackDimensions } from "@/components/stacks/Stack/stack.style";
 import AppError from "@/classes/AppError";
 import { PhysicalMeasuresProvider } from "../cards/context/PhysicalMeasures";
 import { useCardsPhysicalSize } from "@/components/cards/context/CardPhysicalSize";
