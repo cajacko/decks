@@ -1,7 +1,10 @@
 import React from "react";
 import { DeviceMotion, DeviceMotionMeasurement } from "expo-sensors";
+import { Platform } from "react-native";
 
-DeviceMotion.setUpdateInterval(50); // fast updates for accurate gesture tracking
+if (Platform.OS !== "web") {
+  DeviceMotion.setUpdateInterval(50); // fast updates for accurate gesture tracking
+}
 
 export default function useShakeEffect(callback?: (() => void) | null) {
   const rotationHistory = React.useRef<{
