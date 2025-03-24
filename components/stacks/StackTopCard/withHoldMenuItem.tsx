@@ -1,6 +1,6 @@
-import { MenuItemComponentProps } from "@/components/HoldMenu";
-import { IconSymbolName } from "@/components/IconSymbol";
-import CardAction from "@/components/CardAction";
+import { MenuItemComponentProps } from "@/components/ui/HoldMenu";
+import { IconSymbolName } from "@/components/ui/IconSymbol";
+import CardAction from "@/components/forms/CardAction";
 
 export default function withHoldMenuItem(
   icon: IconSymbolName,

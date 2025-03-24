@@ -9,7 +9,7 @@ import {
 import { AnimatedCardSidesRef } from "@/components/cards/connected/AnimatedCardSides";
 import { StackTopCardProps } from "./types";
 import useFlag from "@/hooks/useFlag";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import uuid from "@/utils/uuid";
 
 export default function useDispatchActions({

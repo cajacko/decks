@@ -5,7 +5,7 @@ import AnimatedCardSides, {
 } from "@/components/cards/connected/AnimatedCardSides";
 import { selectCardInstance } from "@/store/slices/tabletop";
 import { useRequiredAppSelector } from "@/store/hooks";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { Target } from "@/utils/cardTarget";
 
 export interface CardInstanceProps extends Partial<AnimatedCardSidesProps> {

@@ -1,6 +1,6 @@
 import React from "react";
 import { OffsetPosition } from "./AnimatedCard.types";
-import { useOptionalTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { useOptionalTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
 import { useAppSelector } from "@/store/hooks";
 import {

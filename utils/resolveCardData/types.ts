@@ -1,4 +1,4 @@
-import { Values as TemplateValuesMap } from "@/components/Template/Template.types";
+import { Values as TemplateValuesMap } from "@/components/templates/Template.types";
 import { Cards, Decks, Templates } from "@/store/types";
 
 export type { TemplateValuesMap };

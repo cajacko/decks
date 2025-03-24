@@ -5,7 +5,7 @@ import {
   setStackOrder,
 } from "@/store/slices/tabletop";
 import { StackProps } from "./stack.types";
-import { useTabletopContext } from "../../Tabletop/Tabletop.context";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";

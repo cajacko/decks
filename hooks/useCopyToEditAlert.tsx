@@ -1,5 +1,5 @@
 import React from "react";
-import Alert, { AlertButton } from "@/components/Alert";
+import Alert, { AlertButton } from "@/components/overlays/Alert";
 import text from "@/constants/text";
 import uuid from "@/utils/uuid";
 import { useAppDispatch } from "@/store/hooks";

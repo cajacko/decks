@@ -1,9 +1,9 @@
 import { Stack } from "expo-router";
 import React from "react";
 import { getDeckName } from "@/app/deck/[deckId]/_layout";
-import { withApp } from "@/components/App";
+import { withApp } from "@/components/ui/App";
 import useFlag from "@/hooks/useFlag";
-import HeaderLogo from "@/components/HeaderLogo";
+import HeaderLogo from "@/components/ui/HeaderLogo";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`

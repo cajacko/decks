@@ -1,10 +1,10 @@
 import React from "react";
-import FieldSet, { FieldSetProps } from "../FieldSet";
-import Picker, { PickerItem } from "../Picker";
+import FieldSet, { FieldSetProps } from "../forms/FieldSet";
+import Picker, { PickerItem } from "../forms/Picker";
 import { selectStackIds } from "@/store/slices/tabletop";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import Field from "../Field";
-import Button from "../Button";
+import Field from "../forms/Field";
+import Button from "../forms/Button";
 import {
   setStackOrder,
   changeCardState,

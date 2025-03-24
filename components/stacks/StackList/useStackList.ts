@@ -7,7 +7,7 @@ import Animated, {
   useDerivedValue,
   runOnJS,
 } from "react-native-reanimated";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { selectStackIds } from "@/store/slices/tabletop";
 import { useAppSelector } from "@/store/hooks";
 import { StackListRef } from "./StackList.types";

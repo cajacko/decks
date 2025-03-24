@@ -8,7 +8,7 @@ import {
   ReservedDataSchemaIds,
   reservedDataSchemaItems,
 } from "@/constants/reservedDataSchemaItems";
-import { colorFunction } from "@/components/Template/handlebars";
+import { colorFunction } from "@/components/templates/handlebars";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");

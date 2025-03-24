@@ -1,8 +1,8 @@
 import React from "react";
 import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
-import { MenuItems, MenuItem } from "@/components/HoldMenu";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
+import { MenuItems, MenuItem } from "@/components/ui/HoldMenu";
 import withHoldMenuItem from "./withHoldMenuItem";
 
 export default function useMenuItems(props: StackTopCardProps) {

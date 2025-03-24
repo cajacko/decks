@@ -1,6 +1,6 @@
 import React from "react";
 import CardContainer, { CardContainerProps } from "./CardContainer";
-import Template, { TemplateProps } from "@/components/Template";
+import Template, { TemplateProps } from "@/components/templates";
 import withUseExternalMemo from "@/hooks/withUseExternalMemo";
 
 /**

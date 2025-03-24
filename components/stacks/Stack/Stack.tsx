@@ -1,13 +1,13 @@
 import React from "react";
 import { View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import EmptyStack from "@/components/EmptyStack";
-import CardAction from "@/components/CardAction";
+import EmptyStack from "@/components/stacks/EmptyStack";
+import CardAction from "@/components/forms/CardAction";
 import CardSpacer from "@/components/cards/connected/CardSpacer";
 import { StackProps } from "./stack.types";
 import styles, { getShuffleStyle } from "./stack.style";
 import useStack from "./useStack";
-import { useTabletopContext } from "@/components/Tabletop/Tabletop.context";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import StackListItem from "@/components/stacks/StackListItem";
 import { Target } from "@/utils/cardTarget";
 
