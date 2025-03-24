@@ -7,10 +7,10 @@ const path = require("path");
 
 const commitSha = execSync("git rev-parse --short HEAD").toString().trim();
 
-const pkgPath = path.resolve(__dirname, "../package.json");
+const pkgPath = path.resolve(__dirname, "../constants/commitSha.json");
 const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
 
-pkg["commit-sha"] = commitSha;
+pkg["commitSha"] = commitSha;
 
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
