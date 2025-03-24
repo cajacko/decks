@@ -21,6 +21,10 @@ export interface FieldSetProps
   itemSpacing?: number;
 }
 
+export const titleProps: CollapsibleProps["titleProps"] = {
+  type: "h3",
+};
+
 export default function FieldSet({
   title,
   children: childrenProp,
@@ -57,9 +61,9 @@ export default function FieldSet({
     });
   }, [childrenProp, itemSpacing]);
 
-  const titleProps = React.useMemo(
+  const _titleProps = React.useMemo(
     (): CollapsibleProps["titleProps"] => ({
-      type: "h3",
+      ...titleProps,
       ...titlePropsProp,
     }),
     [titlePropsProp],
@@ -82,7 +86,7 @@ export default function FieldSet({
       subTitle={subTitle}
       {...props}
       subTitleProps={subTitleProps}
-      titleProps={titleProps}
+      titleProps={_titleProps}
     >
       {children}
     </Collapsible>

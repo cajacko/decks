@@ -41,6 +41,9 @@ export const themes = {
     textureBackgroundStop2: Color(textureBackground.stop2).lighten(0.6).hex(),
     textureBackgroundStop3: Color(textureBackground.stop3).lighten(0.7).hex(),
     emptyStackBorder: Color(colors.darkBlue).lighten(0.5).hex(),
+    warning: colors.yellow,
+    error: colors.red,
+    success: colors.blue,
   },
   dark: {
     primary: colors.yellow,
@@ -61,6 +64,9 @@ export const themes = {
     textureBackgroundStop2: textureBackground.stop2,
     textureBackgroundStop3: textureBackground.stop3,
     emptyStackBorder: colors.white,
+    warning: colors.yellow,
+    error: colors.red,
+    success: colors.blue,
   },
 };
 

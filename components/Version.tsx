@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Pressable, Platform, ViewStyle } from "react-native";
+import { StyleSheet, Pressable, Platform, ViewStyle, View } from "react-native";
 import { nativeApplicationVersion, nativeBuildVersion } from "expo-application";
 import ThemedText from "./ThemedText";
 import app from "@/constants/app";
@@ -9,6 +9,8 @@ import { setUserFlag } from "@/store/slices/userSettings";
 import Alert from "./Alert";
 import text from "@/constants/text";
 import { commitSha } from "@/constants/commitSha.json";
+import { useUpdates } from "expo-updates";
+import { useThemeColors } from "@/hooks/useThemeColor";
 
 let version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`
@@ -20,6 +22,29 @@ if (commitSha) {
 
 export default function Version(props: { style?: ViewStyle }): React.ReactNode {
   const dispatch = useAppDispatch();
+  const colors = useThemeColors();
+  const {
+    isChecking,
+    isDownloading,
+    isUpdateAvailable,
+    isUpdatePending,
+    checkError,
+    downloadError,
+    initializationError,
+  } = useUpdates();
+
+  let updateIndicatorColor: string | null;
+
+  if (isChecking || isDownloading || isUpdatePending) {
+    updateIndicatorColor = colors.warning;
+  } else if (checkError || downloadError || initializationError) {
+    updateIndicatorColor = colors.error;
+  } else if (isUpdateAvailable) {
+    updateIndicatorColor = colors.success;
+  } else {
+    updateIndicatorColor = null;
+  }
+
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
 
@@ -79,17 +104,50 @@ export default function Version(props: { style?: ViewStyle }): React.ReactNode {
         ]}
       />
       <Pressable style={style} onPress={onVersionPress}>
-        <ThemedText>
-          v{version} - {Platform.OS}
-        </ThemedText>
+        <View>
+          <ThemedText>
+            v{version} - {Platform.OS}
+          </ThemedText>
+          {updateIndicatorColor && (
+            <View style={styles.indicatorContainer}>
+              <View
+                style={[
+                  styles.indicator,
+                  { backgroundColor: updateIndicatorColor },
+                ]}
+              />
+            </View>
+          )}
+        </View>
       </Pressable>
     </>
   );
 }
 
+const indicatorSize = 8;
+
 const styles = StyleSheet.create({
   version: {
     width: "100%",
     alignItems: "center",
+    flexDirection: "row",
+    position: "relative",
+    justifyContent: "center",
+  },
+  indicatorContainer: {
+    position: "absolute",
+    right: -indicatorSize * (3 / 2),
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    width: indicatorSize,
+    height: "100%",
+    opacity: 0.25,
+  },
+  indicator: {
+    height: indicatorSize,
+    width: indicatorSize,
+    borderRadius: indicatorSize / 2,
   },
 });

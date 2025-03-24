@@ -4,12 +4,17 @@ import Button from "@/components/Button";
 import { persistor, resetStore } from "@/store/store";
 import AppError from "@/classes/AppError";
 import text from "@/constants/text";
-import FieldSet, { FieldSetProps } from "@/components/FieldSet";
+import FieldSet, {
+  FieldSetProps,
+  titleProps as fieldSetTitleProps,
+} from "@/components/FieldSet";
 import { useRouter } from "expo-router";
 import exampleDecks from "@/constants/exampleDecks";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import * as DevClient from "expo-dev-client";
-import * as Haptics from "expo-haptics";
+import { useUpdates } from "expo-updates";
+import Collapsible from "../Collapsible";
+import ThemedText from "../ThemedText";
 
 export interface DevMenuProps extends FieldSetProps {
   closeDrawer: () => void;
@@ -20,6 +25,19 @@ const titleProps = { type: "h2" } as const;
 export default function DevMenu(props: DevMenuProps): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
   const { navigate } = useRouter();
+  const {
+    currentlyRunning,
+    isChecking,
+    isDownloading,
+    isUpdateAvailable,
+    isUpdatePending,
+    availableUpdate,
+    checkError,
+    downloadError,
+    downloadedUpdate,
+    initializationError,
+    lastCheckForUpdateTimeSinceRestart,
+  } = useUpdates();
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -65,55 +83,6 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
         onPress={purgeStore}
         variant="outline"
       />
-      <FieldSet title="Haptics" collapsible initialCollapsed>
-        <Button
-          title="Selection"
-          onPress={() => {
-            Haptics.selectionAsync();
-          }}
-          variant="outline"
-        />
-        <Button
-          title="Success"
-          onPress={() =>
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-          }
-        />
-        <Button
-          title="Error"
-          onPress={() =>
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
-          }
-        />
-        <Button
-          title="Warning"
-          onPress={() =>
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
-          }
-        />
-        <Button
-          title="Light"
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-        />
-        <Button
-          title="Medium"
-          onPress={() =>
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-          }
-        />
-        <Button
-          title="Heavy"
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)}
-        />
-        <Button
-          title="Rigid"
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid)}
-        />
-        <Button
-          title="Soft"
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
-        />
-      </FieldSet>
       <FieldSet title="Example Deck Links" collapsible initialCollapsed>
         {Object.entries(exampleDecks).map(([id, { name }]) => (
           <Button
@@ -129,6 +98,32 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
         ))}
       </FieldSet>
       <Flags />
+      <Collapsible
+        title="Updates Info"
+        collapsible
+        initialCollapsed
+        titleProps={fieldSetTitleProps}
+      >
+        <ThemedText>
+          {JSON.stringify(
+            {
+              currentlyRunning: currentlyRunning.updateId,
+              isChecking,
+              isDownloading,
+              isUpdateAvailable,
+              isUpdatePending,
+              availableUpdate: availableUpdate?.updateId,
+              checkError,
+              downloadError,
+              downloadedUpdate: downloadedUpdate?.updateId,
+              initializationError,
+              lastCheckForUpdateTimeSinceRestart,
+            },
+            null,
+            2,
+          )}
+        </ThemedText>
+      </Collapsible>
     </FieldSet>
   );
 }
