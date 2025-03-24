@@ -43,12 +43,12 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
 
   const initialCollapsed = React.useMemo(
     (): Collapsed => ({
-      tabletop: false,
-      deck: !!props.tabletopId,
-      app: !!props.deckId || !!props.tabletopId,
+      tabletop: true,
+      deck: true,
+      app: true,
       dev: true,
     }),
-    [props.deckId, props.tabletopId],
+    [],
   );
 
   const [collapsed, setCollapsed] = React.useState<Collapsed>(initialCollapsed);
