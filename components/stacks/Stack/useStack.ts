@@ -1,12 +1,13 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
+  selectCardInstanceIds,
   selectFirstXCardInstances,
   setStackOrder,
 } from "@/store/slices/tabletop";
 import { StackProps } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
-import { generateSeed } from "@/utils/seededShuffle";
+import seededShuffle, { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import {
@@ -70,6 +71,14 @@ export default function useStack({
     }),
   );
 
+  const [cardInstanceIdsOverride, setCardInstanceIdsOverride] = React.useState<
+    string[] | null
+  >(null);
+
+  const allCardInstanceIds = useAppSelector((state) =>
+    selectCardInstanceIds(state, { stackId, tabletopId }),
+  );
+
   const handleShuffle = React.useCallback(async () => {
     let promise: Promise<unknown> | undefined;
 
@@ -77,7 +86,6 @@ export default function useStack({
 
     if (animateShuffle) {
       rotation.value = 0;
-
       const duration = 1200;
 
       promise = new Promise<void>((resolve) => {
@@ -89,6 +97,37 @@ export default function useStack({
           },
         );
       });
+    } else {
+      const idsToShuffle = allCardInstanceIds ?? cardInstancesIds;
+
+      if (idsToShuffle) {
+        const iterations = 4;
+        const interval = 500;
+
+        promise = new Promise<void>((resolve) => {
+          function run() {
+            if (!idsToShuffle) return;
+
+            const newIds = seededShuffle(idsToShuffle, generateSeed()).slice(
+              0,
+              1,
+            );
+
+            setCardInstanceIdsOverride(newIds);
+          }
+
+          run();
+
+          for (let i = 1; i < iterations; i++) {
+            setTimeout(run, i * interval);
+          }
+
+          setTimeout(() => {
+            setCardInstanceIdsOverride(null);
+            resolve();
+          }, iterations * interval);
+        });
+      }
     }
 
     dispatch(
@@ -101,7 +140,18 @@ export default function useStack({
     );
 
     await promise;
-  }, [dispatch, stackId, tabletopId, rotation, animateShuffle, vibrate]);
+
+    setCardInstanceIdsOverride(null);
+  }, [
+    dispatch,
+    stackId,
+    tabletopId,
+    rotation,
+    animateShuffle,
+    vibrate,
+    allCardInstanceIds,
+    cardInstancesIds,
+  ]);
 
   const shakeToShuffleActive: boolean =
     isFocussed === true &&
@@ -188,7 +238,7 @@ export default function useStack({
   return {
     opacity,
     width,
-    cardInstancesIds,
+    cardInstancesIds: cardInstanceIdsOverride ?? cardInstancesIds,
     getCardOffsetPosition,
     handleShuffle,
     rotation,
