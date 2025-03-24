@@ -38,8 +38,8 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Fetch prebuild data
-        run: yarn fetch-decks
+      - name: Run the eas prebuild command
+        run: yarn eas-build-post-install
 
       - name: Export Web
         run: npx expo export --platform web

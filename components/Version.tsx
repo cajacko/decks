@@ -8,10 +8,15 @@ import { selectFlag } from "@/store/combinedSelectors/flags";
 import { setUserFlag } from "@/store/slices/userSettings";
 import Alert from "./Alert";
 import text from "@/constants/text";
+import packageJson from "@/package.json";
 
-const version = nativeApplicationVersion
+let version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`
   : app.version;
+
+if (packageJson["commit-sha"]) {
+  version += ` - ${packageJson["commit-sha"]}`;
+}
 
 export default function Version(props: { style?: ViewStyle }): React.ReactNode {
   const dispatch = useAppDispatch();

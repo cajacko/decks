@@ -19,7 +19,8 @@
     "submit": "eas submit",
     "publish:go": "eas update --branch=main",
     "fetch-decks": "ts-node .scripts/fetchDecks.ts",
-    "eas-build-post-install": "yarn fetch-decks"
+    "eas-build-post-install": "yarn fetch-decks && yarn set-commit-sha",
+    "set-commit-sha": "ts-node .scripts/setCommitSha.ts"
   },
   "jest": {
     "preset": "jest-expo"
@@ -97,5 +98,6 @@
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "private": true,
+  "commit-sha": ""
 }
