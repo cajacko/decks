@@ -37,6 +37,7 @@ export default function useStack({
   const offsetPositionsCount = offsetPositions ? offsetPositions.length : 2;
 
   const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
+  const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
   const animateShuffle = useFlag("SHUFFLE_ANIMATION") === "enabled";
   const dispatch = useAppDispatch();
@@ -97,7 +98,7 @@ export default function useStack({
           },
         );
       });
-    } else {
+    } else if (!performanceMode) {
       const idsToShuffle = allCardInstanceIds ?? cardInstancesIds;
 
       if (idsToShuffle) {
@@ -151,6 +152,7 @@ export default function useStack({
     vibrate,
     allCardInstanceIds,
     cardInstancesIds,
+    performanceMode,
   ]);
 
   const shakeToShuffleActive: boolean =
