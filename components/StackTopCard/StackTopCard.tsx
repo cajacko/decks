@@ -11,6 +11,7 @@ export * from "./types";
 
 export default function StackTopCard({
   style: styleProp,
+  hideActions = false,
   ...props
 }: StackTopCardProps): React.ReactNode {
   const state = useMenuItems(props);
@@ -32,7 +33,7 @@ export default function StackTopCard({
         menuItems={state.menuItems}
         handleDoubleTap={state.handlePress}
         style={style}
-        hideActions={state.hideActions}
+        hideActions={hideActions}
       >
         <CardInstance
           {...props}

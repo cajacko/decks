@@ -209,7 +209,7 @@ export default function useDispatchActions({
     moveLeft,
     handleMoveToBottom,
     setIsAnimating,
-    hideActions: isAnimating,
+    isAnimating,
     animatedToBack,
   };
 }

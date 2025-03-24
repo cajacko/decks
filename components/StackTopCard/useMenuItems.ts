@@ -66,14 +66,13 @@ export default function useMenuItems(props: StackTopCardProps) {
 
   return {
     cardId: state.cardId,
-    menuItems,
+    menuItems: state.isAnimating ? null : menuItems,
     cardInstanceRef: state.cardInstanceRef,
     setIsAnimating: state.setIsAnimating,
-    hideActions: state.hideActions,
     showEditModal,
     closeEditModal,
     side: state.side,
-    handlePress,
+    handlePress: state.isAnimating ? undefined : handlePress,
     animatedToBack: state.animatedToBack,
   };
 }

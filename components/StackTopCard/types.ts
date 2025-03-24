@@ -5,4 +5,5 @@ export interface StackTopCardProps extends CardInstanceProps {
   leftStackId?: string;
   rightStackId?: string;
   canMoveToBottom?: boolean;
+  hideActions?: boolean;
 }

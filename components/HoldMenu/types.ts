@@ -37,7 +37,7 @@ export type RenderChildren = (props: {
 export interface HoldMenuProps {
   handleLongPress?: () => void;
   handleDoubleTap?: () => void;
-  menuItems: MenuItems;
+  menuItems: MenuItems | null;
   touchBuffer?: number;
   children?: React.ReactNode | RenderChildren;
   style?: StyleProp<ViewStyle>;

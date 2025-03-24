@@ -294,7 +294,7 @@ export default function useHoldMenu({
           activeDirectionSharedValue.value = activeDirection;
 
           if (activeDirection) {
-            const selectedActionItem = menuItems[activeDirection];
+            const selectedActionItem = menuItems?.[activeDirection];
 
             if (selectedActionItem) {
               runOnJS(onHighlight)(activeDirection);
@@ -318,7 +318,7 @@ export default function useHoldMenu({
 
         const selectedActionItem =
           activeDirectionSharedValue.value &&
-          menuItems[activeDirectionSharedValue.value];
+          menuItems?.[activeDirectionSharedValue.value];
 
         // We have dragged and selected an action, run it
         if (selectedActionItem) {
@@ -358,36 +358,36 @@ export default function useHoldMenu({
   const menuTaps = React.useMemo(
     () => ({
       top: Gesture.Tap()
-        .enabled(!!menuItems.top)
+        .enabled(!!menuItems?.top)
         .onEnd(() => {
-          if (!menuItems.top) return;
+          if (!menuItems?.top) return;
 
           runOnJS(menuItems.top.handleAction)();
           runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
       bottom: Gesture.Tap()
-        .enabled(!!menuItems.bottom)
+        .enabled(!!menuItems?.bottom)
         .onEnd(() => {
-          if (!menuItems.bottom) return;
+          if (!menuItems?.bottom) return;
 
           runOnJS(menuItems.bottom.handleAction)();
           runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
       left: Gesture.Tap()
-        .enabled(!!menuItems.left)
+        .enabled(!!menuItems?.left)
         .onEnd(() => {
-          if (!menuItems.left) return;
+          if (!menuItems?.left) return;
 
           runOnJS(menuItems.left.handleAction)();
           runOnJS(onAction)();
         })
         .blocksExternalGesture(...gesture.toGestureArray()),
       right: Gesture.Tap()
-        .enabled(!!menuItems.right)
+        .enabled(!!menuItems?.right)
         .onEnd(() => {
-          if (!menuItems.right) return;
+          if (!menuItems?.right) return;
 
           runOnJS(menuItems.right.handleAction)();
           runOnJS(onAction)();

@@ -1,8 +1,11 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 import { HoldMenuProps } from "./types";
 import useHoldMenu from "./useHoldMenu";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  AnimatedStyle,
+} from "react-native-reanimated";
 import {
   GestureDetector,
   GestureHandlerRootView,
@@ -18,9 +21,15 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
     opacity: state.menuOpacity.value,
   }));
 
-  const menuItemStyle = state.alwaysShowCardActions
-    ? undefined
-    : _menuItemStyle;
+  let menuItemStyle: AnimatedStyle<ViewStyle> | undefined;
+
+  if (state.alwaysShowCardActions) {
+    menuItemStyle = undefined;
+  } else if (props.hideActions) {
+    menuItemStyle = styles.hideMenu;
+  } else {
+    menuItemStyle = _menuItemStyle;
+  }
 
   const scaleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: state.scale.value }],
@@ -80,7 +89,7 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
       {children && (
         <Animated.View style={childrenStyle}>{children}</Animated.View>
       )}
-      {!props.hideActions && (
+      {props.menuItems && (
         <>
           {props.menuItems.top && (
             <MenuItem
@@ -181,5 +190,8 @@ const styles = StyleSheet.create({
   },
   bufferBox: {
     position: "absolute",
+  },
+  hideMenu: {
+    opacity: 0,
   },
 });

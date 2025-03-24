@@ -42,6 +42,7 @@ export default function StackListItem(
         rightStackId={props.rightStackId}
         canMoveToBottom={props.canMoveToBottom}
         offsetPosition={cardOffsetPosition}
+        hideActions={!isTopCard}
       />
     );
   }
