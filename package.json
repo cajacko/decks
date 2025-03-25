@@ -17,7 +17,6 @@
     "build:ios:preview": "eas build --platform ios --profile preview",
     "build:ios:production": "eas build --platform ios --profile production",
     "submit": "eas submit",
-    "publish:go": "eas update --branch=main",
     "fetch-decks": "ts-node .scripts/fetchDecks.ts",
     "eas-build-post-install": "yarn fetch-decks && yarn set-commit-sha",
     "set-commit-sha": "ts-node .scripts/setCommitSha.ts"
