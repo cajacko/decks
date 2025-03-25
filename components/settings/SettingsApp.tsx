@@ -36,6 +36,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
 
   const vibrate = useFlag("CARD_ACTIONS_HAPTICS") === "enabled";
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
+  const editCardMoreInfo = useFlag("EDIT_CARD_MORE_INFO") === "enabled";
 
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
@@ -92,6 +93,18 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
     [dispatch],
   );
 
+  const onChangeEditCardMoreInfo = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setUserFlag({
+          key: "EDIT_CARD_MORE_INFO",
+          value: value ? "enabled" : "disabled",
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   return (
     <FieldSet title={text["settings.title"]} titleProps={titleProps} {...props}>
       <Field label={text["settings.theme"]}>
@@ -123,6 +136,14 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         label={text["settings.hold_menu.always_show"]}
         value={holdMenuAlwaysVisible}
         onValueChange={onChangeHoldMenu}
+      />
+      <SwitchField
+        label={text["settings.edit_card.more_info"]}
+        FieldProps={{
+          subLabel: text["settings.edit_card.more_info.helper"],
+        }}
+        value={editCardMoreInfo}
+        onValueChange={onChangeEditCardMoreInfo}
       />
       {Platform.OS !== "web" && (
         <SwitchField

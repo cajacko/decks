@@ -69,6 +69,8 @@
   "settings.do_not_add_new_cards": "Do Not Add Cards",
   "settings.flags.title": "Dev Flags",
   "settings.hold_menu.always_show": "Always Show Card Actions",
+  "settings.edit_card.more_info": "More Edit Card Options",
+  "settings.edit_card.more_info.helper": "Gives you some more control over the card editing process. It allows you to clear fields, use defaults and indicate when a card should not use a default value.",
   "settings.neat_stack.helper": "Align cards within stacks so you definitely can't see what's behind the first card.",
   "settings.neat_stack": "Neat Stacks",
   "settings.new_cards_join_top.helper": "When you create new cards, should they be added to the top of the first stack or the bottom?",
