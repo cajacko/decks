@@ -8,7 +8,7 @@ import {
   ReservedDataSchemaIds,
   reservedDataSchemaItems,
 } from "@/constants/reservedDataSchemaItems";
-import { colorFunction } from "@/components/Template/handlebars";
+import { colorFunction } from "@/components/templates/handlebars";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
@@ -19,6 +19,8 @@ export const dataIds = {
   emoji: dataItemId("emoji"),
   backgroundColor: dataItemId("backgroundColor"),
   textColor: dataItemId("textColor"),
+  textSize: dataItemId("textSize"),
+  emojiSize: dataItemId("emojiSize"),
 } as const;
 
 type DataId = (typeof dataIds)[keyof typeof dataIds];
@@ -65,6 +67,24 @@ const template: Templates.Props<DataId> = {
       type: "color",
       name: text["template.built_in.back.text_color"],
     },
+    [dataIds.emojiSize]: {
+      id: dataIds.emojiSize,
+      type: "text",
+      name: text["template.built_in.front.emoji_size"],
+      defaultValidatedValue: {
+        type: "text",
+        value: "24",
+      },
+    },
+    [dataIds.textSize]: {
+      id: dataIds.textSize,
+      type: "text",
+      name: text["template.built_in.back.text_size"],
+      defaultValidatedValue: {
+        type: "text",
+        value: "10",
+      },
+    },
   },
   markup: [
     {
@@ -83,7 +103,7 @@ const template: Templates.Props<DataId> = {
           text: `{{${dataIds.emoji}}}`,
           conditional: `{{${dataIds.emoji}}}`,
           style: {
-            fontSize: 24,
+            fontSize: `{{${dataIds.emojiSize}}}`,
             textAlign: "center",
             zIndex: 2,
             position: "relative",
@@ -96,11 +116,11 @@ const template: Templates.Props<DataId> = {
           conditional: `{{${dataIds.text}}}`,
           style: {
             color: `{{#if ${dataIds.textColor}}}{{${dataIds.textColor}}}{{else}}${colorFunction("lightness", dataIds.color, 15)}{{/if}}`,
-            fontSize: 10,
+            fontSize: `{{${dataIds.textSize}}}`,
             textAlign: "center",
             zIndex: 2,
             position: "relative",
-            fontFamily: "Zain",
+            fontFamily: "LuckiestGuy",
           },
         },
         {

@@ -20,8 +20,7 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
         style: [front.style, state.renderSpacer && styles.absolute],
         initialScaleX:
           state.flipState === "flipping-to-front" ? 0 : front.initialRotation,
-        initialRotation:
-          state.flipState === "flipping-to-front" ? 0 : front.initialRotation,
+        initialRotation: front.initialRotation,
       }),
       [front.style, front.initialRotation, state.flipState, state.renderSpacer],
     );
@@ -31,8 +30,7 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
         style: [back.cardStyle, state.renderSpacer && styles.absolute],
         initialScaleX:
           state.flipState === "flipping-to-back" ? 0 : back.initialRotation,
-        initialRotation:
-          state.flipState === "flipping-to-back" ? 0 : back.initialRotation,
+        initialRotation: back.initialRotation,
       }),
       [
         back.cardStyle,

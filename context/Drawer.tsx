@@ -2,7 +2,7 @@ import React from "react";
 import { Drawer } from "react-native-drawer-layout";
 import DrawerContent, {
   DrawerProps as _DrawerProps,
-} from "@/components/Drawer";
+} from "@/components/overlays/Drawer";
 import AppError from "@/classes/AppError";
 import { useFocusEffect } from "expo-router";
 import { useThemeColor } from "@/hooks/useThemeColor";

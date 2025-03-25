@@ -8,8 +8,13 @@ export const flagMap = {
   // User control flags go here
   PERFORMANCE_MODE: ["disabled", "enabled"],
   HOLD_MENU_BEHAVIOUR: ["hold/hover", "always-visible"],
+  CARD_ACTIONS_HAPTICS: ["enabled", "disabled"],
+  SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
+  ROTATE_CARDS_BEFORE_FLIP: ["disabled", "enabled"],
+  SHUFFLE_ANIMATION: ["enabled", "disabled"],
+  STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],
   CARD_ANIMATE_SEND_TO_BACK: ["enabled", "disabled"],
   CARD_ANIMATE_OUT_BEHAVIOUR: ["linear", "bezier"],
   HOLD_MENU_DEV_INDICATOR: ["disabled", "enabled"],

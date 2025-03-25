@@ -6,7 +6,7 @@ import {
   ReservedDataSchemaIds,
   reservedDataSchemaItems,
 } from "@/constants/reservedDataSchemaItems";
-import { colorFunction } from "@/components/Template/handlebars";
+import { colorFunction } from "@/components/templates/handlebars";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { templateId, dataItemId } = builtInTemplateIds("front");
@@ -20,6 +20,9 @@ export const dataIds = {
   backgroundColor: dataItemId("backgroundColor"),
   titleColor: dataItemId("titleColor"),
   descriptionColor: dataItemId("descriptionColor"),
+  emojiSize: dataItemId("emojiSize"),
+  titleSize: dataItemId("titleSize"),
+  descriptionSize: dataItemId("descriptionSize"),
 } as const;
 
 type DataId = (typeof dataIds)[keyof typeof dataIds];
@@ -36,6 +39,9 @@ const template: Templates.Props<DataId> = {
     dataIds.descriptionColor,
     dataIds.borderColor,
     dataIds.backgroundColor,
+    dataIds.emojiSize,
+    dataIds.titleSize,
+    dataIds.descriptionSize,
   ],
   schema: {
     [dataIds.title]: {
@@ -84,6 +90,33 @@ const template: Templates.Props<DataId> = {
       type: "color",
       name: text["template.built_in.front.border_color"],
     },
+    [dataIds.emojiSize]: {
+      id: dataIds.emojiSize,
+      type: "text",
+      name: text["template.built_in.front.emoji_size"],
+      defaultValidatedValue: {
+        value: "24",
+        type: "text",
+      },
+    },
+    [dataIds.titleSize]: {
+      id: dataIds.titleSize,
+      type: "text",
+      name: text["template.built_in.front.title_size"],
+      defaultValidatedValue: {
+        value: "8",
+        type: "text",
+      },
+    },
+    [dataIds.descriptionSize]: {
+      id: dataIds.descriptionSize,
+      type: "text",
+      name: text["template.built_in.front.description_size"],
+      defaultValidatedValue: {
+        value: "4",
+        type: "text",
+      },
+    },
   },
   markup: [
     {
@@ -110,7 +143,7 @@ const template: Templates.Props<DataId> = {
               text: `{{${dataIds.emoji}}}`,
               conditional: `{{${dataIds.emoji}}}`,
               style: {
-                fontSize: 24,
+                fontSize: `{{${dataIds.emojiSize}}}`,
                 textAlign: "center",
                 zIndex: 2,
                 position: "relative",
@@ -121,7 +154,7 @@ const template: Templates.Props<DataId> = {
               type: "Text",
               text: `{{${dataIds.title}}}`,
               style: {
-                fontSize: 8,
+                fontSize: `{{${dataIds.titleSize}}}`,
                 textAlign: "center",
                 color: `{{#if ${dataIds.titleColor}}}{{${dataIds.titleColor}}}{{else}}${colorFunction("lightness", dataIds.color, 30)}{{/if}}`,
               },
@@ -132,7 +165,7 @@ const template: Templates.Props<DataId> = {
               conditional: `{{${dataIds.description}}}`,
               style: {
                 marginTop: 2,
-                fontSize: 4,
+                fontSize: `{{${dataIds.descriptionSize}}}`,
                 textAlign: "center",
                 color: `{{#if ${dataIds.descriptionColor}}}{{${dataIds.descriptionColor}}}{{else}}${colorFunction("lightness", dataIds.color, 35)}{{/if}}`,
               },

@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
-import DecksScreen from "@/components/DecksScreen";
-import TextureBackground from "@/components/TextureBackground";
-import Screen from "@/components/Screen";
+import DecksScreen from "@/components/decks/DecksScreen";
+import TextureBackground from "@/components/ui/TextureBackground";
+import Screen from "@/components/ui/Screen";
 
 export default function DecksRoute() {
   return (

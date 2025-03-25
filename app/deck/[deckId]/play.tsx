@@ -1,11 +1,11 @@
-import Tabletop from "@/components/Tabletop/Tabletop";
+import Tabletop from "@/components/tabletops/Tabletop";
 import React from "react";
 import AppError from "@/classes/AppError";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/slices/decks";
 import { useNavigation } from "expo-router";
-import TextureBackground from "@/components/TextureBackground";
-import Screen from "@/components/Screen";
+import TextureBackground from "@/components/ui/TextureBackground";
+import Screen from "@/components/ui/Screen";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
 
 export default function DeckTabletopScreen() {

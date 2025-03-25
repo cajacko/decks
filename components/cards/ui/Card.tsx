@@ -1,6 +1,6 @@
 import React from "react";
 import CardContainer, { CardContainerProps } from "./CardContainer";
-import Template, { TemplateProps } from "@/components/Template";
+import Template, { TemplateProps } from "@/components/templates";
 import withUseExternalMemo from "@/hooks/withUseExternalMemo";
 
 /**
@@ -32,6 +32,7 @@ export default function Card({
   values: valuesProp,
   cardSideCacheKey,
   skeleton = false,
+  children,
   ...cardContainerProps
 }: CardProps): React.ReactNode {
   const values = useExternalMemo(
@@ -45,6 +46,7 @@ export default function Card({
 
   return (
     <CardContainer {...cardContainerProps}>
+      {children}
       {markup && !skeleton && <Template values={values} markup={markup} />}
     </CardContainer>
   );

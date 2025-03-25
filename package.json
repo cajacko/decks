@@ -17,13 +17,16 @@
     "build:ios:preview": "eas build --platform ios --profile preview",
     "build:ios:production": "eas build --platform ios --profile production",
     "submit": "eas submit",
-    "publish:go": "eas update --branch=main"
+    "fetch-decks": "ts-node .scripts/fetchDecks.ts",
+    "eas-build-post-install": "yarn fetch-decks && yarn set-commit-sha",
+    "set-commit-sha": "ts-node .scripts/setCommitSha.ts"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@expo-google-fonts/abril-fatface": "^0.2.3",
+    "@expo-google-fonts/luckiest-guy": "^0.2.3",
+    "@expo-google-fonts/roboto": "^0.2.3",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-picker/picker": "2.9.0",
@@ -32,7 +35,10 @@
     "@react-navigation/native": "^7.0.14",
     "@reduxjs/toolkit": "^2.5.1",
     "@types/lodash": "^4.17.15",
+    "case": "^1.6.3",
     "color": "3",
+    "csv-parse": "^5.6.0",
+    "dotenv-flow": "^4.1.0",
     "expo": "~52.0.38",
     "expo-application": "^6.0.2",
     "expo-blur": "~14.0.3",
@@ -45,6 +51,7 @@
     "expo-image": "~2.0.6",
     "expo-linking": "~7.0.5",
     "expo-router": "~4.0.19",
+    "expo-sensors": "~14.0.2",
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
@@ -53,6 +60,7 @@
     "expo-web-browser": "~14.0.2",
     "handlebars": "^4.7.8",
     "lodash": "^4.17.21",
+    "p-limit": "3.1.0",
     "re-reselect": "^5.1.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -69,13 +77,15 @@
     "redux-persist": "^6.0.0",
     "scheduler": "^0.25.0",
     "ts-node": "^10.9.2",
-    "use-context-selector": "^2.0.0"
+    "use-context-selector": "^2.0.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/color": "3",
     "@types/eslint": "^9.6.1",
     "@types/jest": "^29.5.12",
+    "@types/node-fetch": "^2.6.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
     "eslint": "^8.57.0",

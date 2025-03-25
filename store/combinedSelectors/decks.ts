@@ -1,6 +1,9 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectDecks } from "../slices/decks";
 import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
+import { RootState } from "../types";
+import { Target } from "@/utils/cardTarget";
+import { selectDeckByCard } from "./cards";
 
 export const selectDeckDefaultColors = createSelector(selectDecks, (decks) => {
   const colors: string[] = [];
@@ -26,3 +29,8 @@ export const selectDeckNames = createSelector(selectDecks, (decks) => {
 
   return names;
 });
+
+export const selectDeckId = (state: RootState, props: Target) =>
+  props.type === "card"
+    ? selectDeckByCard(state, { cardId: props.id })?.id
+    : props.id;

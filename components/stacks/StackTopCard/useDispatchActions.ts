@@ -1,0 +1,226 @@
+import React from "react";
+import { useAppDispatch, useRequiredAppSelector } from "@/store/hooks";
+import {
+  moveCard,
+  changeCardState,
+  MoveCardInstanceMethod,
+  selectCardInstance,
+} from "@/store/slices/tabletop";
+import { AnimatedCardSidesRef } from "@/components/cards/connected/AnimatedCardSides";
+import { StackTopCardProps } from "./types";
+import useFlag from "@/hooks/useFlag";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
+import uuid from "@/utils/uuid";
+
+export default function useDispatchActions({
+  cardInstanceId,
+  stackId,
+  canMoveToBottom,
+  leftStackId,
+  rightStackId,
+  stackListRef,
+}: StackTopCardProps) {
+  const { tabletopId, deckId } = useTabletopContext();
+
+  const animateSendToBack = useFlag("CARD_ANIMATE_SEND_TO_BACK") === "enabled";
+  const [animatedToBack, setAnimatedToBack] = React.useState<string | null>(
+    null,
+  );
+
+  const { cardId, side } = useRequiredAppSelector(
+    (state) => selectCardInstance(state, { tabletopId, cardInstanceId }),
+    useDispatchActions.name,
+  );
+
+  const animateCardMovement = useFlag("CARD_ANIMATIONS") === "enabled";
+  const dispatch = useAppDispatch();
+  const cardInstanceRef = React.useRef<AnimatedCardSidesRef>(null);
+  const [isAnimating, setIsAnimating] = React.useState(
+    cardInstanceRef.current?.getIsAnimating() ?? false,
+  );
+
+  const handleFlipCard = React.useCallback(async () => {
+    if (cardInstanceRef.current && animateCardMovement) {
+      try {
+        await cardInstanceRef.current.animateFlip();
+      } catch {}
+    }
+
+    dispatch(
+      changeCardState({
+        tabletopId,
+        target: { cardInstanceId },
+        side: side === "back" ? "front" : "back",
+      }),
+    );
+  }, [dispatch, cardInstanceId, side, tabletopId, animateCardMovement]);
+
+  const moveRight = React.useMemo(() => {
+    return {
+      bottom: async () => {
+        if (cardInstanceRef.current && animateCardMovement) {
+          try {
+            await cardInstanceRef.current.animateOut({
+              direction: "right",
+            });
+          } catch {}
+        }
+
+        dispatch(
+          moveCard({
+            tabletopId,
+            moveTarget: { cardInstanceId },
+            toTarget: rightStackId
+              ? { stackId: rightStackId }
+              : { stackId: uuid(), newStackDirection: "end" },
+            method: MoveCardInstanceMethod.bottomNoChange,
+          }),
+        );
+      },
+      top: async () => {
+        if (cardInstanceRef.current && animateCardMovement) {
+          try {
+            await cardInstanceRef.current.animateOut({
+              direction: "right",
+            });
+          } catch {}
+        }
+
+        dispatch(
+          moveCard({
+            tabletopId,
+            moveTarget: { cardInstanceId },
+            toTarget: rightStackId
+              ? { stackId: rightStackId }
+              : { stackId: uuid(), newStackDirection: "end" },
+            method: MoveCardInstanceMethod.topNoChange,
+          }),
+        );
+      },
+    };
+  }, [
+    dispatch,
+    cardInstanceId,
+    rightStackId,
+    cardInstanceRef,
+    tabletopId,
+    animateCardMovement,
+  ]);
+
+  const moveLeft = React.useMemo(() => {
+    return {
+      bottom: async () => {
+        if (cardInstanceRef.current && animateCardMovement) {
+          try {
+            await cardInstanceRef.current.animateOut({
+              direction: "left",
+            });
+          } catch {}
+        }
+
+        const isNew = !leftStackId;
+
+        dispatch(
+          moveCard({
+            tabletopId,
+            moveTarget: { cardInstanceId },
+            method: MoveCardInstanceMethod.bottomNoChange,
+            toTarget: leftStackId
+              ? { stackId: leftStackId }
+              : { stackId: uuid(), newStackDirection: "start" },
+          }),
+        );
+
+        if (isNew) {
+          stackListRef.current?.scrollNext?.({ animated: false });
+        }
+      },
+      top: async () => {
+        if (cardInstanceRef.current && animateCardMovement) {
+          try {
+            await cardInstanceRef.current.animateOut({
+              direction: "left",
+            });
+          } catch {}
+        }
+
+        const isNew = !leftStackId;
+
+        dispatch(
+          moveCard({
+            tabletopId,
+            moveTarget: { cardInstanceId },
+            method: MoveCardInstanceMethod.topNoChange,
+            toTarget: leftStackId
+              ? { stackId: leftStackId }
+              : { stackId: uuid(), newStackDirection: "start" },
+          }),
+        );
+
+        if (isNew) {
+          stackListRef.current?.scrollNext?.({ animated: false });
+        }
+      },
+    };
+  }, [
+    dispatch,
+    cardInstanceId,
+    leftStackId,
+    cardInstanceRef,
+    tabletopId,
+    animateCardMovement,
+    stackListRef,
+  ]);
+
+  const handleMoveToBottom = React.useMemo(() => {
+    if (!canMoveToBottom) return undefined;
+
+    return async () => {
+      if (cardInstanceRef.current && animateCardMovement) {
+        try {
+          await cardInstanceRef.current.animateOut({
+            direction: "top",
+            animateBack: animateSendToBack
+              ? async () => {
+                  setAnimatedToBack(cardInstanceId);
+                }
+              : undefined,
+          });
+        } catch {}
+      }
+
+      dispatch(
+        moveCard({
+          tabletopId,
+          moveTarget: { cardInstanceId },
+          method: MoveCardInstanceMethod.bottomNoChange,
+          toTarget: { stackId: stackId },
+        }),
+      );
+    };
+  }, [
+    animateSendToBack,
+    dispatch,
+    cardInstanceId,
+    stackId,
+    canMoveToBottom,
+    cardInstanceRef,
+    tabletopId,
+    animateCardMovement,
+  ]);
+
+  return {
+    deckId,
+    side,
+    tabletopId,
+    cardId,
+    cardInstanceRef,
+    handleFlipCard,
+    moveRight,
+    moveLeft,
+    handleMoveToBottom,
+    setIsAnimating,
+    isAnimating,
+    animatedToBack,
+  };
+}

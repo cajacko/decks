@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Run the eas prebuild command
+        run: yarn eas-build-post-install
+
       - name: Export Web
         run: npx expo export --platform web
 

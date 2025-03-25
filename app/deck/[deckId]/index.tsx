@@ -1,8 +1,8 @@
 import React from "react";
-import DeckScreen from "@/components/DeckScreen";
+import DeckScreen from "@/components/decks/DeckScreen";
 import { StyleSheet } from "react-native";
-import TextureBackground from "@/components/TextureBackground";
-import Screen from "@/components/Screen";
+import TextureBackground from "@/components/ui/TextureBackground";
+import Screen from "@/components/ui/Screen";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
 
 export default function DeckRoute() {

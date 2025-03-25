@@ -83,6 +83,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   splash,
   plugins: [
+    [
+      "expo-sensors",
+      {
+        motionPermission: "Allow $(PRODUCT_NAME) to access your device motion.",
+      },
+    ],
     "expo-font",
     [
       "expo-dev-client",

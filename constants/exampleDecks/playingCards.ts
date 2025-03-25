@@ -29,6 +29,7 @@ const deck: ExampleDeck<
   Record<typeof dataIds.suit | typeof dataIds.value, string>
 > = {
   name: "Playing Cards",
+  devOnly: false,
   description: "A standard deck of 52 playing cards",
   templates: {
     back: {

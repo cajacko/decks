@@ -7,7 +7,7 @@ import text from "@/constants/text";
 import { useAppSelector } from "@/store/hooks";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
 import { StyleSheet, View } from "react-native";
-import Tabs, { Tab } from "@/components/Tabs";
+import Tabs, { Tab } from "@/components/ui/Tabs";
 
 export function getDeckName(deckId?: string | null) {
   return deckNameWithFallback(
