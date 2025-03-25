@@ -40,8 +40,13 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   const description = schemaItem.description;
   const fieldType = schemaItem.type;
 
-  const { onChange, validatedValue, placeholder, hasChanges, usingFallback } =
-    useEditCardTemplateSchemaItem(props);
+  const {
+    onChange,
+    validatedValue,
+    placeholder: _placeholder,
+    hasChanges,
+    usingFallback,
+  } = useEditCardTemplateSchemaItem(props);
 
   const onChangeText = React.useCallback(
     (text: string) => {
@@ -74,17 +79,17 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
   }, [showMoreInfo, onChange]);
 
   const input = React.useMemo(() => {
-    const nullText = text["general.null"];
+    let placeholder = _placeholder;
+
+    if (validatedValue?.value === null && !placeholder) {
+      placeholder = text["general.null"];
+    }
 
     switch (fieldType) {
       case "text": {
         return (
           <TextInput
-            value={
-              validatedValue?.value === null
-                ? nullText
-                : String(validatedValue?.value ?? "")
-            }
+            value={String(validatedValue?.value ?? "")}
             onChangeText={onChangeText}
             placeholder={placeholder}
           />
@@ -93,11 +98,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       case "color": {
         return (
           <ColorInput
-            value={
-              validatedValue?.value === null
-                ? nullText
-                : String(validatedValue?.value ?? "")
-            }
+            value={String(validatedValue?.value ?? "")}
             onChangeText={onChangeText}
             placeholder={placeholder}
           />
@@ -106,7 +107,7 @@ export default function TemplateSchemaItem(props: TemplateSchemaItemProps) {
       default:
         return null;
     }
-  }, [validatedValue, onChangeText, placeholder, fieldType]);
+  }, [validatedValue, onChangeText, _placeholder, fieldType]);
 
   if (!input) {
     new AppError(
