@@ -17,9 +17,14 @@ export default function useApplyUpdateAlert({
   autoCheck?: boolean;
 } = {}) {
   const {
-    isUpdatePending: canApplyUpdate,
+    isUpdatePending,
     lastCheckForUpdateTimeSinceRestart,
+    downloadedUpdate,
   } = useUpdates();
+
+  // NOTE: Sometimes we get isUpdatePending=true but downloadedUpdate=undefined. A bug in
+  // expo-updates? This check should catch that
+  const canApplyUpdate = !!isUpdatePending && !!downloadedUpdate;
 
   const lastCheckedForUpdate = React.useRef<Date | undefined>(
     lastCheckForUpdateTimeSinceRestart,
