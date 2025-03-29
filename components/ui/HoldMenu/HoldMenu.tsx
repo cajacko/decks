@@ -66,13 +66,19 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
   const children = React.useMemo((): React.ReactNode | undefined => {
     if (typeof childrenProp === "function") {
       return childrenProp({
+        dragSharedValue: state.dragPosition,
         longPressSharedValue: state.longPressTransition,
         longPressStyle,
       });
     }
 
     return childrenProp;
-  }, [childrenProp, longPressStyle, state.longPressTransition]);
+  }, [
+    childrenProp,
+    longPressStyle,
+    state.longPressTransition,
+    state.dragPosition,
+  ]);
 
   const component = (
     <Animated.View style={containerStyle}>

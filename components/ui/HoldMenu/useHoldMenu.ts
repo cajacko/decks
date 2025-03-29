@@ -53,6 +53,7 @@ export default function useHoldMenu({
   const scaleUpFinished = useSharedValue(true);
   const isTouching = useSharedValue(false);
   const longPressTransition = useSharedValue(0);
+  const dragPosition = useSharedValue<null | { x: number; y: number }>(null);
 
   React.useEffect(() => {
     menuOpacityOverride.value = _menuOpacityOverride;
@@ -268,14 +269,24 @@ export default function useHoldMenu({
             y: event.y,
           };
         }
+
+        dragPosition.value = {
+          x: event.translationX,
+          y: event.translationY,
+        };
       })
       .onUpdate((event) => {
         if (devIndicator) {
-          devEndIndicator.value = {
+          dragPosition.value = {
             x: event.x,
             y: event.y,
           };
         }
+
+        dragPosition.value = {
+          x: event.translationX,
+          y: event.translationY,
+        };
 
         const distance = Math.sqrt(
           event.translationX ** 2 + event.translationY ** 2,
@@ -317,6 +328,13 @@ export default function useHoldMenu({
         }
       })
       .onEnd(() => {
+        // dragPosition.value = null;
+
+        dragPosition.value = {
+          x: withSpring(0),
+          y: withSpring(0),
+        };
+
         if (devIndicator) {
           devEndIndicator.value = {
             x: withSpring(devStartIndicator.value.x),
@@ -355,6 +373,7 @@ export default function useHoldMenu({
     menuItems,
     onHighlight,
     onAction,
+    dragPosition,
   ]);
 
   // Defines the priorities of gestures and how they work together
@@ -424,5 +443,6 @@ export default function useHoldMenu({
     menuTaps,
     longPressTransition,
     menuOpacityOverride,
+    dragPosition,
   };
 }

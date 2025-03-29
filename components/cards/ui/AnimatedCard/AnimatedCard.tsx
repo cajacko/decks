@@ -18,6 +18,7 @@ export default React.forwardRef<AnimatedCardRef, AnimatedCardProps>(
       physicalSize,
       target,
       sizePreset,
+      scaleX,
       ...cardProps
     },
     ref,
@@ -35,6 +36,7 @@ export default React.forwardRef<AnimatedCardRef, AnimatedCardProps>(
         physicalSize,
         target,
         sizePreset,
+        scaleX,
       },
       ref,
     );
@@ -52,7 +54,7 @@ export default React.forwardRef<AnimatedCardRef, AnimatedCardProps>(
           rotate: state.rotate.value ? `${state.rotate.value}deg` : "0deg",
         },
         {
-          scaleX: state.scaleX.value ?? 1,
+          scaleX: scaleX?.value ?? 1,
         },
       ],
     }));

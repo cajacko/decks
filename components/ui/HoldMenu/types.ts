@@ -32,6 +32,7 @@ export type MenuItems = {
 export type RenderChildren = (props: {
   longPressSharedValue: SharedValue<number>;
   longPressStyle: AnimatedStyle<ViewStyle>;
+  dragSharedValue: SharedValue<null | { x: number; y: number }>;
 }) => React.ReactNode;
 
 export interface HoldMenuProps {

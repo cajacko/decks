@@ -1,6 +1,6 @@
 // import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
-import { AnimatedStyle } from "react-native-reanimated";
+import { AnimatedStyle, SharedValue } from "react-native-reanimated";
 import { CardProps } from "@/components/cards/ui/Card";
 import { UseMmToDpProps } from "@/components/cards/context/PhysicalMeasures";
 
@@ -30,6 +30,7 @@ export interface AnimatedCardProps
   initialRotation?: number;
   initialScaleX?: number;
   cardStyle?: CardProps["style"];
+  scaleX?: SharedValue<number>;
 }
 
 export interface AnimateOutProps {
@@ -41,8 +42,8 @@ export interface AnimateOutProps {
 
 export interface AnimatedCardRef {
   getIsAnimating: () => boolean;
-  animateFlipOut: () => Promise<unknown>;
-  animateFlipIn: () => Promise<unknown>;
+  // animateFlipOut: () => Promise<unknown>;
+  // animateFlipIn: () => Promise<unknown>;
   animateOut: (props: AnimateOutProps) => Promise<unknown>;
 }
 

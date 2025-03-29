@@ -17,27 +17,20 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
 
     const frontCardProps = React.useMemo(
       (): Partial<AnimatedCardProps> => ({
-        style: [front.style, state.renderSpacer && styles.absolute],
-        initialScaleX:
-          state.flipState === "flipping-to-front" ? 0 : front.initialRotation,
+        style: [front.style, styles.absolute],
         initialRotation: front.initialRotation,
+        scaleX: state.frontScaleX,
       }),
-      [front.style, front.initialRotation, state.flipState, state.renderSpacer],
+      [front.style, front.initialRotation, state.frontScaleX],
     );
 
     const backCardProps = React.useMemo(
       (): Partial<AnimatedCardProps> => ({
-        style: [back.cardStyle, state.renderSpacer && styles.absolute],
-        initialScaleX:
-          state.flipState === "flipping-to-back" ? 0 : back.initialRotation,
+        style: [back.cardStyle, styles.absolute],
         initialRotation: back.initialRotation,
+        scaleX: state.backScaleX,
       }),
-      [
-        back.cardStyle,
-        back.initialRotation,
-        state.flipState,
-        state.renderSpacer,
-      ],
+      [back.cardStyle, back.initialRotation, state.backScaleX],
     );
 
     const containerStyle = React.useMemo(
@@ -47,13 +40,9 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
 
     return (
       <View style={containerStyle}>
-        {state.renderFaceUp && (
-          <AnimatedCard {...front} {...frontCardProps} ref={state.faceUpRef} />
-        )}
-        {state.renderFaceDown && (
-          <AnimatedCard {...back} {...backCardProps} ref={state.faceDownRef} />
-        )}
-        {state.renderSpacer && <CardSpacer height={height} width={width} />}
+        <AnimatedCard {...front} {...frontCardProps} ref={state.faceUpRef} />
+        <AnimatedCard {...back} {...backCardProps} ref={state.faceDownRef} />
+        <CardSpacer height={height} width={width} />
       </View>
     );
   },

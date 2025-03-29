@@ -3,12 +3,46 @@ import { AnimatedCardRef } from "@/components/cards/connected/AnimatedCard";
 import { AnimatedCardSidesRef } from "./AnimatedCardSides.types";
 import { Cards } from "@/store/types";
 import useFlag from "@/hooks/useFlag";
+import {
+  useDerivedValue,
+  useSharedValue,
+  interpolate,
+  withTiming,
+  Extrapolation,
+  runOnJS,
+} from "react-native-reanimated";
 
 export default function useAnimatedAnimatedSides(
   sideProp: Cards.Side,
   ref: React.Ref<AnimatedCardSidesRef>,
 ) {
   const animateCards = useFlag("CARD_ANIMATIONS") === "enabled";
+  /**
+   * 0 = frontScaleX: 1, backScaleX: 0
+   * 0.25 = frontScaleX: 0.5, backScaleX: 0
+   * 0.5 = frontScaleX: 0, backScaleX: 0
+   * 0.75 = frontScaleX: 0, backScaleX: 0.5
+   * 1 = frontScaleX: 0, backScaleX: 1
+   */
+  const flipProgress = useSharedValue(sideProp === "front" ? 0 : 1);
+
+  const frontScaleX = useDerivedValue(() => {
+    return interpolate(
+      flipProgress.value,
+      [0, 0.5],
+      [1, 0],
+      Extrapolation.CLAMP,
+    );
+  });
+
+  const backScaleX = useDerivedValue(() => {
+    return interpolate(
+      flipProgress.value,
+      [0.5, 1],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
+  });
 
   const [flipState, setFlipState] = React.useState<
     | null
@@ -30,6 +64,8 @@ export default function useAnimatedAnimatedSides(
   // the correct size. If we don't update the component prop then we may get into a bit of a funky
   // state
   React.useEffect(() => {
+    flipProgress.value = sideProp === "front" ? 0 : 1;
+
     setFlipState((prevState) => {
       if (prevState === "flipped-to-front" && side.current === "front") {
         return null;
@@ -41,33 +77,25 @@ export default function useAnimatedAnimatedSides(
 
       return prevState;
     });
-  }, [side]);
+  }, [sideProp, flipProgress]);
 
   React.useImperativeHandle(ref, () => ({
     animateFlip: async () => {
-      if (side.current === "front") {
-        if (animateCards) {
-          setFlipState("flipping-to-back");
-
-          await faceUpRef.current?.animateFlipOut();
-          await faceDownRef.current?.animateFlipIn();
-        }
-
-        setFlipState("flipped-to-back");
-
-        return "back";
-      }
-
       if (animateCards) {
-        setFlipState("flipping-to-front");
-
-        await faceDownRef.current?.animateFlipOut();
-        await faceUpRef.current?.animateFlipIn();
+        await new Promise<void>((resolve) => {
+          flipProgress.value = withTiming(
+            flipProgress.value > 0.5 ? 0 : 1,
+            {
+              duration: 500,
+            },
+            () => {
+              runOnJS(resolve)();
+            },
+          );
+        });
       }
 
-      setFlipState("flipped-to-front");
-
-      return "front";
+      return side.current === "front" ? "back" : "front";
     },
     animateOut: async (props) => {
       if (!animateCards) return;
@@ -87,14 +115,17 @@ export default function useAnimatedAnimatedSides(
     },
   }));
 
-  const flipping =
-    flipState === "flipping-to-back" || flipState === "flipping-to-front";
+  // const flipping =
+  //   flipState === "flipping-to-back" || flipState === "flipping-to-front";
 
-  const renderFaceUp =
-    side.current === "front" || flipping || flipState === "flipped-to-front";
+  // const renderFaceUp =
+  //   side.current === "front" || flipping || flipState === "flipped-to-front";
 
-  const renderFaceDown =
-    side.current === "back" || flipping || flipState === "flipped-to-back";
+  // const renderFaceDown =
+  //   side.current === "back" || flipping || flipState === "flipped-to-back";
+
+  const renderFaceUp = true;
+  const renderFaceDown = true;
 
   // We need to absolutely position the components when they are both being rendered, otherwise
   // they jank around
@@ -107,5 +138,7 @@ export default function useAnimatedAnimatedSides(
     faceUpRef,
     faceDownRef,
     flipState,
+    frontScaleX,
+    backScaleX,
   };
 }
