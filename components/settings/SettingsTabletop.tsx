@@ -12,16 +12,19 @@ import {
 } from "@/store/actionHelpers/tabletop";
 import SwitchField from "../forms/SwitchField";
 import StackActions from "../stacks/StackActions";
-import useTabletopHistory from "@/hooks/useTabletopHistory";
+import useTabletopHistory, {
+  UseTabletopHistoryOptions,
+} from "@/hooks/useTabletopHistory";
 import { setTabletopSetting } from "@/store/slices/tabletop";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
 
 const titleProps = { type: "h2" } as const;
 
-export interface SettingsTabletopProps extends FieldSetProps {
+export interface SettingsTabletopProps
+  extends FieldSetProps,
+    UseTabletopHistoryOptions {
   deckId: string;
   tabletopId: string;
-  closeDrawer: () => void;
 }
 
 export default function SettingsTabletop({
@@ -33,7 +36,7 @@ export default function SettingsTabletop({
   const canEdit = useAppSelector((state) =>
     selectCanEditDeck(state, { deckId }),
   );
-  const { undo, redo } = useTabletopHistory(tabletopId);
+  const { undo, redo } = useTabletopHistory(tabletopId, props);
   const deckName = deckNameWithFallback(
     useAppSelector((state) => selectDeck(state, { deckId })?.name),
   );
@@ -116,6 +119,8 @@ export default function SettingsTabletop({
         title={text["settings.tabletop.title"]}
         titleProps={titleProps}
         subTitle={`(${deckName})`}
+        initialCollapsed
+        collapsible
         {...props}
       >
         <StackActions tabletopId={tabletopId} collapsible initialCollapsed />

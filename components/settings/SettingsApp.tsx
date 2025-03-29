@@ -8,7 +8,7 @@ import {
 import Field from "../forms/Field";
 import Picker, { PickerItem } from "../forms/Picker";
 import { UserSettings } from "@/store/types";
-import FieldSet, { FieldSetProps } from "../forms/FieldSet";
+import FieldSet from "../forms/FieldSet";
 import text from "@/constants/text";
 import SwitchField from "../forms/SwitchField";
 import useFlag from "@/hooks/useFlag";
@@ -19,11 +19,7 @@ type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
 const titleProps = { type: "h2" } as const;
 
-export interface SettingsAppProps extends FieldSetProps {
-  closeDrawer: () => void;
-}
-
-export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
+export default function SettingsApp(): React.ReactNode {
   const dispatch = useAppDispatch();
 
   const theme =
@@ -106,7 +102,12 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
   );
 
   return (
-    <FieldSet title={text["settings.title"]} titleProps={titleProps} {...props}>
+    <FieldSet
+      title={text["settings.title"]}
+      titleProps={titleProps}
+      initialCollapsed
+      collapsible
+    >
       <Field label={text["settings.theme"]}>
         <Picker<Theme>
           onValueChange={onChangeTheme}

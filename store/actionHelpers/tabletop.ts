@@ -53,6 +53,7 @@ export function getResetHistoryState(
   const { stacksIds, stacksById } = createInitStacks(cardInstanceIds, settings);
 
   return {
+    operation: { type: "RESET", payload: null },
     cardInstancesById,
     stacksById,
     stacksIds,
@@ -86,6 +87,7 @@ export function resetTabletopHelper(props: { tabletopId: Tabletops.Id }) {
 
   return resetTabletop({
     tabletopId: props.tabletopId,
+    operation: { type: "RESET", payload: null },
     historyState: getResetHistoryState(
       availableDeckCards,
       tableTopSettings ?? null,

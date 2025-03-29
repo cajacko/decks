@@ -1,8 +1,8 @@
 import React from "react";
-import { Dimensions, ScrollViewProps, StyleSheet } from "react-native";
+import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
 import TabletopToolbar from "@/components/tabletops/TabletopToolbar";
 import { TabletopProps } from "@/components/tabletops/Tabletop/Tabletop.types";
-import StackList from "@/components/stacks/StackList";
+import StackList, { StackListRef } from "@/components/stacks/StackList";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -17,17 +17,28 @@ import { selectTabletopNeedsResetting } from "@/store/combinedSelectors/tabletop
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { TabletopProvider } from "./Tabletop.context";
 import { Target } from "@/utils/cardTarget";
+import { DrawerChildren } from "@/context/Drawer";
+import SettingsTabletop from "@/components/settings/SettingsTabletop";
+import SettingsDeck from "@/components/settings/SettingsDeck";
+import TabletopNotification, {
+  useTabletopNotification,
+} from "../TabletopNotification";
 
 export default function Tabletop({
   tabletopId,
   deckId,
 }: TabletopProps): React.ReactNode {
+  const stackListRef = React.useRef<StackListRef>(null);
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const { hasTabletop } = useEnsureTabletop({ tabletopId });
   const dispatch = useAppDispatch();
   const tabletopNeedsResetting = useAppSelector((state) =>
     selectTabletopNeedsResetting(state, { tabletopId }),
   );
+
+  const { beforeUndo, beforeRedo, notification } = useTabletopNotification({
+    stackListRef,
+  });
 
   const hasTriedToAutoReset = React.useRef(false);
 
@@ -109,9 +120,34 @@ export default function Tabletop({
       deckId={deckId}
       target={target}
     >
-      <TabletopToolbar tabletopId={tabletopId} deckId={deckId} />
+      <DrawerChildren>
+        <SettingsTabletop
+          tabletopId={tabletopId}
+          deckId={deckId}
+          beforeUndo={beforeUndo}
+          beforeRedo={beforeRedo}
+        />
+        <SettingsDeck deckId={deckId} />
+      </DrawerChildren>
+      <TabletopToolbar
+        tabletopId={tabletopId}
+        deckId={deckId}
+        beforeUndo={beforeUndo}
+        beforeRedo={beforeRedo}
+      />
       <Animated.View style={contentStyle} onLayout={handleLayout}>
-        {!skeleton && <StackList skeleton={skeleton} />}
+        {notification && (
+          <View style={styles.alertContainer}>
+            <TabletopNotification {...notification} />
+          </View>
+        )}
+        {!skeleton && (
+          <StackList
+            ref={stackListRef}
+            skeleton={skeleton}
+            style={styles.stackList}
+          />
+        )}
       </Animated.View>
     </TabletopProvider>
   );
@@ -123,6 +159,10 @@ const styles = StyleSheet.create({
     flex: 1,
     zIndex: 2,
   },
+  stackList: {
+    zIndex: 3,
+    position: "relative",
+  },
   background: {
     position: "absolute",
     zIndex: 1,
@@ -130,6 +170,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+  },
+  alertContainer: {
+    position: "absolute",
+    top: 10,
+    left: 0,
+    right: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 4,
   },
   action: {
     position: "absolute",

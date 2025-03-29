@@ -11,6 +11,8 @@ export type ScrollOptions = {
 };
 
 export interface StackListRef {
+  getScrollOffset: () => number;
+  scrollToOffset: (offset: number, options?: ScrollOptions) => Promise<void>;
   scrollNext?: (options?: ScrollOptions) => Promise<void>;
   scrollPrev?: (options?: ScrollOptions) => Promise<void>;
   scrollToStart: (options?: ScrollOptions) => Promise<void>;

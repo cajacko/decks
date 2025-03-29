@@ -1,31 +1,43 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import {
-  produceWithPatches,
-  applyPatches,
-  WritableDraft,
-  Draft,
-  Objectish,
-} from "immer";
-import { History } from "./versions/latest";
+import { produceWithPatches, applyPatches, WritableDraft } from "immer";
+import { History, HistoryState, RequiredOperations } from "./versions/latest";
 
-export function resetHistory<S>(history: History<S>): History<S> {
+export function resetHistory<State extends object = object>(
+  history: History<HistoryState<State>>,
+): History<HistoryState<State, RequiredOperations>> {
   return {
     future: [],
     past: [],
-    present: history.present,
+    present: {
+      ...history.present,
+      operation: { type: "RESET", payload: null },
+    },
   };
 }
 
+type ActionCallback<State, A, SliceState> = (
+  state: WritableDraft<WritableDraft<State>>,
+  action: A,
+  originalNonHistoryState: WritableDraft<SliceState>,
+) => void;
+
 export function configureHistory<
   SliceState,
-  HistoryState extends Objectish,
-  P extends object = object,
+  State extends HistoryState,
+  SelectorProps extends object = object,
+  ActionProps extends SelectorProps = SelectorProps,
 >(
-  selectHistory: (
-    state: WritableDraft<SliceState> | SliceState,
-    props: P,
-  ) => WritableDraft<History<HistoryState>> | undefined | null,
-  options?: { maxHistory?: number },
+  selectHistory: <S extends WritableDraft<SliceState> | SliceState>(
+    state: S,
+    props: SelectorProps,
+  ) => S extends WritableDraft<SliceState>
+    ? WritableDraft<History<State>> | undefined | null
+    : History<State> | undefined | null,
+  options?: {
+    maxHistory?: number;
+    preAction?: ActionCallback<State, PayloadAction<ActionProps>, SliceState>;
+    postAction?: ActionCallback<State, PayloadAction<ActionProps>, SliceState>;
+  },
 ) {
   const maxHistory = options?.maxHistory || 100;
 
@@ -33,28 +45,24 @@ export function configureHistory<
     withSelectors: <RootState>(
       selectSlice: (state: RootState) => SliceState,
     ) => {
-      const selectPastCount = (state: RootState, props: P) =>
+      const selectPastCount = (state: RootState, props: SelectorProps) =>
         selectHistory(selectSlice(state), props)?.past.length || 0;
 
-      const selectFutureCount = (state: RootState, props: P) =>
+      const selectFutureCount = (state: RootState, props: SelectorProps) =>
         selectHistory(selectSlice(state), props)?.future.length || 0;
 
       return {
         selectPastCount,
         selectFutureCount,
-        selectHasPast: (state: RootState, props: P): boolean =>
+        selectHasPast: (state: RootState, props: SelectorProps): boolean =>
           selectPastCount(state, props) > 0,
-        selectHasFuture: (state: RootState, props: P): boolean =>
+        selectHasFuture: (state: RootState, props: SelectorProps): boolean =>
           selectFutureCount(state, props) > 0,
       };
     },
     withHistory:
-      <A extends PayloadAction<P>>(
-        callback: (
-          state: Draft<Draft<HistoryState>>,
-          action: A,
-          originalNonHistoryState: WritableDraft<SliceState>,
-        ) => void,
+      <A extends PayloadAction<ActionProps & Pick<State, "operation">>>(
+        callback: ActionCallback<State, A, SliceState>,
       ) =>
       (state: WritableDraft<SliceState>, action: A): void => {
         const history = selectHistory(state, action.payload);
@@ -63,7 +71,23 @@ export function configureHistory<
 
         const [nextState, patches, inversePatches] = produceWithPatches(
           history.present,
-          (draft) => callback(draft, action, state),
+          (draft: WritableDraft<WritableDraft<State>>) => {
+            const operation: State["operation"] = action.payload.operation;
+
+            draft.operation = operation as WritableDraft<
+              WritableDraft<State>
+            >["operation"];
+
+            if (options?.preAction) {
+              options.preAction(draft, action, state);
+            }
+
+            callback(draft, action, state);
+
+            if (options?.postAction) {
+              options.postAction(draft, action, state);
+            }
+          },
         );
 
         history.past.push({ inversePatches, patches });
@@ -75,24 +99,30 @@ export function configureHistory<
         history.present = nextState;
         history.future = [];
       },
-    undo: (state: WritableDraft<SliceState>, action: PayloadAction<P>) => {
+    undo: (
+      state: WritableDraft<SliceState>,
+      action: PayloadAction<SelectorProps>,
+    ) => {
       const history = selectHistory(state, action.payload);
 
       if (!history) return;
 
-      const lastPatches = history.past.pop(); // Get last undo patch
+      const lastPatch = history.past.pop(); // Get last undo patch
 
-      if (!lastPatches) return;
+      if (!lastPatch) return;
 
       const previousState = applyPatches(
         history.present,
-        lastPatches.inversePatches,
+        lastPatch.inversePatches,
       );
 
-      history.future.unshift(lastPatches); // Save inverse for redo
+      history.future.unshift(lastPatch); // Save inverse for redo
       history.present = previousState;
     },
-    redo: (state: WritableDraft<SliceState>, action: PayloadAction<P>) => {
+    redo: (
+      state: WritableDraft<SliceState>,
+      action: PayloadAction<SelectorProps>,
+    ) => {
       const history = selectHistory(state, action.payload);
 
       if (!history) return;
@@ -105,6 +135,54 @@ export function configureHistory<
 
       history.past.push(nextPatches); // Save inverse for undo
       history.present = nextState;
+    },
+    getState: (state: SliceState | null | undefined, props: SelectorProps) => {
+      if (!state) return null;
+
+      const history = selectHistory(state, props);
+
+      if (!history) return null;
+
+      return history.present;
+    },
+    getUndoState: (
+      state: SliceState | null | undefined,
+      props: SelectorProps,
+    ): State | null => {
+      if (!state) return null;
+
+      const history = selectHistory(state, props);
+
+      if (!history) return null;
+
+      const lastPatch = history?.past[history.past.length - 1]; // Get last undo patch
+
+      if (!lastPatch) return null;
+
+      const previousState = applyPatches(
+        history.present,
+        lastPatch.inversePatches,
+      );
+
+      return previousState as State;
+    },
+    getRedoState: (
+      state: SliceState | null | undefined,
+      props: SelectorProps,
+    ): State | null => {
+      if (!state) return null;
+
+      const history = selectHistory(state, props);
+
+      if (!history) return null;
+
+      const nextPatches = history?.future[0]; // Get last redo patch
+
+      if (!nextPatches) return null;
+
+      const nextState = applyPatches(history.present, nextPatches.patches);
+
+      return nextState as State;
     },
   };
 }

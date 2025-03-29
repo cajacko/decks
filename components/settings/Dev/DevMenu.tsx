@@ -5,7 +5,6 @@ import { persistor, resetStore } from "@/store/store";
 import AppError from "@/classes/AppError";
 import text from "@/constants/text";
 import FieldSet, {
-  FieldSetProps,
   titleProps as fieldSetTitleProps,
 } from "@/components/forms/FieldSet";
 import { useRouter } from "expo-router";
@@ -16,13 +15,13 @@ import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 
-export interface DevMenuProps extends FieldSetProps {
-  closeDrawer: () => void;
-}
-
 const titleProps = { type: "h2" } as const;
 
-export default function DevMenu(props: DevMenuProps): React.ReactNode {
+export default function DevMenu({
+  closeDrawer,
+}: {
+  closeDrawer: () => void;
+}): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
   const { navigate } = useRouter();
   const {
@@ -68,7 +67,6 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       collapsible
       initialCollapsed
       titleProps={titleProps}
-      {...props}
     >
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 
@@ -93,7 +91,7 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
             variant="outline"
             onPress={() => {
               navigate(`/deck/${exampleDeckIds(id).deckId}`);
-              props.closeDrawer();
+              closeDrawer?.();
             }}
             style={{ marginTop: 10 }}
           />

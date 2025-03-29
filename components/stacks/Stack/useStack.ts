@@ -137,6 +137,12 @@ export default function useStack({
         allCardInstancesState: "noChange",
         tabletopId,
         method: { type: "shuffle", seed: generateSeed() },
+        operation: {
+          type: "SHUFFLE",
+          payload: {
+            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+          },
+        },
       }),
     );
 
@@ -153,6 +159,7 @@ export default function useStack({
     allCardInstanceIds,
     cardInstancesIds,
     performanceMode,
+    stackListRef,
   ]);
 
   const shakeToShuffleActive: boolean =
@@ -188,7 +195,18 @@ export default function useStack({
 
     await Promise.all([scroll, transform]);
 
-    dispatch(deleteStack({ tabletopId, stackId }));
+    dispatch(
+      deleteStack({
+        tabletopId,
+        stackId,
+        operation: {
+          type: "DELETE_STACK",
+          payload: {
+            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+          },
+        },
+      }),
+    );
   }, [
     stackId,
     width,

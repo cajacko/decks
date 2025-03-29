@@ -14,7 +14,7 @@ import { StackListRef, ScrollOptions } from "./StackList.types";
 
 const scrollPromise = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
-export default function useStackList() {
+export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
   const animatedRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(animatedRef);
   const { stackWidth, tabletopId, canOnlyFit1Stack } = useTabletopContext();
@@ -59,6 +59,17 @@ export default function useStackList() {
   }, [scrollOffset]);
 
   const stackListRef = React.useRef<StackListRef>({
+    getScrollOffset: () => scrollOffset.value,
+    scrollToOffset: async (
+      offset: number,
+      { animated = true }: ScrollOptions = {},
+    ) => {
+      runOnUI(() => scrollTo(animatedRef, offset, 0, animated))();
+
+      await scrollPromise();
+
+      updateFocus(scrollOffset.value);
+    },
     scrollNext: async ({ animated = true }: ScrollOptions = {}) => {
       const nextOffset = scrollOffset.value + interval;
 
@@ -99,6 +110,8 @@ export default function useStackList() {
       updateFocus(scrollOffset.value);
     },
   });
+
+  React.useImperativeHandle(ref, () => stackListRef.current);
 
   // This double checks and ensures the focus is correct. We have an issue where you delete the
   // first stack, and the focus is not updated correctly. It's probably because the scroll view if

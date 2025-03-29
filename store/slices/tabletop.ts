@@ -2,7 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
-import { RootState, Tabletops, SliceName, Cards, Decks } from "../types";
+import {
+  RootState,
+  Tabletops,
+  SliceName,
+  Cards,
+  Decks,
+  RequiredOperations,
+} from "../types";
 import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
@@ -32,11 +39,19 @@ const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
       tabletopsById: {},
     };
 
+type HistoryPayload<P extends object = object> = P & {
+  tabletopId: string;
+  operation: Tabletops.HistoryOperation | RequiredOperations;
+};
+
 const history = configureHistory<
   TabletopState,
   TabletopHistoryState,
-  { tabletopId: string }
+  { tabletopId: string },
+  HistoryPayload
 >((state, props) => state.tabletopsById[props.tabletopId]?.history);
+
+export const { getRedoState, getUndoState, getState } = history;
 
 // This helper is great for ensuring we don't have duplicate card instance IDs in stacks (which we
 // had once). But also ensures we don't mutate arrays that don't ned changing.
@@ -117,14 +132,15 @@ export const tabletopsSlice = createSlice({
     moveCard: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          moveTarget: { cardInstanceId: string } | { stackId: string | null };
-          toTarget: { stackId: string; newStackDirection?: "start" | "end" };
-          // Do we specify the method, or let the stack define it? Or both? If specified here it's
-          // more specific, otherwise do what the stack it's going to says
-          method: MoveCardInstanceMethod;
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            moveTarget: { cardInstanceId: string } | { stackId: string | null };
+            toTarget: { stackId: string; newStackDirection?: "start" | "end" };
+            // Do we specify the method, or let the stack define it? Or both? If specified here it's
+            // more specific, otherwise do what the stack it's going to says
+            method: MoveCardInstanceMethod;
+          }>
+        >,
       ) => {
         const {
           moveTarget,
@@ -235,11 +251,12 @@ export const tabletopsSlice = createSlice({
     changeCardState: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          side: Cards.Side;
-          target: { cardInstanceId: string } | { stackId: string | null };
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            side: Cards.Side;
+            target: { cardInstanceId: string } | { stackId: string | null };
+          }>
+        >,
       ) => {
         const target = action.payload.target;
 
@@ -268,12 +285,13 @@ export const tabletopsSlice = createSlice({
     setStackOrder: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          stackId: string | null;
-          method: { type: "shuffle"; seed: string } | { type: "reverse" };
-          allCardInstancesState: Cards.Side | "noChange";
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            stackId: string | null;
+            method: { type: "shuffle"; seed: string } | { type: "reverse" };
+            allCardInstancesState: Cards.Side | "noChange";
+          }>
+        >,
       ) => {
         const method = action.payload.method;
 
@@ -314,10 +332,7 @@ export const tabletopsSlice = createSlice({
       },
     ),
     deleteStack: history.withHistory(
-      (
-        state,
-        action: PayloadAction<{ tabletopId: string; stackId: string }>,
-      ) => {
+      (state, action: PayloadAction<HistoryPayload<{ stackId: string }>>) => {
         delete state.stacksById[action.payload.stackId];
 
         removeFromArray(
@@ -329,10 +344,11 @@ export const tabletopsSlice = createSlice({
     resetTabletop: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          historyState: Tabletops.HistoryState;
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            historyState: Tabletops.HistoryState;
+          }>
+        >,
       ) => {
         state.stacksIds = action.payload.historyState.stacksIds;
         state.stacksById = action.payload.historyState.stacksById;

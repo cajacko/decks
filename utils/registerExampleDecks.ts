@@ -92,6 +92,7 @@ export default function registerExampleDecks() {
         future: [],
         past: [],
         present: {
+          operation: { type: "INIT", payload: null },
           cardInstancesById: {},
           stacksById: {
             [stack1Id]: {

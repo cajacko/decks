@@ -137,6 +137,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
       future: [],
       past: [],
       present: {
+        operation: { type: "INIT", payload: null },
         cardInstancesById: {},
         stacksById,
         stacksIds,
@@ -251,6 +252,7 @@ export function copyDeckHelper(props: {
         future: [],
         past: [],
         present: {
+          operation: existingTabletop.history.present.operation,
           cardInstancesById,
           stacksById: cloneDeep(existingTabletop.history.present.stacksById),
           stacksIds: cloneDeep(existingTabletop.history.present.stacksIds),
