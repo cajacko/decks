@@ -14,6 +14,7 @@ import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
+import { useGoogleAuth } from "@/utils/auth/google";
 
 const titleProps = { type: "h2" } as const;
 
@@ -37,6 +38,12 @@ export default function DevMenu({
     initializationError,
     lastCheckForUpdateTimeSinceRestart,
   } = useUpdates();
+
+  const auth2 = useGoogleAuth();
+
+  const auth1 = useGoogleAuth({
+    redirectUri: "https://auth.expo.io/@charliejackson/decks",
+  });
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -68,6 +75,40 @@ export default function DevMenu({
       initialCollapsed
       titleProps={titleProps}
     >
+      <Button
+        title="Sign in with Google (1)"
+        onPress={() => {
+          auth1.promptAsync({});
+        }}
+        variant="outline"
+      />
+
+      <Button
+        title="Sign in with Google (2)"
+        onPress={() => {
+          auth2.promptAsync({});
+        }}
+        variant="outline"
+      />
+
+      <Collapsible
+        title="Sign In Info"
+        collapsible
+        initialCollapsed
+        titleProps={fieldSetTitleProps}
+      >
+        <ThemedText>
+          {JSON.stringify(
+            {
+              auth1: auth1.response,
+              auth2: auth2.response,
+            },
+            null,
+            2,
+          )}
+        </ThemedText>
+      </Collapsible>
+
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 
       {isDevClient && (
