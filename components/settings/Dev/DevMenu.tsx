@@ -14,7 +14,9 @@ import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
-import { useGoogleAuth } from "@/utils/auth/google";
+import useGoogleAuth from "@/api/google/useGoogleAuth";
+import { userInfo } from "@/api/google/userinfo";
+import { files } from "@/api/google/drive";
 
 const titleProps = { type: "h2" } as const;
 
@@ -39,11 +41,7 @@ export default function DevMenu({
     lastCheckForUpdateTimeSinceRestart,
   } = useUpdates();
 
-  const auth2 = useGoogleAuth();
-
-  const auth1 = useGoogleAuth({
-    redirectUri: "https://auth.expo.io/@charliejackson/decks",
-  });
+  const auth = useGoogleAuth();
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -67,6 +65,7 @@ export default function DevMenu({
   }, []);
 
   const isDevClient = DevClient.isDevelopmentBuild();
+  const [testData, setTestData] = React.useState<any>(null);
 
   return (
     <FieldSet
@@ -76,33 +75,69 @@ export default function DevMenu({
       titleProps={titleProps}
     >
       <Button
-        title="Sign in with Google (1)"
+        title="Sign in with Google"
         onPress={() => {
-          auth1.promptAsync({});
+          auth.requestAuth();
         }}
         variant="outline"
       />
 
       <Button
-        title="Sign in with Google (2)"
-        onPress={() => {
-          auth2.promptAsync({});
-        }}
+        title={
+          auth.tokens ? "Refresh with Google" : "Can not refresh with Google"
+        }
+        onPress={
+          auth.tokens
+            ? () => auth.refreshAuth(auth.tokens.refreshToken)
+            : undefined
+        }
+        variant="outline"
+      />
+
+      <Button
+        title="Test Auth"
+        onPress={
+          auth.tokens
+            ? () => {
+                userInfo(auth.tokens)
+                  .then((res) => {
+                    setTestData(res);
+                  })
+                  .catch((err) => {
+                    setTestData("Error testing auth:" + err);
+                  });
+              }
+            : undefined
+        }
+        variant="outline"
+      />
+      <Button
+        title="List Drive Files"
+        onPress={
+          auth.tokens
+            ? () => {
+                files(auth.tokens)
+                  .then((res) => {
+                    setTestData(res);
+                  })
+                  .catch((err) => {
+                    setTestData("Error testing auth:" + err);
+                  });
+              }
+            : undefined
+        }
         variant="outline"
       />
 
       <Collapsible
-        title="Sign In Info"
+        title="Auth State"
         collapsible
         initialCollapsed
         titleProps={fieldSetTitleProps}
       >
         <ThemedText>
           {JSON.stringify(
-            {
-              auth1: auth1.response,
-              auth2: auth2.response,
-            },
+            { type: auth.type, tokens: auth.tokens, testData },
             null,
             2,
           )}

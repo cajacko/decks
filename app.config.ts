@@ -83,6 +83,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   splash,
   plugins: [
+    "expo-secure-store",
     [
       "expo-sensors",
       {
