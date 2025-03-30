@@ -1,6 +1,6 @@
-import migration from "./v1/migration";
+import migration from "./v2/migration";
 
-export * from "./v1/types";
+export * from "./v2/types";
 
 export const version = migration.version;
 
