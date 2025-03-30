@@ -88,10 +88,10 @@ async function updateTokens(state: State): Promise<State> {
   return state;
 }
 
-export async function logout() {
+export async function logout(type: "LOGOUT" | "UNAUTHENTICATED" = "LOGOUT") {
   await updateTokens({
     tokens: null,
-    type: "LOGOUT",
+    type,
   });
 }
 
@@ -292,35 +292,63 @@ export function withAuthenticatedFetch<T>({
   method,
 }: {
   url: string;
-  method: "GET";
+  method: "GET" | "POST" | "PUT" | "DELETE";
 }) {
   return async (auth: GoogleAuthTokens): Promise<T> => {
-    try {
+    let accessToken = auth.accessToken;
+    let invalidOrExpired = false;
+
+    const tryFetch = async (token: string): Promise<T> => {
+      invalidOrExpired = false;
+
       const response = await fetch(url, {
         method,
         headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) {
-        const error = await response.text();
+      if (response.status === 401) {
+        invalidOrExpired = true;
 
+        throw new AppError("Access token is invalid or expired", {
+          status: 401,
+        });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
         throw new AppError(
-          `${withAuthenticatedFetch.name} Did not get an ok response from ${url}: (${response.status}) ${error}`,
-          { error, url, method },
+          `Request to ${url} failed (${response.status}): ${errorText}`,
+          { status: response.status, url, method },
         );
       }
 
-      const data: T = await response.json();
+      return await response.json();
+    };
 
-      return data;
-    } catch (unknownError) {
-      throw AppError.getError(
-        unknownError,
-        `${withAuthenticatedFetch.name} Error while fetching ${url}`,
-        { url, method },
-      );
+    try {
+      return await tryFetch(accessToken);
+    } catch (err: unknown) {
+      if (invalidOrExpired && auth.refreshToken) {
+        try {
+          const refreshed = await refreshAuth(auth.refreshToken);
+
+          return await tryFetch(refreshed.accessToken);
+        } catch (refreshErr) {
+          if (invalidOrExpired) {
+            await logout("UNAUTHENTICATED");
+          }
+
+          throw new AppError("Token refresh failed", {
+            original: refreshErr,
+            url,
+            method,
+          });
+        }
+      }
+
+      throw err;
     }
   };
 }
