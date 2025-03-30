@@ -17,6 +17,7 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
+import { syncState } from "../combinedActions/sync";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -481,6 +482,11 @@ export const tabletopsSlice = createSlice({
 
         addCardInstancesToTabletop(tabletop, cardInstances);
       });
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      state.tabletopsById =
+        actions.payload.state[SliceName.Tabletops].tabletopsById;
     });
   },
 });

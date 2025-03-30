@@ -16,7 +16,7 @@ import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 import useGoogleAuth from "@/api/google/useGoogleAuth";
 import { userInfo } from "@/api/google/userinfo";
-import { files } from "@/api/google/drive";
+import { getRemote, setRemote } from "@/api/dex/sync";
 
 const titleProps = { type: "h2" } as const;
 
@@ -111,21 +111,16 @@ export default function DevMenu({
         }
         variant="outline"
       />
+
       <Button
-        title="List Drive Files"
-        onPress={
-          auth.tokens
-            ? () => {
-                files(auth.tokens)
-                  .then((res) => {
-                    setTestData(res);
-                  })
-                  .catch((err) => {
-                    setTestData("Error testing auth:" + err);
-                  });
-              }
-            : undefined
-        }
+        title="Backup (Push)"
+        onPress={() => setRemote().then(() => setTestData("Done"))}
+        variant="outline"
+      />
+
+      <Button
+        title="Sync (Pull)"
+        onPress={() => getRemote().then(setTestData)}
         variant="outline"
       />
 

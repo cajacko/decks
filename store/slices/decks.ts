@@ -10,6 +10,7 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { SetCardData } from "../combinedActions/types";
 import withBuiltInState, { getBuiltInState } from "../utils/withBuiltInState";
 import AppError from "@/classes/AppError";
+import { syncState } from "../combinedActions/sync";
 
 const initialState: Decks.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
   ? devInitialState.decks
@@ -225,6 +226,11 @@ export const cardsSlice = createSlice({
           status: "active",
         };
       }
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      state.deckIds = actions.payload.state[SliceName.Decks].deckIds;
+      state.decksById = actions.payload.state[SliceName.Decks].decksById;
     });
   },
 });

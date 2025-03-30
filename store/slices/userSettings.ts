@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { RootState, UserSettings, SliceName } from "../types";
 import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
+import { syncState } from "../combinedActions/sync";
 
 export type UserSettingsState = UserSettings.State;
 
@@ -55,6 +56,12 @@ export const userSettingsSlice = createSlice({
 
       state[action.payload.key] = action.payload.value;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(syncState, (state, actions) => {
+      state.flags = actions.payload.state[SliceName.UserSettings].flags;
+      state.theme = actions.payload.state[SliceName.UserSettings].theme;
+    });
   },
 });
 

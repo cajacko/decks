@@ -323,70 +323,78 @@ export async function refreshAuth(
   return tokens;
 }
 
-export function withAuthenticatedFetch<T>({
+export async function authenticatedFetch<T>({
   url,
+  auth,
   method,
 }: {
   url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE";
+  auth: GoogleAuthTokens;
+  method: "GET";
 }) {
-  return async (auth: GoogleAuthTokens): Promise<T> => {
-    debugLog("authFetch", url);
+  debugLog("authFetch", url);
 
-    let accessToken = auth.accessToken;
-    let invalidOrExpired = false;
+  let accessToken = auth.accessToken;
+  let invalidOrExpired = false;
 
-    const tryFetch = async (token: string): Promise<T> => {
-      invalidOrExpired = false;
+  const tryFetch = async (token: string): Promise<T> => {
+    invalidOrExpired = false;
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      invalidOrExpired = true;
+
+      throw new AppError("Access token is invalid or expired", {
+        status: 401,
       });
+    }
 
-      if (response.status === 401) {
-        invalidOrExpired = true;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new AppError(
+        `Request to ${url} failed (${response.status}): ${errorText}`,
+        { status: response.status, url, method },
+      );
+    }
 
-        throw new AppError("Access token is invalid or expired", {
-          status: 401,
+    return await response.json();
+  };
+
+  try {
+    return await tryFetch(accessToken);
+  } catch (err: unknown) {
+    if (invalidOrExpired && auth.refreshToken) {
+      try {
+        const refreshed = await refreshAuth(auth.refreshToken);
+
+        return await tryFetch(refreshed.accessToken);
+      } catch (refreshErr) {
+        if (invalidOrExpired) {
+          await logout("UNAUTHENTICATED");
+        }
+
+        throw new AppError("Token refresh failed", {
+          original: refreshErr,
+          url,
+          method,
         });
       }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new AppError(
-          `Request to ${url} failed (${response.status}): ${errorText}`,
-          { status: response.status, url, method },
-        );
-      }
-
-      return await response.json();
-    };
-
-    try {
-      return await tryFetch(accessToken);
-    } catch (err: unknown) {
-      if (invalidOrExpired && auth.refreshToken) {
-        try {
-          const refreshed = await refreshAuth(auth.refreshToken);
-
-          return await tryFetch(refreshed.accessToken);
-        } catch (refreshErr) {
-          if (invalidOrExpired) {
-            await logout("UNAUTHENTICATED");
-          }
-
-          throw new AppError("Token refresh failed", {
-            original: refreshErr,
-            url,
-            method,
-          });
-        }
-      }
-
-      throw err;
     }
-  };
+
+    throw err;
+  }
+}
+
+export function withAuthenticatedFetch<T>(props: {
+  url: string;
+  method: "GET";
+}) {
+  return async (auth: GoogleAuthTokens): Promise<T> =>
+    authenticatedFetch<T>({ ...props, auth });
 }
