@@ -15,7 +15,7 @@ import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 import useGoogleAuth from "@/api/google/useGoogleAuth";
-import { getRemote, setRemote } from "@/api/dex/sync";
+import * as sync from "@/api/dex/sync";
 
 const titleProps = { type: "h2" } as const;
 
@@ -94,8 +94,8 @@ export default function DevMenu({
 
         {auth.tokens && (
           <Button
-            title="Backup (Push)"
-            onPress={() => setRemote()}
+            title="Sync (Merge)"
+            onPress={() => sync.sync()}
             variant="outline"
           />
         )}
@@ -103,7 +103,15 @@ export default function DevMenu({
         {auth.tokens && (
           <Button
             title="Sync (Pull)"
-            onPress={() => getRemote()}
+            onPress={() => sync.pull()}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Backup (Push)"
+            onPress={() => sync.push()}
             variant="outline"
           />
         )}
