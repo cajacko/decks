@@ -2,6 +2,12 @@ import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 import AppError from "@/classes/AppError";
 import * as AuthSession from "expo-auth-session";
+import withDebugLog from "@/utils/withDebugLog";
+
+const debugLog = withDebugLog(
+  ({ getFlag }) => getFlag("DEBUG_AUTH"),
+  "PlayfaceAuth",
+);
 
 export interface Tokens {
   accessToken: string;
@@ -23,6 +29,8 @@ function expiresInToExpiresAt(expiresIn: number | null): Date | null {
 }
 
 function extractTokens(url: string): Tokens {
+  debugLog(`Extracting tokens from url`);
+
   const params = new URLSearchParams(url.split("#")[1]);
   const accessToken = params.get("access_token");
   const refreshToken = params.get("refresh_token");
@@ -55,22 +63,43 @@ function extractTokens(url: string): Tokens {
 }
 
 export function getRedirectUri(): string {
-  return AuthSession.makeRedirectUri();
+  const redirectUri = AuthSession.makeRedirectUri({});
+
+  debugLog(`getRedirectUri - redirectUri: ${redirectUri}`);
+
+  return redirectUri;
 }
 
 /**
  * type: opened - happens on web, when auth opens in a new tab
  */
 export async function requestAuth(
-  redirectUri?: string,
+  redirectUriProp?: string,
 ): Promise<
   { type: "success"; payload: Tokens } | { type: "cancel" } | { type: "opened" }
 > {
+  const redirectUri = redirectUriProp ?? getRedirectUri();
+
   const authUrl = `https://www.playface.fun/api/auth?redirect=${encodeURIComponent(
-    redirectUri ?? getRedirectUri(),
+    redirectUri,
   )}`;
 
-  const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+  debugLog(`requestAuth - authUrl: ${authUrl}`);
+
+  // NOTE: We have to have the redirectUri here match the one we end up in, otherwise it won't pass
+  // the finished url with the tokens in the hash on return
+  const promise = WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+
+  if (Platform.OS === "web") {
+    debugLog("requestAuth - web");
+    return { type: "opened" };
+  }
+
+  debugLog("requestAuth - mobile");
+
+  const result = await promise;
+
+  debugLog("requestAuth - result", result.type);
 
   switch (result.type) {
     case "success": {
@@ -103,6 +132,8 @@ export function checkAuthInHref(): Tokens | null {
 }
 
 export async function refreshAuth(refreshToken: string): Promise<Tokens> {
+  debugLog("refreshAuth - refreshing auth");
+
   const result = await fetch(`https://www.playface.fun/api/auth/refresh`, {
     method: "POST",
     headers: {

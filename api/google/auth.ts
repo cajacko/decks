@@ -3,6 +3,12 @@ import { Platform } from "react-native";
 import * as Playface from "@/api/playface/auth";
 import AppError from "@/classes/AppError";
 import uuid from "@/utils/uuid";
+import withDebugLog from "@/utils/withDebugLog";
+
+const debugLog = withDebugLog(
+  ({ getFlag }) => getFlag("DEBUG_AUTH"),
+  "GoogleAuth",
+);
 
 export type GoogleAuthTokens = Playface.Tokens;
 
@@ -43,6 +49,8 @@ export function getState(): State {
 }
 
 function setState(state: State): State {
+  debugLog("Update State", state.type);
+
   stateCache = state;
 
   listeners.forEach((callback) => {
@@ -70,12 +78,16 @@ async function updateTokens(state: State): Promise<State> {
   setState(state);
 
   if (!state.tokens) {
+    debugLog("Delete Tokens", state.type);
+
     await deleteItems(
       keys.googleAccessToken,
       keys.googleRefreshToken,
       keys.googleAccessTokenExpiresAt,
     );
   } else {
+    debugLog("Set Tokens", state.type);
+
     await setItems({
       [keys.googleAccessToken]: state.tokens.accessToken,
       [keys.googleRefreshToken]: state.tokens.refreshToken,
@@ -89,6 +101,8 @@ async function updateTokens(state: State): Promise<State> {
 }
 
 export async function logout(type: "LOGOUT" | "UNAUTHENTICATED" = "LOGOUT") {
+  debugLog("Logout");
+
   await updateTokens({
     tokens: null,
     type,
@@ -96,6 +110,8 @@ export async function logout(type: "LOGOUT" | "UNAUTHENTICATED" = "LOGOUT") {
 }
 
 async function getTokensFromStorage(): Promise<GoogleAuthTokens | null> {
+  debugLog("getTokensFromStorage");
+
   const items = await getItems(
     keys.googleAccessToken,
     keys.googleRefreshToken,
@@ -126,6 +142,8 @@ async function waitForAuthFromStorage(
 ): Promise<
   { type: "success"; payload: GoogleAuthTokens } | { type: "timeout" }
 > {
+  debugLog("waitForAuthFromStorage");
+
   return new Promise<
     { type: "success"; payload: GoogleAuthTokens } | { type: "timeout" }
   >((resolve, reject) => {
@@ -147,6 +165,8 @@ async function waitForAuthFromStorage(
     }, options.timeout ?? defaultWebAuthTimeout);
 
     async function poll() {
+      debugLog("waitForAuthFromStorage - poll");
+
       if (pollTimeout) {
         clearTimeout(pollTimeout);
       }
@@ -199,6 +219,8 @@ type RequestAuthState =
 export async function requestAuth(
   redirectUri?: string,
 ): Promise<RequestAuthState> {
+  debugLog("requestAuth - init");
+
   await updateTokens({
     type: "LOGIN_STARTED",
     tokens: null,
@@ -207,12 +229,16 @@ export async function requestAuth(
   let result = await Playface.requestAuth(redirectUri);
   let requestAuthState: RequestAuthState;
 
+  debugLog("requestAuth - result 1", result.type);
+
   // Opens on web in a new tab, lets poll the local storage until we have it or timeout
   if (result.type === "opened") {
     requestAuthState = await waitForAuthFromStorage();
   } else {
     requestAuthState = result;
   }
+
+  debugLog("requestAuth - result 2", result.type);
 
   if (requestAuthState.type !== "success") return requestAuthState;
 
@@ -232,18 +258,24 @@ async function manageWebAuthPopup(
 
   if (!tokens) return;
 
+  debugLog("manageWebAuthPopup - tokens in href");
+
   await updateTokens({
     type: "AUTH_FROM_HREF",
     tokens,
   });
 
   if (Platform.OS === "web" && closeWindowOnTokensInHref) {
+    debugLog("manageWebAuthPopup - close");
+
     window.close();
   }
 }
 
 export function init(): State {
   if (stateCache) return stateCache;
+
+  debugLog("init");
 
   const newState = setState({
     type: "INITIALIZING",
@@ -255,7 +287,7 @@ export function init(): State {
     .then((tokens) => {
       if (tokens) {
         setState({
-          type: "AUTH_FROM_HREF",
+          type: "AUTH_FROM_STORAGE",
           tokens,
         });
       } else {
@@ -264,6 +296,8 @@ export function init(): State {
           tokens: null,
         });
       }
+
+      debugLog("init finished", stateCache?.type);
     })
     .catch((unknownError) => {
       AppError.getError(unknownError, "Error getting tokens from storage").log(
@@ -277,6 +311,8 @@ export function init(): State {
 export async function refreshAuth(
   refreshToken: string,
 ): Promise<GoogleAuthTokens> {
+  debugLog("refreshAuth");
+
   const tokens = await Playface.refreshAuth(refreshToken);
 
   setState({
@@ -295,6 +331,8 @@ export function withAuthenticatedFetch<T>({
   method: "GET" | "POST" | "PUT" | "DELETE";
 }) {
   return async (auth: GoogleAuthTokens): Promise<T> => {
+    debugLog("authFetch", url);
+
     let accessToken = auth.accessToken;
     let invalidOrExpired = false;
 
