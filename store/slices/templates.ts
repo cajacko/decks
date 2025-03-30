@@ -4,7 +4,7 @@ import { getFlag } from "@/utils/flags";
 import devInitialState from "../dev/devInitialState";
 import withBuiltInState from "../utils/withBuiltInState";
 import { builtInTemplatesById } from "@/constants/builtInTemplates";
-// import { syncState } from "../combinedActions/sync";
+// import { setState } from "../combinedActions/sync";
 
 const initialState: Templates.State = getFlag(
   "USE_DEV_INITIAL_REDUX_STATE",
@@ -20,7 +20,7 @@ export const templatesSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // builder.addCase(syncState, (state, actions) => {
+    // builder.addCase(setState, (state, actions) => {
     //   state.templatesById =
     //     actions.payload.state[SliceName.Templates].templatesById;
     // });

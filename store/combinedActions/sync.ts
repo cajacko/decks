@@ -1,7 +1,7 @@
 import { createAction } from "@reduxjs/toolkit";
 import { RootState } from "../types";
 
-export const syncState = createAction<{
+export const setState = createAction<{
   state: RootState;
   dateSaved: string;
-}>("syncState");
+}>("setState");

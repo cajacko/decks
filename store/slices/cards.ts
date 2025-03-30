@@ -6,7 +6,7 @@ import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import withBuiltInState from "../utils/withBuiltInState";
 import { getFlag } from "@/utils/flags";
-import { syncState } from "../combinedActions/sync";
+import { setState } from "../combinedActions/sync";
 
 export type Card = Cards.Props;
 
@@ -128,7 +128,7 @@ export const cardsSlice = createSlice({
       });
     });
 
-    builder.addCase(syncState, (state, actions) => {
+    builder.addCase(setState, (state, actions) => {
       state.cardsById = actions.payload.state[SliceName.Cards].cardsById;
     });
   },

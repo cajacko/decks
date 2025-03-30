@@ -15,7 +15,6 @@ import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 import useGoogleAuth from "@/api/google/useGoogleAuth";
-import { userInfo } from "@/api/google/userinfo";
 import { getRemote, setRemote } from "@/api/dex/sync";
 
 const titleProps = { type: "h2" } as const;
@@ -65,7 +64,6 @@ export default function DevMenu({
   }, []);
 
   const isDevClient = DevClient.isDevelopmentBuild();
-  const [testData, setTestData] = React.useState<any>(null);
 
   return (
     <FieldSet
@@ -74,70 +72,42 @@ export default function DevMenu({
       initialCollapsed
       titleProps={titleProps}
     >
-      <Button
-        title="Sign in with Google"
-        onPress={() => {
-          auth.requestAuth();
-        }}
-        variant="outline"
-      />
-
-      <Button
-        title={
-          auth.tokens ? "Refresh with Google" : "Can not refresh with Google"
-        }
-        onPress={
-          auth.tokens
-            ? () => auth.refreshAuth(auth.tokens.refreshToken)
-            : undefined
-        }
-        variant="outline"
-      />
-
-      <Button
-        title="Test Auth"
-        onPress={
-          auth.tokens
-            ? () => {
-                userInfo(auth.tokens)
-                  .then((res) => {
-                    setTestData(res);
-                  })
-                  .catch((err) => {
-                    setTestData("Error testing auth:" + err);
-                  });
-              }
-            : undefined
-        }
-        variant="outline"
-      />
-
-      <Button
-        title="Backup (Push)"
-        onPress={() => setRemote().then(() => setTestData("Done"))}
-        variant="outline"
-      />
-
-      <Button
-        title="Sync (Pull)"
-        onPress={() => getRemote().then(setTestData)}
-        variant="outline"
-      />
-
-      <Collapsible
-        title="Auth State"
+      <FieldSet
+        title="Data/ Auth"
         collapsible
         initialCollapsed
         titleProps={fieldSetTitleProps}
       >
-        <ThemedText>
-          {JSON.stringify(
-            { type: auth.type, tokens: auth.tokens, testData },
-            null,
-            2,
-          )}
-        </ThemedText>
-      </Collapsible>
+        <Button
+          title="Sign In"
+          onPress={() => auth.requestAuth()}
+          variant="outline"
+        />
+
+        {auth.tokens && (
+          <Button
+            title="Refresh"
+            onPress={() => auth.refreshAuth(auth.tokens.refreshToken)}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Backup (Push)"
+            onPress={() => setRemote()}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Sync (Pull)"
+            onPress={() => getRemote()}
+            variant="outline"
+          />
+        )}
+      </FieldSet>
 
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 

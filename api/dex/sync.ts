@@ -3,7 +3,7 @@ import { store } from "@/store/store";
 import { RootState } from "@/store/types";
 import migrate from "@/store/utils/migrate";
 import { version } from "@/store/versions/latest";
-import { syncState } from "@/store/combinedActions/sync";
+import { setState } from "@/store/combinedActions/sync";
 
 // NOTE: Warning all changes here must be backwards compatible
 type Backup<S = RootState> = {
@@ -33,7 +33,7 @@ export async function getRemote(): Promise<Backup | null> {
   const state = persistedState as RootState;
 
   store.dispatch(
-    syncState({
+    setState({
       state,
       dateSaved: backup.date,
     }),
@@ -54,8 +54,6 @@ export async function setRemote() {
     date: new Date().toISOString(),
     reduxPersistVersion: version,
   };
-
-  console.log("setRemote", data);
 
   return await setAppDataFile(fileName, data);
 }

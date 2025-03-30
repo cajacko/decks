@@ -95,5 +95,3 @@ export interface RootState {
   [SliceName.Tabletops]: TabletopState;
   [SliceName.Cards]: CardsState;
 }
-
-export type RemoteBackup = {};
