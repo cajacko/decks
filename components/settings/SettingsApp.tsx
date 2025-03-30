@@ -14,6 +14,7 @@ import SwitchField from "../forms/SwitchField";
 import useFlag from "@/hooks/useFlag";
 import { defaultTheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
+import { dateToDateString } from "@/utils/dates";
 
 type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
@@ -36,7 +37,13 @@ export default function SettingsApp(): React.ReactNode {
 
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
-      dispatch(setUserSetting({ key: "theme", value }));
+      dispatch(
+        setUserSetting({
+          key: "theme",
+          value,
+          date: dateToDateString(new Date()),
+        }),
+      );
     },
     [dispatch],
   );
@@ -47,6 +54,7 @@ export default function SettingsApp(): React.ReactNode {
         setUserFlag({
           key: "PERFORMANCE_MODE",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -59,6 +67,7 @@ export default function SettingsApp(): React.ReactNode {
         setUserFlag({
           key: "HOLD_MENU_BEHAVIOUR",
           value: value ? "always-visible" : "hold/hover",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -71,6 +80,7 @@ export default function SettingsApp(): React.ReactNode {
         setUserFlag({
           key: "CARD_ACTIONS_HAPTICS",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -83,6 +93,7 @@ export default function SettingsApp(): React.ReactNode {
         setUserFlag({
           key: "SHAKE_TO_SHUFFLE",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -95,6 +106,7 @@ export default function SettingsApp(): React.ReactNode {
         setUserFlag({
           key: "EDIT_CARD_MORE_INFO",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },

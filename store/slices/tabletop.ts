@@ -9,9 +9,8 @@ import {
   Cards,
   Decks,
   RequiredOperations,
+  DateString,
 } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
@@ -34,15 +33,14 @@ export enum MoveCardInstanceMethod {
   bottomNoChange = "bottomNoChange",
 }
 
-const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.tabletops
-  : {
-      tabletopsById: {},
-    };
+const initialState: TabletopState = {
+  tabletopsById: {},
+};
 
 type HistoryPayload<P extends object = object> = P & {
   tabletopId: string;
   operation: Tabletops.HistoryOperation | RequiredOperations;
+  date: DateString;
 };
 
 const history = configureHistory<
@@ -50,7 +48,15 @@ const history = configureHistory<
   TabletopHistoryState,
   { tabletopId: string },
   HistoryPayload
->((state, props) => state.tabletopsById[props.tabletopId]?.history);
+>((state, props) => state.tabletopsById[props.tabletopId]?.history, {
+  postAction: (_, action, state) => {
+    const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+    if (!tabletop) return;
+
+    tabletop.dateUpdated = action.payload.date;
+  },
+});
 
 export const { getRedoState, getUndoState, getState } = history;
 
@@ -74,6 +80,7 @@ function removeCardInstancesFromStacks(
 function addCardInstancesToTabletop(
   tabletop: WritableDraft<Tabletop>,
   cardInstances: Omit<Tabletops.CardInstance, "side">[],
+  date: DateString,
 ) {
   const present = tabletop.history.present;
 
@@ -112,6 +119,7 @@ function addCardInstancesToTabletop(
   if (didEdit) {
     tabletop.history.past = [];
     tabletop.history.future = [];
+    tabletop.dateUpdated = date;
   }
 }
 
@@ -361,15 +369,21 @@ export const tabletopsSlice = createSlice({
       action: PayloadAction<{
         tabletopId: string;
         cardInstances: Omit<Tabletops.CardInstance, "side">[];
+        date: DateString;
       }>,
     ) => {
       const tabletop = state.tabletopsById[action.payload.tabletopId];
 
       if (!tabletop) return;
 
+      tabletop.dateUpdated = action.payload.date;
       tabletop.missingCardIds = [];
 
-      addCardInstancesToTabletop(tabletop, action.payload.cardInstances);
+      addCardInstancesToTabletop(
+        tabletop,
+        action.payload.cardInstances,
+        action.payload.date,
+      );
     },
     setTabletopSetting: <K extends keyof Tabletops.Settings>(
       state: WritableDraft<TabletopState>,
@@ -377,11 +391,14 @@ export const tabletopsSlice = createSlice({
         tabletopId: string;
         key: K;
         value: Tabletops.Settings[K];
+        date: DateString;
       }>,
     ) => {
       const tabletop = state.tabletopsById[action.payload.tabletopId];
 
       if (!tabletop) return;
+
+      tabletop.dateUpdated = action.payload.date;
 
       if (!tabletop.settings) {
         tabletop.settings = {};
@@ -396,6 +413,7 @@ export const tabletopsSlice = createSlice({
       props: {
         deckId: Decks.Id;
         cardIds: Cards.Id[];
+        date: DateString;
       },
     ) {
       const { deckId, cardIds } = props;
@@ -434,6 +452,7 @@ export const tabletopsSlice = createSlice({
         if (didEdit) {
           tabletop.history.past = [];
           tabletop.history.future = [];
+          tabletop.dateUpdated = props.date;
         }
       });
     }
@@ -444,6 +463,7 @@ export const tabletopsSlice = createSlice({
       deleteCards(state, {
         deckId: actions.meta.arg.deckId,
         cardIds: [actions.meta.arg.cardId],
+        date: actions.meta.arg.date,
       });
     });
 
@@ -455,6 +475,7 @@ export const tabletopsSlice = createSlice({
       deleteCards(state, {
         deckId: actions.meta.arg.deckId,
         cardIds: actions.meta.arg.cardIds,
+        date: actions.meta.arg.date,
       });
     });
 
@@ -475,12 +496,17 @@ export const tabletopsSlice = createSlice({
             tabletop.missingCardIds = [];
           }
 
+          tabletop.dateUpdated = actions.payload.date;
           tabletop.missingCardIds.push(actions.payload.cardId);
 
           return;
         }
 
-        addCardInstancesToTabletop(tabletop, cardInstances);
+        addCardInstancesToTabletop(
+          tabletop,
+          cardInstances,
+          actions.payload.date,
+        );
       });
     });
 

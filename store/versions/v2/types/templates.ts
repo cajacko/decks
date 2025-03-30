@@ -3,6 +3,7 @@ import {
   TemplateId as Id,
   FieldType,
   ValidatedValue,
+  DateString,
 } from "./types";
 import { Nodes as Markup } from "./markup";
 
@@ -43,6 +44,8 @@ export interface Props<DID extends DataId = DataId> {
   schemaOrder?: DID[];
   schema: Data<DID>;
   markup: Markup;
+  dateCreated: DateString;
+  dateUpdated: DateString;
 }
 
 export interface State {

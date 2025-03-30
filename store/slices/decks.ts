@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
-import { Cards, Decks, RootState, SliceName } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
+import { Cards, DateString, Decks, RootState, SliceName } from "../types";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
@@ -12,21 +10,22 @@ import withBuiltInState, { getBuiltInState } from "../utils/withBuiltInState";
 import AppError from "@/classes/AppError";
 import { setState } from "../combinedActions/sync";
 
-const initialState: Decks.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.decks
-  : {
-      decksById: {},
-      deckIds: [],
-    };
+const initialState: Decks.State = {
+  decksById: {},
+  deckIds: [],
+};
 
 function updateDeckTemplateMapping(
   state: WritableDraft<Decks.State>,
   props: {
     deckId: string;
     data: SetCardData;
+    date: DateString;
   },
 ) {
   const deck = state.decksById[props.deckId];
+
+  let hasUpdated = false;
 
   function processSide(side: Cards.Side) {
     if (!deck) return;
@@ -38,6 +37,8 @@ function updateDeckTemplateMapping(
       if (!templateDataId) return;
 
       if (templateMapping[dataId]?.templateDataId !== templateDataId) {
+        hasUpdated = true;
+
         templateMapping[dataId] = {
           dataId,
           templateDataId,
@@ -45,10 +46,12 @@ function updateDeckTemplateMapping(
       }
 
       if (!deck.dataSchemaOrder) {
+        hasUpdated = true;
         deck.dataSchemaOrder = [];
       }
 
       if (!deck.dataSchemaOrder.includes(dataId)) {
+        hasUpdated = true;
         deck.dataSchemaOrder.push(dataId);
       }
 
@@ -61,6 +64,7 @@ function updateDeckTemplateMapping(
       if (!dataItem) return;
       if (!dataItem.fieldType) return;
 
+      hasUpdated = true;
       deck.dataSchema[dataId] = {
         id: dataId,
         type: dataItem.fieldType,
@@ -70,6 +74,10 @@ function updateDeckTemplateMapping(
 
   processSide("front");
   processSide("back");
+
+  if (hasUpdated && deck) {
+    deck.dateUpdated = props.date;
+  }
 }
 
 export const cardsSlice = createSlice({
@@ -80,6 +88,8 @@ export const cardsSlice = createSlice({
       state,
       actions: PayloadAction<{ deckId: Decks.Id; screen: "deck" | "play" }>,
     ) => {
+      // NOTE: Do not update dateUpdated from this, it's just a minor ux thing not a data thing that
+      // should mess up our date syncing
       const deck = state.decksById[actions.payload.deckId];
 
       if (!deck) return;
@@ -92,11 +102,14 @@ export const cardsSlice = createSlice({
         deckId: Decks.Id;
         name?: string;
         description?: string;
+        date: DateString;
       }>,
     ) => {
       const deck = state.decksById[actions.payload.deckId];
 
       if (!deck) return;
+
+      deck.dateUpdated = actions.payload.date;
 
       if (actions.payload.name !== undefined) {
         deck.name = actions.payload.name;
@@ -111,6 +124,7 @@ export const cardsSlice = createSlice({
       actions: PayloadAction<{
         deckId: Decks.Id;
         data: SetCardData;
+        date: DateString;
       }>,
     ) => {
       updateDeckTemplateMapping(state, actions.payload);
@@ -118,6 +132,8 @@ export const cardsSlice = createSlice({
       const deck = state.decksById[actions.payload.deckId];
 
       if (!deck) return;
+
+      deck.dateUpdated = actions.payload.date;
 
       actions.payload.data.items.forEach((dataItem) => {
         const dataId =
@@ -166,6 +182,7 @@ export const cardsSlice = createSlice({
 
       if (deck) {
         deck.status = "deleting";
+        deck.dateUpdated = actions.meta.arg.date;
       }
 
       removeFromArray(state.deckIds, (id) => id === actions.meta.arg.deckId);
@@ -186,6 +203,8 @@ export const cardsSlice = createSlice({
 
       if (!deck) return;
 
+      deck.dateUpdated = actions.payload.date;
+
       deck.cards.push({
         cardId: actions.payload.cardId,
         quantity: 1,
@@ -201,6 +220,8 @@ export const cardsSlice = createSlice({
       const deck = state.decksById[deckId];
 
       if (!deck) return;
+
+      deck.dateUpdated = actions.meta.arg.date;
 
       removeFromArray(deck.cards, (item) => item.cardId === cardId);
     });

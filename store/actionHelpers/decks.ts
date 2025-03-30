@@ -18,6 +18,7 @@ import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
 import { fixed } from "@/constants/colors";
 import { getResetHistoryState } from "./tabletop";
 import { cloneDeep } from "lodash";
+import { dateToDateString } from "@/utils/dates";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.Id;
@@ -31,7 +32,12 @@ export function deleteDeckHelper(props: {
 
   const tabletopId = deck?.defaultTabletopId ?? props.tabletopId ?? null;
 
-  return deleteDeck({ cardIds, deckId: props.deckId, tabletopId });
+  return deleteDeck({
+    cardIds,
+    deckId: props.deckId,
+    tabletopId,
+    date: dateToDateString(new Date()),
+  });
 }
 
 type ValidNumbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -81,6 +87,8 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
 
   const deck: Decks.Props = {
     id: deckId,
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
     cards: [],
     dataSchema: {
       [ReservedDataSchemaIds.Color]: {
@@ -132,6 +140,8 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
 
   const defaultTabletop: Tabletops.Props = {
     id: tabletopId,
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
     availableDecks: [deckId],
     history: {
       future: [],
@@ -151,6 +161,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     cards,
     deck,
     defaultTabletop,
+    date: dateToDateString(new Date()),
   });
 }
 
@@ -184,6 +195,8 @@ export function copyDeckHelper(props: {
     cardIdMap.set(existingCardId, newCardId);
 
     cards.push({
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
       size: null,
       templates: existingCard.templates,
       cardId: newCardId,
@@ -248,6 +261,8 @@ export function copyDeckHelper(props: {
     );
 
     defaultTabletop = {
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
       history: {
         future: [],
         past: [],
@@ -266,6 +281,8 @@ export function copyDeckHelper(props: {
   } else {
     // We have no existing tabletop to copy from, so we need to create a new one
     defaultTabletop = {
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
       id: newTabletopId,
       availableDecks: [deckId],
       settings: undefined,
@@ -281,6 +298,8 @@ export function copyDeckHelper(props: {
 
   // NOTE: Don't spread, it will force us to add in all new props and choose what we need
   const deck: Decks.Props = {
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
     cards: deckCards,
     cardSize: deckToCopy.cardSize,
     dataSchema: deckToCopy.dataSchema,
@@ -298,5 +317,6 @@ export function copyDeckHelper(props: {
     cards,
     deck,
     defaultTabletop,
+    date: dateToDateString(new Date()),
   });
 }

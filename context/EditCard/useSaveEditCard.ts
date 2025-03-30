@@ -12,6 +12,7 @@ import uuid from "@/utils/uuid";
 import AppError from "@/classes/AppError";
 import useAutoSave from "@/hooks/useAutoSave";
 import debugLog from "./debugLog";
+import { dateToDateString } from "@/utils/dates";
 
 /**
  * Must be used within the EditCard context and with a valid target. Otherwise why is this component
@@ -78,6 +79,7 @@ export default function useSaveEditCard(options?: {
           setDeckCardDefaults({
             deckId: contextState.target.id,
             data: getUpdateCardData(contextState),
+            date: dateToDateString(new Date()),
           }),
         );
 

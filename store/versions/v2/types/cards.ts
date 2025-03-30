@@ -6,6 +6,7 @@ import {
   CardId as Id,
   CardSize as Size,
   ValidatedValue,
+  DateString,
 } from "./types";
 
 export { Side, SideTemplate, DataTemplateMapping, Id, Size, DataId };
@@ -13,6 +14,8 @@ export { Side, SideTemplate, DataTemplateMapping, Id, Size, DataId };
 export type Data = Record<DataId, ValidatedValue | undefined>;
 
 export interface Props {
+  dateCreated: DateString;
+  dateUpdated: DateString;
   cardId: Id;
   canEdit: boolean;
   deckId: DeckId | null;

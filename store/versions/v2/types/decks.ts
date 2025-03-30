@@ -9,6 +9,7 @@ import {
   TemplateDataId,
   ValidatedValue,
   FieldType,
+  DateString,
 } from "./types";
 
 export type { Id };
@@ -84,6 +85,8 @@ export interface Props {
   canEdit: boolean;
   cardSize: CardSize;
   lastScreen?: "deck" | "play";
+  dateCreated: DateString;
+  dateUpdated: DateString;
 }
 
 export interface State {

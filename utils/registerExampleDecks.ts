@@ -4,6 +4,7 @@ import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 import { getFlag } from "@/store/combinedSelectors/flags";
+import { dateToDateString } from "./dates";
 
 type State = Pick<
   RootState,
@@ -81,6 +82,8 @@ export default function registerExampleDecks() {
       status: "active",
       canEdit: false,
       templates: exampleDeck.templates,
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
     };
 
     const tabletop: Tabletops.Props = {
@@ -88,6 +91,8 @@ export default function registerExampleDecks() {
       availableDecks: [deckId],
       settings: exampleDeck.tabletopSettings,
       missingCardIds: [],
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
       history: {
         future: [],
         past: [],
@@ -116,6 +121,8 @@ export default function registerExampleDecks() {
       const cardInstanceId = ids.cardInstanceId(cardId);
 
       const card: Cards.Props = {
+        dateCreated: dateToDateString(new Date()),
+        dateUpdated: dateToDateString(new Date()),
         size: null,
         cardId,
         canEdit: false,

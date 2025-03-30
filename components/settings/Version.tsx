@@ -11,6 +11,7 @@ import text from "@/constants/text";
 import { commitSha } from "@/constants/commitSha.json";
 import { useUpdates } from "expo-updates";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import { dateToDateString } from "@/utils/dates";
 
 let version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`
@@ -64,7 +65,13 @@ export default function Version(props: { style?: ViewStyle }): React.ReactNode {
 
     if (taps.current >= 5) {
       if (devMode) {
-        dispatch(setUserFlag({ key: "DEV_MODE", value: false }));
+        dispatch(
+          setUserFlag({
+            key: "DEV_MODE",
+            value: false,
+            date: dateToDateString(new Date()),
+          }),
+        );
       } else {
         setShowDevModeAlert(true);
       }
@@ -97,7 +104,13 @@ export default function Version(props: { style?: ViewStyle }): React.ReactNode {
             text: text["general.enable"],
             onPress: () => {
               setShowDevModeAlert(false);
-              dispatch(setUserFlag({ key: "DEV_MODE", value: !devMode }));
+              dispatch(
+                setUserFlag({
+                  key: "DEV_MODE",
+                  value: !devMode,
+                  date: dateToDateString(new Date()),
+                }),
+              );
             },
             style: "default",
           },

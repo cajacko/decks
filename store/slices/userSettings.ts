@@ -1,17 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState, UserSettings, SliceName } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
+import { RootState, UserSettings, SliceName, DateString } from "../types";
 import { setState } from "../combinedActions/sync";
+import { dateToDateString } from "@/utils/dates";
 
 export type UserSettingsState = UserSettings.State;
 
-const initialState: UserSettingsState = getFlag(
-  "USE_DEV_INITIAL_REDUX_STATE",
-  null,
-)
-  ? devInitialState.userSettings
-  : {};
+const initialState: UserSettingsState = {
+  settings: {
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
+  },
+};
 
 export const userSettingsSlice = createSlice({
   name: SliceName.UserSettings,
@@ -24,19 +23,21 @@ export const userSettingsSlice = createSlice({
         payload: {
           key: FlagKey;
           value: UserSettings.FlagValue<FlagKey> | null;
+          date: DateString;
         };
       },
     ) => {
-      state.flags = state.flags || {};
+      state.settings.flags = state.settings.flags || {};
+      state.settings.dateUpdated = action.payload.date;
 
       if (action.payload.value === null) {
-        delete state.flags[action.payload.key];
+        delete state.settings.flags[action.payload.key];
 
         return;
       }
 
       // @ts-ignore
-      state.flags[action.payload.key] = action.payload.value;
+      state.settings.flags[action.payload.key] = action.payload.value;
     },
     setUserSetting: <K extends UserSettings.UserSettingKey>(
       state: UserSettingsState,
@@ -45,22 +46,24 @@ export const userSettingsSlice = createSlice({
         payload: {
           key: K;
           value: UserSettings.UserSettingValue<K> | null;
+          date: DateString;
         };
       },
     ) => {
+      state.settings.dateUpdated = action.payload.date;
+
       if (action.payload.value === null) {
-        delete state[action.payload.key];
+        delete state.settings?.[action.payload.key];
 
         return;
       }
 
-      state[action.payload.key] = action.payload.value;
+      state.settings[action.payload.key] = action.payload.value;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(setState, (state, actions) => {
-      state.flags = actions.payload.state[SliceName.UserSettings].flags;
-      state.theme = actions.payload.state[SliceName.UserSettings].theme;
+      state.settings = actions.payload.state[SliceName.UserSettings].settings;
     });
   },
 });
@@ -73,11 +76,13 @@ export const selectUserSettings = (state: RootState): UserSettingsState =>
 export const selectUserSetting = <K extends UserSettings.UserSettingKey>(
   state: RootState,
   props: { key: K },
-): UserSettings.UserSettingValue<K> => selectUserSettings(state)[props.key];
+): UserSettings.UserSettingValue<K> | undefined =>
+  selectUserSettings(state).settings?.[props.key];
 
 export const selectUserSettingsFlags = (
   state: RootState,
-): UserSettings.FlagsState | undefined => state[userSettingsSlice.name].flags;
+): UserSettings.FlagsState | undefined =>
+  state[userSettingsSlice.name].settings?.flags;
 
 export const selectUserSettingsFlag = <FlagKey extends UserSettings.FlagKey>(
   state: RootState,

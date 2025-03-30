@@ -5,6 +5,8 @@ import * as Cards from "./cards";
 import * as Templates from "./templates";
 import * as Markup from "./markup";
 
+export { DateString } from "./types";
+
 export * from "./helpers";
 
 // Don't re-export everything, each file should re-export what it needs in a more semantic way

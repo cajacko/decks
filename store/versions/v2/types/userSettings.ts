@@ -3,6 +3,8 @@
 // from boolean to having some different states we may miss some conditional checks that were just
 // doing a truthy check.
 
+import { DateString } from "./types";
+
 // NOTE: First option is the default
 export const flagMap = {
   // User control flags go here
@@ -22,7 +24,6 @@ export const flagMap = {
   BOTTOM_DRAWER_DRAG: ["enabled", "disabled"],
   CARD_ACTIONS_ALWAYS_VISIBLE: [false, true],
   EDIT_CARD_MORE_INFO: ["disabled", "enabled"],
-  USE_DEV_INITIAL_REDUX_STATE: [false, true],
   CARD_ANIMATIONS: ["enabled", "disabled"],
   SKELETON_LOADER: ["enabled", "disabled"],
   SCREEN_ANIMATIONS: [
@@ -61,11 +62,20 @@ export type FlagsState = {
   [K in FlagKey]?: FlagValue<K> | undefined;
 };
 
-export interface State {
+export interface UserSettings {
   theme?: "system" | "light" | "dark";
   flags?: FlagsState;
+  dateCreated: DateString;
+  dateUpdated: DateString;
 }
 
-export type UserSettingKey = keyof State;
+export interface State {
+  settings: UserSettings;
+}
+
+export type UserSettingKey = keyof Omit<
+  UserSettings,
+  "dateCreated" | "dateUpdated" | "flags"
+>;
 export type UserSettingValue<K extends UserSettingKey = UserSettingKey> =
-  State[K];
+  UserSettings[K];

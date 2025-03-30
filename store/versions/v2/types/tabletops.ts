@@ -10,6 +10,7 @@ import {
   CardSide,
   CardId,
   DeckId,
+  DateString,
 } from "./types";
 
 export type { CardInstanceId, StackId, Id };
@@ -87,6 +88,8 @@ export interface Props {
   // decks etc
   settings: Settings | undefined;
   missingCardIds: CardId[] | undefined;
+  dateCreated: DateString;
+  dateUpdated: DateString;
 }
 
 export interface State {

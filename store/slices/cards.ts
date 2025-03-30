@@ -1,32 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
-import devInitialState from "../dev/devInitialState";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import withBuiltInState from "../utils/withBuiltInState";
-import { getFlag } from "@/utils/flags";
-import { setState } from "../combinedActions/sync";
+import { setState, syncState } from "../combinedActions/sync";
 
 export type Card = Cards.Props;
 
 export { updateCard };
 
-const initialState: Cards.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.cards
-  : {
-      cardsById: {},
-    };
+const initialState: Cards.State = {
+  cardsById: {},
+};
 
 export const cardsSlice = createSlice({
   name: SliceName.Cards,
   initialState,
-  reducers: {
-    removeCard: (state, actions: PayloadAction<{ cardId: string }>) => {
-      // TODO: Remove from decks, stacks, tabletops, etc.
-      delete state.cardsById[actions.payload.cardId];
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(updateCard, (state, actions) => {
       const card = state.cardsById[actions.payload.cardId];
@@ -42,10 +33,14 @@ export const cardsSlice = createSlice({
           card.data[cardDataSchemaId] = dataItem.validatedValue;
         }
       });
+
+      card.dateUpdated = actions.payload.date;
     });
 
     builder.addCase(createCard, (state, actions) => {
       const card: Card = {
+        dateCreated: actions.payload.date,
+        dateUpdated: actions.payload.date,
         size: null,
         status: "active",
         canEdit: true,
@@ -73,6 +68,7 @@ export const cardsSlice = createSlice({
 
       if (!card) return;
 
+      card.dateUpdated = actions.meta.arg.date;
       card.status = "deleting";
     });
 
@@ -89,6 +85,7 @@ export const cardsSlice = createSlice({
         if (!card) return;
 
         card.status = "deleting";
+        card.dateUpdated = actions.meta.arg.date;
       });
     });
 
@@ -131,10 +128,27 @@ export const cardsSlice = createSlice({
     builder.addCase(setState, (state, actions) => {
       state.cardsById = actions.payload.state[SliceName.Cards].cardsById;
     });
+
+    // builder.addCase(syncState, (state, actions) => {
+    //   const { cardsById } = actions.payload.state[SliceName.Cards];
+
+    //   Object.values(cardsById).forEach((card) => {
+    //     if (!card) return;
+
+    //     const existingCard = state.cardsById[card.cardId];
+
+    //     if (!existingCard) {
+    //       state.cardsById[card.cardId] = {
+    //         ...card,
+    //         status: "active",
+    //       };
+
+    //       return;
+    //     }
+    //   });
+    // });
   },
 });
-
-export const { removeCard } = cardsSlice.actions;
 
 export const selectCard = withBuiltInState(
   (state: RootState, props: { cardId: string }): Card | undefined =>

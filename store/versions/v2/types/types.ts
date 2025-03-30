@@ -49,3 +49,6 @@ export type ValidatedValue<Type extends FieldType = FieldType> =
       boolean: CreateValidatedValue<"boolean", boolean>;
     }[Type]
   | CreateValidatedValue<"null", null>;
+
+export type DateString =
+  `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`;

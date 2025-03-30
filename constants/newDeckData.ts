@@ -4,6 +4,7 @@ import builtInTemplates, { back } from "@/constants/builtInTemplates";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 import text from "./text";
 import { fixed } from "./colors";
+import { dateToDateString } from "@/utils/dates";
 
 /**
  * Data for displaying a new deck creation card.
@@ -20,6 +21,8 @@ const dataSchemaIds = {
 };
 
 export const newDeckCard: Cards.Props = {
+  dateCreated: dateToDateString(new Date()),
+  dateUpdated: dateToDateString(new Date()),
   cardId: newDeckCardTarget.id,
   canEdit: false,
   size: Cards.Size.Poker,

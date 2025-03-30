@@ -7,7 +7,7 @@ export const selectFlag = createCachedSelector(
   (_: RootState, props: { key: UserSettings.FlagKey }): UserSettings.FlagKey =>
     props.key,
   (state: RootState): UserSettings.FlagsState | undefined =>
-    state.userSettings.flags,
+    state.userSettings.settings?.flags,
   (key: UserSettings.FlagKey, state?: UserSettings.FlagsState) =>
     _getFlag(key, state),
 )((_, props) => props.key);
