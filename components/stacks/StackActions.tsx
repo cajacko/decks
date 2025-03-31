@@ -14,9 +14,12 @@ import {
 import uuid from "@/utils/uuid";
 import text from "@/constants/text";
 import { generateSeed } from "@/utils/seededShuffle";
+import { StackListRef } from "./StackList";
+import { dateToDateString } from "@/utils/dates";
 
 export interface StackActionsProps extends FieldSetProps {
   tabletopId: string;
+  stackListRef?: React.RefObject<StackListRef>;
 }
 
 const moveNewStackText = {
@@ -60,6 +63,7 @@ function getDefaultSelectedMoveToStackId(
 
 export default function StackActions({
   tabletopId,
+  stackListRef,
   ...fieldSetProps
 }: StackActionsProps): React.ReactNode {
   const dispatch = useAppDispatch();
@@ -97,9 +101,16 @@ export default function StackActions({
           stackId: selectedStackId,
           method: { type: "shuffle", seed: generateSeed() },
           allCardInstancesState: "noChange",
+          date: dateToDateString(new Date()),
+          operation: {
+            type: "SHUFFLE",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       ),
-    [dispatch, tabletopId, selectedStackId],
+    [dispatch, tabletopId, selectedStackId, stackListRef],
   );
 
   const flipFaceDown = React.useCallback(
@@ -109,9 +120,18 @@ export default function StackActions({
           tabletopId,
           target: { stackId: selectedStackId },
           side: "back",
+          date: dateToDateString(new Date()),
+          operation: {
+            type: selectedStackId
+              ? "FLIP_STACK_FACE_DOWN"
+              : "FLIP_ALL_FACE_DOWN",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       ),
-    [dispatch, tabletopId, selectedStackId],
+    [dispatch, tabletopId, selectedStackId, stackListRef],
   );
 
   const flipFaceDownUp = React.useCallback(
@@ -121,9 +141,16 @@ export default function StackActions({
           tabletopId,
           target: { stackId: selectedStackId },
           side: "front",
+          date: dateToDateString(new Date()),
+          operation: {
+            type: selectedStackId ? "FLIP_STACK_FACE_UP" : "FLIP_ALL_FACE_UP",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       ),
-    [dispatch, tabletopId, selectedStackId],
+    [dispatch, tabletopId, selectedStackId, stackListRef],
   );
 
   const moveToTarget = React.useMemo((): {
@@ -147,9 +174,18 @@ export default function StackActions({
           tabletopId,
           moveTarget: { stackId: selectedStackId },
           toTarget: moveToTarget,
+          date: dateToDateString(new Date()),
+          operation: {
+            type: selectedStackId
+              ? "MOVE_STACK_CARDS_TO_TOP"
+              : "MOVE_ALL_CARDS_TO_TOP",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       ),
-    [tabletopId, selectedStackId, moveToTarget, dispatch],
+    [tabletopId, selectedStackId, moveToTarget, dispatch, stackListRef],
   );
 
   const moveBottom = React.useCallback(
@@ -160,9 +196,18 @@ export default function StackActions({
           tabletopId,
           moveTarget: { stackId: selectedStackId },
           toTarget: moveToTarget,
+          date: dateToDateString(new Date()),
+          operation: {
+            type: selectedStackId
+              ? "MOVE_STACK_CARDS_TO_BOTTOM"
+              : "MOVE_ALL_CARDS_TO_BOTTOM",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       ),
-    [tabletopId, selectedStackId, moveToTarget, dispatch],
+    [tabletopId, selectedStackId, moveToTarget, dispatch, stackListRef],
   );
 
   const reverseStack = React.useCallback(
@@ -173,9 +218,16 @@ export default function StackActions({
           stackId: selectedStackId,
           method: { type: "reverse" },
           allCardInstancesState: "noChange",
+          date: dateToDateString(new Date()),
+          operation: {
+            type: selectedStackId ? "REVERSE_ALL_CARDS" : "REVERSE_STACK",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       ),
-    [tabletopId, selectedStackId, dispatch],
+    [tabletopId, selectedStackId, dispatch, stackListRef],
   );
 
   const selectedStackName = stackName(stackIds, selectedStackId);

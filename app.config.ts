@@ -47,7 +47,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: getAppName(), // Actual app name
   slug: "decks", // Only used in expo for identifying the project
-  version: "1.0.0",
+  version: "1.1.0", // Update when releasing new native changes
   orientation: "portrait",
   icon: "./assets/images/app-icon.png",
   scheme: "dex",
@@ -83,6 +83,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   splash,
   plugins: [
+    "expo-secure-store",
     [
       "expo-sensors",
       {

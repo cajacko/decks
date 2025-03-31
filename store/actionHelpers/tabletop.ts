@@ -13,6 +13,7 @@ import {
 import { createInitStacks } from "@/utils/minStacks";
 import uuid from "@/utils/uuid";
 import { getBuiltInState } from "../utils/withBuiltInState";
+import { dateToDateString } from "@/utils/dates";
 
 function deckCardsToCardInstances(
   deckCards: Decks.Card[] | null,
@@ -53,6 +54,7 @@ export function getResetHistoryState(
   const { stacksIds, stacksById } = createInitStacks(cardInstanceIds, settings);
 
   return {
+    operation: { type: "RESET", payload: null },
     cardInstancesById,
     stacksById,
     stacksIds,
@@ -86,6 +88,8 @@ export function resetTabletopHelper(props: { tabletopId: Tabletops.Id }) {
 
   return resetTabletop({
     tabletopId: props.tabletopId,
+    operation: { type: "RESET", payload: null },
+    date: dateToDateString(new Date()),
     historyState: getResetHistoryState(
       availableDeckCards,
       tableTopSettings ?? null,
@@ -112,5 +116,6 @@ export function addMissingTabletopCardsHelper(props: {
   return addMissingTabletopCards({
     tabletopId: props.tabletopId,
     cardInstances,
+    date: dateToDateString(new Date()),
   });
 }

@@ -71,9 +71,21 @@ export default function useEditCardTemplateSchemaItem(props: {
     [updateEditingDataItem, props.side, props.templateDataId],
   );
 
+  let placeholder: string | undefined;
+
+  // Only template values are placeholders. Deck defaults etc are actual values you set.
+  if (
+    resolvedValidatedValue &&
+    resolvedValidatedValue.origin === "template" &&
+    typeof resolvedValidatedValue.value === "string"
+  ) {
+    placeholder = resolvedValidatedValue.value;
+  }
+
   return {
     onChange,
-    validatedValue: resolvedValidatedValue,
+    placeholder,
+    validatedValue: placeholder ? undefined : resolvedValidatedValue,
     hasChanges: !!hasChanges,
     usingFallback:
       resolvedValidatedValue?.origin === fallbackValidatedValue?.origin

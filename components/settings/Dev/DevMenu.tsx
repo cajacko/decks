@@ -5,7 +5,6 @@ import { persistor, resetStore } from "@/store/store";
 import AppError from "@/classes/AppError";
 import text from "@/constants/text";
 import FieldSet, {
-  FieldSetProps,
   titleProps as fieldSetTitleProps,
 } from "@/components/forms/FieldSet";
 import { useRouter } from "expo-router";
@@ -15,14 +14,16 @@ import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
-
-export interface DevMenuProps extends FieldSetProps {
-  closeDrawer: () => void;
-}
+import useGoogleAuth from "@/api/google/useGoogleAuth";
+import * as sync from "@/api/dex/sync";
 
 const titleProps = { type: "h2" } as const;
 
-export default function DevMenu(props: DevMenuProps): React.ReactNode {
+export default function DevMenu({
+  closeDrawer,
+}: {
+  closeDrawer: () => void;
+}): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
   const { navigate } = useRouter();
   const {
@@ -38,6 +39,8 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
     initializationError,
     lastCheckForUpdateTimeSinceRestart,
   } = useUpdates();
+
+  const auth = useGoogleAuth();
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -68,8 +71,52 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
       collapsible
       initialCollapsed
       titleProps={titleProps}
-      {...props}
     >
+      <FieldSet
+        title="Data/ Auth"
+        collapsible
+        initialCollapsed
+        titleProps={fieldSetTitleProps}
+      >
+        <Button
+          title="Sign In"
+          onPress={() => auth.requestAuth()}
+          variant="outline"
+        />
+
+        {auth.tokens && (
+          <Button
+            title="Refresh"
+            onPress={() => auth.refreshAuth(auth.tokens.refreshToken)}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Sync (Merge)"
+            onPress={() => sync.sync()}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Sync (Pull)"
+            onPress={() => sync.pull()}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Backup (Push)"
+            onPress={() => sync.push()}
+            variant="outline"
+          />
+        )}
+      </FieldSet>
+
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 
       {isDevClient && (
@@ -93,7 +140,7 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
             variant="outline"
             onPress={() => {
               navigate(`/deck/${exampleDeckIds(id).deckId}`);
-              props.closeDrawer();
+              closeDrawer?.();
             }}
             style={{ marginTop: 10 }}
           />
@@ -114,12 +161,13 @@ export default function DevMenu(props: DevMenuProps): React.ReactNode {
               isDownloading,
               isUpdateAvailable,
               isUpdatePending,
-              availableUpdate: availableUpdate?.updateId,
-              checkError,
-              downloadError,
-              downloadedUpdate: downloadedUpdate?.updateId,
-              initializationError,
-              lastCheckForUpdateTimeSinceRestart,
+              availableUpdate: availableUpdate?.updateId ?? "N/A",
+              checkError: checkError ?? "N/A",
+              downloadError: downloadError ?? "N/A",
+              downloadedUpdate: downloadedUpdate?.updateId ?? "N/A",
+              initializationError: initializationError ?? "N/A",
+              lastCheckForUpdateTimeSinceRestart:
+                lastCheckForUpdateTimeSinceRestart ?? "N/A",
             },
             null,
             2,

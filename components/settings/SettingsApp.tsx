@@ -8,22 +8,19 @@ import {
 import Field from "../forms/Field";
 import Picker, { PickerItem } from "../forms/Picker";
 import { UserSettings } from "@/store/types";
-import FieldSet, { FieldSetProps } from "../forms/FieldSet";
+import FieldSet from "../forms/FieldSet";
 import text from "@/constants/text";
 import SwitchField from "../forms/SwitchField";
 import useFlag from "@/hooks/useFlag";
 import { defaultTheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
+import { dateToDateString } from "@/utils/dates";
 
 type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
 const titleProps = { type: "h2" } as const;
 
-export interface SettingsAppProps extends FieldSetProps {
-  closeDrawer: () => void;
-}
-
-export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
+export default function SettingsApp(): React.ReactNode {
   const dispatch = useAppDispatch();
 
   const theme =
@@ -36,10 +33,17 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
 
   const vibrate = useFlag("CARD_ACTIONS_HAPTICS") === "enabled";
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
+  const editCardMoreInfo = useFlag("EDIT_CARD_MORE_INFO") === "enabled";
 
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
-      dispatch(setUserSetting({ key: "theme", value }));
+      dispatch(
+        setUserSetting({
+          key: "theme",
+          value,
+          date: dateToDateString(new Date()),
+        }),
+      );
     },
     [dispatch],
   );
@@ -50,6 +54,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         setUserFlag({
           key: "PERFORMANCE_MODE",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -62,6 +67,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         setUserFlag({
           key: "HOLD_MENU_BEHAVIOUR",
           value: value ? "always-visible" : "hold/hover",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -74,6 +80,7 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         setUserFlag({
           key: "CARD_ACTIONS_HAPTICS",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -86,6 +93,20 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         setUserFlag({
           key: "SHAKE_TO_SHUFFLE",
           value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const onChangeEditCardMoreInfo = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setUserFlag({
+          key: "EDIT_CARD_MORE_INFO",
+          value: value ? "enabled" : "disabled",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -93,7 +114,12 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
   );
 
   return (
-    <FieldSet title={text["settings.title"]} titleProps={titleProps} {...props}>
+    <FieldSet
+      title={text["settings.title"]}
+      titleProps={titleProps}
+      initialCollapsed
+      collapsible
+    >
       <Field label={text["settings.theme"]}>
         <Picker<Theme>
           onValueChange={onChangeTheme}
@@ -123,6 +149,14 @@ export default function SettingsApp(props: SettingsAppProps): React.ReactNode {
         label={text["settings.hold_menu.always_show"]}
         value={holdMenuAlwaysVisible}
         onValueChange={onChangeHoldMenu}
+      />
+      <SwitchField
+        label={text["settings.edit_card.more_info"]}
+        FieldProps={{
+          subLabel: text["settings.edit_card.more_info.helper"],
+        }}
+        value={editCardMoreInfo}
+        onValueChange={onChangeEditCardMoreInfo}
       />
       {Platform.OS !== "web" && (
         <SwitchField

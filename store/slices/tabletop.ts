@@ -2,14 +2,22 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
-import { RootState, Tabletops, SliceName, Cards, Decks } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
+import {
+  RootState,
+  Tabletops,
+  SliceName,
+  Cards,
+  Decks,
+  RequiredOperations,
+  DateString,
+} from "../types";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
+import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -26,17 +34,32 @@ export enum MoveCardInstanceMethod {
   bottomNoChange = "bottomNoChange",
 }
 
-const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.tabletops
-  : {
-      tabletopsById: {},
-    };
+const initialState: TabletopState = {
+  tabletopsById: {},
+};
+
+type HistoryPayload<P extends object = object> = P & {
+  tabletopId: string;
+  operation: Tabletops.HistoryOperation | RequiredOperations;
+  date: DateString;
+};
 
 const history = configureHistory<
   TabletopState,
   TabletopHistoryState,
-  { tabletopId: string }
->((state, props) => state.tabletopsById[props.tabletopId]?.history);
+  { tabletopId: string },
+  HistoryPayload
+>((state, props) => state.tabletopsById[props.tabletopId]?.history, {
+  postAction: (_, action, state) => {
+    const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+    if (!tabletop) return;
+
+    tabletop.dateUpdated = action.payload.date;
+  },
+});
+
+export const { getRedoState, getUndoState, getState } = history;
 
 // This helper is great for ensuring we don't have duplicate card instance IDs in stacks (which we
 // had once). But also ensures we don't mutate arrays that don't ned changing.
@@ -58,6 +81,7 @@ function removeCardInstancesFromStacks(
 function addCardInstancesToTabletop(
   tabletop: WritableDraft<Tabletop>,
   cardInstances: Omit<Tabletops.CardInstance, "side">[],
+  date: DateString,
 ) {
   const present = tabletop.history.present;
 
@@ -96,6 +120,7 @@ function addCardInstancesToTabletop(
   if (didEdit) {
     tabletop.history.past = [];
     tabletop.history.future = [];
+    tabletop.dateUpdated = date;
   }
 }
 
@@ -117,14 +142,15 @@ export const tabletopsSlice = createSlice({
     moveCard: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          moveTarget: { cardInstanceId: string } | { stackId: string | null };
-          toTarget: { stackId: string; newStackDirection?: "start" | "end" };
-          // Do we specify the method, or let the stack define it? Or both? If specified here it's
-          // more specific, otherwise do what the stack it's going to says
-          method: MoveCardInstanceMethod;
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            moveTarget: { cardInstanceId: string } | { stackId: string | null };
+            toTarget: { stackId: string; newStackDirection?: "start" | "end" };
+            // Do we specify the method, or let the stack define it? Or both? If specified here it's
+            // more specific, otherwise do what the stack it's going to says
+            method: MoveCardInstanceMethod;
+          }>
+        >,
       ) => {
         const {
           moveTarget,
@@ -235,11 +261,12 @@ export const tabletopsSlice = createSlice({
     changeCardState: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          side: Cards.Side;
-          target: { cardInstanceId: string } | { stackId: string | null };
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            side: Cards.Side;
+            target: { cardInstanceId: string } | { stackId: string | null };
+          }>
+        >,
       ) => {
         const target = action.payload.target;
 
@@ -268,12 +295,13 @@ export const tabletopsSlice = createSlice({
     setStackOrder: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          stackId: string | null;
-          method: { type: "shuffle"; seed: string } | { type: "reverse" };
-          allCardInstancesState: Cards.Side | "noChange";
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            stackId: string | null;
+            method: { type: "shuffle"; seed: string } | { type: "reverse" };
+            allCardInstancesState: Cards.Side | "noChange";
+          }>
+        >,
       ) => {
         const method = action.payload.method;
 
@@ -314,10 +342,7 @@ export const tabletopsSlice = createSlice({
       },
     ),
     deleteStack: history.withHistory(
-      (
-        state,
-        action: PayloadAction<{ tabletopId: string; stackId: string }>,
-      ) => {
+      (state, action: PayloadAction<HistoryPayload<{ stackId: string }>>) => {
         delete state.stacksById[action.payload.stackId];
 
         removeFromArray(
@@ -329,10 +354,11 @@ export const tabletopsSlice = createSlice({
     resetTabletop: history.withHistory(
       (
         state,
-        action: PayloadAction<{
-          tabletopId: string;
-          historyState: Tabletops.HistoryState;
-        }>,
+        action: PayloadAction<
+          HistoryPayload<{
+            historyState: Tabletops.HistoryState;
+          }>
+        >,
       ) => {
         state.stacksIds = action.payload.historyState.stacksIds;
         state.stacksById = action.payload.historyState.stacksById;
@@ -344,15 +370,21 @@ export const tabletopsSlice = createSlice({
       action: PayloadAction<{
         tabletopId: string;
         cardInstances: Omit<Tabletops.CardInstance, "side">[];
+        date: DateString;
       }>,
     ) => {
       const tabletop = state.tabletopsById[action.payload.tabletopId];
 
       if (!tabletop) return;
 
+      tabletop.dateUpdated = action.payload.date;
       tabletop.missingCardIds = [];
 
-      addCardInstancesToTabletop(tabletop, action.payload.cardInstances);
+      addCardInstancesToTabletop(
+        tabletop,
+        action.payload.cardInstances,
+        action.payload.date,
+      );
     },
     setTabletopSetting: <K extends keyof Tabletops.Settings>(
       state: WritableDraft<TabletopState>,
@@ -360,11 +392,14 @@ export const tabletopsSlice = createSlice({
         tabletopId: string;
         key: K;
         value: Tabletops.Settings[K];
+        date: DateString;
       }>,
     ) => {
       const tabletop = state.tabletopsById[action.payload.tabletopId];
 
       if (!tabletop) return;
+
+      tabletop.dateUpdated = action.payload.date;
 
       if (!tabletop.settings) {
         tabletop.settings = {};
@@ -379,6 +414,7 @@ export const tabletopsSlice = createSlice({
       props: {
         deckId: Decks.Id;
         cardIds: Cards.Id[];
+        date: DateString;
       },
     ) {
       const { deckId, cardIds } = props;
@@ -417,32 +453,40 @@ export const tabletopsSlice = createSlice({
         if (didEdit) {
           tabletop.history.past = [];
           tabletop.history.future = [];
+          tabletop.dateUpdated = props.date;
         }
       });
     }
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      if (!actions.meta.arg.deckId) return;
+    builder.addCase(deleteCard, (state, actions) => {
+      if (!actions.payload.deckId) return;
 
       deleteCards(state, {
-        deckId: actions.meta.arg.deckId,
-        cardIds: [actions.meta.arg.cardId],
+        deckId: actions.payload.deckId,
+        cardIds: [actions.payload.cardId],
+        date: actions.payload.date,
       });
     });
 
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      if (actions.meta.arg.tabletopId) {
-        delete state.tabletopsById[actions.meta.arg.tabletopId];
+    builder.addCase(deleteDeck, (state, actions) => {
+      if (actions.payload.tabletopId) {
+        const tabletop = state.tabletopsById[actions.payload.tabletopId];
+
+        if (tabletop) {
+          tabletop.dateDeleted = actions.payload.date;
+          tabletop.dateUpdated = actions.payload.date;
+        }
       }
 
       deleteCards(state, {
-        deckId: actions.meta.arg.deckId,
-        cardIds: actions.meta.arg.cardIds,
+        deckId: actions.payload.deckId,
+        cardIds: actions.payload.cardIds,
+        date: actions.payload.date,
       });
     });
 
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const tabletop = actions.meta.arg.defaultTabletop;
+    builder.addCase(createDeck, (state, actions) => {
+      const tabletop = actions.payload.defaultTabletop;
 
       state.tabletopsById[tabletop.id] = tabletop;
     });
@@ -458,13 +502,30 @@ export const tabletopsSlice = createSlice({
             tabletop.missingCardIds = [];
           }
 
+          tabletop.dateUpdated = actions.payload.date;
           tabletop.missingCardIds.push(actions.payload.cardId);
 
           return;
         }
 
-        addCardInstancesToTabletop(tabletop, cardInstances);
+        addCardInstancesToTabletop(
+          tabletop,
+          cardInstances,
+          actions.payload.date,
+        );
       });
+    });
+
+    builder.addCase(setState, (state, actions) => {
+      state.tabletopsById =
+        actions.payload.state[SliceName.Tabletops].tabletopsById;
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      mergeMap(
+        state.tabletopsById,
+        actions.payload.state.tabletops.tabletopsById,
+      );
     });
   },
 });

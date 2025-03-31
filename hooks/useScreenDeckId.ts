@@ -27,17 +27,17 @@ export default function useScreenDeckId(
   const navigation = useNavigation();
 
   if (!deckId) {
-    if (type === "screen" && logErrorComponentName && navigation.isFocused()) {
-      new AppError(`${logErrorComponentName}: deckId must be a string`).log(
-        "error",
-      );
-    }
-
     // globalParams is a fallback
     const fallbackDeckId = fallbackParams[paramKeys.deckId];
 
     if (typeof fallbackDeckId === "string") {
       return fallbackDeckId;
+    }
+
+    if (type === "screen" && logErrorComponentName && navigation.isFocused()) {
+      new AppError(`${logErrorComponentName}: deckId must be a string`).log(
+        "error",
+      );
     }
 
     return null;

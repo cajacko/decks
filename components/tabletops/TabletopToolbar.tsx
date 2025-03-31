@@ -6,10 +6,11 @@ import Toolbar, {
   styles,
   useOnPressProps,
 } from "@/components/ui/Toolbar";
-import { useSetDrawerProps } from "@/context/Drawer";
-import useTabletopHistory from "@/hooks/useTabletopHistory";
+import useTabletopHistory, {
+  UseTabletopHistoryOptions,
+} from "@/hooks/useTabletopHistory";
 
-export interface TabletopToolbarProps {
+export interface TabletopToolbarProps extends UseTabletopHistoryOptions {
   deckId: string;
   tabletopId: string;
 }
@@ -17,8 +18,7 @@ export interface TabletopToolbarProps {
 export default function TabletopToolbar(
   props: TabletopToolbarProps,
 ): React.ReactNode {
-  useSetDrawerProps(props);
-  const { undo, redo } = useTabletopHistory(props.tabletopId);
+  const { undo, redo } = useTabletopHistory(props.tabletopId, props);
   const undoProps = useOnPressProps(undo);
   const redoProps = useOnPressProps(redo);
 

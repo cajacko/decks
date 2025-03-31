@@ -1,23 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Templates, RootState, SliceName } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
 import withBuiltInState from "../utils/withBuiltInState";
 import { builtInTemplatesById } from "@/constants/builtInTemplates";
+// import { setState, syncState } from "../combinedActions/sync";
+// import { mergeMap } from "../utils/mergeData";
 
-const initialState: Templates.State = getFlag(
-  "USE_DEV_INITIAL_REDUX_STATE",
-  null,
-)
-  ? devInitialState.templates
-  : {
-      templatesById: {},
-    };
+const initialState: Templates.State = {
+  templatesById: {},
+};
 
 export const templatesSlice = createSlice({
   name: SliceName.Templates,
   initialState,
   reducers: {},
+  extraReducers: (builder) => {
+    // builder.addCase(setState, (state, actions) => {
+    //   state.templatesById =
+    //     actions.payload.state[SliceName.Templates].templatesById;
+    // });
+    // builder.addCase(syncState, (state, actions) => {
+    //   mergeMap(
+    //     state.templatesById,
+    //     actions.payload.state[SliceName.Templates].templatesById,
+    //   );
+    // });
+  },
 });
 
 export const selectTemplate = withBuiltInState(

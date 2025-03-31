@@ -7,6 +7,7 @@ import useAutoSave from "@/hooks/useAutoSave";
 import text from "@/constants/text";
 import { selectCanEditDeck } from "@/store/slices/decks";
 import ThemedText from "../ui/ThemedText";
+import { dateToDateString } from "@/utils/dates";
 
 export interface DeckDetailsProps {
   deckId: string;
@@ -44,7 +45,12 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
 
   const save = React.useCallback(() => {
     dispatch(
-      setDeckDetails({ deckId: props.deckId, name: title, description }),
+      setDeckDetails({
+        deckId: props.deckId,
+        name: title,
+        description,
+        date: dateToDateString(new Date()),
+      }),
     );
   }, [title, description, dispatch, props.deckId]);
 

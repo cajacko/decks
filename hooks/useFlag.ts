@@ -16,7 +16,7 @@ const selectFlags = createCachedSelector(
   (_: RootState, props: { keys: UserSettings.FlagKey[] }): string =>
     props.keys.join("|"),
   (state: RootState): UserSettings.FlagsState | undefined =>
-    state.userSettings.flags,
+    state.userSettings.settings?.flags,
   (keys: string, state?: UserSettings.FlagsState) =>
     getFlags(keys.split("|") as UserSettings.FlagKey[], state),
 )((_, props) => props.keys.join("|"));

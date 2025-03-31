@@ -38,8 +38,14 @@ exampleDecks.forEach(
     borderColor,
     textColor,
     backTextSize,
+    sortOrder: _sortOrder,
   }) => {
     const prebuiltDeck = prebuildDecks[key];
+    const sortOrderNumber = _sortOrder ? parseInt(_sortOrder) : null;
+    const sortOrder =
+      sortOrderNumber !== null && !isNaN(sortOrderNumber)
+        ? sortOrderNumber
+        : null;
 
     if (prebuiltDeck) {
       map[key] = {
@@ -48,6 +54,7 @@ exampleDecks.forEach(
         description,
         devOnly: !!devOnly,
         cards: cards ?? prebuiltDeck.cards,
+        sortOrder,
       };
 
       return;
@@ -58,6 +65,7 @@ exampleDecks.forEach(
       description,
       devOnly: !!devOnly,
       cards: cards ?? [],
+      sortOrder,
       templates: {
         back: {
           templateId: back.templateId,

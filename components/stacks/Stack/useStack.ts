@@ -22,6 +22,7 @@ import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/
 import text from "@/constants/text";
 import useShakeEffect from "@/hooks/useShakeEffect";
 import useVibrate from "@/hooks/useVibrate";
+import { dateToDateString } from "@/utils/dates";
 
 export default function useStack({
   stackId,
@@ -137,6 +138,13 @@ export default function useStack({
         allCardInstancesState: "noChange",
         tabletopId,
         method: { type: "shuffle", seed: generateSeed() },
+        date: dateToDateString(new Date()),
+        operation: {
+          type: "SHUFFLE",
+          payload: {
+            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+          },
+        },
       }),
     );
 
@@ -153,6 +161,7 @@ export default function useStack({
     allCardInstanceIds,
     cardInstancesIds,
     performanceMode,
+    stackListRef,
   ]);
 
   const shakeToShuffleActive: boolean =
@@ -188,7 +197,19 @@ export default function useStack({
 
     await Promise.all([scroll, transform]);
 
-    dispatch(deleteStack({ tabletopId, stackId }));
+    dispatch(
+      deleteStack({
+        tabletopId,
+        stackId,
+        date: dateToDateString(new Date()),
+        operation: {
+          type: "DELETE_STACK",
+          payload: {
+            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+          },
+        },
+      }),
+    );
   }, [
     stackId,
     width,

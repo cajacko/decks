@@ -1,4 +1,8 @@
-import { History as CreateHistoryHelper } from "./helpers";
+import {
+  History as CreateHistoryHelper,
+  HistoryState as CreateHistoryStateHelper,
+  CreateHistoryOperationHelper,
+} from "./helpers";
 import {
   CardInstanceId,
   StackId,
@@ -28,11 +32,36 @@ export type CardInstancesById = Record<
 
 export type StacksById = Record<StackId, Stack | undefined>;
 
-export interface HistoryState {
-  stacksIds: StackId[];
-  stacksById: StacksById;
-  cardInstancesById: CardInstancesById;
-}
+export type HistoryOperation = CreateHistoryOperationHelper<
+  | "DELETE_STACK"
+  | "FLIP_ALL_FACE_DOWN"
+  | "FLIP_ALL_FACE_UP"
+  | "FLIP_CARD"
+  | "FLIP_STACK_FACE_DOWN"
+  | "FLIP_STACK_FACE_UP"
+  | "MOVE_ALL_CARDS_TO_BOTTOM"
+  | "MOVE_ALL_CARDS_TO_TOP"
+  | "MOVE_CARD_RIGHT_TO_BOTTOM"
+  | "MOVE_CARD_RIGHT_TO_TOP"
+  | "MOVE_CARD_TO_BOTTOM"
+  | "MOVE_CARD_LEFT_TO_TOP"
+  | "MOVE_CARD_LEFT_TO_BOTTOM"
+  | "MOVE_STACK_CARDS_TO_BOTTOM"
+  | "MOVE_STACK_CARDS_TO_TOP"
+  | "REVERSE_ALL_CARDS"
+  | "REVERSE_STACK"
+  | "SHUFFLE",
+  { scrollOffset: number | null }
+>;
+
+export type HistoryState = CreateHistoryStateHelper<
+  {
+    stacksIds: StackId[];
+    stacksById: StacksById;
+    cardInstancesById: CardInstancesById;
+  },
+  HistoryOperation
+>;
 
 type History = CreateHistoryHelper<HistoryState>;
 

@@ -18,6 +18,7 @@ import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
 import { fixed } from "@/constants/colors";
 import { getResetHistoryState } from "./tabletop";
 import { cloneDeep } from "lodash";
+import { dateToDateString } from "@/utils/dates";
 
 export function deleteDeckHelper(props: {
   deckId: Decks.Id;
@@ -31,7 +32,12 @@ export function deleteDeckHelper(props: {
 
   const tabletopId = deck?.defaultTabletopId ?? props.tabletopId ?? null;
 
-  return deleteDeck({ cardIds, deckId: props.deckId, tabletopId });
+  return deleteDeck({
+    cardIds,
+    deckId: props.deckId,
+    tabletopId,
+    date: dateToDateString(new Date()),
+  });
 }
 
 type ValidNumbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -81,6 +87,9 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
 
   const deck: Decks.Props = {
     id: deckId,
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
+    dateDeleted: null,
     cards: [],
     dataSchema: {
       [ReservedDataSchemaIds.Color]: {
@@ -96,7 +105,6 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     defaultTabletopId: tabletopId,
     name: deckName,
     description: text["deck.new.description"],
-    status: "creating",
     canEdit: true,
     cardSize: Cards.Size.Poker,
     templates: {
@@ -132,11 +140,15 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
 
   const defaultTabletop: Tabletops.Props = {
     id: tabletopId,
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
+    dateDeleted: null,
     availableDecks: [deckId],
     history: {
       future: [],
       past: [],
       present: {
+        operation: { type: "INIT", payload: null },
         cardInstancesById: {},
         stacksById,
         stacksIds,
@@ -150,6 +162,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     cards,
     deck,
     defaultTabletop,
+    date: dateToDateString(new Date()),
   });
 }
 
@@ -183,13 +196,15 @@ export function copyDeckHelper(props: {
     cardIdMap.set(existingCardId, newCardId);
 
     cards.push({
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       size: null,
       templates: existingCard.templates,
       cardId: newCardId,
       data: existingCard.data,
       canEdit: true,
       deckId,
-      status: "creating",
     });
 
     return newCardId;
@@ -247,10 +262,14 @@ export function copyDeckHelper(props: {
     );
 
     defaultTabletop = {
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       history: {
         future: [],
         past: [],
         present: {
+          operation: existingTabletop.history.present.operation,
           cardInstancesById,
           stacksById: cloneDeep(existingTabletop.history.present.stacksById),
           stacksIds: cloneDeep(existingTabletop.history.present.stacksIds),
@@ -264,6 +283,9 @@ export function copyDeckHelper(props: {
   } else {
     // We have no existing tabletop to copy from, so we need to create a new one
     defaultTabletop = {
+      dateCreated: dateToDateString(new Date()),
+      dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       id: newTabletopId,
       availableDecks: [deckId],
       settings: undefined,
@@ -279,6 +301,9 @@ export function copyDeckHelper(props: {
 
   // NOTE: Don't spread, it will force us to add in all new props and choose what we need
   const deck: Decks.Props = {
+    dateCreated: dateToDateString(new Date()),
+    dateUpdated: dateToDateString(new Date()),
+    dateDeleted: null,
     cards: deckCards,
     cardSize: deckToCopy.cardSize,
     dataSchema: deckToCopy.dataSchema,
@@ -288,7 +313,6 @@ export function copyDeckHelper(props: {
     description: deckToCopy.description,
     id: deckId,
     defaultTabletopId: newTabletopId,
-    status: "creating",
     canEdit: true,
   };
 
@@ -296,5 +320,6 @@ export function copyDeckHelper(props: {
     cards,
     deck,
     defaultTabletop,
+    date: dateToDateString(new Date()),
   });
 }

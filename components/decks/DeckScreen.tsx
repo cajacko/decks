@@ -26,6 +26,8 @@ import ContentWidth from "@/components/ui/ContentWidth";
 import DeckDefaults from "@/components/decks/DeckDefaults";
 import ThemedText from "../ui/ThemedText";
 import text from "@/constants/text";
+import { DrawerChildren } from "@/context/Drawer";
+import SettingsDeck from "@/components/settings/SettingsDeck";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -168,6 +170,9 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   return (
     <>
       <DeckToolbar deckId={props.deckId} />
+      <DrawerChildren>
+        <SettingsDeck deckId={props.deckId} />
+      </DrawerChildren>
       <ContentWidth
         style={containerStyle}
         contentContainerStyle={styles.container}

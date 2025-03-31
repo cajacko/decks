@@ -13,9 +13,7 @@ import { selectFlag } from "@/store/combinedSelectors/flags";
 import DevMenu from "@/components/settings/Dev/DevMenu";
 import Version from "@/components/settings/Version";
 import SettingsApp from "@/components/settings/SettingsApp";
-import SettingsDeck from "@/components/settings/SettingsDeck";
 import FieldSet from "@/components/forms/FieldSet";
-import SettingsTabletop from "@/components/settings/SettingsTabletop";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
 import { ExternalPathString, Link } from "expo-router";
@@ -25,46 +23,15 @@ import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import Button from "../forms/Button";
 
 export interface DrawerProps {
-  deckId?: string | null;
-  tabletopId?: string | null;
-  isOpen?: boolean;
   closeDrawer: () => void;
+  children: React.ReactNode;
 }
-
-type Collapsed = {
-  deck?: boolean;
-  tabletop?: boolean;
-  app?: boolean;
-  dev?: boolean;
-};
 
 export default function Drawer(props: DrawerProps): React.ReactNode {
   const textLogo = useTextLogo();
   const updates = useApplyUpdateAlert();
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
-
-  const initialCollapsed = React.useMemo(
-    (): Collapsed => ({
-      tabletop: true,
-      deck: true,
-      app: true,
-      dev: true,
-    }),
-    [],
-  );
-
-  const [collapsed, setCollapsed] = React.useState<Collapsed>(initialCollapsed);
-  const isOpenRef = React.useRef(props.isOpen);
-  isOpenRef.current = props.isOpen;
-
-  React.useEffect(() => {
-    // Don't reset when we're open, it feels janky, but we also don't want to reset when isOpen
-    // changes, as it animates and we'd see it
-    if (isOpenRef.current) return;
-
-    setCollapsed(initialCollapsed);
-  }, [initialCollapsed]);
 
   const dexWebLink: ExternalPathString | null = Platform.select({
     ios: "https://www.playface.fun/s/dexwebios",
@@ -82,46 +49,9 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
           <View style={styles.content}>
             <View style={styles.settings}>
               <FieldSet itemSpacing={30}>
-                {props.tabletopId && props.deckId && (
-                  <SettingsTabletop
-                    tabletopId={props.tabletopId}
-                    deckId={props.deckId}
-                    collapsed={collapsed.tabletop !== false}
-                    collapsible
-                    closeDrawer={props.closeDrawer}
-                    onCollapse={(collapsed) =>
-                      setCollapsed((prev) => ({ ...prev, tabletop: collapsed }))
-                    }
-                  />
-                )}
-                {props.deckId && (
-                  <SettingsDeck
-                    deckId={props.deckId}
-                    collapsible
-                    collapsed={collapsed.deck !== false}
-                    closeDrawer={props.closeDrawer}
-                    onCollapse={(collapsed) =>
-                      setCollapsed((prev) => ({ ...prev, deck: collapsed }))
-                    }
-                  />
-                )}
-                <SettingsApp
-                  collapsible
-                  collapsed={collapsed.app !== false}
-                  closeDrawer={props.closeDrawer}
-                  onCollapse={(collapsed) =>
-                    setCollapsed((prev) => ({ ...prev, app: collapsed }))
-                  }
-                />
-                {devMode && (
-                  <DevMenu
-                    collapsed={collapsed.dev !== false}
-                    closeDrawer={props.closeDrawer}
-                    onCollapse={(collapsed) =>
-                      setCollapsed((prev) => ({ ...prev, dev: collapsed }))
-                    }
-                  />
-                )}
+                {props.children}
+                <SettingsApp />
+                {devMode && <DevMenu closeDrawer={props.closeDrawer} />}
                 {updates.canApplyUpdate && (
                   <View>
                     <ThemedText style={styles.updateText} type="h2">

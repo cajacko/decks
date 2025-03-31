@@ -8,14 +8,12 @@ import { selectCanEditDeck } from "@/store/slices/decks";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import Toolbar, { styles, useOnPressProps } from "../ui/Toolbar";
-import { useSetDrawerProps } from "@/context/Drawer";
 
 interface DeckToolbarProps {
   deckId: string;
 }
 
 export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
-  useSetDrawerProps(props);
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
 

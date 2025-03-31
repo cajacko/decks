@@ -11,6 +11,7 @@ import { selectFlag } from "@/store/combinedSelectors/flags";
 import text from "@/constants/text";
 import Field from "@/components/forms/Field";
 import FieldSet from "@/components/forms/FieldSet";
+import { dateToDateString } from "@/utils/dates";
 
 function Flag(props: { flagKey: UserSettings.FlagKey; style?: ViewStyle }) {
   const dispatch = useAppDispatch();
@@ -36,6 +37,7 @@ function Flag(props: { flagKey: UserSettings.FlagKey; style?: ViewStyle }) {
             setUserFlag({
               key: props.flagKey,
               value,
+              date: dateToDateString(new Date()),
             }),
           )
         }

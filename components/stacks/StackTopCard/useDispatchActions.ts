@@ -11,6 +11,7 @@ import { StackTopCardProps } from "./types";
 import useFlag from "@/hooks/useFlag";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import uuid from "@/utils/uuid";
+import { dateToDateString } from "@/utils/dates";
 
 export default function useDispatchActions({
   cardInstanceId,
@@ -51,9 +52,23 @@ export default function useDispatchActions({
         tabletopId,
         target: { cardInstanceId },
         side: side === "back" ? "front" : "back",
+        date: dateToDateString(new Date()),
+        operation: {
+          type: "FLIP_CARD",
+          payload: {
+            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+          },
+        },
       }),
     );
-  }, [dispatch, cardInstanceId, side, tabletopId, animateCardMovement]);
+  }, [
+    dispatch,
+    cardInstanceId,
+    side,
+    tabletopId,
+    animateCardMovement,
+    stackListRef,
+  ]);
 
   const moveRight = React.useMemo(() => {
     return {
@@ -74,6 +89,13 @@ export default function useDispatchActions({
               ? { stackId: rightStackId }
               : { stackId: uuid(), newStackDirection: "end" },
             method: MoveCardInstanceMethod.bottomNoChange,
+            date: dateToDateString(new Date()),
+            operation: {
+              type: "MOVE_CARD_RIGHT_TO_BOTTOM",
+              payload: {
+                scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+              },
+            },
           }),
         );
       },
@@ -94,6 +116,13 @@ export default function useDispatchActions({
               ? { stackId: rightStackId }
               : { stackId: uuid(), newStackDirection: "end" },
             method: MoveCardInstanceMethod.topNoChange,
+            date: dateToDateString(new Date()),
+            operation: {
+              type: "MOVE_CARD_RIGHT_TO_TOP",
+              payload: {
+                scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+              },
+            },
           }),
         );
       },
@@ -105,6 +134,7 @@ export default function useDispatchActions({
     cardInstanceRef,
     tabletopId,
     animateCardMovement,
+    stackListRef,
   ]);
 
   const moveLeft = React.useMemo(() => {
@@ -125,9 +155,16 @@ export default function useDispatchActions({
             tabletopId,
             moveTarget: { cardInstanceId },
             method: MoveCardInstanceMethod.bottomNoChange,
+            date: dateToDateString(new Date()),
             toTarget: leftStackId
               ? { stackId: leftStackId }
               : { stackId: uuid(), newStackDirection: "start" },
+            operation: {
+              type: "MOVE_CARD_LEFT_TO_BOTTOM",
+              payload: {
+                scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+              },
+            },
           }),
         );
 
@@ -151,9 +188,16 @@ export default function useDispatchActions({
             tabletopId,
             moveTarget: { cardInstanceId },
             method: MoveCardInstanceMethod.topNoChange,
+            date: dateToDateString(new Date()),
             toTarget: leftStackId
               ? { stackId: leftStackId }
               : { stackId: uuid(), newStackDirection: "start" },
+            operation: {
+              type: "MOVE_CARD_LEFT_TO_TOP",
+              payload: {
+                scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+              },
+            },
           }),
         );
 
@@ -195,6 +239,13 @@ export default function useDispatchActions({
           moveTarget: { cardInstanceId },
           method: MoveCardInstanceMethod.bottomNoChange,
           toTarget: { stackId: stackId },
+          date: dateToDateString(new Date()),
+          operation: {
+            type: "MOVE_CARD_TO_BOTTOM",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+          },
         }),
       );
     };
@@ -207,6 +258,7 @@ export default function useDispatchActions({
     cardInstanceRef,
     tabletopId,
     animateCardMovement,
+    stackListRef,
   ]);
 
   return {

@@ -9,19 +9,19 @@ import { useRouter } from "expo-router";
 import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import uuid from "@/utils/uuid";
+import { useDrawer } from "@/context/Drawer";
 
 const titleProps = { type: "h2" } as const;
 
 export interface SettingsDeckProps extends FieldSetProps {
   deckId: string;
-  closeDrawer: () => void;
 }
 
 export default function SettingsDeck({
   deckId,
-  closeDrawer,
   ...props
 }: SettingsDeckProps): React.ReactNode {
+  const { close: closeDrawer } = useDrawer() ?? {};
   const dispatch = useAppDispatch();
   const { navigate } = useRouter();
   const deckName = deckNameWithFallback(
@@ -29,7 +29,7 @@ export default function SettingsDeck({
   );
 
   const deleteDeck = React.useCallback(() => {
-    closeDrawer();
+    closeDrawer?.();
     navigate("/");
 
     dispatch(deleteDeckHelper({ deckId }));
@@ -46,7 +46,7 @@ export default function SettingsDeck({
   );
 
   const copyDeck = React.useCallback(() => {
-    closeDrawer();
+    closeDrawer?.();
     const newDeckId = uuid();
 
     dispatch(copyDeckHelper({ deckId, newDeckId }));
@@ -61,6 +61,8 @@ export default function SettingsDeck({
         title={text["settings.deck.title"]}
         titleProps={titleProps}
         subTitle={`(${deckName})`}
+        initialCollapsed
+        collapsible
         {...props}
       >
         <Button

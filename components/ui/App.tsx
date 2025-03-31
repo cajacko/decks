@@ -56,7 +56,9 @@ function useNavigationTheme(): NavigationTheme {
 }
 
 function Content({ children }: { children: React.ReactNode }) {
-  const { component } = useApplyUpdateAlert();
+  const { component } = useApplyUpdateAlert({
+    autoCheck: true,
+  });
 
   return (
     <>
