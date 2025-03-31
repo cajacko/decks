@@ -1,4 +1,3 @@
-import { dateToDateString } from "@/utils/dates";
 import { RootState, SliceName } from "../types";
 import merge from "lodash/merge";
 
@@ -22,10 +21,7 @@ let builtInState: RootState = {
     tabletopsById: {},
   },
   [SliceName.UserSettings]: {
-    settings: {
-      dateCreated: dateToDateString(new Date()),
-      dateUpdated: dateToDateString(new Date()),
-    },
+    settings: null,
   },
 };
 

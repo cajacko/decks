@@ -71,9 +71,6 @@ export interface State {
   settings: UserSettings | null;
 }
 
-export type UserSettingKey = keyof Omit<
-  UserSettings,
-  "dateCreated" | "dateUpdated" | "flags"
->;
+export type UserSettingKey = keyof Pick<UserSettings, "theme">;
 export type UserSettingValue<K extends UserSettingKey = UserSettingKey> =
   UserSettings[K];

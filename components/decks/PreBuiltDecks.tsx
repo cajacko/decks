@@ -16,7 +16,9 @@ export default function PreBuiltDecks(
   props: PreBuiltDecksProps,
 ): React.ReactNode {
   const skeleton = useScreenSkeleton(PreBuiltDecks.name);
-  const deckIds = useBuiltInStateSelector(selectDeckIds);
+  const deckIds = useBuiltInStateSelector((state) =>
+    selectDeckIds(state, { sortBy: "sortOrder" }),
+  );
 
   const children = React.useMemo(
     () =>

@@ -50,6 +50,10 @@ export type ValidatedValue<Type extends FieldType = FieldType> =
     }[Type]
   | CreateValidatedValue<"null", null>;
 
+/**
+ * Being explicit about the date format, and helps us to force in the correct type and not just
+ * through strings around
+ */
 export type DateString =
   `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`;
 

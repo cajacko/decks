@@ -66,6 +66,8 @@ export default function registerExampleDecks() {
     const tabletopId = ids.tabletopId;
     const stack1Id = ids.stackId("1");
     const stack2Id = ids.stackId("2");
+    const dateCreated = dateToDateString(new Date());
+    const dateUpdated = dateCreated;
 
     const dataSchema = exampleDeck.dataSchema ?? {};
 
@@ -81,9 +83,10 @@ export default function registerExampleDecks() {
       status: "active",
       canEdit: false,
       templates: exampleDeck.templates,
-      dateCreated: dateToDateString(new Date()),
-      dateUpdated: dateToDateString(new Date()),
+      dateCreated,
+      dateUpdated,
       dateDeleted: null,
+      sortOrder: exampleDeck.sortOrder ?? undefined,
     };
 
     const tabletop: Tabletops.Props = {
@@ -91,8 +94,8 @@ export default function registerExampleDecks() {
       availableDecks: [deckId],
       settings: exampleDeck.tabletopSettings,
       missingCardIds: [],
-      dateCreated: dateToDateString(new Date()),
-      dateUpdated: dateToDateString(new Date()),
+      dateCreated,
+      dateUpdated,
       dateDeleted: null,
       history: {
         future: [],
@@ -122,8 +125,8 @@ export default function registerExampleDecks() {
       const cardInstanceId = ids.cardInstanceId(cardId);
 
       const card: Cards.Props = {
-        dateCreated: dateToDateString(new Date()),
-        dateUpdated: dateToDateString(new Date()),
+        dateCreated,
+        dateUpdated,
         dateDeleted: null,
         size: null,
         cardId,

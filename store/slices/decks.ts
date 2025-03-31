@@ -273,17 +273,58 @@ export const selectDeck = withBuiltInState(
 
 export const selectDeckIds = createSelector(
   selectDecksById,
-  (decksById): Decks.Id[] => {
+  (
+    _: RootState,
+    props?: {
+      sortBy?: "dateUpdated" | "dateCreated" | "sortOrder";
+      direction?: "asc" | "desc";
+    },
+  ) => props?.sortBy,
+  (
+    _: RootState,
+    props?: {
+      sortBy?: "dateUpdated" | "dateCreated" | "sortOrder";
+      direction?: "asc" | "desc";
+    },
+  ) => props?.direction,
+  (decksById, sortBy = "dateUpdated", _direction): Decks.Id[] => {
+    const defaultDirection = sortBy === "sortOrder" ? "asc" : "desc";
+    const direction = _direction ?? defaultDirection;
     const deckIds: Decks.Id[] = [];
 
     Object.values(decksById)
-      .sort((a, b) => {
+      .sort((a, b): number => {
         if (!a || !b) return 0;
 
-        const aDate = new Date(a.dateUpdated);
-        const bDate = new Date(b.dateUpdated);
+        switch (sortBy) {
+          case "dateCreated":
+          case "dateUpdated": {
+            const aDate = new Date(
+              sortBy === "dateCreated" ? a.dateCreated : a.dateUpdated,
+            );
 
-        return bDate.getTime() - aDate.getTime();
+            const bDate = new Date(
+              sortBy === "dateCreated" ? b.dateCreated : b.dateUpdated,
+            );
+
+            if (direction === "asc") {
+              return aDate.getTime() - bDate.getTime();
+            }
+
+            return bDate.getTime() - aDate.getTime();
+          }
+          case "sortOrder": {
+            if (a.sortOrder === undefined || b.sortOrder === undefined) {
+              return 0;
+            }
+
+            if (direction === "asc") {
+              return a.sortOrder - b.sortOrder;
+            }
+
+            return b.sortOrder - a.sortOrder;
+          }
+        }
       })
       .forEach((deck) => {
         if (!deck) return;
