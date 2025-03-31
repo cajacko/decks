@@ -9,6 +9,7 @@ import {
   reservedDataSchemaItems,
 } from "@/constants/reservedDataSchemaItems";
 import { colorFunction } from "@/components/templates/handlebars";
+import { dateToDateString } from "@/utils/dates";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { dataItemId, templateId } = builtInTemplateIds("back");
@@ -27,6 +28,9 @@ type DataId = (typeof dataIds)[keyof typeof dataIds];
 
 const template: Templates.Props<DataId> = {
   templateId,
+  dateCreated: dateToDateString(new Date()),
+  dateUpdated: dateToDateString(new Date()),
+  dateDeleted: null,
   name: text["template.built_in.back.title"],
   schemaOrder: [
     dataIds.text,

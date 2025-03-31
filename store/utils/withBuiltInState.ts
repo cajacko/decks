@@ -15,13 +15,14 @@ let builtInState: RootState = {
     cardsById: {},
   },
   [SliceName.Decks]: {
-    deckIds: [],
     decksById: {},
   },
   [SliceName.Tabletops]: {
     tabletopsById: {},
   },
-  [SliceName.UserSettings]: {},
+  [SliceName.UserSettings]: {
+    settings: null,
+  },
 };
 
 export type BuiltInState = Partial<RootState>;

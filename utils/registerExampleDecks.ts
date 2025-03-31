@@ -4,6 +4,7 @@ import builtInTemplates from "@/constants/builtInTemplates";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import { registerBuiltInState } from "@/store/utils/withBuiltInState";
 import { getFlag } from "@/store/combinedSelectors/flags";
+import { dateToDateString } from "./dates";
 
 type State = Pick<
   RootState,
@@ -44,7 +45,6 @@ function getValidatedValueType(
 export default function registerExampleDecks() {
   const state: State = {
     decks: {
-      deckIds: [],
       decksById: {},
     },
     tabletops: {
@@ -66,6 +66,8 @@ export default function registerExampleDecks() {
     const tabletopId = ids.tabletopId;
     const stack1Id = ids.stackId("1");
     const stack2Id = ids.stackId("2");
+    const dateCreated = dateToDateString(new Date());
+    const dateUpdated = dateCreated;
 
     const dataSchema = exampleDeck.dataSchema ?? {};
 
@@ -78,9 +80,12 @@ export default function registerExampleDecks() {
       dataSchema,
       dataSchemaOrder: Object.keys(dataSchema),
       defaultTabletopId: tabletopId,
-      status: "active",
       canEdit: false,
       templates: exampleDeck.templates,
+      dateCreated,
+      dateUpdated,
+      dateDeleted: null,
+      sortOrder: exampleDeck.sortOrder ?? undefined,
     };
 
     const tabletop: Tabletops.Props = {
@@ -88,6 +93,9 @@ export default function registerExampleDecks() {
       availableDecks: [deckId],
       settings: exampleDeck.tabletopSettings,
       missingCardIds: [],
+      dateCreated,
+      dateUpdated,
+      dateDeleted: null,
       history: {
         future: [],
         past: [],
@@ -116,12 +124,14 @@ export default function registerExampleDecks() {
       const cardInstanceId = ids.cardInstanceId(cardId);
 
       const card: Cards.Props = {
+        dateCreated,
+        dateUpdated,
+        dateDeleted: null,
         size: null,
         cardId,
         canEdit: false,
         deckId,
         data: {},
-        status: "active",
       };
 
       Object.entries(cardProps).forEach(([dataId, value]) => {
@@ -154,7 +164,6 @@ export default function registerExampleDecks() {
     });
 
     state.decks.decksById[deckId] = deck;
-    state.decks.deckIds.push(deckId);
     state.tabletops.tabletopsById[tabletopId] = tabletop;
   });
 

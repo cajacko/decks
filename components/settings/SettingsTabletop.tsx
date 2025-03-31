@@ -17,6 +17,7 @@ import useTabletopHistory, {
 } from "@/hooks/useTabletopHistory";
 import { setTabletopSetting } from "@/store/slices/tabletop";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
+import { dateToDateString } from "@/utils/dates";
 
 const titleProps = { type: "h2" } as const;
 
@@ -62,6 +63,7 @@ export default function SettingsTabletop({
           tabletopId,
           key: "preferNeatStacks",
           value: value,
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -75,6 +77,7 @@ export default function SettingsTabletop({
           tabletopId,
           key: "defaultCardSide",
           value: value ? "front" : "back",
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -88,6 +91,7 @@ export default function SettingsTabletop({
           tabletopId,
           key: "newCardsGoToTopOfStack",
           value: value,
+          date: dateToDateString(new Date()),
         }),
       );
     },
@@ -101,6 +105,7 @@ export default function SettingsTabletop({
           tabletopId,
           key: "doNotAddNewCardsAutomatically",
           value: value,
+          date: dateToDateString(new Date()),
         }),
       );
 

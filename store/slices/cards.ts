@@ -1,31 +1,24 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { RootState, Cards, SliceName } from "../types";
-import devInitialState from "../dev/devInitialState";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import withBuiltInState from "../utils/withBuiltInState";
-import { getFlag } from "@/utils/flags";
+import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
 export type Card = Cards.Props;
 
 export { updateCard };
 
-const initialState: Cards.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.cards
-  : {
-      cardsById: {},
-    };
+const initialState: Cards.State = {
+  cardsById: {},
+};
 
 export const cardsSlice = createSlice({
   name: SliceName.Cards,
   initialState,
-  reducers: {
-    removeCard: (state, actions: PayloadAction<{ cardId: string }>) => {
-      // TODO: Remove from decks, stacks, tabletops, etc.
-      delete state.cardsById[actions.payload.cardId];
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(updateCard, (state, actions) => {
       const card = state.cardsById[actions.payload.cardId];
@@ -41,12 +34,16 @@ export const cardsSlice = createSlice({
           card.data[cardDataSchemaId] = dataItem.validatedValue;
         }
       });
+
+      card.dateUpdated = actions.payload.date;
     });
 
     builder.addCase(createCard, (state, actions) => {
       const card: Card = {
+        dateDeleted: null,
+        dateCreated: actions.payload.date,
+        dateUpdated: actions.payload.date,
         size: null,
-        status: "active",
         canEdit: true,
         cardId: actions.payload.cardId,
         deckId: actions.payload.deckId,
@@ -67,69 +64,47 @@ export const cardsSlice = createSlice({
       state.cardsById[actions.payload.cardId] = card;
     });
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      const card = state.cardsById[actions.meta.arg.cardId];
+    builder.addCase(deleteCard, (state, actions) => {
+      const card = state.cardsById[actions.payload.cardId];
 
       if (!card) return;
 
-      card.status = "deleting";
+      card.dateDeleted = actions.payload.date;
+      card.dateUpdated = actions.payload.date;
     });
 
-    builder.addCase(deleteCard.fulfilled, (state, actions) => {
-      delete state.cardsById[actions.payload.cardId];
-    });
-
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      const cardIds = actions.meta.arg.cardIds;
+    builder.addCase(deleteDeck, (state, actions) => {
+      const cardIds = actions.payload.cardIds;
 
       cardIds.forEach((cardId) => {
         const card = state.cardsById[cardId];
 
         if (!card) return;
 
-        card.status = "deleting";
+        card.dateUpdated = actions.payload.date;
+        card.dateDeleted = actions.payload.date;
       });
     });
 
-    builder.addCase(deleteDeck.fulfilled, (state, actions) => {
-      const cardIds = actions.payload.cardIds;
-
-      cardIds.forEach((cardId) => {
-        delete state.cardsById[cardId];
-      });
-    });
-
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const cards = actions.meta.arg.cards;
+    builder.addCase(createDeck, (state, actions) => {
+      const cards = actions.payload.cards;
 
       cards.forEach((card) => {
-        state.cardsById[card.cardId] = {
-          ...card,
-          status: "creating",
-        };
+        state.cardsById[card.cardId] = card;
       });
     });
 
-    builder.addCase(createDeck.fulfilled, (state, actions) => {
-      const cards = actions.meta.arg.cards;
+    builder.addCase(setState, (state, actions) => {
+      state.cardsById = actions.payload.state[SliceName.Cards].cardsById;
+    });
 
-      cards.forEach((card) => {
-        const existingCard = state.cardsById[card.cardId];
+    builder.addCase(syncState, (state, actions) => {
+      const { cardsById } = actions.payload.state[SliceName.Cards];
 
-        if (existingCard) {
-          existingCard.status = "active";
-        } else {
-          state.cardsById[card.cardId] = {
-            ...card,
-            status: "active",
-          };
-        }
-      });
+      mergeMap(state.cardsById, cardsById);
     });
   },
 });
-
-export const { removeCard } = cardsSlice.actions;
 
 export const selectCard = withBuiltInState(
   (state: RootState, props: { cardId: string }): Card | undefined =>

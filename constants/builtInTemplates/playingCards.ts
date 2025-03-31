@@ -7,6 +7,7 @@ import {
   reservedDataSchemaItems,
 } from "@/constants/reservedDataSchemaItems";
 import { colorFunction } from "@/components/templates/handlebars";
+import { dateToDateString } from "@/utils/dates";
 
 // NOTE: Do not change these ID's as people's existing mappings will break
 const { templateId, dataItemId } = builtInTemplateIds("playing-cards");
@@ -207,6 +208,9 @@ function repeatSuit(count: number): Markup.Nodes {
 
 const template: Templates.Props<DataId> = {
   templateId,
+  dateCreated: dateToDateString(new Date()),
+  dateUpdated: dateToDateString(new Date()),
+  dateDeleted: null,
   name: text["template.built_in.playing-cards.name"],
   schemaOrder: [dataIds.value, dataIds.suit, dataIds.color],
   schema: {

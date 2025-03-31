@@ -23,4 +23,5 @@ export interface ExampleDeck<
   dataSchema?: Decks.DataSchema;
   tabletopSettings?: Tabletops.Settings;
   devOnly: boolean;
+  sortOrder: number | null;
 }

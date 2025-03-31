@@ -14,6 +14,8 @@ import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
+import useGoogleAuth from "@/api/google/useGoogleAuth";
+import * as sync from "@/api/dex/sync";
 
 const titleProps = { type: "h2" } as const;
 
@@ -37,6 +39,8 @@ export default function DevMenu({
     initializationError,
     lastCheckForUpdateTimeSinceRestart,
   } = useUpdates();
+
+  const auth = useGoogleAuth();
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -68,6 +72,51 @@ export default function DevMenu({
       initialCollapsed
       titleProps={titleProps}
     >
+      <FieldSet
+        title="Data/ Auth"
+        collapsible
+        initialCollapsed
+        titleProps={fieldSetTitleProps}
+      >
+        <Button
+          title="Sign In"
+          onPress={() => auth.requestAuth()}
+          variant="outline"
+        />
+
+        {auth.tokens && (
+          <Button
+            title="Refresh"
+            onPress={() => auth.refreshAuth(auth.tokens.refreshToken)}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Sync (Merge)"
+            onPress={() => sync.sync()}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Sync (Pull)"
+            onPress={() => sync.pull()}
+            variant="outline"
+          />
+        )}
+
+        {auth.tokens && (
+          <Button
+            title="Backup (Push)"
+            onPress={() => sync.push()}
+            variant="outline"
+          />
+        )}
+      </FieldSet>
+
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 
       {isDevClient && (

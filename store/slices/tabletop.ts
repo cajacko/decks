@@ -9,14 +9,15 @@ import {
   Cards,
   Decks,
   RequiredOperations,
+  DateString,
 } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
 import { withSeededShuffleSort } from "@/utils/seededShuffle";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
+import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -33,15 +34,14 @@ export enum MoveCardInstanceMethod {
   bottomNoChange = "bottomNoChange",
 }
 
-const initialState: TabletopState = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.tabletops
-  : {
-      tabletopsById: {},
-    };
+const initialState: TabletopState = {
+  tabletopsById: {},
+};
 
 type HistoryPayload<P extends object = object> = P & {
   tabletopId: string;
   operation: Tabletops.HistoryOperation | RequiredOperations;
+  date: DateString;
 };
 
 const history = configureHistory<
@@ -49,7 +49,15 @@ const history = configureHistory<
   TabletopHistoryState,
   { tabletopId: string },
   HistoryPayload
->((state, props) => state.tabletopsById[props.tabletopId]?.history);
+>((state, props) => state.tabletopsById[props.tabletopId]?.history, {
+  postAction: (_, action, state) => {
+    const tabletop = state.tabletopsById[action.payload.tabletopId];
+
+    if (!tabletop) return;
+
+    tabletop.dateUpdated = action.payload.date;
+  },
+});
 
 export const { getRedoState, getUndoState, getState } = history;
 
@@ -73,6 +81,7 @@ function removeCardInstancesFromStacks(
 function addCardInstancesToTabletop(
   tabletop: WritableDraft<Tabletop>,
   cardInstances: Omit<Tabletops.CardInstance, "side">[],
+  date: DateString,
 ) {
   const present = tabletop.history.present;
 
@@ -111,6 +120,7 @@ function addCardInstancesToTabletop(
   if (didEdit) {
     tabletop.history.past = [];
     tabletop.history.future = [];
+    tabletop.dateUpdated = date;
   }
 }
 
@@ -360,15 +370,21 @@ export const tabletopsSlice = createSlice({
       action: PayloadAction<{
         tabletopId: string;
         cardInstances: Omit<Tabletops.CardInstance, "side">[];
+        date: DateString;
       }>,
     ) => {
       const tabletop = state.tabletopsById[action.payload.tabletopId];
 
       if (!tabletop) return;
 
+      tabletop.dateUpdated = action.payload.date;
       tabletop.missingCardIds = [];
 
-      addCardInstancesToTabletop(tabletop, action.payload.cardInstances);
+      addCardInstancesToTabletop(
+        tabletop,
+        action.payload.cardInstances,
+        action.payload.date,
+      );
     },
     setTabletopSetting: <K extends keyof Tabletops.Settings>(
       state: WritableDraft<TabletopState>,
@@ -376,11 +392,14 @@ export const tabletopsSlice = createSlice({
         tabletopId: string;
         key: K;
         value: Tabletops.Settings[K];
+        date: DateString;
       }>,
     ) => {
       const tabletop = state.tabletopsById[action.payload.tabletopId];
 
       if (!tabletop) return;
+
+      tabletop.dateUpdated = action.payload.date;
 
       if (!tabletop.settings) {
         tabletop.settings = {};
@@ -395,6 +414,7 @@ export const tabletopsSlice = createSlice({
       props: {
         deckId: Decks.Id;
         cardIds: Cards.Id[];
+        date: DateString;
       },
     ) {
       const { deckId, cardIds } = props;
@@ -433,32 +453,40 @@ export const tabletopsSlice = createSlice({
         if (didEdit) {
           tabletop.history.past = [];
           tabletop.history.future = [];
+          tabletop.dateUpdated = props.date;
         }
       });
     }
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      if (!actions.meta.arg.deckId) return;
+    builder.addCase(deleteCard, (state, actions) => {
+      if (!actions.payload.deckId) return;
 
       deleteCards(state, {
-        deckId: actions.meta.arg.deckId,
-        cardIds: [actions.meta.arg.cardId],
+        deckId: actions.payload.deckId,
+        cardIds: [actions.payload.cardId],
+        date: actions.payload.date,
       });
     });
 
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      if (actions.meta.arg.tabletopId) {
-        delete state.tabletopsById[actions.meta.arg.tabletopId];
+    builder.addCase(deleteDeck, (state, actions) => {
+      if (actions.payload.tabletopId) {
+        const tabletop = state.tabletopsById[actions.payload.tabletopId];
+
+        if (tabletop) {
+          tabletop.dateDeleted = actions.payload.date;
+          tabletop.dateUpdated = actions.payload.date;
+        }
       }
 
       deleteCards(state, {
-        deckId: actions.meta.arg.deckId,
-        cardIds: actions.meta.arg.cardIds,
+        deckId: actions.payload.deckId,
+        cardIds: actions.payload.cardIds,
+        date: actions.payload.date,
       });
     });
 
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const tabletop = actions.meta.arg.defaultTabletop;
+    builder.addCase(createDeck, (state, actions) => {
+      const tabletop = actions.payload.defaultTabletop;
 
       state.tabletopsById[tabletop.id] = tabletop;
     });
@@ -474,13 +502,30 @@ export const tabletopsSlice = createSlice({
             tabletop.missingCardIds = [];
           }
 
+          tabletop.dateUpdated = actions.payload.date;
           tabletop.missingCardIds.push(actions.payload.cardId);
 
           return;
         }
 
-        addCardInstancesToTabletop(tabletop, cardInstances);
+        addCardInstancesToTabletop(
+          tabletop,
+          cardInstances,
+          actions.payload.date,
+        );
       });
+    });
+
+    builder.addCase(setState, (state, actions) => {
+      state.tabletopsById =
+        actions.payload.state[SliceName.Tabletops].tabletopsById;
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      mergeMap(
+        state.tabletopsById,
+        actions.payload.state.tabletops.tabletopsById,
+      );
     });
   },
 });

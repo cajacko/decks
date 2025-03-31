@@ -22,6 +22,7 @@ import { selectDoesTabletopHaveAvailableCards } from "@/store/combinedSelectors/
 import text from "@/constants/text";
 import useShakeEffect from "@/hooks/useShakeEffect";
 import useVibrate from "@/hooks/useVibrate";
+import { dateToDateString } from "@/utils/dates";
 
 export default function useStack({
   stackId,
@@ -137,6 +138,7 @@ export default function useStack({
         allCardInstancesState: "noChange",
         tabletopId,
         method: { type: "shuffle", seed: generateSeed() },
+        date: dateToDateString(new Date()),
         operation: {
           type: "SHUFFLE",
           payload: {
@@ -199,6 +201,7 @@ export default function useStack({
       deleteStack({
         tabletopId,
         stackId,
+        date: dateToDateString(new Date()),
         operation: {
           type: "DELETE_STACK",
           payload: {

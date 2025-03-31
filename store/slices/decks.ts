@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
-import { Cards, Decks, RootState, SliceName } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
+import { Cards, DateString, Decks, RootState, SliceName } from "../types";
 import { updateCard, deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
@@ -10,22 +8,24 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { SetCardData } from "../combinedActions/types";
 import withBuiltInState, { getBuiltInState } from "../utils/withBuiltInState";
 import AppError from "@/classes/AppError";
+import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
-const initialState: Decks.State = getFlag("USE_DEV_INITIAL_REDUX_STATE", null)
-  ? devInitialState.decks
-  : {
-      decksById: {},
-      deckIds: [],
-    };
+const initialState: Decks.State = {
+  decksById: {},
+};
 
 function updateDeckTemplateMapping(
   state: WritableDraft<Decks.State>,
   props: {
     deckId: string;
     data: SetCardData;
+    date: DateString;
   },
 ) {
   const deck = state.decksById[props.deckId];
+
+  let hasUpdated = false;
 
   function processSide(side: Cards.Side) {
     if (!deck) return;
@@ -37,6 +37,8 @@ function updateDeckTemplateMapping(
       if (!templateDataId) return;
 
       if (templateMapping[dataId]?.templateDataId !== templateDataId) {
+        hasUpdated = true;
+
         templateMapping[dataId] = {
           dataId,
           templateDataId,
@@ -44,10 +46,12 @@ function updateDeckTemplateMapping(
       }
 
       if (!deck.dataSchemaOrder) {
+        hasUpdated = true;
         deck.dataSchemaOrder = [];
       }
 
       if (!deck.dataSchemaOrder.includes(dataId)) {
+        hasUpdated = true;
         deck.dataSchemaOrder.push(dataId);
       }
 
@@ -60,6 +64,7 @@ function updateDeckTemplateMapping(
       if (!dataItem) return;
       if (!dataItem.fieldType) return;
 
+      hasUpdated = true;
       deck.dataSchema[dataId] = {
         id: dataId,
         type: dataItem.fieldType,
@@ -69,6 +74,10 @@ function updateDeckTemplateMapping(
 
   processSide("front");
   processSide("back");
+
+  if (hasUpdated && deck) {
+    deck.dateUpdated = props.date;
+  }
 }
 
 export const cardsSlice = createSlice({
@@ -79,6 +88,8 @@ export const cardsSlice = createSlice({
       state,
       actions: PayloadAction<{ deckId: Decks.Id; screen: "deck" | "play" }>,
     ) => {
+      // NOTE: Do not update dateUpdated from this, it's just a minor ux thing not a data thing that
+      // should mess up our date syncing
       const deck = state.decksById[actions.payload.deckId];
 
       if (!deck) return;
@@ -91,11 +102,14 @@ export const cardsSlice = createSlice({
         deckId: Decks.Id;
         name?: string;
         description?: string;
+        date: DateString;
       }>,
     ) => {
       const deck = state.decksById[actions.payload.deckId];
 
       if (!deck) return;
+
+      deck.dateUpdated = actions.payload.date;
 
       if (actions.payload.name !== undefined) {
         deck.name = actions.payload.name;
@@ -110,6 +124,7 @@ export const cardsSlice = createSlice({
       actions: PayloadAction<{
         deckId: Decks.Id;
         data: SetCardData;
+        date: DateString;
       }>,
     ) => {
       updateDeckTemplateMapping(state, actions.payload);
@@ -117,6 +132,8 @@ export const cardsSlice = createSlice({
       const deck = state.decksById[actions.payload.deckId];
 
       if (!deck) return;
+
+      deck.dateUpdated = actions.payload.date;
 
       actions.payload.data.items.forEach((dataItem) => {
         const dataId =
@@ -160,18 +177,13 @@ export const cardsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      const deck = state.decksById[actions.meta.arg.deckId];
+    builder.addCase(deleteDeck, (state, actions) => {
+      const deck = state.decksById[actions.payload.deckId];
 
       if (deck) {
-        deck.status = "deleting";
+        deck.dateUpdated = actions.payload.date;
+        deck.dateDeleted = actions.payload.date;
       }
-
-      removeFromArray(state.deckIds, (id) => id === actions.meta.arg.deckId);
-    });
-
-    builder.addCase(deleteDeck.fulfilled, (state, actions) => {
-      delete state.decksById[actions.payload.deckId];
     });
 
     builder.addCase(updateCard, (state, actions) => {
@@ -185,15 +197,17 @@ export const cardsSlice = createSlice({
 
       if (!deck) return;
 
+      deck.dateUpdated = actions.payload.date;
+
       deck.cards.push({
         cardId: actions.payload.cardId,
         quantity: 1,
       });
     });
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      const deckId = actions.meta.arg.deckId;
-      const cardId = actions.meta.arg.cardId;
+    builder.addCase(deleteCard, (state, actions) => {
+      const deckId = actions.payload.deckId;
+      const cardId = actions.payload.cardId;
 
       if (!deckId) return;
 
@@ -201,30 +215,26 @@ export const cardsSlice = createSlice({
 
       if (!deck) return;
 
+      deck.dateUpdated = actions.payload.date;
+
       removeFromArray(deck.cards, (item) => item.cardId === cardId);
     });
 
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const deckId = actions.meta.arg.deck.id;
+    builder.addCase(createDeck, (state, actions) => {
+      const deckId = actions.payload.deck.id;
 
-      state.decksById[deckId] = actions.meta.arg.deck;
+      state.decksById[deckId] = actions.payload.deck;
     });
 
-    builder.addCase(createDeck.fulfilled, (state, actions) => {
-      const deckId = actions.meta.arg.deck.id;
+    builder.addCase(setState, (state, actions) => {
+      state.decksById = actions.payload.state[SliceName.Decks].decksById;
+    });
 
-      state.deckIds.push(deckId);
-
-      const deck = state.decksById[deckId];
-
-      if (deck) {
-        deck.status = "active";
-      } else {
-        state.decksById[deckId] = {
-          ...actions.meta.arg.deck,
-          status: "active",
-        };
-      }
+    builder.addCase(syncState, (state, actions) => {
+      mergeMap(
+        state.decksById,
+        actions.payload.state[SliceName.Decks].decksById,
+      );
     });
   },
 });
@@ -240,8 +250,71 @@ export const selectDeck = withBuiltInState(
     selectDecksById(state)[props.deckId],
 );
 
-export const selectDeckIds = (state: RootState): Decks.Id[] =>
-  state[cardsSlice.name].deckIds;
+export const selectDeckIds = createSelector(
+  selectDecksById,
+  (
+    _: RootState,
+    props?: {
+      sortBy?: "dateUpdated" | "dateCreated" | "sortOrder";
+      direction?: "asc" | "desc";
+    },
+  ) => props?.sortBy,
+  (
+    _: RootState,
+    props?: {
+      sortBy?: "dateUpdated" | "dateCreated" | "sortOrder";
+      direction?: "asc" | "desc";
+    },
+  ) => props?.direction,
+  (decksById, sortBy = "dateUpdated", _direction): Decks.Id[] => {
+    const defaultDirection = sortBy === "sortOrder" ? "asc" : "desc";
+    const direction = _direction ?? defaultDirection;
+    const deckIds: Decks.Id[] = [];
+
+    Object.values(decksById)
+      .sort((a, b): number => {
+        if (!a || !b) return 0;
+
+        switch (sortBy) {
+          case "dateCreated":
+          case "dateUpdated": {
+            const aDate = new Date(
+              sortBy === "dateCreated" ? a.dateCreated : a.dateUpdated,
+            );
+
+            const bDate = new Date(
+              sortBy === "dateCreated" ? b.dateCreated : b.dateUpdated,
+            );
+
+            if (direction === "asc") {
+              return aDate.getTime() - bDate.getTime();
+            }
+
+            return bDate.getTime() - aDate.getTime();
+          }
+          case "sortOrder": {
+            if (a.sortOrder === undefined || b.sortOrder === undefined) {
+              return 0;
+            }
+
+            if (direction === "asc") {
+              return a.sortOrder - b.sortOrder;
+            }
+
+            return b.sortOrder - a.sortOrder;
+          }
+        }
+      })
+      .forEach((deck) => {
+        if (!deck) return;
+        if (deck.dateDeleted) return;
+
+        deckIds.push(deck.id);
+      });
+
+    return deckIds;
+  },
+);
 
 export const selectDecks = createSelector(
   selectDeckIds,

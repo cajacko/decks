@@ -11,6 +11,7 @@ import { store } from "../store";
 import { SetCardData } from "../combinedActions/types";
 import uuid from "@/utils/uuid";
 import { selectDeck } from "../slices/decks";
+import { dateToDateString } from "@/utils/dates";
 
 export function updateCardHelper(props: {
   cardId: Cards.Id;
@@ -25,7 +26,7 @@ export function updateCardHelper(props: {
     );
   }
 
-  return updateCard({ ...props, deckId });
+  return updateCard({ ...props, deckId, date: dateToDateString(new Date()) });
 }
 
 export function deleteCardHelper(props: {
@@ -36,7 +37,11 @@ export function deleteCardHelper(props: {
   const deckId =
     props.deckId ?? selectCard(store.getState(), props)?.deckId ?? null;
 
-  return deleteCard({ cardId: props.cardId, deckId });
+  return deleteCard({
+    cardId: props.cardId,
+    deckId,
+    date: dateToDateString(new Date()),
+  });
 }
 
 export function createCardHelper(props: {
@@ -64,5 +69,9 @@ export function createCardHelper(props: {
     });
   }
 
-  return createCard({ ...props, tabletops });
+  return createCard({
+    ...props,
+    tabletops,
+    date: dateToDateString(new Date()),
+  });
 }

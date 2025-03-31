@@ -15,6 +15,7 @@ import uuid from "@/utils/uuid";
 import text from "@/constants/text";
 import { generateSeed } from "@/utils/seededShuffle";
 import { StackListRef } from "./StackList";
+import { dateToDateString } from "@/utils/dates";
 
 export interface StackActionsProps extends FieldSetProps {
   tabletopId: string;
@@ -100,6 +101,7 @@ export default function StackActions({
           stackId: selectedStackId,
           method: { type: "shuffle", seed: generateSeed() },
           allCardInstancesState: "noChange",
+          date: dateToDateString(new Date()),
           operation: {
             type: "SHUFFLE",
             payload: {
@@ -118,6 +120,7 @@ export default function StackActions({
           tabletopId,
           target: { stackId: selectedStackId },
           side: "back",
+          date: dateToDateString(new Date()),
           operation: {
             type: selectedStackId
               ? "FLIP_STACK_FACE_DOWN"
@@ -138,6 +141,7 @@ export default function StackActions({
           tabletopId,
           target: { stackId: selectedStackId },
           side: "front",
+          date: dateToDateString(new Date()),
           operation: {
             type: selectedStackId ? "FLIP_STACK_FACE_UP" : "FLIP_ALL_FACE_UP",
             payload: {
@@ -170,6 +174,7 @@ export default function StackActions({
           tabletopId,
           moveTarget: { stackId: selectedStackId },
           toTarget: moveToTarget,
+          date: dateToDateString(new Date()),
           operation: {
             type: selectedStackId
               ? "MOVE_STACK_CARDS_TO_TOP"
@@ -191,6 +196,7 @@ export default function StackActions({
           tabletopId,
           moveTarget: { stackId: selectedStackId },
           toTarget: moveToTarget,
+          date: dateToDateString(new Date()),
           operation: {
             type: selectedStackId
               ? "MOVE_STACK_CARDS_TO_BOTTOM"
@@ -212,6 +218,7 @@ export default function StackActions({
           stackId: selectedStackId,
           method: { type: "reverse" },
           allCardInstancesState: "noChange",
+          date: dateToDateString(new Date()),
           operation: {
             type: selectedStackId ? "REVERSE_ALL_CARDS" : "REVERSE_STACK",
             payload: {

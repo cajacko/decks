@@ -1,16 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState, UserSettings, SliceName } from "../types";
-import { getFlag } from "@/utils/flags";
-import devInitialState from "../dev/devInitialState";
+import { RootState, UserSettings, SliceName, DateString } from "../types";
+import { setState, syncState } from "../combinedActions/sync";
+import { getMostRecentItem } from "../utils/mergeData";
 
 export type UserSettingsState = UserSettings.State;
 
-const initialState: UserSettingsState = getFlag(
-  "USE_DEV_INITIAL_REDUX_STATE",
-  null,
-)
-  ? devInitialState.userSettings
-  : {};
+const initialState: UserSettingsState = {
+  settings: null,
+};
 
 export const userSettingsSlice = createSlice({
   name: SliceName.UserSettings,
@@ -23,19 +20,28 @@ export const userSettingsSlice = createSlice({
         payload: {
           key: FlagKey;
           value: UserSettings.FlagValue<FlagKey> | null;
+          date: DateString;
         };
       },
     ) => {
-      state.flags = state.flags || {};
+      const settings = state.settings ?? {
+        dateCreated: action.payload.date,
+        dateUpdated: action.payload.date,
+      };
+
+      const flags = settings.flags ?? {};
+
+      settings.dateUpdated = action.payload.date;
 
       if (action.payload.value === null) {
-        delete state.flags[action.payload.key];
-
-        return;
+        delete flags[action.payload.key];
+      } else {
+        // @ts-ignore
+        flags[action.payload.key] = action.payload.value;
       }
 
-      // @ts-ignore
-      state.flags[action.payload.key] = action.payload.value;
+      settings.flags = flags;
+      state.settings = settings;
     },
     setUserSetting: <K extends UserSettings.UserSettingKey>(
       state: UserSettingsState,
@@ -44,17 +50,48 @@ export const userSettingsSlice = createSlice({
         payload: {
           key: K;
           value: UserSettings.UserSettingValue<K> | null;
+          date: DateString;
         };
       },
     ) => {
-      if (action.payload.value === null) {
-        delete state[action.payload.key];
+      const settings = state.settings ?? {
+        dateCreated: action.payload.date,
+        dateUpdated: action.payload.date,
+      };
 
-        return;
+      settings.dateUpdated = action.payload.date;
+
+      if (action.payload.value === null) {
+        delete settings?.[action.payload.key];
+      } else {
+        settings[action.payload.key] = action.payload.value;
       }
 
-      state[action.payload.key] = action.payload.value;
+      state.settings = settings;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(setState, (state, actions) => {
+      state.settings = actions.payload.state[SliceName.UserSettings].settings;
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      const inboundState =
+        actions.payload.state[SliceName.UserSettings].settings;
+
+      if (!state.settings) {
+        state.settings = inboundState;
+      } else if (inboundState) {
+        const mostRecent = getMostRecentItem({
+          existing: state.settings,
+          incoming: inboundState,
+        });
+
+        if (mostRecent === inboundState) {
+          state.settings = inboundState;
+        }
+      }
+    });
   },
 });
 
@@ -66,11 +103,13 @@ export const selectUserSettings = (state: RootState): UserSettingsState =>
 export const selectUserSetting = <K extends UserSettings.UserSettingKey>(
   state: RootState,
   props: { key: K },
-): UserSettings.UserSettingValue<K> => selectUserSettings(state)[props.key];
+): UserSettings.UserSettingValue<K> | undefined =>
+  selectUserSettings(state).settings?.[props.key];
 
 export const selectUserSettingsFlags = (
   state: RootState,
-): UserSettings.FlagsState | undefined => state[userSettingsSlice.name].flags;
+): UserSettings.FlagsState | undefined =>
+  state[userSettingsSlice.name].settings?.flags;
 
 export const selectUserSettingsFlag = <FlagKey extends UserSettings.FlagKey>(
   state: RootState,
