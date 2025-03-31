@@ -210,6 +210,7 @@ const template: Templates.Props<DataId> = {
   templateId,
   dateCreated: dateToDateString(new Date()),
   dateUpdated: dateToDateString(new Date()),
+  dateDeleted: null,
   name: text["template.built_in.playing-cards.name"],
   schemaOrder: [dataIds.value, dataIds.suit, dataIds.color],
   schema: {

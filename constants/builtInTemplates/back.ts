@@ -30,6 +30,7 @@ const template: Templates.Props<DataId> = {
   templateId,
   dateCreated: dateToDateString(new Date()),
   dateUpdated: dateToDateString(new Date()),
+  dateDeleted: null,
   name: text["template.built_in.back.title"],
   schemaOrder: [
     dataIds.text,

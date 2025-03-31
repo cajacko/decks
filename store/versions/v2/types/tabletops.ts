@@ -10,7 +10,7 @@ import {
   CardSide,
   CardId,
   DeckId,
-  DateString,
+  TimestampMetadata,
 } from "./types";
 
 export type { CardInstanceId, StackId, Id };
@@ -80,7 +80,7 @@ export interface Settings {
   doNotAddNewCardsAutomatically?: boolean;
 }
 
-export interface Props {
+export interface Props extends TimestampMetadata {
   id: Id;
   availableDecks: DeckId[];
   history: History;
@@ -88,8 +88,6 @@ export interface Props {
   // decks etc
   settings: Settings | undefined;
   missingCardIds: CardId[] | undefined;
-  dateCreated: DateString;
-  dateUpdated: DateString;
 }
 
 export interface State {

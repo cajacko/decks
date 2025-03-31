@@ -52,3 +52,9 @@ export type ValidatedValue<Type extends FieldType = FieldType> =
 
 export type DateString =
   `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`;
+
+export interface TimestampMetadata {
+  dateCreated: DateString;
+  dateUpdated: DateString;
+  dateDeleted: DateString | null;
+}

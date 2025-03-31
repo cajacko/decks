@@ -89,6 +89,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     id: deckId,
     dateCreated: dateToDateString(new Date()),
     dateUpdated: dateToDateString(new Date()),
+    dateDeleted: null,
     cards: [],
     dataSchema: {
       [ReservedDataSchemaIds.Color]: {
@@ -142,6 +143,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     id: tabletopId,
     dateCreated: dateToDateString(new Date()),
     dateUpdated: dateToDateString(new Date()),
+    dateDeleted: null,
     availableDecks: [deckId],
     history: {
       future: [],
@@ -197,6 +199,7 @@ export function copyDeckHelper(props: {
     cards.push({
       dateCreated: dateToDateString(new Date()),
       dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       size: null,
       templates: existingCard.templates,
       cardId: newCardId,
@@ -263,6 +266,7 @@ export function copyDeckHelper(props: {
     defaultTabletop = {
       dateCreated: dateToDateString(new Date()),
       dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       history: {
         future: [],
         past: [],
@@ -283,6 +287,7 @@ export function copyDeckHelper(props: {
     defaultTabletop = {
       dateCreated: dateToDateString(new Date()),
       dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       id: newTabletopId,
       availableDecks: [deckId],
       settings: undefined,
@@ -300,6 +305,7 @@ export function copyDeckHelper(props: {
   const deck: Decks.Props = {
     dateCreated: dateToDateString(new Date()),
     dateUpdated: dateToDateString(new Date()),
+    dateDeleted: null,
     cards: deckCards,
     cardSize: deckToCopy.cardSize,
     dataSchema: deckToCopy.dataSchema,

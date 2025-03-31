@@ -16,7 +16,8 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
-import { setState } from "../combinedActions/sync";
+import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -469,7 +470,15 @@ export const tabletopsSlice = createSlice({
 
     builder.addCase(deleteDeck.pending, (state, actions) => {
       if (actions.meta.arg.tabletopId) {
-        delete state.tabletopsById[actions.meta.arg.tabletopId];
+        // TODO: Is this what we want? To remove this?
+        // delete state.tabletopsById[actions.meta.arg.tabletopId];
+
+        const tabletop = state.tabletopsById[actions.meta.arg.tabletopId];
+
+        if (tabletop) {
+          tabletop.dateDeleted = actions.meta.arg.date;
+          tabletop.dateUpdated = actions.meta.arg.date;
+        }
       }
 
       deleteCards(state, {
@@ -513,6 +522,13 @@ export const tabletopsSlice = createSlice({
     builder.addCase(setState, (state, actions) => {
       state.tabletopsById =
         actions.payload.state[SliceName.Tabletops].tabletopsById;
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      mergeMap(
+        state.tabletopsById,
+        actions.payload.state.tabletops.tabletopsById,
+      );
     });
   },
 });

@@ -6,16 +6,14 @@ import {
   CardId as Id,
   CardSize as Size,
   ValidatedValue,
-  DateString,
+  TimestampMetadata,
 } from "./types";
 
 export { Side, SideTemplate, DataTemplateMapping, Id, Size, DataId };
 
 export type Data = Record<DataId, ValidatedValue | undefined>;
 
-export interface Props {
-  dateCreated: DateString;
-  dateUpdated: DateString;
+export interface Props extends TimestampMetadata {
   cardId: Id;
   canEdit: boolean;
   deckId: DeckId | null;

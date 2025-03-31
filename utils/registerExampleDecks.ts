@@ -45,7 +45,6 @@ function getValidatedValueType(
 export default function registerExampleDecks() {
   const state: State = {
     decks: {
-      deckIds: [],
       decksById: {},
     },
     tabletops: {
@@ -84,6 +83,7 @@ export default function registerExampleDecks() {
       templates: exampleDeck.templates,
       dateCreated: dateToDateString(new Date()),
       dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
     };
 
     const tabletop: Tabletops.Props = {
@@ -93,6 +93,7 @@ export default function registerExampleDecks() {
       missingCardIds: [],
       dateCreated: dateToDateString(new Date()),
       dateUpdated: dateToDateString(new Date()),
+      dateDeleted: null,
       history: {
         future: [],
         past: [],
@@ -123,6 +124,7 @@ export default function registerExampleDecks() {
       const card: Cards.Props = {
         dateCreated: dateToDateString(new Date()),
         dateUpdated: dateToDateString(new Date()),
+        dateDeleted: null,
         size: null,
         cardId,
         canEdit: false,
@@ -161,7 +163,6 @@ export default function registerExampleDecks() {
     });
 
     state.decks.decksById[deckId] = deck;
-    state.decks.deckIds.push(deckId);
     state.tabletops.tabletopsById[tabletopId] = tabletop;
   });
 

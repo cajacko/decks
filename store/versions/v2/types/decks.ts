@@ -9,7 +9,7 @@ import {
   TemplateDataId,
   ValidatedValue,
   FieldType,
-  DateString,
+  TimestampMetadata,
 } from "./types";
 
 export type { Id };
@@ -64,7 +64,7 @@ export type SideTemplate = {
 
 export type Templates = Record<CardSide, SideTemplate>;
 
-export interface Props {
+export interface Props extends TimestampMetadata {
   id: Id;
   cards: Card[];
   templates: Templates;
@@ -85,11 +85,8 @@ export interface Props {
   canEdit: boolean;
   cardSize: CardSize;
   lastScreen?: "deck" | "play";
-  dateCreated: DateString;
-  dateUpdated: DateString;
 }
 
 export interface State {
   decksById: Record<Id, Props | undefined>;
-  deckIds: Id[];
 }

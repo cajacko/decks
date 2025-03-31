@@ -8,11 +8,11 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { SetCardData } from "../combinedActions/types";
 import withBuiltInState, { getBuiltInState } from "../utils/withBuiltInState";
 import AppError from "@/classes/AppError";
-import { setState } from "../combinedActions/sync";
+import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
 const initialState: Decks.State = {
   decksById: {},
-  deckIds: [],
 };
 
 function updateDeckTemplateMapping(
@@ -183,14 +183,14 @@ export const cardsSlice = createSlice({
       if (deck) {
         deck.status = "deleting";
         deck.dateUpdated = actions.meta.arg.date;
+        deck.dateDeleted = actions.meta.arg.date;
       }
-
-      removeFromArray(state.deckIds, (id) => id === actions.meta.arg.deckId);
     });
 
-    builder.addCase(deleteDeck.fulfilled, (state, actions) => {
-      delete state.decksById[actions.payload.deckId];
-    });
+    // TODO: Is this what we want? To remove this?
+    // builder.addCase(deleteDeck.fulfilled, (state, actions) => {
+    //   delete state.decksById[actions.payload.deckId];
+    // });
 
     builder.addCase(updateCard, (state, actions) => {
       updateDeckTemplateMapping(state, actions.payload);
@@ -235,8 +235,6 @@ export const cardsSlice = createSlice({
     builder.addCase(createDeck.fulfilled, (state, actions) => {
       const deckId = actions.meta.arg.deck.id;
 
-      state.deckIds.push(deckId);
-
       const deck = state.decksById[deckId];
 
       if (deck) {
@@ -250,8 +248,14 @@ export const cardsSlice = createSlice({
     });
 
     builder.addCase(setState, (state, actions) => {
-      state.deckIds = actions.payload.state[SliceName.Decks].deckIds;
       state.decksById = actions.payload.state[SliceName.Decks].decksById;
+    });
+
+    builder.addCase(syncState, (state, actions) => {
+      mergeMap(
+        state.decksById,
+        actions.payload.state[SliceName.Decks].decksById,
+      );
     });
   },
 });
@@ -267,8 +271,31 @@ export const selectDeck = withBuiltInState(
     selectDecksById(state)[props.deckId],
 );
 
-export const selectDeckIds = (state: RootState): Decks.Id[] =>
-  state[cardsSlice.name].deckIds;
+export const selectDeckIds = createSelector(
+  selectDecksById,
+  (decksById): Decks.Id[] => {
+    const deckIds: Decks.Id[] = [];
+
+    Object.values(decksById)
+      .sort((a, b) => {
+        if (!a || !b) return 0;
+
+        const aDate = new Date(a.dateUpdated);
+        const bDate = new Date(b.dateUpdated);
+
+        return bDate.getTime() - aDate.getTime();
+      })
+      .forEach((deck) => {
+        if (!deck) return;
+        if (deck.dateDeleted) return;
+        if (deck.status === "deleting") return;
+
+        deckIds.push(deck.id);
+      });
+
+    return deckIds;
+  },
+);
 
 export const selectDecks = createSelector(
   selectDeckIds,

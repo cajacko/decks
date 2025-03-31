@@ -23,13 +23,13 @@ export default createMigration<V1, V2>({
         ...card,
         dateCreated,
         dateUpdated,
+        dateDeleted: null,
       };
 
       cards.cardsById[newCard.cardId] = newCard;
     });
 
     const decks: V2["decks"] = {
-      deckIds: props.validState.decks.deckIds,
       decksById: {},
     };
 
@@ -40,6 +40,7 @@ export default createMigration<V1, V2>({
         ...deck,
         dateCreated,
         dateUpdated,
+        dateDeleted: null,
       };
 
       decks.decksById[newDeck.id] = newDeck;
@@ -57,6 +58,7 @@ export default createMigration<V1, V2>({
           ...tabletop,
           dateCreated,
           dateUpdated,
+          dateDeleted: null,
         };
 
         tabletops.tabletopsById[newTabletop.id] = newTabletop;
@@ -83,6 +85,7 @@ export default createMigration<V1, V2>({
           ...template,
           dateCreated,
           dateUpdated,
+          dateDeleted: null,
         };
 
         templates.templatesById[template.templateId] = newTemplate;

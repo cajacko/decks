@@ -3,7 +3,7 @@
 // from boolean to having some different states we may miss some conditional checks that were just
 // doing a truthy check.
 
-import { DateString } from "./types";
+import { TimestampMetadata } from "./types";
 
 // NOTE: First option is the default
 export const flagMap = {
@@ -62,15 +62,13 @@ export type FlagsState = {
   [K in FlagKey]?: FlagValue<K> | undefined;
 };
 
-export interface UserSettings {
+export interface UserSettings extends Omit<TimestampMetadata, "dateDeleted"> {
   theme?: "system" | "light" | "dark";
   flags?: FlagsState;
-  dateCreated: DateString;
-  dateUpdated: DateString;
 }
 
 export interface State {
-  settings: UserSettings;
+  settings: UserSettings | null;
 }
 
 export type UserSettingKey = keyof Omit<

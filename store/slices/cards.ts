@@ -5,6 +5,7 @@ import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import withBuiltInState from "../utils/withBuiltInState";
 import { setState, syncState } from "../combinedActions/sync";
+import { mergeMap } from "../utils/mergeData";
 
 export type Card = Cards.Props;
 
@@ -39,6 +40,7 @@ export const cardsSlice = createSlice({
 
     builder.addCase(createCard, (state, actions) => {
       const card: Card = {
+        dateDeleted: null,
         dateCreated: actions.payload.date,
         dateUpdated: actions.payload.date,
         size: null,
@@ -68,13 +70,15 @@ export const cardsSlice = createSlice({
 
       if (!card) return;
 
+      card.dateDeleted = actions.meta.arg.date;
       card.dateUpdated = actions.meta.arg.date;
       card.status = "deleting";
     });
 
-    builder.addCase(deleteCard.fulfilled, (state, actions) => {
-      delete state.cardsById[actions.payload.cardId];
-    });
+    // TODO: Is this what we want? To remove this?
+    // builder.addCase(deleteCard.fulfilled, (state, actions) => {
+    //   delete state.cardsById[actions.payload.cardId];
+    // });
 
     builder.addCase(deleteDeck.pending, (state, actions) => {
       const cardIds = actions.meta.arg.cardIds;
@@ -86,16 +90,18 @@ export const cardsSlice = createSlice({
 
         card.status = "deleting";
         card.dateUpdated = actions.meta.arg.date;
+        card.dateDeleted = actions.meta.arg.date;
       });
     });
 
-    builder.addCase(deleteDeck.fulfilled, (state, actions) => {
-      const cardIds = actions.payload.cardIds;
+    // TODO: Is this what we want? To remove this?
+    // builder.addCase(deleteDeck.fulfilled, (state, actions) => {
+    //   const cardIds = actions.payload.cardIds;
 
-      cardIds.forEach((cardId) => {
-        delete state.cardsById[cardId];
-      });
-    });
+    //   cardIds.forEach((cardId) => {
+    //     delete state.cardsById[cardId];
+    //   });
+    // });
 
     builder.addCase(createDeck.pending, (state, actions) => {
       const cards = actions.meta.arg.cards;
@@ -129,24 +135,11 @@ export const cardsSlice = createSlice({
       state.cardsById = actions.payload.state[SliceName.Cards].cardsById;
     });
 
-    // builder.addCase(syncState, (state, actions) => {
-    //   const { cardsById } = actions.payload.state[SliceName.Cards];
+    builder.addCase(syncState, (state, actions) => {
+      const { cardsById } = actions.payload.state[SliceName.Cards];
 
-    //   Object.values(cardsById).forEach((card) => {
-    //     if (!card) return;
-
-    //     const existingCard = state.cardsById[card.cardId];
-
-    //     if (!existingCard) {
-    //       state.cardsById[card.cardId] = {
-    //         ...card,
-    //         status: "active",
-    //       };
-
-    //       return;
-    //     }
-    //   });
-    // });
+      mergeMap(state.cardsById, cardsById);
+    });
   },
 });
 

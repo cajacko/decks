@@ -23,6 +23,7 @@ const dataSchemaIds = {
 export const newDeckCard: Cards.Props = {
   dateCreated: dateToDateString(new Date()),
   dateUpdated: dateToDateString(new Date()),
+  dateDeleted: null,
   cardId: newDeckCardTarget.id,
   canEdit: false,
   size: Cards.Size.Poker,

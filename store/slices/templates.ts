@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Templates, RootState, SliceName } from "../types";
 import withBuiltInState from "../utils/withBuiltInState";
 import { builtInTemplatesById } from "@/constants/builtInTemplates";
-// import { setState } from "../combinedActions/sync";
+// import { setState, syncState } from "../combinedActions/sync";
+// import { mergeMap } from "../utils/mergeData";
 
 const initialState: Templates.State = {
   templatesById: {},
@@ -16,6 +17,12 @@ export const templatesSlice = createSlice({
     // builder.addCase(setState, (state, actions) => {
     //   state.templatesById =
     //     actions.payload.state[SliceName.Templates].templatesById;
+    // });
+    // builder.addCase(syncState, (state, actions) => {
+    //   mergeMap(
+    //     state.templatesById,
+    //     actions.payload.state[SliceName.Templates].templatesById,
+    //   );
     // });
   },
 });

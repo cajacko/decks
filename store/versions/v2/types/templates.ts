@@ -3,7 +3,7 @@ import {
   TemplateId as Id,
   FieldType,
   ValidatedValue,
-  DateString,
+  TimestampMetadata,
 } from "./types";
 import { Nodes as Markup } from "./markup";
 
@@ -37,15 +37,13 @@ export type Data<DID extends DataId = DataId> = {
 };
 
 // Allowing to pass in the data id lets us validate our prebuilt decks that are defined in the code
-export interface Props<DID extends DataId = DataId> {
+export interface Props<DID extends DataId = DataId> extends TimestampMetadata {
   templateId: Id;
   name: string;
   description?: string;
   schemaOrder?: DID[];
   schema: Data<DID>;
   markup: Markup;
-  dateCreated: DateString;
-  dateUpdated: DateString;
 }
 
 export interface State {
