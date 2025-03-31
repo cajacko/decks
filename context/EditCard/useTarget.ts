@@ -15,22 +15,23 @@ export function _useTarget({
   onChangeTarget?: OnChangeTarget | null;
 }) {
   const [target, _setTarget] = React.useState<Target | null>(propsTarget);
+  const prevTarget = React.useRef<Target | null>(target);
+  prevTarget.current = target;
 
   const setTarget = React.useCallback<SetTarget>(
     (_newTarget) => {
-      _setTarget((prevTarget) => {
-        let newTarget: Target | null;
+      let newTarget: Target | null;
 
-        if (typeof _newTarget === "function") {
-          newTarget = _newTarget(prevTarget);
-        } else {
-          newTarget = _newTarget;
-        }
+      if (typeof _newTarget === "function") {
+        newTarget = _newTarget(prevTarget.current);
+      } else {
+        newTarget = _newTarget;
+      }
 
-        onChangeTarget?.(newTarget);
-
-        return newTarget;
-      });
+      // We can't call onChangeTarget within the _setTarget call and we don't want to call it on the
+      // useEffect, so doing it like this
+      onChangeTarget?.(newTarget);
+      _setTarget(newTarget);
     },
     [onChangeTarget, _setTarget],
   );

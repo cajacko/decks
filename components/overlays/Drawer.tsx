@@ -20,7 +20,8 @@ import { ExternalPathString, Link } from "expo-router";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
-import Button from "../forms/Button";
+import Button from "@/components/forms/Button";
+import AppStores from "@/components/ui/AppStores";
 
 export interface DrawerProps {
   closeDrawer: () => void;
@@ -69,6 +70,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 )}
               </FieldSet>
             </View>
+            {Platform.OS === "web" && <AppStores />}
             {dexWebLink ? (
               <Link href={dexWebLink} asChild>
                 <Pressable>

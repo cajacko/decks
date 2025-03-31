@@ -70,7 +70,6 @@ export function CardTargetProvider({
   children,
   target,
   inheritIfSame,
-  // onChangeTarget,
 }: CardTargetProviderProps) {
   const parentTarget = useCardTarget();
 
