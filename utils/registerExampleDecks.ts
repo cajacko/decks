@@ -80,7 +80,6 @@ export default function registerExampleDecks() {
       dataSchema,
       dataSchemaOrder: Object.keys(dataSchema),
       defaultTabletopId: tabletopId,
-      status: "active",
       canEdit: false,
       templates: exampleDeck.templates,
       dateCreated,
@@ -133,7 +132,6 @@ export default function registerExampleDecks() {
         canEdit: false,
         deckId,
         data: {},
-        status: "active",
       };
 
       Object.entries(cardProps).forEach(([dataId, value]) => {

@@ -1,9 +1,8 @@
 import { createAction } from "@reduxjs/toolkit";
 import { Cards, DateString, Decks, Tabletops } from "../types";
 import { SetCardData } from "./types";
-import createDelayedActionForAnimations from "../utils/createDelayedActionForAnimations";
 
-export const deleteDeck = createDelayedActionForAnimations<{
+export const deleteDeck = createAction<{
   deckId: Decks.Id;
   cardIds: Cards.Id[];
   date: DateString;
@@ -29,7 +28,7 @@ export interface CreateCardActionPayload {
 
 export const createCard = createAction<CreateCardActionPayload>("createCard");
 
-export const deleteCard = createDelayedActionForAnimations<{
+export const deleteCard = createAction<{
   cardId: Cards.Id;
   deckId: Decks.Id | null;
   date: DateString;

@@ -38,7 +38,6 @@ export const newDeckCard: Cards.Props = {
     },
   },
   deckId: null,
-  status: "active",
   templates: {
     front: {
       dataTemplateMapping: {

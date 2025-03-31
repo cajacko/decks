@@ -27,7 +27,6 @@ export interface Props extends TimestampMetadata {
    * one card would be overkill.
    */
   templates?: Partial<Templates>;
-  status: "creating" | "active" | "deleting";
 }
 
 export interface State {

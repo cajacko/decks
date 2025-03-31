@@ -1,14 +1,14 @@
 import { Cards, DateString, Decks, Tabletops } from "../types";
-import createDelayedActionForAnimations from "../utils/createDelayedActionForAnimations";
+import { createAction } from "@reduxjs/toolkit";
 
-export const deleteDeck = createDelayedActionForAnimations<{
+export const deleteDeck = createAction<{
   deckId: Decks.Id;
   cardIds: Cards.Id[];
   tabletopId: Tabletops.Id | null;
   date: DateString;
 }>("deleteDeck");
 
-export const createDeck = createDelayedActionForAnimations<{
+export const createDeck = createAction<{
   deck: Decks.Props;
   defaultTabletop: Tabletops.Props;
   cards: Cards.Props[];

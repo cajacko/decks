@@ -105,7 +105,6 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
     defaultTabletopId: tabletopId,
     name: deckName,
     description: text["deck.new.description"],
-    status: "creating",
     canEdit: true,
     cardSize: Cards.Size.Poker,
     templates: {
@@ -206,7 +205,6 @@ export function copyDeckHelper(props: {
       data: existingCard.data,
       canEdit: true,
       deckId,
-      status: "creating",
     });
 
     return newCardId;
@@ -315,7 +313,6 @@ export function copyDeckHelper(props: {
     description: deckToCopy.description,
     id: deckId,
     defaultTabletopId: newTabletopId,
-    status: "creating",
     canEdit: true,
   };
 

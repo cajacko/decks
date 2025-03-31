@@ -458,38 +458,35 @@ export const tabletopsSlice = createSlice({
       });
     }
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      if (!actions.meta.arg.deckId) return;
+    builder.addCase(deleteCard, (state, actions) => {
+      if (!actions.payload.deckId) return;
 
       deleteCards(state, {
-        deckId: actions.meta.arg.deckId,
-        cardIds: [actions.meta.arg.cardId],
-        date: actions.meta.arg.date,
+        deckId: actions.payload.deckId,
+        cardIds: [actions.payload.cardId],
+        date: actions.payload.date,
       });
     });
 
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      if (actions.meta.arg.tabletopId) {
-        // TODO: Is this what we want? To remove this?
-        // delete state.tabletopsById[actions.meta.arg.tabletopId];
-
-        const tabletop = state.tabletopsById[actions.meta.arg.tabletopId];
+    builder.addCase(deleteDeck, (state, actions) => {
+      if (actions.payload.tabletopId) {
+        const tabletop = state.tabletopsById[actions.payload.tabletopId];
 
         if (tabletop) {
-          tabletop.dateDeleted = actions.meta.arg.date;
-          tabletop.dateUpdated = actions.meta.arg.date;
+          tabletop.dateDeleted = actions.payload.date;
+          tabletop.dateUpdated = actions.payload.date;
         }
       }
 
       deleteCards(state, {
-        deckId: actions.meta.arg.deckId,
-        cardIds: actions.meta.arg.cardIds,
-        date: actions.meta.arg.date,
+        deckId: actions.payload.deckId,
+        cardIds: actions.payload.cardIds,
+        date: actions.payload.date,
       });
     });
 
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const tabletop = actions.meta.arg.defaultTabletop;
+    builder.addCase(createDeck, (state, actions) => {
+      const tabletop = actions.payload.defaultTabletop;
 
       state.tabletopsById[tabletop.id] = tabletop;
     });

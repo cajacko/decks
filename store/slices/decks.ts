@@ -177,20 +177,14 @@ export const cardsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      const deck = state.decksById[actions.meta.arg.deckId];
+    builder.addCase(deleteDeck, (state, actions) => {
+      const deck = state.decksById[actions.payload.deckId];
 
       if (deck) {
-        deck.status = "deleting";
-        deck.dateUpdated = actions.meta.arg.date;
-        deck.dateDeleted = actions.meta.arg.date;
+        deck.dateUpdated = actions.payload.date;
+        deck.dateDeleted = actions.payload.date;
       }
     });
-
-    // TODO: Is this what we want? To remove this?
-    // builder.addCase(deleteDeck.fulfilled, (state, actions) => {
-    //   delete state.decksById[actions.payload.deckId];
-    // });
 
     builder.addCase(updateCard, (state, actions) => {
       updateDeckTemplateMapping(state, actions.payload);
@@ -211,9 +205,9 @@ export const cardsSlice = createSlice({
       });
     });
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      const deckId = actions.meta.arg.deckId;
-      const cardId = actions.meta.arg.cardId;
+    builder.addCase(deleteCard, (state, actions) => {
+      const deckId = actions.payload.deckId;
+      const cardId = actions.payload.cardId;
 
       if (!deckId) return;
 
@@ -221,30 +215,15 @@ export const cardsSlice = createSlice({
 
       if (!deck) return;
 
-      deck.dateUpdated = actions.meta.arg.date;
+      deck.dateUpdated = actions.payload.date;
 
       removeFromArray(deck.cards, (item) => item.cardId === cardId);
     });
 
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const deckId = actions.meta.arg.deck.id;
+    builder.addCase(createDeck, (state, actions) => {
+      const deckId = actions.payload.deck.id;
 
-      state.decksById[deckId] = actions.meta.arg.deck;
-    });
-
-    builder.addCase(createDeck.fulfilled, (state, actions) => {
-      const deckId = actions.meta.arg.deck.id;
-
-      const deck = state.decksById[deckId];
-
-      if (deck) {
-        deck.status = "active";
-      } else {
-        state.decksById[deckId] = {
-          ...actions.meta.arg.deck,
-          status: "active",
-        };
-      }
+      state.decksById[deckId] = actions.payload.deck;
     });
 
     builder.addCase(setState, (state, actions) => {
@@ -329,7 +308,6 @@ export const selectDeckIds = createSelector(
       .forEach((deck) => {
         if (!deck) return;
         if (deck.dateDeleted) return;
-        if (deck.status === "deleting") return;
 
         deckIds.push(deck.id);
       });

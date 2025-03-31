@@ -81,7 +81,6 @@ export interface Props extends TimestampMetadata {
    */
   dataSchema: DataSchema;
   defaultTabletopId: TabletopId;
-  status: "creating" | "active" | "deleting";
   canEdit: boolean;
   cardSize: CardSize;
   lastScreen?: "deck" | "play";

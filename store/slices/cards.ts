@@ -44,7 +44,6 @@ export const cardsSlice = createSlice({
         dateCreated: actions.payload.date,
         dateUpdated: actions.payload.date,
         size: null,
-        status: "active",
         canEdit: true,
         cardId: actions.payload.cardId,
         deckId: actions.payload.deckId,
@@ -65,69 +64,33 @@ export const cardsSlice = createSlice({
       state.cardsById[actions.payload.cardId] = card;
     });
 
-    builder.addCase(deleteCard.pending, (state, actions) => {
-      const card = state.cardsById[actions.meta.arg.cardId];
+    builder.addCase(deleteCard, (state, actions) => {
+      const card = state.cardsById[actions.payload.cardId];
 
       if (!card) return;
 
-      card.dateDeleted = actions.meta.arg.date;
-      card.dateUpdated = actions.meta.arg.date;
-      card.status = "deleting";
+      card.dateDeleted = actions.payload.date;
+      card.dateUpdated = actions.payload.date;
     });
 
-    // TODO: Is this what we want? To remove this?
-    // builder.addCase(deleteCard.fulfilled, (state, actions) => {
-    //   delete state.cardsById[actions.payload.cardId];
-    // });
-
-    builder.addCase(deleteDeck.pending, (state, actions) => {
-      const cardIds = actions.meta.arg.cardIds;
+    builder.addCase(deleteDeck, (state, actions) => {
+      const cardIds = actions.payload.cardIds;
 
       cardIds.forEach((cardId) => {
         const card = state.cardsById[cardId];
 
         if (!card) return;
 
-        card.status = "deleting";
-        card.dateUpdated = actions.meta.arg.date;
-        card.dateDeleted = actions.meta.arg.date;
+        card.dateUpdated = actions.payload.date;
+        card.dateDeleted = actions.payload.date;
       });
     });
 
-    // TODO: Is this what we want? To remove this?
-    // builder.addCase(deleteDeck.fulfilled, (state, actions) => {
-    //   const cardIds = actions.payload.cardIds;
-
-    //   cardIds.forEach((cardId) => {
-    //     delete state.cardsById[cardId];
-    //   });
-    // });
-
-    builder.addCase(createDeck.pending, (state, actions) => {
-      const cards = actions.meta.arg.cards;
+    builder.addCase(createDeck, (state, actions) => {
+      const cards = actions.payload.cards;
 
       cards.forEach((card) => {
-        state.cardsById[card.cardId] = {
-          ...card,
-          status: "creating",
-        };
-      });
-    });
-
-    builder.addCase(createDeck.fulfilled, (state, actions) => {
-      const cards = actions.meta.arg.cards;
-
-      cards.forEach((card) => {
-        const existingCard = state.cardsById[card.cardId];
-
-        if (existingCard) {
-          existingCard.status = "active";
-        } else {
-          state.cardsById[card.cardId] = {
-            ...card,
-            status: "active",
-          };
-        }
+        state.cardsById[card.cardId] = card;
       });
     });
 
