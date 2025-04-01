@@ -18,19 +18,55 @@ export interface ButtonProps extends TouchableOpacityProps {
   ThemedTextProps?: Partial<ThemedTextProps>;
 }
 
+/**
+ * Sometimes we have to use onPressOut instead of onPress, because onPress doesn't seem to work in
+ * the react-navigation headers
+ */
+export function useOnPressProps({
+  onPress,
+  vibrate: shouldVibrate = false,
+  onPressOut,
+}: Pick<ButtonProps, "onPress" | "onPressOut" | "vibrate">): Pick<
+  TouchableOpacityProps,
+  "onPress" | "onPressOut"
+> {
+  const { vibrate } = useVibrate();
+
+  const withOnPress = React.useCallback(
+    (
+      callback: ButtonProps["onPress"] | ButtonProps["onPressOut"],
+    ): ButtonProps["onPressOut"] =>
+      callback
+        ? (event) => {
+            if (shouldVibrate) {
+              vibrate?.(`useOnPressProps`);
+            }
+
+            return callback(event);
+          }
+        : undefined,
+    [vibrate, shouldVibrate],
+  );
+
+  return React.useMemo(
+    () => ({
+      onPress: withOnPress(onPress),
+      onPressOut: withOnPress(onPressOut),
+    }),
+    [onPress, onPressOut, withOnPress],
+  );
+}
+
 export default function Button({
   title,
   style,
   color = "primary",
   variant = "filled",
-  vibrate: shouldVibrate = false,
-  onPress: onPressProp,
   rightIcon,
   ThemedTextProps,
   ...props
 }: ButtonProps): React.ReactNode {
   const { buttonBackground, buttonText, inputOutline } = useThemeColors();
-  const { vibrate } = useVibrate();
   const hasRightIcon = !!rightIcon;
 
   const { button, text } = React.useMemo(
@@ -69,22 +105,10 @@ export default function Button({
     ],
   );
 
-  const onPress = React.useMemo<ButtonProps["onPress"]>(
-    () =>
-      onPressProp
-        ? (event) => {
-            if (shouldVibrate) {
-              vibrate?.(`Button (${title})`);
-            }
-
-            return onPressProp(event);
-          }
-        : undefined,
-    [onPressProp, vibrate, shouldVibrate, title],
-  );
+  const onPressProps = useOnPressProps(props);
 
   return (
-    <TouchableOpacity {...props} onPress={onPress} style={button}>
+    <TouchableOpacity {...props} {...onPressProps} style={button}>
       <ThemedText type="button" {...ThemedTextProps} style={text}>
         {title}
       </ThemedText>
