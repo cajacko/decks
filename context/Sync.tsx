@@ -103,53 +103,54 @@ export function SyncProvider(props: { children: React.ReactNode }) {
     [withRequest],
   );
 
-  React.useEffect(() => {
-    if (!autoSyncEnabled) return;
+  // FIXME:
+  // React.useEffect(() => {
+  //   if (!autoSyncEnabled) return;
 
-    let timeout: NodeJS.Timeout;
+  //   let timeout: NodeJS.Timeout;
 
-    const maybeAutoSync = async () => {
-      const { isConnected } = await NetInfo.fetch();
-      const now = Date.now();
-      const last = lastSynced ? new Date(lastSynced).getTime() : 0;
-      const timeSinceLast = now - last;
+  //   const maybeAutoSync = async () => {
+  //     const { isConnected } = await NetInfo.fetch();
+  //     const now = Date.now();
+  //     const last = lastSynced ? new Date(lastSynced).getTime() : 0;
+  //     const timeSinceLast = now - last;
 
-      const minInterval = 1000 * 60 * 5; // 5 minutes
+  //     const minInterval = 1000 * 60 * 5; // 5 minutes
 
-      if (
-        loading ||
-        !isConnected ||
-        AppState.currentState !== "active" ||
-        timeSinceLast < minInterval
-      ) {
-        // Retry again in 30 seconds
-        timeout = setTimeout(maybeAutoSync, 1000 * 30);
-        return;
-      }
+  //     if (
+  //       loading ||
+  //       !isConnected ||
+  //       AppState.currentState !== "active" ||
+  //       timeSinceLast < minInterval
+  //     ) {
+  //       // Retry again in 30 seconds
+  //       timeout = setTimeout(maybeAutoSync, 1000 * 30);
+  //       return;
+  //     }
 
-      try {
-        await requests.sync();
-      } finally {
-        timeout = setTimeout(maybeAutoSync, minInterval);
-      }
-    };
+  //     try {
+  //       await requests.sync();
+  //     } finally {
+  //       timeout = setTimeout(maybeAutoSync, minInterval);
+  //     }
+  //   };
 
-    // Initial check
-    maybeAutoSync();
+  //   // Initial check
+  //   maybeAutoSync();
 
-    // AppState listener to re-trigger sync when app comes into focus
-    const sub = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active" && !loading) {
-        maybeAutoSync();
-      }
-    });
+  //   // AppState listener to re-trigger sync when app comes into focus
+  //   const sub = AppState.addEventListener("change", (nextAppState) => {
+  //     if (nextAppState === "active" && !loading) {
+  //       maybeAutoSync();
+  //     }
+  //   });
 
-    return () => {
-      clearTimeout(timeout);
+  //   return () => {
+  //     clearTimeout(timeout);
 
-      sub.remove();
-    };
-  }, [autoSyncEnabled, lastSynced, loading, requests]);
+  //     sub.remove();
+  //   };
+  // }, [autoSyncEnabled, lastSynced, loading, requests]);
 
   const value = React.useMemo<ContextState>(
     () => ({

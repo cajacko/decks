@@ -2,7 +2,7 @@ import React from "react";
 import FieldSet, { FieldSetProps } from "../forms/FieldSet";
 import Button from "@/components/forms/Button";
 import text from "@/constants/text";
-import Field from "../forms/Field";
+import Field, { subLabelStyle } from "../forms/Field";
 import useFlag from "@/hooks/useFlag";
 import SwitchField from "../forms/SwitchField";
 import { useAppDispatch } from "@/store/hooks";
@@ -12,15 +12,15 @@ import { useAuthentication } from "@/context/Authentication";
 import { useSync } from "@/context/Sync";
 import useRelativeTimeText from "@/hooks/useRelativeTimeText";
 import ThemedText from "../ui/ThemedText";
-import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
+import ProfilePic from "@/components/ui/ProfilePic";
 
 const titleProps = { type: "h2" } as const;
 
-export type SettingsDeckProps = FieldSetProps;
+export type SettingsBackupSyncProps = FieldSetProps;
 
-export default function SettingsDeck(
-  props: SettingsDeckProps,
+export default function SettingsBackupSync(
+  props: SettingsBackupSyncProps,
 ): React.ReactNode {
   const devMode = useFlag("DEV_MODE") === true;
   const dispatch = useAppDispatch();
@@ -30,6 +30,10 @@ export default function SettingsDeck(
   const lastSynced = useRelativeTimeText(sync.lastSynced);
   const lastPulled = useRelativeTimeText(sync.lastPulled);
   const lastPushed = useRelativeTimeText(sync.lastPushed);
+  const humanNumber = React.useMemo(
+    () => Math.round(Math.random() * 10000),
+    [],
+  );
 
   const onChangeAutoSync = React.useCallback(
     (enableAutoSync: boolean) => {
@@ -55,17 +59,29 @@ export default function SettingsDeck(
       {auth.isLoggedIn && (
         <View>
           {auth.user ? (
-            <>
-              <ThemedText>Logged in as {auth.user.name}</ThemedText>
-              <Image
-                source={{ uri: auth.user.picture }}
-                style={{ width: 50, height: 50, borderRadius: 25 }}
-              />
-            </>
+            <View style={styles.userInfo}>
+              <View style={styles.userName}>
+                <ThemedText type="body2" style={styles.userNameHeading}>
+                  Logged in as:
+                </ThemedText>
+                <ThemedText type="h4">
+                  {auth.user.name ?? `Human #${humanNumber}`}
+                </ThemedText>
+              </View>
+              <ProfilePic style={styles.profilePic} />
+            </View>
           ) : (
             <ThemedText>Logged In</ThemedText>
           )}
         </View>
+      )}
+
+      {auth.isLoggedIn && (
+        <Button
+          title="Logout"
+          onPress={() => auth.logout()}
+          variant="outline"
+        />
       )}
 
       {auth.isLoggedIn && (
@@ -113,13 +129,7 @@ export default function SettingsDeck(
         </Field>
       )}
 
-      {auth.isLoggedIn ? (
-        <Button
-          title="Logout"
-          onPress={() => auth.logout()}
-          variant="outline"
-        />
-      ) : (
+      {!auth.isLoggedIn && (
         <Field
           errorMessage={
             auth.error
@@ -151,4 +161,14 @@ const styles = StyleSheet.create({
   aboutHeading: {
     marginBottom: 10,
   },
+  userInfo: {
+    flexDirection: "row",
+  },
+  userNameHeading: {
+    ...subLabelStyle,
+  },
+  userName: {
+    flex: 1,
+  },
+  profilePic: {},
 });

@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DevMenu from "@/components/settings/Dev/DevMenu";
 import Version from "@/components/settings/Version";
 import SettingsApp from "@/components/settings/SettingsApp";
-import AuthSettings from "@/components/settings/AuthSettings";
+import SettingsBackupSync from "@/components/settings/SettingsBackupSync";
 import FieldSet from "@/components/forms/FieldSet";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
@@ -47,7 +47,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
               <FieldSet itemSpacing={30}>
                 {props.children}
                 <SettingsApp />
-                {backupSyncEnabled && <AuthSettings />}
+                {backupSyncEnabled && <SettingsBackupSync />}
                 {devMode && <DevMenu closeDrawer={props.closeDrawer} />}
                 {updates.canApplyUpdate && (
                   <View>

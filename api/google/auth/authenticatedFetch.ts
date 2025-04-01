@@ -1,5 +1,5 @@
 import AppError from "@/classes/AppError";
-import { getState } from "./init";
+import { getState } from "./state";
 import refreshAuth from "./refreshAuth";
 import logout from "./logout";
 
@@ -12,7 +12,7 @@ export async function authenticatedFetch<T>({
   let invalidOrExpired = false;
 
   const tryFetch = async (): Promise<T> => {
-    let accessToken = getState().tokens?.accessToken;
+    let accessToken = getState()?.tokens?.accessToken;
     invalidOrExpired = false;
 
     const response = await fetch(url, {
@@ -45,7 +45,7 @@ export async function authenticatedFetch<T>({
   try {
     return await tryFetch();
   } catch (err: unknown) {
-    const refreshToken = getState().tokens?.refreshToken;
+    const refreshToken = getState()?.tokens?.refreshToken;
 
     if (invalidOrExpired && refreshToken) {
       try {

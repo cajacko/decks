@@ -5,16 +5,8 @@ import debugLog from "./debugLog";
 let stateCache: Types.State | null = null;
 const listeners = new Map<string, (state: Types.State) => void>();
 
-export function getMaybeState(): Types.State | null {
+export function getState(): Types.State | null {
   return stateCache;
-}
-
-export function withGetState(onNull: () => Types.State) {
-  return function getState() {
-    if (stateCache) return stateCache;
-
-    return onNull();
-  };
 }
 
 export function setState(state: Types.State): Types.State {

@@ -1,9 +1,10 @@
 import * as Playface from "@/api/playface/auth";
 import * as Types from "../types";
 import debugLog from "./debugLog";
-import * as persist from "./persist";
+import waitForPersistedState from "./waitForPersistedState";
 import updateTokens from "./updateTokens";
-import { getState } from "./init";
+import { userInfo } from "../endpoints/userinfo";
+import { setState } from "./state";
 
 export default async function requestAuth(
   redirectUri?: string,
@@ -16,40 +17,64 @@ export default async function requestAuth(
     user: null,
   });
 
-  let result = await Playface.requestAuth(redirectUri);
-  let requestAuthState: Types.RequestAuthState;
+  const result = await Playface.requestAuth(redirectUri);
 
   debugLog("requestAuth - result 1", result.type);
 
-  // Opens on web in a new tab, lets poll the local storage until we have it or timeout
-  if (result.type === "opened") {
-    requestAuthState = await persist.waitForPersistedState({
-      getState,
-    });
-  } else {
-    requestAuthState =
-      result.type === "success"
-        ? {
-            type: result.type,
-            payload: {
-              tokens: result.payload,
-              user: null,
-            },
-          }
-        : {
-            type: result.type,
-          };
+  if (result.type === "cancel") {
+    return {
+      type: "cancel",
+    };
   }
 
-  debugLog("requestAuth - result 2", result.type);
+  // Opens on web in a new tab, lets poll the local storage until we have it or timeout
+  if (result.type === "opened") {
+    const state = await waitForPersistedState();
 
-  if (requestAuthState.type !== "success") return requestAuthState;
+    if (state.type === "timeout") {
+      debugLog("requestAuth - result 2", state.type);
+
+      return {
+        type: "timeout",
+      };
+    }
+
+    debugLog("requestAuth - result 3", "success");
+    return {
+      type: "success",
+      payload: {
+        tokens: state.payload.tokens,
+        user: state.payload.user,
+      },
+    };
+  }
+
+  debugLog("requestAuth - result 4");
+
+  // Update the state with the tokens so our userInfo request can work
+  setState({
+    type: "AUTH_FROM_LOGIN",
+    tokens: result.payload,
+    user: null,
+  });
+
+  const user = await userInfo();
+
+  debugLog("requestAuth - result 5");
 
   await updateTokens({
     type: "AUTH_FROM_LOGIN",
-    tokens: requestAuthState.payload.tokens,
-    user: requestAuthState.payload.user,
+    tokens: result.payload,
+    user,
   });
 
-  return requestAuthState;
+  debugLog("requestAuth - result 6");
+
+  return {
+    type: "success",
+    payload: {
+      tokens: result.payload,
+      user,
+    },
+  };
 }

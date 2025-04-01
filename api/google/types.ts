@@ -1,13 +1,19 @@
-import * as Playface from "@/api/playface/auth";
-
+// NOTE: These values are persisted, if you change them check the persist file to see if you should
+// make backward compatible changes
 export type GoogleUser = {
-  email: string;
+  email: string | null;
   id: string;
-  name: string;
-  picture: string;
+  name: string | null;
+  picture: string | null;
 };
 
-export type GoogleAuthTokens = Playface.Tokens;
+// NOTE: These values are persisted, if you change them check the persist file to see if you should
+// make backward compatible changes
+export type GoogleAuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAt: Date | null;
+};
 
 type CreateStateHelper<Type extends string, IsLoggedIn extends boolean> = {
   type: Type;

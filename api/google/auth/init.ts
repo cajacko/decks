@@ -1,14 +1,12 @@
 import * as Types from "../types";
-import { getMaybeState, setState, withGetState } from "./state";
+import { getState, setState } from "./state";
 import debugLog from "./debugLog";
 import * as persist from "./persist";
 import AppError from "@/classes/AppError";
 import manageWebAuthPopup from "./manageWebAuthPopup";
 
-export const getState = withGetState(init);
-
 export default function init(): Types.State {
-  const state = getMaybeState();
+  const state = getState();
 
   if (state) return state;
 

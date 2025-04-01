@@ -86,6 +86,10 @@ export default function Field(props: FieldProps): React.ReactNode {
   );
 }
 
+export const subLabelStyle = {
+  opacity: 0.5,
+};
+
 const styles = StyleSheet.create({
   labelContainer: {
     flexDirection: "row",
@@ -98,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   subLabel: {
-    opacity: 0.5,
+    ...subLabelStyle,
     marginTop: 5,
   },
   checkbox: {
