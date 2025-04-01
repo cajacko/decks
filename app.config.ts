@@ -80,6 +80,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundler: "metro",
     output: "static",
     favicon: "./assets/images/favicon.png",
+    backgroundColor: colors.black,
   },
   splash,
   plugins: [

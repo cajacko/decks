@@ -16,12 +16,13 @@ import SettingsApp from "@/components/settings/SettingsApp";
 import FieldSet from "@/components/forms/FieldSet";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
-import { ExternalPathString, Link } from "expo-router";
+import { Link } from "expo-router";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import Button from "@/components/forms/Button";
 import AppStores from "@/components/ui/AppStores";
+import { playfaceWebsite, dexWebLink } from "@/constants/links";
 
 export interface DrawerProps {
   closeDrawer: () => void;
@@ -33,12 +34,6 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
   const updates = useApplyUpdateAlert();
   const devMode =
     useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
-
-  const dexWebLink: ExternalPathString | null = Platform.select({
-    ios: "https://www.playface.fun/s/dexwebios",
-    android: "https://www.playface.fun/s/dexwebandroid",
-    default: null,
-  });
 
   return (
     <ScrollView
@@ -89,15 +84,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
               />
             )}
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
-            <Link
-              href={Platform.select({
-                ios: "https://www.playface.fun/s/065ad6ab",
-                android: "https://www.playface.fun/s/ff5a0418",
-                default: "https://www.playface.fun/s/103404f4",
-              })}
-              target="_blank"
-              asChild
-            >
+            <Link href={playfaceWebsite} target="_blank" asChild>
               <Pressable>
                 <Image
                   style={styles.playface}

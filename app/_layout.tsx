@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import React from "react";
 import { getDeckName } from "@/app/deck/[deckId]/_layout";
 import { withApp } from "@/components/ui/App";
@@ -13,12 +13,13 @@ import IconButton from "@/components/forms/IconButton";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
-  initialRouteName: "index",
+  initialRouteName: Platform.OS === "web" ? "app" : "index",
 };
 
 type NavOptions = {
   default?: React.ComponentProps<typeof Stack>["screenOptions"];
-  index?: React.ComponentProps<typeof Stack.Screen>["options"];
+  app?: React.ComponentProps<typeof Stack.Screen>["options"];
+  marketing?: React.ComponentProps<typeof Stack.Screen>["options"];
   deck?: React.ComponentProps<typeof Stack.Screen>["options"];
 };
 
@@ -28,6 +29,7 @@ function RootLayout() {
   const freezeOnBlur = useFlag("SCREENS_FREEZE_ON_BLUR");
   const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
   const borderColor = useThemeColor("inputOutline");
+  const pathname = usePathname();
   const [showAppStore, setShowAppStore] = React.useState(true);
 
   const navOptions: NavOptions = React.useMemo(
@@ -35,11 +37,15 @@ function RootLayout() {
       default: {
         freezeOnBlur,
       },
-      index: {
+      app: {
         headerShown: true,
         headerBackVisible: false,
         headerTitle: HeaderLogo,
         animation: animateStack ? "slide_from_left" : "none",
+      },
+      marketing: {
+        headerShown: false,
+        animation: "none",
       },
       deck: ({ route: { params } }) => ({
         headerShown: true,
@@ -58,10 +64,16 @@ function RootLayout() {
     <>
       <Stack screenOptions={navOptions.default}>
         {/* Only need to add items if defining options */}
-        <Stack.Screen name="index" options={navOptions.index} />
+        <Stack.Screen
+          name="index"
+          options={
+            Platform.OS === "web" ? navOptions.marketing : navOptions.app
+          }
+        />
+        <Stack.Screen name="app" options={navOptions.app} />
         <Stack.Screen name="deck/[deckId]" options={navOptions.deck} />
       </Stack>
-      {Platform.OS === "web" && showAppStore && (
+      {Platform.OS === "web" && showAppStore && pathname !== "/" && (
         <ThemedView style={[styles.appStoreContainer, { borderColor }]}>
           <ContentWidth style={styles.inner}>
             <AppStores />
