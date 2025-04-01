@@ -8,6 +8,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { Link } from "expo-router";
+import { iosAppStoreLink, playStoreLink } from "@/constants/links";
 
 export interface AppStoresProps {
   style?: StyleProp<ViewStyle>;
@@ -20,12 +21,7 @@ export default function AppStores({
 }: AppStoresProps): React.ReactNode {
   return (
     <View style={[styles.container, style]}>
-      <Link
-        asChild
-        href="https://www.playface.fun/s/dex-ios"
-        target="_blank"
-        style={styles.link}
-      >
+      <Link asChild href={iosAppStoreLink} target="_blank" style={styles.link}>
         <Pressable style={styles.pressable}>
           <Image
             style={[styles.appStore, { height }]}
@@ -34,12 +30,7 @@ export default function AppStores({
           />
         </Pressable>
       </Link>
-      <Link
-        asChild
-        href="https://www.playface.fun/s/dex-playstore"
-        target="_blank"
-        style={styles.link}
-      >
+      <Link asChild href={playStoreLink} target="_blank" style={styles.link}>
         <Pressable style={styles.pressable}>
           <Image
             style={[styles.playStore, { height }]}

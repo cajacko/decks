@@ -3,6 +3,7 @@ import { Drawer } from "react-native-drawer-layout";
 import DrawerContent from "@/components/overlays/Drawer";
 import AppError from "@/classes/AppError";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { StyleSheet } from "react-native";
 
 interface ContextValue {
   isOpen: boolean;
@@ -97,9 +98,17 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
         drawerType="front"
         swipeEnabled={false}
         drawerStyle={drawerStyle}
+        style={styles.container}
       >
         {props.children}
       </Drawer>
     </Context.Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    overflow: "hidden",
+    flex: 1,
+  },
+});

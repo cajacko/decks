@@ -15,29 +15,20 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
     const state = useAnimatedCardSides(side, ref);
     const { height, width } = side === "front" ? front : back;
 
-    const frontCardProps = React.useMemo(
-      (): Partial<AnimatedCardProps> => ({
-        style: [front.style, state.renderSpacer && styles.absolute],
-        initialScaleX:
-          state.flipState === "flipping-to-front" ? 0 : front.initialRotation,
-        initialRotation: front.initialRotation,
-      }),
-      [front.style, front.initialRotation, state.flipState, state.renderSpacer],
+    const frontStyle = React.useMemo(
+      (): AnimatedCardProps["style"] => [
+        front.style,
+        state.renderSpacer && styles.absolute,
+      ],
+      [front.style, state.renderSpacer],
     );
 
-    const backCardProps = React.useMemo(
-      (): Partial<AnimatedCardProps> => ({
-        style: [back.cardStyle, state.renderSpacer && styles.absolute],
-        initialScaleX:
-          state.flipState === "flipping-to-back" ? 0 : back.initialRotation,
-        initialRotation: back.initialRotation,
-      }),
-      [
+    const backStyle = React.useMemo(
+      (): AnimatedCardProps["style"] => [
         back.cardStyle,
-        back.initialRotation,
-        state.flipState,
-        state.renderSpacer,
+        state.renderSpacer && styles.absolute,
       ],
+      [back.cardStyle, state.renderSpacer],
     );
 
     const containerStyle = React.useMemo(
@@ -48,10 +39,26 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
     return (
       <View style={containerStyle}>
         {state.renderFaceUp && (
-          <AnimatedCard {...front} {...frontCardProps} ref={state.faceUpRef} />
+          <AnimatedCard
+            {...front}
+            _templateKey={state._templateKey}
+            initialScaleX={
+              state.flipState === "flipping-to-front" ? 0 : front.initialScaleX
+            }
+            style={frontStyle}
+            ref={state.faceUpRef}
+          />
         )}
         {state.renderFaceDown && (
-          <AnimatedCard {...back} {...backCardProps} ref={state.faceDownRef} />
+          <AnimatedCard
+            {...back}
+            _templateKey={state._templateKey}
+            initialScaleX={
+              state.flipState === "flipping-to-back" ? 0 : back.initialScaleX
+            }
+            style={backStyle}
+            ref={state.faceDownRef}
+          />
         )}
         {state.renderSpacer && <CardSpacer height={height} width={width} />}
       </View>

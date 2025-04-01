@@ -3,6 +3,8 @@ import { AnimatedCardRef } from "@/components/cards/connected/AnimatedCard";
 import { AnimatedCardSidesRef } from "./AnimatedCardSides.types";
 import { Cards } from "@/store/types";
 import useFlag from "@/hooks/useFlag";
+import uuid from "@/utils/uuid";
+import { Platform } from "react-native";
 
 export default function useAnimatedAnimatedSides(
   sideProp: Cards.Side,
@@ -100,6 +102,20 @@ export default function useAnimatedAnimatedSides(
   // they jank around
   const renderSpacer = !!renderFaceUp && !!renderFaceDown;
 
+  const [_templateKey, setTemplateKey] = React.useState(uuid);
+
+  // NOTE: This is a specific android fix which will cause a re-mount of the card template after a
+  // flip to either side. This is due to a bug where large emojis are blurring out after the flip
+  // animation. Remounting the component after fixes this
+  React.useEffect(() => {
+    if (Platform.OS !== "android") return;
+    if (flipState !== "flipped-to-back" && flipState !== "flipped-to-front") {
+      return;
+    }
+
+    setTemplateKey(uuid());
+  }, [flipState]);
+
   return {
     renderSpacer,
     renderFaceUp,
@@ -107,5 +123,6 @@ export default function useAnimatedAnimatedSides(
     faceUpRef,
     faceDownRef,
     flipState,
+    _templateKey,
   };
 }

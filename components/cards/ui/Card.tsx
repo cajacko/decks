@@ -19,6 +19,11 @@ export interface CardProps extends CardContainerProps {
   values: Required<TemplateProps>["values"] | null;
   cardSideCacheKey: string;
   skeleton?: boolean;
+  /**
+   * Use to re-mount the template component/ forcing a re-render. Only used for some bug fixes,
+   * check the use of _templateKey to see how it's fixing issues
+   */
+  _templateKey?: string;
 }
 
 // If we compiled these in normal memo's we loose all our references when we
@@ -33,6 +38,7 @@ export default function Card({
   cardSideCacheKey,
   skeleton = false,
   children,
+  _templateKey = "template",
   ...cardContainerProps
 }: CardProps): React.ReactNode {
   const values = useExternalMemo(
@@ -47,7 +53,9 @@ export default function Card({
   return (
     <CardContainer {...cardContainerProps}>
       {children}
-      {markup && !skeleton && <Template values={values} markup={markup} />}
+      {markup && !skeleton && (
+        <Template key={_templateKey} values={values} markup={markup} />
+      )}
     </CardContainer>
   );
 }
