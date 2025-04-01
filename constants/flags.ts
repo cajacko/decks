@@ -16,6 +16,10 @@ export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though
 export const flagRelationships: FlagRelationships = {
+  BACKUP_SYNC: (value, getFlag) =>
+    getFlag("DEV_MODE") === true ? value : "disabled",
+  AUTO_SYNC: (value, getFlag) =>
+    getFlag("DEV_MODE") === true ? value : "disabled",
   SHUFFLE_ANIMATION: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ||
     getFlag("CARD_ANIMATIONS") === "disabled"
@@ -62,6 +66,9 @@ export const flagRelationships: FlagRelationships = {
   },
 };
 
+const isDevEnv =
+  process.env.NODE_ENV === "development" || DevClient.isDevelopmentBuild();
+
 // The default value is the first defined option
 export const defaultFlags: UserSettings.FlagMap = {
   ...Object.entries(UserSettings.flagMap).reduce(
@@ -71,10 +78,11 @@ export const defaultFlags: UserSettings.FlagMap = {
     }),
     {} as UserSettings.FlagMap,
   ),
-  DEV_MODE:
-    process.env.NODE_ENV === "development" || DevClient.isDevelopmentBuild()
-      ? true
-      : false,
+  // Add dynamic final fallback values here. These are the last resort values
+  // that will be used if the flag is not set in userSettings or in the
+  // flagOverrides
+  BACKUP_SYNC: isDevEnv ? "enabled" : "disabled",
+  DEV_MODE: isDevEnv ? true : false,
   CARD_ANIMATE_OUT_BEHAVIOUR: Platform.OS === "web" ? "linear" : "bezier",
   CARD_ACTIONS_HAPTICS: Platform.OS === "web" ? "disabled" : "enabled",
   SHUFFLE_ANIMATION: Platform.OS === "web" ? "disabled" : "enabled",

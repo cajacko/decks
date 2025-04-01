@@ -1,9 +1,15 @@
-import { getAppDataFile, setAppDataFile } from "../google/appData";
+import {
+  getAppDataFile,
+  setAppDataFile,
+  removeAppDatafile,
+} from "../google/appData";
 import { store } from "@/store/store";
 import { RootState } from "@/store/types";
 import migrate from "@/store/utils/migrate";
 import { version } from "@/store/versions/latest";
 import { setState, syncState } from "@/store/combinedActions/sync";
+import { setState as setSyncState } from "@/store/slices/sync";
+import { dateToDateString } from "@/utils/dates";
 
 // NOTE: Warning all changes here must be backwards compatible
 type Backup<S = RootState> = {
@@ -41,13 +47,23 @@ async function getBackup(): Promise<Backup | null> {
 
 export async function pull(): Promise<Backup | null> {
   const backup = await getBackup();
+  const now = dateToDateString(new Date());
 
-  if (!backup) return null;
+  if (!backup) {
+    store.dispatch(
+      setSyncState({
+        lastPulled: now,
+      }),
+    );
+
+    return null;
+  }
 
   store.dispatch(
     setState({
       state: backup.state,
-      dateSaved: backup.date,
+      dateSaved: dateToDateString(new Date(backup.date)),
+      date: now,
     }),
   );
 
@@ -59,22 +75,55 @@ export async function push() {
 
   const data: Backup = {
     state,
-    date: new Date().toISOString(),
+    date: dateToDateString(new Date()),
     reduxPersistVersion: version,
   };
 
-  return await setAppDataFile(fileName, data);
+  await setAppDataFile(fileName, data);
+
+  store.dispatch(
+    setSyncState({
+      lastPushed: dateToDateString(new Date()),
+    }),
+  );
+}
+
+export async function remove() {
+  await removeAppDatafile(fileName);
+
+  store.dispatch(
+    setSyncState({
+      lastPulled: null,
+      lastPushed: null,
+      lastSynced: null,
+    }),
+  );
 }
 
 export async function sync() {
   const backup = await getBackup();
+
+  const now = dateToDateString(new Date());
+
+  store.dispatch(
+    setSyncState({
+      lastPulled: now,
+    }),
+  );
 
   if (!backup) return push();
 
   store.dispatch(
     syncState({
       state: backup.state,
-      dateSaved: backup.date,
+      dateSaved: dateToDateString(new Date(backup.date)),
+      date: now,
+    }),
+  );
+
+  store.dispatch(
+    setSyncState({
+      lastPushed: now,
     }),
   );
 

@@ -23,6 +23,11 @@ let builtInState: RootState = {
   [SliceName.UserSettings]: {
     settings: null,
   },
+  [SliceName.Sync]: {
+    lastPulled: null,
+    lastPushed: null,
+    lastSynced: null,
+  },
 };
 
 export type BuiltInState = Partial<RootState>;

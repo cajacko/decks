@@ -7,21 +7,18 @@ import {
   setUserFlag,
 } from "@/store/slices/userSettings";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectFlag } from "@/store/combinedSelectors/flags";
 import text from "@/constants/text";
 import Field from "@/components/forms/Field";
 import FieldSet from "@/components/forms/FieldSet";
 import { dateToDateString } from "@/utils/dates";
+import useFlag from "@/hooks/useFlag";
 
 function Flag(props: { flagKey: UserSettings.FlagKey; style?: ViewStyle }) {
   const dispatch = useAppDispatch();
   const userSettingsValue = useAppSelector((state) =>
     selectUserSettingsFlag(state, { key: props.flagKey }),
   );
-  const implementedValue = useAppSelector((state) =>
-    selectFlag(state, { key: props.flagKey }),
-  );
-
+  const implementedValue = useFlag(props.flagKey);
   const values = UserSettings.flagMap[props.flagKey];
 
   return (

@@ -17,6 +17,7 @@ export interface FieldProps {
   showEnabled?: boolean;
   faded?: boolean;
   inline?: boolean;
+  errorMessage?: string | null;
 }
 
 export default function Field(props: FieldProps): React.ReactNode {
@@ -68,6 +69,13 @@ export default function Field(props: FieldProps): React.ReactNode {
         </View>
       )}
 
+      {props.errorMessage !== undefined && (
+        <ThemedText type="body2" style={styles.error}>
+          {/* Always allow spacing so things don't pop in/out */}
+          {props.errorMessage ?? " "}
+        </ThemedText>
+      )}
+
       {props.subLabel !== undefined && (
         <ThemedText type="body2" style={styles.subLabel}>
           {/* Always allow spacing so things don't pop in/out */}
@@ -85,6 +93,9 @@ const styles = StyleSheet.create({
   mainLabels: {
     flexDirection: "row",
     flex: 1,
+  },
+  error: {
+    marginTop: 5,
   },
   subLabel: {
     opacity: 0.5,

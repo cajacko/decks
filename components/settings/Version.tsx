@@ -3,8 +3,7 @@ import { StyleSheet, Pressable, Platform, ViewStyle, View } from "react-native";
 import { nativeApplicationVersion, nativeBuildVersion } from "expo-application";
 import ThemedText from "@/components/ui/ThemedText";
 import app from "@/constants/app";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectFlag } from "@/store/combinedSelectors/flags";
+import { useAppDispatch } from "@/store/hooks";
 import { setUserFlag } from "@/store/slices/userSettings";
 import Alert from "@/components/overlays/Alert";
 import text from "@/constants/text";
@@ -12,6 +11,7 @@ import { commitSha } from "@/constants/commitSha.json";
 import { useUpdates } from "expo-updates";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { dateToDateString } from "@/utils/dates";
+import useFlag from "@/hooks/useFlag";
 
 let version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`
@@ -46,8 +46,7 @@ export default function Version(props: { style?: ViewStyle }): React.ReactNode {
     updateIndicatorColor = null;
   }
 
-  const devMode =
-    useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
+  const devMode = useFlag("DEV_MODE") === true;
 
   // If we tap the version number 5 times, we enable dev mode
 

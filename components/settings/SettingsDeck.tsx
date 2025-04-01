@@ -10,6 +10,7 @@ import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import uuid from "@/utils/uuid";
 import { useDrawer } from "@/context/Drawer";
+import { appHome } from "@/constants/links";
 
 const titleProps = { type: "h2" } as const;
 
@@ -30,7 +31,7 @@ export default function SettingsDeck({
 
   const deleteDeck = React.useCallback(() => {
     closeDrawer?.();
-    navigate("/");
+    navigate(appHome);
 
     dispatch(deleteDeckHelper({ deckId }));
   }, [deckId, dispatch, navigate, closeDrawer]);

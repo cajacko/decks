@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import ThemedView from "@/components/ui/ThemedView";
 import text from "@/constants/text";
+import { appHome } from "@/constants/links";
 
 export default function NotFoundScreen() {
   return (
@@ -10,7 +11,7 @@ export default function NotFoundScreen() {
       <Stack.Screen options={{ title: text["screen.404.title"] }} />
       <ThemedView style={styles.container}>
         <ThemedText type="h3">{text["404.title"]}</ThemedText>
-        <Link href="/" style={styles.link}>
+        <Link href={appHome} style={styles.link}>
           <ThemedText type="link">{text["404.link"]}</ThemedText>
         </Link>
       </ThemedView>

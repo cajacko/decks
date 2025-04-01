@@ -14,6 +14,8 @@ export const flagMap = {
   SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
+  BACKUP_SYNC: ["disabled", "enabled"],
+  AUTO_SYNC: ["disabled", "enabled"],
   ROTATE_CARDS_BEFORE_FLIP: ["disabled", "enabled"],
   SHUFFLE_ANIMATION: ["enabled", "disabled"],
   STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],

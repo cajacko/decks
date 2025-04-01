@@ -23,6 +23,8 @@ import useFlag from "@/hooks/useFlag";
 import { useHasRehydrated } from "@/store/hooks";
 import registerExampleDecks from "@/utils/registerExampleDecks";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
+import { SyncProvider } from "@/context/Sync";
+import { AuthenticationProvider } from "@/context/Authentication";
 
 enableFreeze();
 registerExampleDecks();
@@ -112,12 +114,16 @@ function HasStore({ children }: { children: React.ReactNode }) {
   return (
     <PersistGate loading={null} persistor={persistor}>
       <NavigationThemeProvider value={navigationTheme}>
-        <ModalProvider>
-          <DrawerProvider>
-            <Content>{children}</Content>
-            <StatusBar style="auto" />
-          </DrawerProvider>
-        </ModalProvider>
+        <AuthenticationProvider>
+          <SyncProvider>
+            <ModalProvider>
+              <DrawerProvider>
+                <Content>{children}</Content>
+                <StatusBar style="auto" />
+              </DrawerProvider>
+            </ModalProvider>
+          </SyncProvider>
+        </AuthenticationProvider>
       </NavigationThemeProvider>
     </PersistGate>
   );

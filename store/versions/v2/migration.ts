@@ -101,6 +101,11 @@ export default createMigration<V1, V2>({
       tabletops,
       userSettings,
       templates,
+      sync: {
+        lastSynced: null,
+        lastPulled: null,
+        lastPushed: null,
+      },
     };
 
     return state;

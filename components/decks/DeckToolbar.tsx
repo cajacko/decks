@@ -1,7 +1,6 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useRouter } from "expo-router";
-import { useEditCardModal } from "../editCard/EditCardModal";
 import text from "@/constants/text";
 import Button from "../forms/Button";
 import { selectCanEditDeck } from "@/store/slices/decks";
@@ -17,11 +16,6 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
 
-  const defaultCard = useEditCardModal({
-    type: "deck-defaults",
-    id: props.deckId,
-  });
-
   const canEditDeck = useAppSelector((state) =>
     selectCanEditDeck(state, props),
   );
@@ -34,27 +28,11 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     navigate(`/deck/${newDeckId}`);
   }, [props.deckId, dispatch, navigate]);
 
-  const open = React.useCallback(() => {
-    defaultCard.open();
-  }, [defaultCard]);
-
-  const openProps = useOnPressProps(open);
   const copyDeckProps = useOnPressProps(copyDeck);
 
   return (
     <Toolbar useParent>
-      {canEditDeck ? (
-        <>
-          {defaultCard.component}
-          <Button
-            style={styles.action}
-            title={text["deck.actions.default"]}
-            variant="transparent"
-            vibrate
-            {...openProps}
-          />
-        </>
-      ) : (
+      {!canEditDeck && (
         <Button
           title={text["deck.copy.title"]}
           variant="transparent"

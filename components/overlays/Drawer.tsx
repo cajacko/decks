@@ -8,11 +8,10 @@ import {
 } from "react-native";
 import ThemedView from "@/components/ui/ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAppSelector } from "@/store/hooks";
-import { selectFlag } from "@/store/combinedSelectors/flags";
 import DevMenu from "@/components/settings/Dev/DevMenu";
 import Version from "@/components/settings/Version";
 import SettingsApp from "@/components/settings/SettingsApp";
+import AuthSettings from "@/components/settings/AuthSettings";
 import FieldSet from "@/components/forms/FieldSet";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
@@ -23,6 +22,7 @@ import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import Button from "@/components/forms/Button";
 import AppStores from "@/components/ui/AppStores";
 import { playfaceWebsite, dexWebLink } from "@/constants/links";
+import useFlag from "@/hooks/useFlag";
 
 export interface DrawerProps {
   closeDrawer: () => void;
@@ -32,8 +32,8 @@ export interface DrawerProps {
 export default function Drawer(props: DrawerProps): React.ReactNode {
   const textLogo = useTextLogo();
   const updates = useApplyUpdateAlert();
-  const devMode =
-    useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
+  const devMode = useFlag("DEV_MODE") === true;
+  const backupSyncEnabled = useFlag("BACKUP_SYNC") === "enabled";
 
   return (
     <ScrollView
@@ -47,6 +47,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
               <FieldSet itemSpacing={30}>
                 {props.children}
                 <SettingsApp />
+                {backupSyncEnabled && <AuthSettings />}
                 {devMode && <DevMenu closeDrawer={props.closeDrawer} />}
                 {updates.canApplyUpdate && (
                   <View>
