@@ -1,5 +1,5 @@
 import uuid from "@/utils/uuid";
-import * as Types from "./types";
+import * as Types from "../types";
 import debugLog from "./debugLog";
 
 let stateCache: Types.State | null = null;

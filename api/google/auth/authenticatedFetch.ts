@@ -1,5 +1,7 @@
-import { getState, refreshAuth, logout } from "./auth";
 import AppError from "@/classes/AppError";
+import { getState } from "./init";
+import refreshAuth from "./refreshAuth";
+import logout from "./logout";
 
 export async function authenticatedFetch<T>({
   url,

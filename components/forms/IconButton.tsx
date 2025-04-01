@@ -16,6 +16,7 @@ export interface IconButtonProps extends TouchableOpacityProps {
   size?: number;
   variant?: "filled" | "transparent";
   vibrate?: boolean;
+  loading?: boolean;
 }
 
 const defaultSize = 80;
@@ -25,6 +26,7 @@ export default function IconButton({
   style: styleProp,
   size = defaultSize,
   variant = "filled",
+  loading = false,
   ...props
 }: IconButtonProps): React.ReactNode {
   const { background, text } = useThemeColors();

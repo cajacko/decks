@@ -2,7 +2,7 @@ import {
   getAppDataFile,
   setAppDataFile,
   removeAppDatafile,
-} from "../google/appData";
+} from "../google/endpoints/appData";
 import { store } from "@/store/store";
 import { RootState } from "@/store/types";
 import migrate from "@/store/utils/migrate";
