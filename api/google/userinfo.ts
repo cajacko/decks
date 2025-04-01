@@ -1,4 +1,4 @@
-import { withAuthenticatedFetch } from "./auth";
+import { withAuthenticatedFetch } from "./authenticatedFetch";
 
 export const userInfo = withAuthenticatedFetch<{
   email: string;

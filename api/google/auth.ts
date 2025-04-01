@@ -1,114 +1,20 @@
-import { getItems, setItems, deleteItems } from "@/utils/secureStore";
 import { Platform } from "react-native";
 import * as Playface from "@/api/playface/auth";
 import AppError from "@/classes/AppError";
-import uuid from "@/utils/uuid";
-import withDebugLog from "@/utils/withDebugLog";
+import * as Types from "./types";
+import debugLog from "./debugLog";
+import * as persist from "./persist";
+import { listenToState, setState, withGetState, getMaybeState } from "./state";
 
-const debugLog = withDebugLog(
-  ({ getFlag }) => getFlag("DEBUG_AUTH"),
-  "GoogleAuth",
-);
-
-export type GoogleUser = {
-  email: string;
-  id: string;
-  name: string;
-  picture: string;
-};
-
-export type GoogleAuthTokens = Playface.Tokens;
-
-const keys = {
-  googleAccessToken: "googleAccessToken",
-  googleRefreshToken: "googleRefreshToken",
-  googleAccessTokenExpiresAt: "googleAccessTokenExpiresAt",
-};
+export { listenToState };
+export const getState = withGetState(init);
 
 const defaultWebAuthTimeout = 1000 * 60 * 2; // 2 minutes
 
-type CreateStateHelper<Type extends string, IsLoggedIn extends boolean> = {
-  type: Type;
-  tokens: IsLoggedIn extends true ? GoogleAuthTokens : null;
-  user: IsLoggedIn extends true ? GoogleUser | null : null;
-};
-
-type LoggedInState = CreateStateHelper<
-  | "AUTH_FROM_STORAGE"
-  | "AUTH_FROM_HREF"
-  | "AUTH_FROM_LOGIN"
-  | "AUTH_FROM_REFRESH",
-  true
->;
-
-type LoggedOutState = CreateStateHelper<
-  | "INITIALIZING"
-  | "INITIALIZED"
-  | "LOGOUT"
-  | "UNAUTHENTICATED"
-  | "LOGIN_STARTED",
-  false
->;
-
-export type State = LoggedInState | LoggedOutState;
-
-let stateCache: State | null = null;
-const listeners = new Map<string, (state: State) => void>();
-
-export function getState(): State {
-  if (stateCache) return stateCache;
-
-  return init();
-}
-
-function setState(state: State): State {
-  debugLog("Update State", state.type);
-
-  stateCache = state;
-
-  listeners.forEach((callback) => {
-    callback(state);
-  });
-
-  return state;
-}
-
-export function listenToState(callback: (state: State) => void): {
-  remove: () => void;
-} {
-  const id = uuid();
-
-  listeners.set(id, callback);
-
-  return {
-    remove: () => {
-      listeners.delete(id);
-    },
-  };
-}
-
-async function updateTokens(state: State): Promise<State> {
+async function updateTokens(state: Types.State): Promise<Types.State> {
   setState(state);
 
-  if (!state.tokens) {
-    debugLog("Delete Tokens", state.type);
-
-    await deleteItems(
-      keys.googleAccessToken,
-      keys.googleRefreshToken,
-      keys.googleAccessTokenExpiresAt,
-    );
-  } else {
-    debugLog("Set Tokens", state.type);
-
-    await setItems({
-      [keys.googleAccessToken]: state.tokens.accessToken,
-      [keys.googleRefreshToken]: state.tokens.refreshToken,
-      [keys.googleAccessTokenExpiresAt]: state.tokens.accessTokenExpiresAt
-        ? state.tokens.accessTokenExpiresAt.toISOString()
-        : null,
-    });
-  }
+  await persist.setState(state);
 
   return state;
 }
@@ -123,47 +29,16 @@ export async function logout(type: "LOGOUT" | "UNAUTHENTICATED" = "LOGOUT") {
   });
 }
 
-async function getStateFromStorage(): Promise<Omit<State, "type">> {
-  debugLog("getStateFromStorage");
-
-  const items = await getItems(
-    keys.googleAccessToken,
-    keys.googleRefreshToken,
-    keys.googleAccessTokenExpiresAt,
-  );
-
-  const accessToken = items[keys.googleAccessToken];
-  const refreshToken = items[keys.googleRefreshToken];
-  const accessTokenExpiresAt = items[keys.googleAccessTokenExpiresAt];
-
-  if (!accessToken || !refreshToken) {
-    return {
-      tokens: null,
-      user: null,
-    };
-  }
-
-  const tokens: GoogleAuthTokens = {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    accessTokenExpiresAt: accessTokenExpiresAt
-      ? new Date(accessTokenExpiresAt)
-      : null,
-  };
-
-  return { tokens, user: null };
-}
-
 async function waitForAuthFromStorage(
   options: { timeout?: number } = {},
 ): Promise<
-  | { type: "success"; payload: Omit<LoggedInState, "type"> }
+  | { type: "success"; payload: Omit<Types.LoggedInState, "type"> }
   | { type: "timeout" }
 > {
   debugLog("waitForAuthFromStorage");
 
   return new Promise<
-    | { type: "success"; payload: Omit<LoggedInState, "type"> }
+    | { type: "success"; payload: Omit<Types.LoggedInState, "type"> }
     | { type: "timeout" }
   >((resolve, reject) => {
     let pollTimeout: NodeJS.Timeout | null = null;
@@ -190,15 +65,17 @@ async function waitForAuthFromStorage(
         clearTimeout(pollTimeout);
       }
 
+      const state = getState();
+
       // We've somehow already authenticated, return that
-      if (stateCache?.tokens) {
+      if (state?.tokens) {
         clearTimeout(timeout);
 
         resolve({
           type: "success",
           payload: {
-            tokens: stateCache.tokens,
-            user: stateCache.user,
+            tokens: state.tokens,
+            user: state.user,
           },
         });
 
@@ -207,7 +84,7 @@ async function waitForAuthFromStorage(
 
       // Don't reject on errors here, just wait out the timeout
       try {
-        const state = await getStateFromStorage();
+        const state = await persist.getState();
 
         if (state.tokens) {
           clearTimeout(timeout);
@@ -236,14 +113,9 @@ async function waitForAuthFromStorage(
   });
 }
 
-type RequestAuthState =
-  | { type: "success"; payload: Omit<LoggedInState, "type"> }
-  | { type: "cancel" }
-  | { type: "timeout" };
-
 export async function requestAuth(
   redirectUri?: string,
-): Promise<RequestAuthState> {
+): Promise<Types.RequestAuthState> {
   debugLog("requestAuth - init");
 
   await updateTokens({
@@ -253,7 +125,7 @@ export async function requestAuth(
   });
 
   let result = await Playface.requestAuth(redirectUri);
-  let requestAuthState: RequestAuthState;
+  let requestAuthState: Types.RequestAuthState;
 
   debugLog("requestAuth - result 1", result.type);
 
@@ -311,8 +183,10 @@ async function manageWebAuthPopup(
   }
 }
 
-export function init(): State {
-  if (stateCache) return stateCache;
+export function init(): Types.State {
+  const state = getMaybeState();
+
+  if (state) return state;
 
   debugLog("init");
 
@@ -323,7 +197,7 @@ export function init(): State {
   });
 
   manageWebAuthPopup()
-    .then(getStateFromStorage)
+    .then(persist.getState)
     .then((state) => {
       if (state.tokens) {
         setState({
@@ -339,7 +213,7 @@ export function init(): State {
         });
       }
 
-      debugLog("init finished", stateCache?.type);
+      debugLog("init finished");
     })
     .catch((unknownError) => {
       AppError.getError(unknownError, "Error getting tokens from storage").log(
@@ -352,7 +226,7 @@ export function init(): State {
 
 export async function refreshAuth(
   refreshToken: string,
-): Promise<GoogleAuthTokens> {
+): Promise<Types.GoogleAuthTokens> {
   debugLog("refreshAuth");
 
   const tokens = await Playface.refreshAuth(refreshToken);
@@ -364,79 +238,4 @@ export async function refreshAuth(
   });
 
   return tokens;
-}
-
-export async function authenticatedFetch<T>({
-  url,
-  ...requestInit
-}: {
-  url: string;
-} & RequestInit) {
-  debugLog("authFetch", url);
-
-  let invalidOrExpired = false;
-
-  const tryFetch = async (): Promise<T> => {
-    let accessToken = getState().tokens?.accessToken;
-    invalidOrExpired = false;
-
-    const response = await fetch(url, {
-      ...requestInit,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        ...requestInit.headers,
-      },
-    });
-
-    if (response.status === 401) {
-      invalidOrExpired = true;
-
-      throw new AppError("Access token is invalid or expired", {
-        status: 401,
-      });
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new AppError(
-        `Request to ${url} failed (${response.status}): ${errorText}`,
-        { status: response.status, url },
-      );
-    }
-
-    return await response.json();
-  };
-
-  try {
-    return await tryFetch();
-  } catch (err: unknown) {
-    const refreshToken = getState().tokens?.refreshToken;
-
-    if (invalidOrExpired && refreshToken) {
-      try {
-        await refreshAuth(refreshToken);
-
-        return await tryFetch();
-      } catch (refreshErr) {
-        if (invalidOrExpired) {
-          await logout("UNAUTHENTICATED");
-        }
-
-        throw new AppError("Token refresh failed", {
-          original: refreshErr,
-          url,
-        });
-      }
-    }
-
-    throw err;
-  }
-}
-
-export function withAuthenticatedFetch<T>(
-  props: {
-    url: string;
-  } & RequestInit,
-) {
-  return async (): Promise<T> => authenticatedFetch<T>(props);
 }

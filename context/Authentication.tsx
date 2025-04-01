@@ -6,8 +6,8 @@ import {
   logout as googleLogout,
   requestAuth,
   listenToState,
-  GoogleUser,
 } from "@/api/google/auth";
+import { GoogleUser } from "@/api/google/types";
 
 type ContextState = {
   featureEnabled: boolean;

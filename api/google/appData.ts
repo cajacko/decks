@@ -1,4 +1,4 @@
-import { authenticatedFetch } from "./auth";
+import { authenticatedFetch } from "./authenticatedFetch";
 
 const DRIVE_FILES_API = "https://www.googleapis.com/drive/v3/files";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files";
