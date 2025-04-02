@@ -1,12 +1,11 @@
 import React from "react";
 import { Platform, StyleSheet } from "react-native";
-// import { useRouter } from "expo-router";
 import { useHeaderRight as _useHeaderRight } from "@/hooks/useParentHeaderRight";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
-import IconButton from "../forms/IconButton";
 import { useDrawer } from "@/context/Drawer";
 import { TouchableOpacityProps } from "react-native-gesture-handler";
+import ProfilePic from "./ProfilePic";
 
 export const iconSize = 30;
 export const horizontalPadding = 16;
@@ -62,10 +61,10 @@ function HeaderRight(props: HeaderRightProps): React.ReactNode {
     >
       {props.children}
       {open && (
-        <IconButton
-          icon="settings"
+        <ProfilePic
+          key="toolbar-profile-pic"
+          fallbackIcon="settings"
           size={iconSize}
-          variant="transparent"
           style={styles.action}
           {...openProps}
         />

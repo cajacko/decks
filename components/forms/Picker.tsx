@@ -154,7 +154,7 @@ export default function Picker<T extends PickerValue>({
         return (
           <PickerItem
             value={itemValueString}
-            key={key}
+            key={key ?? itemValueString}
             label={label}
             {...itemProps}
           />
