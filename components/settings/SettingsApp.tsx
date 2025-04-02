@@ -6,7 +6,7 @@ import {
   setUserSetting,
 } from "@/store/slices/userSettings";
 import Field from "../forms/Field";
-import Picker, { PickerItem } from "../forms/Picker";
+import Picker from "../forms/Picker";
 import { UserSettings } from "@/store/types";
 import FieldSet from "../forms/FieldSet";
 import text from "@/constants/text";
@@ -124,18 +124,20 @@ export default function SettingsApp(): React.ReactNode {
         <Picker<Theme>
           onValueChange={onChangeTheme}
           selectedValue={theme}
-          iosButtonTitle={text[`settings.theme.${theme}`]}
-        >
-          <PickerItem<Theme>
-            label={text["settings.theme.system"]}
-            value="system"
-          />
-          <PickerItem<Theme>
-            label={text["settings.theme.light"]}
-            value="light"
-          />
-          <PickerItem<Theme> label={text["settings.theme.dark"]} value="dark" />
-        </Picker>
+          items={[
+            {
+              label: text["settings.theme.system"],
+              value: "system",
+              key: "system",
+            },
+            {
+              label: text["settings.theme.light"],
+              value: "light",
+              key: "light",
+            },
+            { label: text["settings.theme.dark"], value: "dark", key: "dark" },
+          ]}
+        />
       </Field>
       <SwitchField
         label={text["settings.performance_mode"]}

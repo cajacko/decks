@@ -1,6 +1,6 @@
 import React from "react";
 import FieldSet, { FieldSetProps } from "../forms/FieldSet";
-import Picker, { PickerItem } from "../forms/Picker";
+import Picker from "../forms/Picker";
 import { selectStackIds } from "@/store/slices/tabletop";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Field from "../forms/Field";
@@ -239,17 +239,15 @@ export default function StackActions({
         <Picker
           selectedValue={selectedStackId}
           onValueChange={setSelectedStackId}
-          iosButtonTitle={stackName(stackIds, selectedStackId)}
-        >
-          <PickerItem label="All Stacks" value={null} />
-          {stackIds?.map((stackId) => (
-            <PickerItem
-              key={stackId}
-              label={stackName(stackIds, stackId)}
-              value={stackId}
-            />
-          ))}
-        </Picker>
+          items={[
+            { label: "All Stacks", value: null, key: "all-stacks" },
+            ...(stackIds ?? []).map((stackId) => ({
+              key: stackId,
+              label: stackName(stackIds, stackId),
+              value: stackId,
+            })),
+          ]}
+        />
       </Field>
       <Button
         title={`Shuffle ${selectedStackName}`}
@@ -283,29 +281,27 @@ export default function StackActions({
         initialCollapsed
       >
         <Field label="To Stack:">
-          <Picker
+          <Picker<string>
             selectedValue={selectedMoveToStackId}
             onValueChange={setSelectedMoveToStackId}
-            iosButtonTitle={stackName(stackIds, selectedMoveToStackId)}
-          >
-            {stackIds
-              ?.filter((stackId) => stackId !== selectedStackId)
-              ?.map((stackId) => (
-                <PickerItem
-                  key={stackId}
-                  label={stackName(stackIds, stackId)}
-                  value={stackId}
-                />
-              ))}
-            <PickerItem
-              label={moveNewStackText.end}
-              value={moveNewStackText.end}
-            />
-            <PickerItem
-              label={moveNewStackText.start}
-              value={moveNewStackText.start}
-            />
-          </Picker>
+            items={[
+              ...(stackIds
+                ?.filter((stackId) => stackId !== selectedStackId)
+                .map((stackId) => ({
+                  key: stackId,
+                  label: stackName(stackIds, stackId),
+                  value: stackId,
+                })) ?? []),
+              {
+                label: moveNewStackText.end,
+                value: moveNewStackText.end,
+              },
+              {
+                label: moveNewStackText.start,
+                value: moveNewStackText.start,
+              },
+            ]}
+          />
         </Field>
         <Field
           subLabel={
