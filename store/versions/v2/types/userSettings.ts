@@ -14,6 +14,7 @@ export const flagMap = {
   SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
+  TOOLBAR_HEIGHT_ANIMATION: ["enabled", "disabled"],
   BACKUP_SYNC: ["disabled", "enabled"],
   AUTO_SYNC: ["disabled", "enabled"],
   ROTATE_CARDS_BEFORE_FLIP: ["disabled", "enabled"],

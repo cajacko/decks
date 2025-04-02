@@ -16,6 +16,8 @@ export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though
 export const flagRelationships: FlagRelationships = {
+  TOOLBAR_HEIGHT_ANIMATION: (value, getFlag) =>
+    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   BACKUP_SYNC: (value, getFlag) =>
     getFlag("DEV_MODE") === true ? value : "disabled",
   AUTO_SYNC: (value, getFlag) =>

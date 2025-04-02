@@ -26,6 +26,8 @@ import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import { SyncProvider } from "@/context/Sync";
 import { AuthenticationProvider } from "@/context/Authentication";
 import { ToolbarProvider } from "@/context/Toolbar";
+import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 enableFreeze();
 registerExampleDecks();
@@ -78,6 +80,11 @@ function HasStore({ children }: { children: React.ReactNode }) {
     LuckiestGuy: LuckiestGuy_400Regular,
   });
 
+  const isSafeAreaReady = useIsSafeAreaContextReady({
+    timeout: 2000,
+    timeoutWithoutChange: 1500,
+  });
+
   const [isStoreReady, setIsStoreReady] = React.useState(false);
   const hasRehydrated = useHasRehydrated();
   const shouldPurgeStoreOnStart = useFlag("PURGE_STORE_ON_START");
@@ -97,7 +104,7 @@ function HasStore({ children }: { children: React.ReactNode }) {
     setIsStoreReady(true);
   }, [hasRehydrated, shouldPurgeStoreOnStart]);
 
-  const loaded = loadedFonts && isStoreReady;
+  const loaded = loadedFonts && isStoreReady && isSafeAreaReady;
 
   useEffect(() => {
     initMousePointer();
@@ -135,9 +142,11 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
 export default function App({ children }: { children: React.ReactNode }) {
   return (
-    <ReduxProvider store={store}>
-      <HasStore>{children}</HasStore>
-    </ReduxProvider>
+    <SafeAreaProvider>
+      <ReduxProvider store={store}>
+        <HasStore>{children}</HasStore>
+      </ReduxProvider>
+    </SafeAreaProvider>
   );
 }
 

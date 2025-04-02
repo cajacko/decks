@@ -12,7 +12,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { Link, LinkProps } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ContentWidth from "./ContentWidth";
-import { iconSize, toolbarHeight } from "@/context/Toolbar";
+import { iconSize, _contentHeight } from "@/context/Toolbar";
 
 export interface TabsProps {
   children?: React.ReactNode;
@@ -55,7 +55,7 @@ export default function Tabs(props: TabsProps): React.ReactNode {
   const backgroundColor = useThemeColor("background");
   const colors = useThemeColor("inputOutline");
   const { bottom } = useSafeAreaInsets();
-  const height = toolbarHeight + bottom;
+  const height = _contentHeight + bottom;
 
   return (
     <ContentWidth

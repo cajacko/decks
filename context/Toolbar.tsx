@@ -6,9 +6,13 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native";
-import ThemedView from "@/components/ui/ThemedView";
 import ThemedText from "@/components/ui/ThemedText";
-import Animated from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  SharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
 import ProfilePic from "@/components/ui/ProfilePic";
@@ -26,6 +30,7 @@ import { useTextLogo } from "@/hooks/useLogo";
 import IconButton from "@/components/forms/IconButton";
 import ContentWidth from "@/components/ui/ContentWidth";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import useFlag from "@/hooks/useFlag";
 
 interface ToolbarProps {
   hidden?: boolean;
@@ -42,6 +47,7 @@ type ContextState = {
     isScreenFocussed: boolean;
   }) => void;
   onUnmount: (id: string) => void;
+  sharedToolbarHeight: SharedValue<number> | null;
 };
 
 const defaultProps: ToolbarProps = {
@@ -55,15 +61,27 @@ const defaultProps: ToolbarProps = {
 const Context = React.createContext<ContextState>({
   onPropsChange: () => undefined,
   onUnmount: () => undefined,
+  sharedToolbarHeight: null,
 });
 
-function useToolbarHeight() {
+function useToolbarHeight(sharedToolbarHeight: SharedValue<number> | null) {
   const paddingTop = useSafeAreaInsets().top;
+  const height = _contentHeight + paddingTop;
+
+  const animatedHeightStyle = useAnimatedStyle(() => ({
+    height: sharedToolbarHeight ? sharedToolbarHeight.value : height,
+  }));
+
+  const animatedTopStyle = useAnimatedStyle(() => ({
+    top: sharedToolbarHeight ? -(height - sharedToolbarHeight.value) : 0,
+  }));
 
   return {
+    animatedTopStyle,
+    animatedHeightStyle,
     paddingTop,
-    height: toolbarHeight + paddingTop,
-    contentHeight: toolbarHeight,
+    height,
+    contentHeight: _contentHeight,
   };
 }
 
@@ -73,17 +91,18 @@ export function Toolbar({
 }: ToolbarProps & {
   style?: StyleProp<ViewStyle>;
 }) {
-  const { onPropsChange, onUnmount } = React.useContext(Context);
+  const { onPropsChange, onUnmount, sharedToolbarHeight } =
+    React.useContext(Context);
   const id = React.useMemo(uuid, []);
   const navigation = useNavigation();
   const [isScreenFocussed, setIsScreenFocussed] = React.useState(
     navigation.isFocused,
   );
-  const { height } = useToolbarHeight();
+  const { animatedHeightStyle } = useToolbarHeight(sharedToolbarHeight);
 
   const style = React.useMemo(
-    () => StyleSheet.flatten([{ height }, styleProp]),
-    [height, styleProp],
+    () => [animatedHeightStyle, styleProp],
+    [animatedHeightStyle, styleProp],
   );
 
   useFocusEffect(
@@ -107,7 +126,7 @@ export function Toolbar({
 
   React.useEffect(() => () => onUnmount(id), [onUnmount, id]);
 
-  return <View style={style} />;
+  return <Animated.View style={style} />;
 }
 
 function WholeToolbar({
@@ -115,13 +134,18 @@ function WholeToolbar({
   logoVisible,
   children,
   backPath,
-}: Omit<ToolbarProps, "hidden">) {
+  sharedToolbarHeight,
+}: Omit<ToolbarProps, "hidden"> & {
+  sharedToolbarHeight: SharedValue<number>;
+}) {
   const { entering, exiting } = useLayoutAnimations();
   const { open } = useDrawer() ?? {};
   const { source, aspectRatio } = useTextLogo();
   const { navigate } = useRouter();
-  const { height, paddingTop } = useToolbarHeight();
+  const { height, paddingTop, animatedTopStyle } =
+    useToolbarHeight(sharedToolbarHeight);
   const borderBottomColor = useThemeColor("inputOutline");
+  const backgroundColor = useThemeColor("background");
 
   const back = React.useMemo(() => {
     if (!backPath) return undefined;
@@ -133,17 +157,18 @@ function WholeToolbar({
   }, [backPath, navigate]);
 
   const containerStyle = React.useMemo(
-    () =>
-      StyleSheet.flatten([
-        styles.container,
-        {
-          paddingTop,
-          height,
-          maxHeight: height,
-          borderBottomColor,
-        },
-      ]),
-    [height, borderBottomColor, paddingTop],
+    () => [
+      animatedTopStyle,
+      styles.container,
+      {
+        paddingTop,
+        height,
+        maxHeight: height,
+        borderBottomColor,
+        backgroundColor,
+      },
+    ],
+    [animatedTopStyle, height, borderBottomColor, paddingTop, backgroundColor],
   );
 
   const imageContainerStyle = React.useMemo(
@@ -156,7 +181,7 @@ function WholeToolbar({
   );
 
   return (
-    <ThemedView style={containerStyle}>
+    <Animated.View style={containerStyle}>
       <ContentWidth
         padding="standard"
         style={styles.contentWidth}
@@ -218,38 +243,75 @@ function WholeToolbar({
           </View>
         </View>
       </ContentWidth>
-    </ThemedView>
+    </Animated.View>
   );
 }
 
+const animateHeightDuration = 500;
+
 export function ToolbarProvider(props: { children: React.ReactNode }) {
+  const { height } = useToolbarHeight(null);
+  const sharedToolbarHeight = useSharedValue(height);
   const [toolbarProps, setToolbarProps] =
     React.useState<ToolbarProps>(defaultProps);
+  const shouldAnimateHeight = useFlag("TOOLBAR_HEIGHT_ANIMATION") === "enabled";
+
+  // Happens when insets change e.g. on device rotation etc
+  React.useEffect(() => {
+    if (shouldAnimateHeight) {
+      sharedToolbarHeight.value = withTiming(height, {
+        duration: animateHeightDuration,
+      });
+    } else {
+      sharedToolbarHeight.value = height;
+    }
+  }, [sharedToolbarHeight, height, shouldAnimateHeight]);
 
   const value = React.useMemo(
     (): ContextState => ({
-      onPropsChange: ({ id, isScreenFocussed, props: newToolbarProps }) => {
+      onPropsChange: ({ isScreenFocussed, props: newToolbarProps }) => {
         if (!isScreenFocussed) return;
 
-        setToolbarProps(newToolbarProps);
+        if (shouldAnimateHeight) {
+          if (newToolbarProps.hidden) {
+            sharedToolbarHeight.value = withTiming(0, {
+              duration: animateHeightDuration,
+            });
+          } else {
+            sharedToolbarHeight.value = withTiming(height, {
+              duration: animateHeightDuration,
+            });
+
+            setToolbarProps(newToolbarProps);
+          }
+        } else {
+          sharedToolbarHeight.value = height;
+          setToolbarProps(newToolbarProps);
+        }
       },
-      onUnmount: (id) => {},
+      onUnmount: () => undefined,
+      sharedToolbarHeight,
     }),
-    [],
+    [sharedToolbarHeight, height, shouldAnimateHeight],
   );
 
   return (
     <Context.Provider value={value}>
-      {!toolbarProps.hidden && <WholeToolbar {...toolbarProps} />}
+      {!toolbarProps.hidden && (
+        <WholeToolbar
+          sharedToolbarHeight={sharedToolbarHeight}
+          {...toolbarProps}
+        />
+      )}
       <View style={styles.children}>{props.children}</View>
     </Context.Provider>
   );
 }
 
-export const toolbarHeight = 50;
-const imageHeight = toolbarHeight - 10;
+export const _contentHeight = 50;
+const imageHeight = _contentHeight - 10;
 
-export const iconSize = toolbarHeight - 20;
+export const iconSize = _contentHeight - 20;
 export const horizontalPadding = 16;
 
 export const styles = StyleSheet.create({
@@ -257,13 +319,12 @@ export const styles = StyleSheet.create({
     width: "100%",
     borderBottomWidth: 1,
     position: "absolute",
-    top: 0,
     right: 0,
     left: 0,
     zIndex: 2,
   },
   contentWidth: {
-    height: toolbarHeight,
+    height: _contentHeight,
   },
   content: {
     flex: 1,
