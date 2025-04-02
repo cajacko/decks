@@ -24,6 +24,7 @@ export type ThemedTextVariant =
 
 export type ThemedTextProps = TextProps & {
   type?: ThemedTextVariant;
+  truncate?: boolean;
 };
 
 export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
@@ -31,6 +32,7 @@ export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
 export function useThemedTextStyle({
   type = "body1",
   style: styleProp,
+  truncate,
 }: Partial<ThemedTextProps>): StyleProp<TextStyle> {
   const color = useThemeColor(type === "link" ? "link" : "text");
 
@@ -38,6 +40,7 @@ export function useThemedTextStyle({
     () =>
       StyleSheet.flatten([
         { color },
+        truncate && styles.truncate,
         type === "body1" ? styles.body1 : undefined,
         type === "body2" ? styles.body2 : undefined,
         type === "h1" ? styles.h1 : undefined,
@@ -47,7 +50,7 @@ export function useThemedTextStyle({
         type === "button" ? styles.button : undefined,
         styleProp,
       ]),
-    [styleProp, type, color],
+    [styleProp, type, color, truncate],
   );
 
   return style;
@@ -56,18 +59,30 @@ export function useThemedTextStyle({
 export default function ThemedText({
   style: styleProp,
   type,
+  truncate,
   ...rest
 }: ThemedTextProps) {
   const style = useThemedTextStyle({
     type,
     style: styleProp,
+    truncate,
     ...rest,
   });
 
-  return <Text {...rest} style={style} />;
+  return (
+    <Text
+      {...rest}
+      numberOfLines={truncate ? 1 : rest.numberOfLines}
+      style={style}
+    />
+  );
 }
 
 export const styles = StyleSheet.create({
+  truncate: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
   body1: {
     fontSize: 16,
     lineHeight: 24,

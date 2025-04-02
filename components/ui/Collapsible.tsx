@@ -120,6 +120,7 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
                 <Label
                   text={title}
                   type="body1"
+                  truncate
                   {...titleProps}
                   style={titleProps?.style}
                 />
@@ -127,6 +128,7 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
               {subTitle && (
                 <ThemedText
                   type="body2"
+                  truncate
                   {...subTitleProps}
                   style={subTitleProps?.style}
                 >
@@ -163,11 +165,13 @@ const styles = StyleSheet.create({
   headerElements: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
   headerText: {
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    flex: 1,
   },
   content: {
     overflow: "hidden",

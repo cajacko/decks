@@ -17,20 +17,16 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
 import ProfilePic from "@/components/ui/ProfilePic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import uuid from "@/utils/uuid";
-import {
-  useFocusEffect,
-  useNavigation,
-  useRouter,
-  Href,
-  Link,
-} from "expo-router";
+import { useRouter, Href, Link } from "expo-router";
 import { Image } from "expo-image";
 import { useTextLogo } from "@/hooks/useLogo";
 import IconButton from "@/components/forms/IconButton";
 import ContentWidth from "@/components/ui/ContentWidth";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import useFlag from "@/hooks/useFlag";
+import withScreenControlContext, {
+  ContextState as CreateContextState,
+} from "@/context/withScreenControlContext";
 
 interface ToolbarProps {
   hidden?: boolean;
@@ -40,17 +36,12 @@ interface ToolbarProps {
   backPath?: Href | null;
 }
 
-type ContextState = {
-  onPropsChange: (props: {
-    id: string;
-    props: ToolbarProps;
-    isScreenFocussed: boolean;
-  }) => void;
-  onUnmount: (id: string) => void;
+type ContextState = CreateContextState<ToolbarProps> & {
   sharedToolbarHeight: SharedValue<number> | null;
 };
 
-const defaultProps: ToolbarProps = {
+// We want this for our memo keys later
+const defaultProps: { [K in keyof ToolbarProps]: ToolbarProps[K] } = {
   hidden: false,
   title: null,
   logoVisible: true,
@@ -58,11 +49,19 @@ const defaultProps: ToolbarProps = {
   backPath: null,
 };
 
-const Context = React.createContext<ContextState>({
-  onPropsChange: () => undefined,
-  onUnmount: () => undefined,
-  sharedToolbarHeight: null,
-});
+const { Context, useScreenControlContext, useScreenControlProvider } =
+  withScreenControlContext<ToolbarProps, ContextState>(
+    {
+      onPropsChange: () => undefined,
+      onUnmount: () => undefined,
+      sharedToolbarHeight: null,
+      props: defaultProps,
+    },
+    defaultProps,
+    {
+      resetOnUnmount: false,
+    },
+  );
 
 function useToolbarHeight(sharedToolbarHeight: SharedValue<number> | null) {
   const paddingTop = useSafeAreaInsets().top;
@@ -85,46 +84,33 @@ function useToolbarHeight(sharedToolbarHeight: SharedValue<number> | null) {
   };
 }
 
+const orderedKeys = Object.keys(defaultProps).sort() as (keyof ToolbarProps)[];
+
 export function Toolbar({
   style: styleProp,
   ...props
 }: ToolbarProps & {
   style?: StyleProp<ViewStyle>;
 }) {
-  const { onPropsChange, onUnmount, sharedToolbarHeight } =
-    React.useContext(Context);
-  const id = React.useMemo(uuid, []);
-  const navigation = useNavigation();
-  const [isScreenFocussed, setIsScreenFocussed] = React.useState(
-    navigation.isFocused,
+  const mergedProps = {
+    ...defaultProps,
+    ...props,
+  };
+
+  const { sharedToolbarHeight } = useScreenControlContext(
+    React.useMemo(
+      () => mergedProps,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      orderedKeys.map((key) => mergedProps[key]),
+    ),
   );
+
   const { animatedHeightStyle } = useToolbarHeight(sharedToolbarHeight);
 
   const style = React.useMemo(
     () => [animatedHeightStyle, styleProp],
     [animatedHeightStyle, styleProp],
   );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      setIsScreenFocussed(true);
-
-      return () => {
-        setIsScreenFocussed(false);
-      };
-    }, []),
-  );
-
-  React.useEffect(() => {
-    onPropsChange({
-      id,
-      props: { ...defaultProps, ...props },
-      isScreenFocussed,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onPropsChange, isScreenFocussed, id, ...Object.values(props)]);
-
-  React.useEffect(() => () => onUnmount(id), [onUnmount, id]);
 
   return <Animated.View style={style} />;
 }
@@ -252,9 +238,13 @@ const animateHeightDuration = 500;
 export function ToolbarProvider(props: { children: React.ReactNode }) {
   const { height } = useToolbarHeight(null);
   const sharedToolbarHeight = useSharedValue(height);
-  const [toolbarProps, setToolbarProps] =
-    React.useState<ToolbarProps>(defaultProps);
   const shouldAnimateHeight = useFlag("TOOLBAR_HEIGHT_ANIMATION") === "enabled";
+
+  const {
+    onPropsChange,
+    onUnmount,
+    props: toolbarProps,
+  } = useScreenControlProvider();
 
   // Happens when insets change e.g. on device rotation etc
   React.useEffect(() => {
@@ -269,40 +259,36 @@ export function ToolbarProvider(props: { children: React.ReactNode }) {
 
   const value = React.useMemo(
     (): ContextState => ({
-      onPropsChange: ({ isScreenFocussed, props: newToolbarProps }) => {
-        if (!isScreenFocussed) return;
-
-        if (shouldAnimateHeight) {
-          if (newToolbarProps.hidden) {
-            sharedToolbarHeight.value = withTiming(0, {
-              duration: animateHeightDuration,
-            });
-          } else {
-            sharedToolbarHeight.value = withTiming(height, {
-              duration: animateHeightDuration,
-            });
-
-            setToolbarProps(newToolbarProps);
-          }
-        } else {
-          sharedToolbarHeight.value = height;
-          setToolbarProps(newToolbarProps);
-        }
-      },
-      onUnmount: () => undefined,
+      props: toolbarProps,
+      onPropsChange,
+      onUnmount,
       sharedToolbarHeight,
     }),
-    [sharedToolbarHeight, height, shouldAnimateHeight],
+    [sharedToolbarHeight, onPropsChange, onUnmount, toolbarProps],
   );
+
+  React.useEffect(() => {
+    if (shouldAnimateHeight) {
+      if (toolbarProps.hidden) {
+        sharedToolbarHeight.value = withTiming(0, {
+          duration: animateHeightDuration,
+        });
+      } else {
+        sharedToolbarHeight.value = withTiming(height, {
+          duration: animateHeightDuration,
+        });
+      }
+    } else {
+      sharedToolbarHeight.value = height;
+    }
+  }, [toolbarProps, height, sharedToolbarHeight, shouldAnimateHeight]);
 
   return (
     <Context.Provider value={value}>
-      {!toolbarProps.hidden && (
-        <WholeToolbar
-          sharedToolbarHeight={sharedToolbarHeight}
-          {...toolbarProps}
-        />
-      )}
+      <WholeToolbar
+        sharedToolbarHeight={sharedToolbarHeight}
+        {...toolbarProps}
+      />
       <View style={styles.children}>{props.children}</View>
     </Context.Provider>
   );
