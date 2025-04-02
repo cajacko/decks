@@ -1,6 +1,9 @@
 import React from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import FieldSet, { FieldSetProps } from "../forms/FieldSet";
+import FieldSet, {
+  FieldSetProps,
+  useLeftAdornmentSize,
+} from "../forms/FieldSet";
 import text from "@/constants/text";
 import Button from "@/components/forms/Button";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
@@ -11,6 +14,7 @@ import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import uuid from "@/utils/uuid";
 import { useDrawer } from "@/context/Drawer";
 import { appHome } from "@/constants/links";
+import IconSymbol from "../ui/IconSymbol";
 
 const titleProps = { type: "h2" } as const;
 
@@ -55,6 +59,8 @@ export default function SettingsDeck({
     navigate(`/deck/${newDeckId}`);
   }, [deckId, dispatch, navigate, closeDrawer]);
 
+  const iconSize = useLeftAdornmentSize({ titleProps });
+
   return (
     <>
       {deleteDeckModal.component}
@@ -64,6 +70,7 @@ export default function SettingsDeck({
         subTitle={`(${deckName})`}
         initialCollapsed
         collapsible
+        leftAdornment={<IconSymbol name="crop-portrait" size={iconSize} />}
         {...props}
       >
         <Button

@@ -10,8 +10,10 @@ import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useOnPressProps } from "@/components/forms/Button";
 
+export type { IconSymbolName };
+
 export interface IconButtonProps extends TouchableOpacityProps {
-  icon: IconSymbolName;
+  icon: IconSymbolName | { _children: React.ReactNode };
   style?: StyleProp<ViewStyle>;
   size?: number;
   variant?: "filled" | "transparent";
@@ -48,13 +50,23 @@ export default function IconButton({
 
   const onPressProps = useOnPressProps(props);
 
+  const children = React.useMemo((): React.ReactNode => {
+    if (typeof icon === "string") {
+      return (
+        <IconSymbol
+          name={icon}
+          color={text}
+          size={variant === "filled" ? (size * 2) / 3 : size}
+        />
+      );
+    }
+
+    return icon._children;
+  }, [icon, size, text, variant]);
+
   return (
     <TouchableOpacity {...props} {...onPressProps} style={style}>
-      <IconSymbol
-        name={icon}
-        color={text}
-        size={variant === "filled" ? (size * 2) / 3 : size}
-      />
+      {children}
     </TouchableOpacity>
   );
 }

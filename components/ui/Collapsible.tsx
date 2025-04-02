@@ -22,25 +22,37 @@ export interface CollapsibleProps {
   titleProps?: Partial<LabelProps>;
   subTitleProps?: Partial<ThemedTextProps>;
   headerStyle?: ViewStyle;
+  leftAdornment?: React.ReactNode;
 }
 
-export default function Collapsible({
-  title,
-  children,
-  style: styleProp,
-  collapsible = true,
-  initialCollapsed = true,
-  collapsed: controlledCollapsed,
-  onCollapse,
-  titleProps,
-  subTitleProps,
-  subTitle,
-  headerStyle,
-}: CollapsibleProps): React.ReactNode {
+export function useLeftAdornmentSize(
+  props: Pick<CollapsibleProps, "titleProps">,
+): number {
+  return 25;
+}
+
+export default function Collapsible(props: CollapsibleProps): React.ReactNode {
+  const {
+    title,
+    children,
+    style: styleProp,
+    collapsible = true,
+    initialCollapsed = true,
+    collapsed: controlledCollapsed,
+    onCollapse,
+    titleProps,
+    subTitleProps,
+    subTitle,
+    headerStyle,
+    leftAdornment,
+  } = props;
+
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const [isCollapsed, setIsCollapsed] = useState(
     controlledCollapsed === undefined ? initialCollapsed : controlledCollapsed,
   );
+
+  const leftAdornmentSize = useLeftAdornmentSize(props);
 
   // Manage internal state when uncontrolled
   const toggleCollapse = useCallback(() => {
@@ -95,24 +107,33 @@ export default function Collapsible({
           disabled={!collapsible}
           style={headerStyleProp}
         >
-          <View style={styles.headerText}>
-            {title && (
-              <Label
-                text={title}
-                type="body1"
-                {...titleProps}
-                style={titleProps?.style}
-              />
-            )}
-            {subTitle && (
-              <ThemedText
-                type="body2"
-                {...subTitleProps}
-                style={subTitleProps?.style}
+          <View style={styles.headerElements}>
+            {leftAdornment && (
+              <View
+                style={[styles.leftAdornment, { width: leftAdornmentSize }]}
               >
-                {subTitle}
-              </ThemedText>
+                {leftAdornment}
+              </View>
             )}
+            <View style={styles.headerText}>
+              {title && (
+                <Label
+                  text={title}
+                  type="body1"
+                  {...titleProps}
+                  style={titleProps?.style}
+                />
+              )}
+              {subTitle && (
+                <ThemedText
+                  type="body2"
+                  {...subTitleProps}
+                  style={subTitleProps?.style}
+                >
+                  {subTitle}
+                </ThemedText>
+              )}
+            </View>
           </View>
           {collapsible && (
             <IconSymbol
@@ -131,9 +152,16 @@ const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
   },
+  leftAdornment: {
+    marginRight: 10,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerElements: {
+    flexDirection: "row",
     alignItems: "center",
   },
   headerText: {

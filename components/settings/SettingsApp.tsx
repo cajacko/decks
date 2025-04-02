@@ -8,13 +8,14 @@ import {
 import Field from "../forms/Field";
 import Picker from "../forms/Picker";
 import { UserSettings } from "@/store/types";
-import FieldSet from "../forms/FieldSet";
+import FieldSet, { useLeftAdornmentSize } from "../forms/FieldSet";
 import text from "@/constants/text";
 import SwitchField from "../forms/SwitchField";
 import useFlag from "@/hooks/useFlag";
 import { defaultTheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
 import { dateToDateString } from "@/utils/dates";
+import IconSymbol from "../ui/IconSymbol";
 
 type Theme = NonNullable<UserSettings.UserSettingValue<"theme">>;
 
@@ -34,6 +35,7 @@ export default function SettingsApp(): React.ReactNode {
   const vibrate = useFlag("CARD_ACTIONS_HAPTICS") === "enabled";
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
   const editCardMoreInfo = useFlag("EDIT_CARD_MORE_INFO") === "enabled";
+  const iconSize = useLeftAdornmentSize({ titleProps });
 
   const onChangeTheme = React.useCallback(
     (value: Theme) => {
@@ -119,6 +121,7 @@ export default function SettingsApp(): React.ReactNode {
       titleProps={titleProps}
       initialCollapsed
       collapsible
+      leftAdornment={<IconSymbol name="settings" size={iconSize} />}
     >
       <Field label={text["settings.theme"]}>
         <Picker<Theme>

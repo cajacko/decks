@@ -26,13 +26,13 @@ function Flag(props: { flagKey: UserSettings.FlagKey; style?: ViewStyle }) {
       style={props.style}
       label={`${props.flagKey}\n(${String(implementedValue)})`}
     >
-      <Picker
+      <Picker<UserSettings.FlagValue | null>
         selectedValue={userSettingsValue ?? null}
         onValueChange={(value) =>
           dispatch(
             setUserFlag({
               key: props.flagKey,
-              value: value as any,
+              value,
               date: dateToDateString(new Date()),
             }),
           )

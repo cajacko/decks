@@ -6,6 +6,7 @@ import AppError from "@/classes/AppError";
 import text from "@/constants/text";
 import FieldSet, {
   titleProps as fieldSetTitleProps,
+  useLeftAdornmentSize,
 } from "@/components/forms/FieldSet";
 import { useRouter } from "expo-router";
 import exampleDecks from "@/constants/exampleDecks";
@@ -14,6 +15,7 @@ import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
+import IconSymbol from "@/components/ui/IconSymbol";
 
 const titleProps = { type: "h2" } as const;
 
@@ -61,12 +63,15 @@ export default function DevMenu({
 
   const isDevClient = DevClient.isDevelopmentBuild();
 
+  const iconSize = useLeftAdornmentSize({ titleProps });
+
   return (
     <FieldSet
       title={text["settings.dev_mode.title"]}
       collapsible
       initialCollapsed
       titleProps={titleProps}
+      leftAdornment={<IconSymbol name="bug-report" size={iconSize} />}
     >
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 

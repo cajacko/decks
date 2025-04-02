@@ -1,5 +1,8 @@
 import React from "react";
-import FieldSet, { FieldSetProps } from "../forms/FieldSet";
+import FieldSet, {
+  FieldSetProps,
+  useLeftAdornmentSize,
+} from "../forms/FieldSet";
 import Button from "@/components/forms/Button";
 import text from "@/constants/text";
 import Field, { subLabelStyle } from "../forms/Field";
@@ -48,42 +51,19 @@ export default function SettingsBackupSync(
     [dispatch],
   );
 
+  const profilePicSize = useLeftAdornmentSize({ titleProps });
+
   return (
     <FieldSet
       title={text["settings.backup_sync.title"]}
       titleProps={titleProps}
       initialCollapsed
       collapsible
+      leftAdornment={
+        <ProfilePic size={profilePicSize} style={styles.profilePic} />
+      }
       {...props}
     >
-      {auth.isLoggedIn && (
-        <View>
-          {auth.user ? (
-            <View style={styles.userInfo}>
-              <View style={styles.userName}>
-                <ThemedText type="body2" style={styles.userNameHeading}>
-                  Logged in as:
-                </ThemedText>
-                <ThemedText type="h4">
-                  {auth.user.name ?? `Human #${humanNumber}`}
-                </ThemedText>
-              </View>
-              <ProfilePic style={styles.profilePic} />
-            </View>
-          ) : (
-            <ThemedText>Logged In</ThemedText>
-          )}
-        </View>
-      )}
-
-      {auth.isLoggedIn && (
-        <Button
-          title="Logout"
-          onPress={() => auth.logout()}
-          variant="outline"
-        />
-      )}
-
       {auth.isLoggedIn && (
         <SwitchField
           value={autoSync}
@@ -145,6 +125,14 @@ export default function SettingsBackupSync(
         </Field>
       )}
 
+      {auth.isLoggedIn && (
+        <Button
+          title="Logout"
+          onPress={() => auth.logout()}
+          variant="outline"
+        />
+      )}
+
       <View>
         <ThemedText type="h4" style={styles.aboutHeading}>
           About Backup & Sync
@@ -153,6 +141,22 @@ export default function SettingsBackupSync(
           {text["settings.backup_sync.helper"]}
         </ThemedText>
       </View>
+
+      {auth.isLoggedIn && (
+        <View>
+          <View style={styles.userInfo}>
+            <View style={styles.userName}>
+              <ThemedText type="body2" style={styles.userNameHeading}>
+                Logged in as:
+              </ThemedText>
+              <ThemedText type="h4">
+                {auth.user?.name ?? `Human #${humanNumber}`}
+              </ThemedText>
+            </View>
+            <ProfilePic style={styles.profilePic} />
+          </View>
+        </View>
+      )}
     </FieldSet>
   );
 }
