@@ -20,6 +20,7 @@ import {
   playfaceWebsite,
   charlieJacksonLink,
 } from "@/constants/links";
+import { Toolbar } from "@/context/Toolbar";
 
 export interface MarketingScreenProps {
   style?: StyleProp<ViewStyle>;
@@ -32,6 +33,7 @@ export default function MarketingScreen({
 
   return (
     <ThemedView style={[styles.container, style]}>
+      <Toolbar hidden />
       <ScrollView style={styles.scrollView}>
         <ContentWidth padding="standard">
           <Link href="/app" asChild>

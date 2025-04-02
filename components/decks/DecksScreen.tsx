@@ -8,11 +8,11 @@ import IconButton, {
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import DecksToolbar from "@/components/decks/DecksToolbar";
 import MyDecks from "@/components/decks/MyDecks";
 import PreBuiltDecks from "@/components/decks/PreBuiltDecks";
 import useDeviceSize from "@/hooks/useDeviceSize";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
+import { Toolbar } from "@/context/Toolbar";
 
 const minCardListWidth = 100;
 const maxCardListWidth = 150;
@@ -58,7 +58,7 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 
   return (
     <CardConstraintsProvider width={cardWidth}>
-      <DecksToolbar />
+      <Toolbar />
       <ScrollView
         style={containerStyle}
         contentContainerStyle={styles.contentContainerStyle}

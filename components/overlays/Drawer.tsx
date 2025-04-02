@@ -30,7 +30,7 @@ export interface DrawerProps {
 }
 
 export default function Drawer(props: DrawerProps): React.ReactNode {
-  const textLogo = useTextLogo();
+  const { source } = useTextLogo();
   const updates = useApplyUpdateAlert();
   const devMode = useFlag("DEV_MODE") === true;
   const backupSyncEnabled = useFlag("BACKUP_SYNC") === "enabled";
@@ -72,17 +72,13 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 <Pressable>
                   <Image
                     style={styles.logo}
-                    source={textLogo}
+                    source={source}
                     contentFit="contain"
                   />
                 </Pressable>
               </Link>
             ) : (
-              <Image
-                style={styles.logo}
-                source={textLogo}
-                contentFit="contain"
-              />
+              <Image style={styles.logo} source={source} contentFit="contain" />
             )}
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
             <Link href={playfaceWebsite} target="_blank" asChild>

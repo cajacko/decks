@@ -6,7 +6,11 @@ import Button from "../forms/Button";
 import { selectCanEditDeck } from "@/store/slices/decks";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import Toolbar, { styles, useOnPressProps } from "../ui/Toolbar";
+import { Toolbar, styles } from "@/context/Toolbar";
+import useDeckName from "@/hooks/useDeckName";
+import { appHome } from "@/constants/links";
+import Animated from "react-native-reanimated";
+import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 
 interface DeckToolbarProps {
   deckId: string;
@@ -15,6 +19,7 @@ interface DeckToolbarProps {
 export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
+  const { entering, exiting } = useLayoutAnimations();
 
   const canEditDeck = useAppSelector((state) =>
     selectCanEditDeck(state, props),
@@ -28,18 +33,20 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     navigate(`/deck/${newDeckId}`);
   }, [props.deckId, dispatch, navigate]);
 
-  const copyDeckProps = useOnPressProps(copyDeck);
+  const title = useDeckName(props.deckId);
 
   return (
-    <Toolbar useParent>
+    <Toolbar backPath={appHome} logoVisible={false} title={title}>
       {!canEditDeck && (
-        <Button
-          title={text["deck.copy.title"]}
-          variant="transparent"
-          style={styles.action}
-          vibrate
-          {...copyDeckProps}
-        />
+        <Animated.View entering={entering} exiting={exiting}>
+          <Button
+            title={text["deck.copy.title"]}
+            variant="transparent"
+            style={styles.action}
+            vibrate
+            onPress={copyDeck}
+          />
+        </Animated.View>
       )}
     </Toolbar>
   );

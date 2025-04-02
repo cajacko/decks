@@ -1,46 +1,11 @@
 import React from "react";
-import { useNavigation, Slot, useSegments } from "expo-router";
-import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
-import deckNameWithFallback from "@/utils/deckNameWithFallback";
-import { store } from "@/store/store";
+import { Slot, useSegments } from "expo-router";
+import { selectCanEditDeck } from "@/store/slices/decks";
 import text from "@/constants/text";
 import { useAppSelector } from "@/store/hooks";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
 import { StyleSheet, View } from "react-native";
 import Tabs, { Tab } from "@/components/ui/Tabs";
-
-export function getDeckName(deckId?: string | null) {
-  return deckNameWithFallback(
-    deckId &&
-      selectDeck(store.getState(), {
-        deckId,
-      })?.name,
-  );
-}
-
-function useSetDeckName(deckId: string | null) {
-  const navigation = useNavigation();
-
-  React.useEffect(() => {
-    let prevName = getDeckName(deckId);
-
-    navigation.setOptions({
-      headerTitle: prevName,
-    });
-
-    return store.subscribe(() => {
-      const newName = getDeckName(deckId);
-
-      if (newName === prevName) return;
-
-      navigation.setOptions({
-        headerTitle: newName,
-      });
-
-      prevName = newName;
-    });
-  }, [navigation, deckId]);
-}
 
 export default function DeckLayout() {
   const deckId = useScreenDeckId("layout", null);
@@ -51,8 +16,6 @@ export default function DeckLayout() {
   const segments = useSegments();
   const lastSegment = segments[segments.length - 1];
   const isPlay = lastSegment === "play";
-
-  useSetDeckName(deckId ?? null);
 
   return (
     <View style={styles.container}>

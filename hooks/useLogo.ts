@@ -6,5 +6,8 @@ const logoLight = require("../assets/images/text-logo-light.png");
 export function useTextLogo() {
   const colorScheme = useColorScheme();
 
-  return colorScheme === "dark" ? logoDark : logoLight;
+  return {
+    source: colorScheme === "dark" ? logoDark : logoLight,
+    aspectRatio: 300 / 166,
+  };
 }

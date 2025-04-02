@@ -1,9 +1,7 @@
 import { Stack, usePathname } from "expo-router";
 import React from "react";
-import { getDeckName } from "@/app/deck/[deckId]/_layout";
 import { withApp } from "@/components/ui/App";
 import useFlag from "@/hooks/useFlag";
-import HeaderLogo from "@/components/ui/HeaderLogo";
 import AppStores from "@/components/ui/AppStores";
 import ThemedView from "@/components/ui/ThemedView";
 import { Platform, StyleSheet } from "react-native";
@@ -36,24 +34,15 @@ function RootLayout() {
     () => ({
       default: {
         freezeOnBlur,
+        headerShown: false,
       },
       app: {
-        headerShown: true,
-        headerBackVisible: false,
-        headerTitle: HeaderLogo,
         animation: animateStack ? "slide_from_left" : "none",
       },
       marketing: {
-        headerShown: false,
         animation: "none",
       },
       deck: ({ route: { params } }) => ({
-        headerShown: true,
-        headerTitle: getDeckName(
-          params && "deckId" in params && typeof params.deckId === "string"
-            ? params.deckId
-            : null,
-        ),
         animation: animateStack ? "slide_from_right" : "none",
       }),
     }),

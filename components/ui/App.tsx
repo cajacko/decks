@@ -25,6 +25,7 @@ import registerExampleDecks from "@/utils/registerExampleDecks";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import { SyncProvider } from "@/context/Sync";
 import { AuthenticationProvider } from "@/context/Authentication";
+import { ToolbarProvider } from "@/context/Toolbar";
 
 enableFreeze();
 registerExampleDecks();
@@ -80,6 +81,7 @@ function HasStore({ children }: { children: React.ReactNode }) {
   const [isStoreReady, setIsStoreReady] = React.useState(false);
   const hasRehydrated = useHasRehydrated();
   const shouldPurgeStoreOnStart = useFlag("PURGE_STORE_ON_START");
+  const scheme = useColorScheme();
 
   React.useEffect(() => {
     if (!hasRehydrated) return;
@@ -118,8 +120,10 @@ function HasStore({ children }: { children: React.ReactNode }) {
           <SyncProvider>
             <ModalProvider>
               <DrawerProvider>
-                <Content>{children}</Content>
-                <StatusBar style="auto" />
+                <ToolbarProvider>
+                  <Content>{children}</Content>
+                  <StatusBar style={scheme} />
+                </ToolbarProvider>
               </DrawerProvider>
             </ModalProvider>
           </SyncProvider>

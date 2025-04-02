@@ -4,10 +4,12 @@ import ThemedText from "@/components/ui/ThemedText";
 import ThemedView from "@/components/ui/ThemedView";
 import text from "@/constants/text";
 import { appHome } from "@/constants/links";
+import { Toolbar } from "@/context/Toolbar";
 
 export default function NotFoundScreen() {
   return (
     <>
+      <Toolbar />
       <Stack.Screen options={{ title: text["screen.404.title"] }} />
       <ThemedView style={styles.container}>
         <ThemedText type="h3">{text["404.title"]}</ThemedText>
