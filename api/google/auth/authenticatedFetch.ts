@@ -1,77 +1,22 @@
 import AppError from "@/classes/AppError";
 import { getState } from "./state";
-import refreshAuth from "./refreshAuth";
-import logout from "./logout";
+import { googleFetch, FetchProps as _FetchProps, Auth } from "./fetch";
 
-export async function authenticatedFetch<T>({
-  url,
-  ...requestInit
-}: {
-  url: string;
-} & RequestInit) {
-  let invalidOrExpired = false;
+export type FetchProps = Omit<_FetchProps, "auth">;
 
-  const tryFetch = async (): Promise<T> => {
-    let accessToken = getState()?.tokens?.accessToken;
-    invalidOrExpired = false;
+export function authenticatedFetch<T>(props: FetchProps): Promise<T> {
+  const auth: Auth | null = getState()?.tokens ?? null;
 
-    const response = await fetch(url, {
-      ...requestInit,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        ...requestInit.headers,
-      },
-    });
-
-    if (response.status === 401) {
-      invalidOrExpired = true;
-
-      throw new AppError("Access token is invalid or expired", {
-        status: 401,
-      });
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new AppError(
-        `Request to ${url} failed (${response.status}): ${errorText}`,
-        { status: response.status, url },
-      );
-    }
-
-    return await response.json();
-  };
-
-  try {
-    return await tryFetch();
-  } catch (err: unknown) {
-    const refreshToken = getState()?.tokens?.refreshToken;
-
-    if (invalidOrExpired && refreshToken) {
-      try {
-        await refreshAuth(refreshToken);
-
-        return await tryFetch();
-      } catch (refreshErr) {
-        if (invalidOrExpired) {
-          await logout("UNAUTHENTICATED");
-        }
-
-        throw new AppError("Token refresh failed", {
-          original: refreshErr,
-          url,
-        });
-      }
-    }
-
-    throw err;
+  if (!auth) {
+    throw new AppError(`${authenticatedFetch.name} - No auth tokens found`);
   }
+
+  return googleFetch<T>({
+    ...props,
+    auth,
+  });
 }
 
-export function withAuthenticatedFetch<T>(
-  props: {
-    url: string;
-  } & RequestInit,
-) {
+export function withAuthenticatedFetch<T>(props: FetchProps) {
   return async (): Promise<T> => authenticatedFetch<T>(props);
 }

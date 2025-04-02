@@ -4,6 +4,8 @@ import debugLog from "./debugLog";
 import * as persist from "./persist";
 import AppError from "@/classes/AppError";
 import manageWebAuthPopup from "./manageWebAuthPopup";
+import { userInfo } from "../endpoints/userinfo";
+import updateTokens from "./updateTokens";
 
 export default function init(): Types.State {
   const state = getState();
@@ -18,22 +20,36 @@ export default function init(): Types.State {
     user: null,
   });
 
-  manageWebAuthPopup()
+  manageWebAuthPopup({
+    getUser: userInfo,
+  })
     .then(persist.getState)
     .then((state) => {
-      if (state.tokens) {
+      const tokens = state.tokens;
+
+      if (tokens) {
         setState({
           type: "AUTH_FROM_STORAGE",
-          tokens: state.tokens,
+          tokens: tokens,
           user: state.user,
         });
-      } else {
-        setState({
-          type: "INITIALIZED",
-          tokens: null,
-          user: null,
-        });
+
+        if (!state.user) return;
+
+        return userInfo(tokens).then((user) =>
+          updateTokens({
+            type: "AUTH_FROM_STORAGE",
+            tokens,
+            user,
+          }),
+        );
       }
+
+      setState({
+        type: "INITIALIZED",
+        tokens: null,
+        user: null,
+      });
 
       debugLog("init finished");
     })

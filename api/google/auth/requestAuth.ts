@@ -3,8 +3,8 @@ import * as Types from "../types";
 import debugLog from "./debugLog";
 import waitForPersistedState from "./waitForPersistedState";
 import updateTokens from "./updateTokens";
-import { userInfo } from "../endpoints/userinfo";
-import { setState } from "./state";
+import processTokens from "./processTokens";
+import { userInfo } from "./fetch";
 
 export default async function requestAuth(
   redirectUri?: string,
@@ -32,14 +32,15 @@ export default async function requestAuth(
     const state = await waitForPersistedState();
 
     if (state.type === "timeout") {
-      debugLog("requestAuth - result 2", state.type);
+      debugLog("requestAuth - result 2", state);
 
       return {
         type: "timeout",
       };
     }
 
-    debugLog("requestAuth - result 3", "success");
+    debugLog("requestAuth - result 3", state);
+
     return {
       type: "success",
       payload: {
@@ -51,30 +52,16 @@ export default async function requestAuth(
 
   debugLog("requestAuth - result 4");
 
-  // Update the state with the tokens so our userInfo request can work
-  setState({
+  const state = await processTokens({
     type: "AUTH_FROM_LOGIN",
     tokens: result.payload,
-    user: null,
+    getUser: () => userInfo(result.payload),
   });
-
-  const user = await userInfo();
 
   debugLog("requestAuth - result 5");
 
-  await updateTokens({
-    type: "AUTH_FROM_LOGIN",
-    tokens: result.payload,
-    user,
-  });
-
-  debugLog("requestAuth - result 6");
-
   return {
     type: "success",
-    payload: {
-      tokens: result.payload,
-      user,
-    },
+    payload: state,
   };
 }

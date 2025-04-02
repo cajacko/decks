@@ -1,6 +1,6 @@
-import { withAuthenticatedFetch } from "../auth/authenticatedFetch";
+import { withGoogleFetch } from "../auth/fetch";
 
-export const userInfo = withAuthenticatedFetch<{
+export const userInfo = withGoogleFetch<{
   email: string;
   id: string;
   name: string;
