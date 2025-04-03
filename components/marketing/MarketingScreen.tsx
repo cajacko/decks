@@ -10,7 +10,7 @@ import {
 import ThemedText from "@/components/ui/ThemedText";
 import ThemedView from "@/components/ui/ThemedView";
 import ContentWidth from "@/components/ui/ContentWidth";
-import { Image } from "expo-image";
+import Image from "@/components/ui/Image";
 import AppStores from "@/components/ui/AppStores";
 import text from "@/constants/text";
 import Button from "@/components/forms/Button";

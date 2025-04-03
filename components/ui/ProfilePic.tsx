@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useAuthentication } from "@/context/Authentication";
-import { Image, ImageProps } from "expo-image";
+import Image, { ImageProps } from "@/components/ui/Image";
 import IconSymbol, { IconSymbolName } from "./IconSymbol";
 import AppError from "@/classes/AppError";
 import { useOnPressProps, UseOnPressProps } from "@/components/forms/Button";
@@ -101,9 +101,17 @@ export default function ProfilePic({
     [size, styleProp],
   );
 
-  const onError = React.useCallback<NonNullable<ImageProps["onError"]>>(() => {
-    setLoading(false);
-  }, []);
+  const onError = React.useCallback<NonNullable<ImageProps["onError"]>>(
+    (event) => {
+      setError(
+        new AppError(
+          `${ProfilePic.name} encountered an error loading the image`,
+          event.error,
+        ),
+      );
+    },
+    [],
+  );
 
   const onLoad = React.useCallback<NonNullable<ImageProps["onLoad"]>>(() => {
     setError(undefined);
@@ -125,7 +133,7 @@ export default function ProfilePic({
   const imageStyle = React.useMemo(
     () => [
       styles.image,
-      showImage ? styles.hide : styles.loaded,
+      showImage ? styles.loaded : styles.hide,
       {
         // Border colour ensures we have something to show even if the users profile is just a black
         // image or something

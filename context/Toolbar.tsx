@@ -13,7 +13,7 @@ import { useDrawer } from "@/context/Drawer";
 import ProfilePic from "@/components/ui/ProfilePic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, Href } from "expo-router";
-import { Image } from "expo-image";
+import Image from "@/components/ui/Image";
 import { useTextLogo } from "@/hooks/useLogo";
 import IconButton from "@/components/forms/IconButton";
 import ContentWidth from "@/components/ui/ContentWidth";

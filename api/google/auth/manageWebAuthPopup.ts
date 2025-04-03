@@ -17,7 +17,7 @@ export default async function manageWebAuthPopup({
 
   debugLog("manageWebAuthPopup - tokens in href");
 
-  processTokens({
+  await processTokens({
     type: "AUTH_FROM_HREF",
     tokens,
     getUser: () => getUser(tokens),
@@ -26,6 +26,6 @@ export default async function manageWebAuthPopup({
   if (Platform.OS === "web" && closeWindowOnTokensInHref) {
     debugLog("manageWebAuthPopup - close");
 
-    // window.close();
+    window.close();
   }
 }

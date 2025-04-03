@@ -1,4 +1,4 @@
-import { Image } from "expo-image";
+import Image from "@/components/ui/Image";
 import React from "react";
 import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 import Link from "@/components/ui/Link";

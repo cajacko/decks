@@ -8,7 +8,7 @@ import SettingsApp from "@/components/settings/SettingsApp";
 import SettingsBackupSync from "@/components/settings/SettingsBackupSync";
 import FieldSet from "@/components/forms/FieldSet";
 import { useTextLogo } from "@/hooks/useLogo";
-import { Image } from "expo-image";
+import Image from "@/components/ui/Image";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
