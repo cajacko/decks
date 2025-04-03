@@ -25,6 +25,7 @@ export type ThemedTextVariant =
 export type ThemedTextProps = TextProps & {
   type?: ThemedTextVariant;
   truncate?: boolean;
+  skeleton?: number[];
 };
 
 export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
@@ -79,6 +80,10 @@ export default function ThemedText({
 }
 
 export const styles = StyleSheet.create({
+  skeleton: {
+    borderRadius: 3,
+    transform: [{ scaleY: 0.8 }],
+  },
   truncate: {
     overflow: "hidden",
     textOverflow: "ellipsis",

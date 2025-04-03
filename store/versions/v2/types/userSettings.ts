@@ -29,6 +29,7 @@ export const flagMap = {
   EDIT_CARD_MORE_INFO: ["disabled", "enabled"],
   CARD_ANIMATIONS: ["enabled", "disabled"],
   SKELETON_LOADER: ["enabled", "disabled"],
+  SKELETON_ANIMATIONS: ["enabled", "disabled"],
   SCREEN_ANIMATIONS: [
     "disabled",
     "react-navigation",

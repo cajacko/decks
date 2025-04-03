@@ -5,8 +5,10 @@ import { selectDeck, selectDeckCards } from "@/store/slices/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "@/components/cards/connected/CardSideBySide";
+import CardSideBySideSkeleton from "@/components/cards/connected/CardSideBySideSkeleton";
+import Skeleton from "@/components/ui/Skeleton";
 import ThemedText from "@/components/ui/ThemedText";
-import IconButton from "@/components/forms/IconButton";
+import IconButton, { IconButtonSkeleton } from "@/components/forms/IconButton";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
@@ -16,10 +18,71 @@ import useVibrate from "@/hooks/useVibrate";
 export interface ExpandedDeckListItemProps {
   deckId: string;
   style?: ViewStyle;
-  skeleton?: boolean;
 }
 
 const iconSize = 40;
+
+function ExpandedDeckListItemContent({
+  children,
+  style,
+  onPress,
+  actions,
+  text,
+}: Pick<ExpandedDeckListItemProps, "style"> & {
+  children: React.ReactNode;
+  actions: React.ReactNode;
+  onPress?: () => void;
+  text?: React.ReactNode;
+}) {
+  const containerStyle = React.useMemo(
+    () => [styles.container, style],
+    [style],
+  );
+
+  return (
+    <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
+      {onPress ? (
+        <Pressable onPress={onPress} style={styles.cards}>
+          {children}
+        </Pressable>
+      ) : (
+        <View style={styles.cards}>{children}</View>
+      )}
+
+      <View style={styles.details}>
+        <View style={styles.text}>{text}</View>
+        <View style={styles.actions}>{actions}</View>
+      </View>
+    </ContentWidth>
+  );
+}
+
+export function ExpandedDeckListItemSkeleton({
+  style,
+}: Partial<ExpandedDeckListItemProps>) {
+  return (
+    <ExpandedDeckListItemContent
+      style={style}
+      text={
+        <>
+          <Skeleton variant="text" width="50%" style={{ marginBottom: 20 }} />
+          <Skeleton variant="text" width="100%" textSpacingBottom />
+          <Skeleton variant="text" width="100%" textSpacingBottom />
+          <Skeleton variant="text" width="20%" />
+        </>
+      }
+      actions={
+        <>
+          <IconButtonSkeleton size={iconSize} />
+          <IconButtonSkeleton size={iconSize} />
+          <IconButtonSkeleton size={iconSize} />
+        </>
+      }
+    >
+      <CardSideBySideSkeleton />
+    </ExpandedDeckListItemContent>
+  );
+}
 
 export default function ExpandedDeckListItem(
   props: ExpandedDeckListItemProps,
@@ -47,11 +110,6 @@ export default function ExpandedDeckListItem(
     navigate(`/deck/${props.deckId}`);
   }, [props.deckId, navigate]);
 
-  const containerStyle = React.useMemo(
-    () => [styles.container, props.style],
-    [props.style],
-  );
-
   const copyDeck = React.useCallback(() => {
     const newDeckId = uuid();
 
@@ -67,12 +125,11 @@ export default function ExpandedDeckListItem(
 
   return (
     <CardTargetProvider target={coverTarget}>
-      <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
-        <Pressable onPress={onPressCards} style={styles.cards}>
-          <CardSideBySide topSide="front" target={coverTarget} />
-        </Pressable>
-        <View style={styles.details}>
-          <View style={styles.text}>
+      <ExpandedDeckListItemContent
+        style={props.style}
+        onPress={onPressCards}
+        text={
+          <>
             {name && (
               <ThemedText type="h3" style={styles.title}>
                 {name}
@@ -83,8 +140,10 @@ export default function ExpandedDeckListItem(
                 {description}
               </ThemedText>
             )}
-          </View>
-          <View style={styles.actions}>
+          </>
+        }
+        actions={
+          <>
             <IconButton
               icon="remove-red-eye"
               onPress={view}
@@ -103,9 +162,11 @@ export default function ExpandedDeckListItem(
               onPress={copyDeck}
               variant="transparent"
             />
-          </View>
-        </View>
-      </ContentWidth>
+          </>
+        }
+      >
+        <CardSideBySide topSide="front" target={coverTarget} />
+      </ExpandedDeckListItemContent>
     </CardTargetProvider>
   );
 }

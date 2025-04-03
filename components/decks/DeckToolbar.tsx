@@ -14,6 +14,7 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 
 interface DeckToolbarProps {
   deckId: string;
+  loading: boolean;
 }
 
 export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
@@ -36,7 +37,12 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   const title = useDeckName(props.deckId);
 
   return (
-    <Toolbar backPath={appHome} logoVisible={false} title={title}>
+    <Toolbar
+      backPath={appHome}
+      logoVisible={false}
+      title={title}
+      loading={props.loading}
+    >
       {!canEditDeck && (
         <Animated.View entering={entering} exiting={exiting}>
           <Button

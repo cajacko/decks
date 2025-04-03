@@ -2,7 +2,10 @@ import React from "react";
 import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
 import TabletopToolbar from "@/components/tabletops/TabletopToolbar";
 import { TabletopProps } from "@/components/tabletops/Tabletop/Tabletop.types";
-import StackList, { StackListRef } from "@/components/stacks/StackList";
+import StackList, {
+  StackListRef,
+  StackListSkeleton,
+} from "@/components/stacks/StackList";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -130,6 +133,7 @@ export default function Tabletop({
         <SettingsDeck deckId={deckId} />
       </DrawerChildren>
       <TabletopToolbar
+        loading={skeleton}
         tabletopId={tabletopId}
         deckId={deckId}
         beforeUndo={beforeUndo}
@@ -141,12 +145,10 @@ export default function Tabletop({
             <TabletopNotification {...notification} />
           </View>
         )}
-        {!skeleton && (
-          <StackList
-            ref={stackListRef}
-            skeleton={skeleton}
-            style={styles.stackList}
-          />
+        {skeleton ? (
+          <StackListSkeleton style={styles.stackList} />
+        ) : (
+          <StackList ref={stackListRef} style={styles.stackList} />
         )}
       </Animated.View>
     </TabletopProvider>

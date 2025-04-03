@@ -12,6 +12,7 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
   withTiming,
+  interpolate,
 } from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
@@ -27,6 +28,7 @@ import useFlag from "@/hooks/useFlag";
 import withScreenControlContext, {
   ContextState as CreateContextState,
 } from "@/context/withScreenControlContext";
+import { useSkeletonAnimation } from "./Skeleton";
 
 interface ToolbarProps {
   hidden?: boolean;
@@ -34,6 +36,7 @@ interface ToolbarProps {
   logoVisible?: boolean;
   children?: React.ReactNode | null;
   backPath?: Href | null;
+  loading?: boolean;
 }
 
 type ContextState = CreateContextState<ToolbarProps> & {
@@ -47,6 +50,7 @@ const defaultProps: { [K in keyof ToolbarProps]: ToolbarProps[K] } = {
   logoVisible: true,
   children: null,
   backPath: null,
+  loading: false,
 };
 
 const { Context, useScreenControlContext, useScreenControlProvider } =
@@ -121,6 +125,7 @@ function WholeToolbar({
   children,
   backPath,
   sharedToolbarHeight,
+  loading = false,
 }: Omit<ToolbarProps, "hidden"> & {
   sharedToolbarHeight: SharedValue<number>;
 }) {
@@ -132,6 +137,8 @@ function WholeToolbar({
     useToolbarHeight(sharedToolbarHeight);
   const borderBottomColor = useThemeColor("inputOutline");
   const backgroundColor = useThemeColor("background");
+  const primaryColor = useThemeColor("primary");
+  const { loopAnimation } = useSkeletonAnimation();
 
   const back = React.useMemo(() => {
     if (!backPath) return undefined;
@@ -164,6 +171,25 @@ function WholeToolbar({
         { height: imageHeight, width: imageHeight * aspectRatio },
       ]),
     [aspectRatio],
+  );
+
+  const loadingPositionStyle = useAnimatedStyle(() => {
+    const width = 10;
+    const midPosition = 50 - width / 2;
+
+    return {
+      left: `${interpolate(loopAnimation.value, [0, 0.1, 0.5, 1], [0, 0, midPosition, 100])}%`,
+      right: `${interpolate(loopAnimation.value, [0, 0.5, 0.9, 1], [100, midPosition, 0, 0])}%`,
+    };
+  });
+
+  const loadingProgressStyle = React.useMemo(
+    () => [
+      styles.progress,
+      { backgroundColor: primaryColor },
+      loadingPositionStyle,
+    ],
+    [loadingPositionStyle, primaryColor],
   );
 
   return (
@@ -229,6 +255,13 @@ function WholeToolbar({
           </View>
         </View>
       </ContentWidth>
+      {loading && (
+        <Animated.View
+          entering={entering}
+          exiting={exiting}
+          style={loadingProgressStyle}
+        />
+      )}
     </Animated.View>
   );
 }
@@ -350,5 +383,12 @@ export const styles = StyleSheet.create({
   },
   action: {
     marginHorizontal: horizontalPadding,
+  },
+  progress: {
+    height: 3,
+    position: "absolute",
+    bottom: -2,
+    zIndex: 500,
+    borderRadius: 3,
   },
 });

@@ -9,6 +9,9 @@ import {
 import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useOnPressProps } from "@/components/forms/Button";
+import { useSkeletonAnimation } from "@/context/Skeleton";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Skeleton from "../ui/Skeleton";
 
 export type { IconSymbolName };
 
@@ -19,9 +22,25 @@ export interface IconButtonProps extends TouchableOpacityProps {
   variant?: "filled" | "transparent";
   vibrate?: boolean;
   loading?: boolean;
+  skeleton?: boolean;
 }
 
 const defaultSize = 80;
+
+export function IconButtonSkeleton({
+  size = defaultSize,
+  style,
+}: Pick<IconButtonProps, "size" | "style">) {
+  return (
+    <Skeleton
+      variant="button"
+      shape="circle"
+      height={size}
+      width={size}
+      style={style}
+    />
+  );
+}
 
 export default function IconButton({
   icon,
@@ -29,9 +48,11 @@ export default function IconButton({
   size = defaultSize,
   variant = "filled",
   loading = false,
+  skeleton,
   ...props
 }: IconButtonProps): React.ReactNode {
   const { background, text } = useThemeColors();
+  const { color } = useSkeletonAnimation();
 
   const style = React.useMemo(
     () =>
@@ -50,19 +71,30 @@ export default function IconButton({
 
   const onPressProps = useOnPressProps(props);
 
+  const skeletonStyle = useAnimatedStyle(() => ({
+    backgroundColor: color.value,
+  }));
+
   const children = React.useMemo((): React.ReactNode => {
-    if (typeof icon === "string") {
+    const iconSize = variant === "filled" ? size * 0.5 : size;
+
+    if (skeleton) {
       return (
-        <IconSymbol
-          name={icon}
-          color={text}
-          size={variant === "filled" ? (size * 2) / 3 : size}
+        <Animated.View
+          style={[
+            { width: iconSize, height: iconSize, borderRadius: iconSize / 2 },
+            skeletonStyle,
+          ]}
         />
       );
     }
 
+    if (typeof icon === "string") {
+      return <IconSymbol name={icon} color={text} size={iconSize} />;
+    }
+
     return icon._children;
-  }, [icon, size, text, variant]);
+  }, [icon, size, text, variant, skeleton, skeletonStyle]);
 
   return (
     <TouchableOpacity {...props} {...onPressProps} style={style}>

@@ -3,7 +3,6 @@ import { ScrollViewProps, StyleProp, ViewStyle } from "react-native";
 export interface StackListProps {
   handleLayout?: Required<ScrollViewProps>["onLayout"];
   style?: StyleProp<ViewStyle>;
-  skeleton?: boolean;
 }
 
 export type ScrollOptions = {

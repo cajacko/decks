@@ -13,6 +13,7 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 export interface TabletopToolbarProps extends UseTabletopHistoryOptions {
   deckId: string;
   tabletopId: string;
+  loading: boolean;
 }
 
 export default function TabletopToolbar(
@@ -23,7 +24,12 @@ export default function TabletopToolbar(
   const { entering, exiting } = useLayoutAnimations();
 
   return (
-    <Toolbar backPath={appHome} logoVisible={false} title={title}>
+    <Toolbar
+      backPath={appHome}
+      logoVisible={false}
+      title={title}
+      loading={props.loading}
+    >
       <Animated.View entering={entering} exiting={exiting}>
         <IconButton
           icon="undo"

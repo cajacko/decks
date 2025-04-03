@@ -14,10 +14,14 @@ import { StackListRef, ScrollOptions } from "./StackList.types";
 
 const scrollPromise = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
+export function useInterval() {
+  return useTabletopContext().stackWidth;
+}
+
 export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
   const animatedRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(animatedRef);
-  const { stackWidth, tabletopId, canOnlyFit1Stack } = useTabletopContext();
+  const { tabletopId, canOnlyFit1Stack } = useTabletopContext();
   const stackIds = useAppSelector((state) =>
     selectStackIds(state, { tabletopId }),
   );
@@ -27,7 +31,7 @@ export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
 
   const [deletedStackIds, setDeletedStackIds] = React.useState<string[]>([]);
 
-  const interval = stackWidth;
+  const interval = useInterval();
 
   const updateFocusProps = React.useRef({
     interval,
@@ -137,7 +141,6 @@ export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
   return {
     stackListRef,
     stackIds,
-    interval,
     animatedRef,
     focussedStackId,
     indicatorIds,

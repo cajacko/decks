@@ -28,6 +28,7 @@ import { AuthenticationProvider } from "@/context/Authentication";
 import { ToolbarProvider } from "@/context/Toolbar";
 import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SkeletonProvider } from "@/context/Skeleton";
 
 enableFreeze();
 registerExampleDecks();
@@ -125,14 +126,16 @@ function HasStore({ children }: { children: React.ReactNode }) {
       <NavigationThemeProvider value={navigationTheme}>
         <AuthenticationProvider>
           <SyncProvider>
-            <ModalProvider>
-              <DrawerProvider>
-                <ToolbarProvider>
-                  <Content>{children}</Content>
-                  <StatusBar style={scheme} />
-                </ToolbarProvider>
-              </DrawerProvider>
-            </ModalProvider>
+            <SkeletonProvider>
+              <ModalProvider>
+                <DrawerProvider>
+                  <ToolbarProvider>
+                    <Content>{children}</Content>
+                    <StatusBar style={scheme === "dark" ? "light" : "dark"} />
+                  </ToolbarProvider>
+                </DrawerProvider>
+              </ModalProvider>
+            </SkeletonProvider>
           </SyncProvider>
         </AuthenticationProvider>
       </NavigationThemeProvider>
