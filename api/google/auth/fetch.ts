@@ -3,6 +3,9 @@ import refreshAuth from "./refreshAuth";
 import logout from "./logout";
 import { alert } from "@/components/overlays/Alert";
 import text from "@/constants/text";
+import { getState as _getState } from "./state";
+import { GoogleAuthTokens } from "../types";
+import debugLog from "./debugLog";
 
 export const userInfo = withGoogleFetch<{
   email: string;
@@ -21,18 +24,32 @@ export interface Auth {
 
 export interface FetchProps extends RequestInit {
   url: string;
-  auth: Auth;
+  auth?: Auth;
 }
 
 export async function googleFetch<T>({
   url,
-  auth,
+  auth: _auth,
   ...requestInit
 }: FetchProps) {
+  debugLog(`googleFetch - ${url}`);
+
   let invalidOrExpired = false;
+
+  let auth = _auth ?? _getState()?.tokens;
+  const isLoggedIn = !!auth;
 
   const tryFetch = async (): Promise<T> => {
     invalidOrExpired = false;
+
+    if (!auth?.accessToken) {
+      debugLog(`googleFetch - no access token`);
+      invalidOrExpired = true;
+
+      throw new AppError(
+        `${googleFetch.name} called but no accessToken is in state`,
+      );
+    }
 
     const response = await fetch(url, {
       ...requestInit,
@@ -43,6 +60,7 @@ export async function googleFetch<T>({
     });
 
     if (response.status === 401) {
+      debugLog(`googleFetch - 401`);
       invalidOrExpired = true;
 
       throw new AppError("Access token is invalid or expired", {
@@ -51,7 +69,10 @@ export async function googleFetch<T>({
     }
 
     if (!response.ok) {
+      debugLog(`googleFetch - response not ok`);
+
       const errorText = await response.text();
+
       throw new AppError(
         `Request to ${url} failed (${response.status}): ${errorText}`,
         { status: response.status, url },
@@ -62,25 +83,44 @@ export async function googleFetch<T>({
   };
 
   try {
-    return await tryFetch();
-  } catch (err: unknown) {
-    if (invalidOrExpired && auth.refreshToken) {
-      try {
-        await refreshAuth({
-          refreshToken: auth.refreshToken,
-          getUser: userInfo,
-        });
+    const result = await tryFetch();
 
-        return await tryFetch();
+    debugLog(`googleFetch - success`);
+
+    return result;
+  } catch (err: unknown) {
+    debugLog(`googleFetch - error`, err);
+    const refreshToken = auth?.refreshToken;
+
+    if (invalidOrExpired && refreshToken) {
+      try {
+        debugLog(`googleFetch - attempt refresh`);
+
+        auth = (
+          await refreshAuth({
+            refreshToken: refreshToken,
+            getUser: userInfo,
+          })
+        ).tokens;
+
+        const result = await tryFetch();
+
+        debugLog(`googleFetch - success after refresh`);
+
+        return result;
       } catch (refreshErr) {
-        if (invalidOrExpired) {
-          alert(({ close }) => ({
+        debugLog(`googleFetch - refresh error`, refreshErr);
+
+        if (invalidOrExpired && isLoggedIn) {
+          debugLog(`googleFetch - logout user`);
+
+          alert(({ onRequestClose }) => ({
             title: text["auth.auto_logout.alert.title"],
             message: text["auth.auto_logout.alert.message"],
             buttons: [
               {
                 text: text["general.ok"],
-                onClick: close,
+                onPress: () => onRequestClose(),
               },
             ],
           }));
@@ -100,6 +140,6 @@ export async function googleFetch<T>({
 }
 
 export function withGoogleFetch<T>(props: Omit<FetchProps, "auth">) {
-  return async (auth: FetchProps["auth"]): Promise<T> =>
-    googleFetch<T>({ ...props, auth });
+  return async (auth?: GoogleAuthTokens): Promise<T> =>
+    googleFetch<T>({ auth, ...props });
 }

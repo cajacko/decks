@@ -19,12 +19,12 @@ function ModalContent(props: { children: React.ReactNode }) {
 }
 
 export function withModal() {
-  const { setModalProps, unmount: close } = withSetModalProps();
+  const { setModalProps, unmount: onRequestClose } = withSetModalProps();
 
   function update(modalProps: ModalProps) {
     setModalProps({
       ...defaultModalProps,
-      onRequestClose: close,
+      onRequestClose,
       visible: true,
       ...modalProps,
       children: <ModalContent>{modalProps.children}</ModalContent>,
@@ -32,20 +32,22 @@ export function withModal() {
 
     return {
       update,
-      close,
+      onRequestClose,
     };
   }
 
   return {
     update,
-    close,
+    onRequestClose,
   };
 }
 
-export function modal(callback: (props: { close: () => void }) => ModalProps) {
-  const { update, close } = withModal();
+export function modal(
+  callback: (props: { onRequestClose: () => void }) => ModalProps,
+) {
+  const { update, onRequestClose } = withModal();
 
-  const modalProps = callback({ close });
+  const modalProps = callback({ onRequestClose });
 
   return update(modalProps);
 }

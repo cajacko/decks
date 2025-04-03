@@ -2,7 +2,7 @@
   "404.link": "Go to home screen!",
   "404.title": "This screen doesn't exist.",
   "auth.auto_logout.alert.title": "Automatically logged out",
-  "auth.auto_logout.alert.message": "Your session has expired. Please log in again. No data has been lost. But you will need to log in again to sync recent changes.",
+  "auth.auto_logout.alert.message": "Your session has expired and you have been automatically logged out. No data has been lost. But you will need to log in again to sync recent changes.",
   "card.action.flip": "Flip Card",
   "card.delete.message": "Are you sure you want to delete this card?",
   "card.delete.title": "Delete Card",

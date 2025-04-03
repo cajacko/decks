@@ -10,8 +10,8 @@ export type GoogleUser = {
 // NOTE: These values are persisted, if you change them check the persist file to see if you should
 // make backward compatible changes
 export type GoogleAuthTokens = {
-  accessToken: string;
-  refreshToken: string;
+  accessToken: string | null;
+  refreshToken: string | null;
   accessTokenExpiresAt: Date | null;
 };
 

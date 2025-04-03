@@ -34,7 +34,7 @@ export default function init(): Types.State {
           user: state.user,
         });
 
-        if (!state.user) return;
+        if (state.user) return;
 
         return userInfo(tokens).then((user) =>
           updateTokens({
@@ -50,13 +50,14 @@ export default function init(): Types.State {
         tokens: null,
         user: null,
       });
-
-      debugLog("init finished");
     })
     .catch((unknownError) => {
       AppError.getError(unknownError, "Error getting tokens from storage").log(
         "warn",
       );
+    })
+    .finally(() => {
+      debugLog("init finished");
     });
 
   return newState;

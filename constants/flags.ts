@@ -11,9 +11,7 @@ import { Platform } from "react-native";
 import * as DevClient from "expo-dev-client";
 
 // If set, this value will be used
-export const flagOverrides: Partial<UserSettings.FlagMap> = {
-  DEBUG_AUTH: true,
-};
+export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though

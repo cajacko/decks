@@ -76,17 +76,17 @@ export default function DevMenu({
       <Button
         title="Demo Alert"
         onPress={() => {
-          alert(({ close }) => ({
+          alert(({ onRequestClose }) => ({
             title: "Test Alert",
             message: "This is a test alert",
             buttons: [
               {
                 text: "OK",
-                onPress: close,
+                onPress: onRequestClose,
               },
               {
                 text: "Cancel",
-                onPress: close,
+                onPress: onRequestClose,
               },
             ],
           }));

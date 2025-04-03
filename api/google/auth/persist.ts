@@ -36,10 +36,10 @@ export async function getState(): Promise<Omit<Types.State, "type">> {
   const accessTokenExpiresAt = items[keys.accessTokenExpiresAt];
   const user = parseUser(items[keys.user]);
 
-  if (!accessToken || !refreshToken) {
+  if (!accessToken && !refreshToken) {
     return {
       tokens: null,
-      user: user,
+      user: null,
     };
   }
 

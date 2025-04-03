@@ -13,7 +13,6 @@ export function authenticatedFetch<T>(props: FetchProps): Promise<T> {
 
   return googleFetch<T>({
     ...props,
-    auth,
   });
 }
 

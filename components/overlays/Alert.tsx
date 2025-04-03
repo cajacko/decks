@@ -81,33 +81,35 @@ function AlertContent(props: AlertContentProps) {
 }
 
 function withAlert() {
-  const { update: updateModal, close } = withModal();
+  const { update: updateModal, onRequestClose } = withModal();
 
   function update(alertProps: Omit<AlertContentProps, "onRequestClose">) {
     updateModal({
-      children: <AlertContent onRequestClose={close} {...alertProps} />,
+      children: (
+        <AlertContent onRequestClose={onRequestClose} {...alertProps} />
+      ),
     });
 
     return {
       update,
-      close,
+      onRequestClose,
     };
   }
 
   return {
     update,
-    close,
+    onRequestClose,
   };
 }
 
 export function alert(
   callback: (props: {
-    close: () => void;
+    onRequestClose: () => void;
   }) => Omit<AlertContentProps, "onRequestClose">,
 ) {
-  const { update, close } = withAlert();
+  const { update, onRequestClose } = withAlert();
 
-  const alertProps = callback({ close });
+  const alertProps = callback({ onRequestClose });
 
   return update(alertProps);
 }
