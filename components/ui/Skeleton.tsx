@@ -1,9 +1,6 @@
 import React from "react";
 import { StyleProp, StyleSheet, ViewProps, ViewStyle } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  interpolateColor,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useSkeletonAnimation } from "@/context/Skeleton";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
@@ -30,23 +27,8 @@ export default function Skeleton({
   textSpacingVertical,
   ...props
 }: SkeletonProps): React.ReactNode {
-  const { backAndForthAnimation } = useSkeletonAnimation();
-
-  const backgroundColor = useThemeColor(
-    variant === "card" ? "skeletonCard" : "skeleton",
-  );
-
-  const backgroundColorPulse = useThemeColor(
-    variant === "card" ? "skeletonCardPulse" : "skeletonPulse",
-  );
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      backAndForthAnimation.value,
-      [0, 1],
-      [backgroundColor, backgroundColorPulse],
-    ),
-  }));
+  const { backgroundColorStyle } = useSkeletonAnimation();
+  const skeletonCardColor = useThemeColor("skeletonCard");
 
   const style = React.useMemo<StyleProp<ViewStyle>>(() => {
     const sizes: ViewStyle = {};
@@ -82,14 +64,15 @@ export default function Skeleton({
           styles.rounded,
         shape === "circle" && styles.circle,
         variant === "text" && styles.text,
+        variant === "card" && { backgroundColor: skeletonCardColor },
         sizes,
         styleProp,
       ]),
-      animatedStyle,
+      variant !== "card" && backgroundColorStyle,
     ];
   }, [
     styleProp,
-    animatedStyle,
+    backgroundColorStyle,
     shape,
     height,
     width,
@@ -98,6 +81,7 @@ export default function Skeleton({
     textSpacingTop,
     textSpacingBottom,
     textSpacingVertical,
+    skeletonCardColor,
   ]);
 
   return <Animated.View {...props} style={style} />;

@@ -1,56 +1,44 @@
 import useFlag from "@/hooks/useFlag";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import React from "react";
+import { ViewStyle } from "react-native";
 import {
   useSharedValue,
   SharedValue,
   withTiming,
   withRepeat,
   Easing,
-  useDerivedValue,
   interpolateColor,
+  useAnimatedStyle,
+  withDelay,
 } from "react-native-reanimated";
 
 interface ContextState {
   loopAnimation: SharedValue<number>;
-  backAndForthAnimation: SharedValue<number>;
-  color: SharedValue<string>;
-  colorInverse: SharedValue<string>;
+  backgroundColorStyle: ViewStyle;
 }
 
 const Context = React.createContext<ContextState | undefined>(undefined);
 
-const loopDuration = 2000;
+const loopDuration = 1500;
 
 // Loop the animation from 0-1 and then it hops back to 1
 function useAnimations(_animate = true): ContextState {
   const animate = useFlag("SKELETON_ANIMATIONS") === "enabled" && _animate;
-
   const backgroundColor = useThemeColor("skeleton");
   const backgroundColorPulse = useThemeColor("skeletonPulse");
   const loopAnimation = useSharedValue(0);
-  const backAndForthAnimation = useSharedValue(0);
-
-  React.useEffect(() => {
-    if (animate) {
-      backAndForthAnimation.value = withRepeat(
-        withTiming(1, { duration: loopDuration / 2 }),
-        -1,
-        true,
-      );
-    } else {
-      backAndForthAnimation.value = 0;
-    }
-
-    return () => {
-      backAndForthAnimation.value = 0;
-    };
-  }, [backAndForthAnimation, animate]);
 
   React.useEffect(() => {
     if (animate) {
       loopAnimation.value = withRepeat(
-        withTiming(1, { duration: loopDuration, easing: Easing.linear }),
+        withDelay(
+          500,
+          withTiming(1, {
+            duration: loopDuration,
+            easing: Easing.bezier(0.77, 0.25, 1, 1),
+          }),
+        ),
         -1,
         false,
       );
@@ -63,27 +51,17 @@ function useAnimations(_animate = true): ContextState {
     };
   }, [loopAnimation, animate]);
 
-  const color = useDerivedValue(() => {
-    return interpolateColor(
-      backAndForthAnimation.value,
-      [0, 1],
-      [backgroundColor, backgroundColorPulse],
-    );
-  });
-
-  const colorInverse = useDerivedValue(() => {
-    return interpolateColor(
-      backAndForthAnimation.value,
-      [1, 0],
-      [backgroundColor, backgroundColorPulse],
-    );
-  });
+  const backgroundColorStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      loopAnimation.value,
+      [0, 0.6, 0.8, 1],
+      [backgroundColor, backgroundColor, backgroundColorPulse, backgroundColor],
+    ),
+  }));
 
   return {
     loopAnimation,
-    backAndForthAnimation,
-    color,
-    colorInverse,
+    backgroundColorStyle,
   };
 }
 
@@ -98,12 +76,11 @@ export const useSkeletonAnimation = (): ContextState => {
 export const SkeletonProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { backAndForthAnimation, loopAnimation, color, colorInverse } =
-    useAnimations();
+  const { loopAnimation, backgroundColorStyle } = useAnimations();
 
   const value = React.useMemo<ContextState>(
-    () => ({ loopAnimation, backAndForthAnimation, color, colorInverse }),
-    [loopAnimation, backAndForthAnimation, color, colorInverse],
+    () => ({ loopAnimation, backgroundColorStyle }),
+    [loopAnimation, backgroundColorStyle],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

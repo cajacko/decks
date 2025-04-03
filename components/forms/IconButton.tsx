@@ -10,7 +10,7 @@ import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { useOnPressProps } from "@/components/forms/Button";
 import { useSkeletonAnimation } from "@/context/Skeleton";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import Skeleton from "../ui/Skeleton";
 
 export type { IconSymbolName };
@@ -52,7 +52,7 @@ export default function IconButton({
   ...props
 }: IconButtonProps): React.ReactNode {
   const { background, text } = useThemeColors();
-  const { color } = useSkeletonAnimation();
+  const { backgroundColorStyle } = useSkeletonAnimation();
 
   const style = React.useMemo(
     () =>
@@ -71,10 +71,6 @@ export default function IconButton({
 
   const onPressProps = useOnPressProps(props);
 
-  const skeletonStyle = useAnimatedStyle(() => ({
-    backgroundColor: color.value,
-  }));
-
   const children = React.useMemo((): React.ReactNode => {
     const iconSize = variant === "filled" ? size * 0.5 : size;
 
@@ -83,7 +79,7 @@ export default function IconButton({
         <Animated.View
           style={[
             { width: iconSize, height: iconSize, borderRadius: iconSize / 2 },
-            skeletonStyle,
+            backgroundColorStyle,
           ]}
         />
       );
@@ -94,7 +90,7 @@ export default function IconButton({
     }
 
     return icon._children;
-  }, [icon, size, text, variant, skeleton, skeletonStyle]);
+  }, [icon, size, text, variant, skeleton, backgroundColorStyle]);
 
   return (
     <TouchableOpacity {...props} {...onPressProps} style={style}>

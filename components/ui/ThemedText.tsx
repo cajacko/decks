@@ -25,7 +25,6 @@ export type ThemedTextVariant =
 export type ThemedTextProps = TextProps & {
   type?: ThemedTextVariant;
   truncate?: boolean;
-  skeleton?: number[];
 };
 
 export const navigationFonts: NavigationTheme["fonts"] = DefaultTheme.fonts;
