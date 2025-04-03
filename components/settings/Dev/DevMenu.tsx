@@ -16,6 +16,7 @@ import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 import IconSymbol from "@/components/ui/IconSymbol";
+import { alert } from "@/components/overlays/Alert";
 
 const titleProps = { type: "h2" } as const;
 
@@ -62,7 +63,6 @@ export default function DevMenu({
   }, []);
 
   const isDevClient = DevClient.isDevelopmentBuild();
-
   const iconSize = useLeftAdornmentSize({ titleProps });
 
   return (
@@ -73,6 +73,27 @@ export default function DevMenu({
       titleProps={titleProps}
       leftAdornment={<IconSymbol name="bug-report" size={iconSize} />}
     >
+      <Button
+        title="Demo Alert"
+        onPress={() => {
+          alert(({ close }) => ({
+            title: "Test Alert",
+            message: "This is a test alert",
+            buttons: [
+              {
+                text: "OK",
+                onPress: close,
+              },
+              {
+                text: "Cancel",
+                onPress: close,
+              },
+            ],
+          }));
+        }}
+        variant="outline"
+      />
+
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 
       {isDevClient && (

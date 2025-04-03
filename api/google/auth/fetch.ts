@@ -1,6 +1,8 @@
 import AppError from "@/classes/AppError";
 import refreshAuth from "./refreshAuth";
 import logout from "./logout";
+import { alert } from "@/components/overlays/Alert";
+import text from "@/constants/text";
 
 export const userInfo = withGoogleFetch<{
   email: string;
@@ -72,6 +74,17 @@ export async function googleFetch<T>({
         return await tryFetch();
       } catch (refreshErr) {
         if (invalidOrExpired) {
+          alert(({ close }) => ({
+            title: text["auth.auto_logout.alert.title"],
+            message: text["auth.auto_logout.alert.message"],
+            buttons: [
+              {
+                text: text["general.ok"],
+                onClick: close,
+              },
+            ],
+          }));
+
           await logout("UNAUTHENTICATED");
         }
 
