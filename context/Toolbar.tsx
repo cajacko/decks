@@ -24,6 +24,7 @@ import withScreenControlContext, {
 } from "@/context/withScreenControlContext";
 import { useSkeletonAnimation } from "./Skeleton";
 import Link from "@/components/ui/Link";
+import { useSync } from "./Sync";
 
 interface ToolbarProps {
   hidden?: boolean;
@@ -120,10 +121,14 @@ function WholeToolbar({
   children,
   backPath,
   sharedToolbarHeight,
-  loading = false,
+  loading: loadingProp = false,
 }: Omit<ToolbarProps, "hidden"> & {
   sharedToolbarHeight: SharedValue<number>;
 }) {
+  const { loading: syncing } = useSync();
+
+  const loading: boolean = loadingProp || syncing;
+
   const { entering, exiting } = useLayoutAnimations();
   const { open } = useDrawer() ?? {};
   const { source, aspectRatio } = useTextLogo();

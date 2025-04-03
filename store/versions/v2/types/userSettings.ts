@@ -17,7 +17,7 @@ export const flagMap = {
   TOOLBAR_LOADING_ANIMATION: ["enabled", "disabled"],
   TOOLBAR_HEIGHT_ANIMATION: ["enabled", "disabled"],
   BACKUP_SYNC: ["disabled", "enabled"],
-  AUTO_SYNC: ["disabled", "enabled"],
+  AUTO_SYNC: ["enabled", "disabled"],
   ROTATE_CARDS_BEFORE_FLIP: ["disabled", "enabled"],
   SHUFFLE_ANIMATION: ["enabled", "disabled"],
   STACK_LIST_ITEM_BEHAVIOUR: ["all-touchable", "top-touchable"],
@@ -78,6 +78,7 @@ export type FlagsState = {
 
 export interface UserSettings extends Omit<TimestampMetadata, "dateDeleted"> {
   theme?: "system" | "light" | "dark";
+  hideWebAppStorePopUp?: boolean;
   flags?: FlagsState;
 }
 
@@ -85,6 +86,9 @@ export interface State {
   settings: UserSettings | null;
 }
 
-export type UserSettingKey = keyof Pick<UserSettings, "theme">;
+export type UserSettingKey = keyof Pick<
+  UserSettings,
+  "theme" | "hideWebAppStorePopUp"
+>;
 export type UserSettingValue<K extends UserSettingKey = UserSettingKey> =
   UserSettings[K];

@@ -8,6 +8,9 @@ import { Platform, StyleSheet } from "react-native";
 import ContentWidth from "@/components/ui/ContentWidth";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import IconButton from "@/components/forms/IconButton";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUserSetting, setUserSetting } from "@/store/slices/userSettings";
+import { dateToDateString } from "@/utils/dates";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
@@ -28,7 +31,28 @@ function RootLayout() {
   const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
   const borderColor = useThemeColor("inputOutline");
   const pathname = usePathname();
-  const [showAppStore, setShowAppStore] = React.useState(true);
+
+  const hideWebAppStorePopUp = useAppSelector((state) =>
+    selectUserSetting(state, { key: "hideWebAppStorePopUp" }),
+  );
+
+  const [showAppStore, setShowAppStore] = React.useState(
+    hideWebAppStorePopUp === true ? false : true,
+  );
+
+  const dispatch = useAppDispatch();
+
+  const closeAppStorePopUp = React.useCallback(() => {
+    setShowAppStore(false);
+
+    dispatch(
+      setUserSetting({
+        key: "hideWebAppStorePopUp",
+        value: true,
+        date: dateToDateString(new Date()),
+      }),
+    );
+  }, [dispatch]);
 
   const navOptions: NavOptions = React.useMemo(
     () => ({
@@ -69,7 +93,7 @@ function RootLayout() {
             <IconButton
               style={[styles.close, { borderColor }]}
               icon="close"
-              onPress={() => setShowAppStore(false)}
+              onPress={closeAppStorePopUp}
               size={closeIconSize}
             />
           </ContentWidth>
