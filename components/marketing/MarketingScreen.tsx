@@ -14,13 +14,14 @@ import { Image } from "expo-image";
 import AppStores from "@/components/ui/AppStores";
 import text from "@/constants/text";
 import Button from "@/components/forms/Button";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import {
   privacyPolicyLink,
   playfaceWebsite,
   charlieJacksonLink,
 } from "@/constants/links";
 import { Toolbar } from "@/context/Toolbar";
+import Link from "@/components/ui/Link";
 
 export interface MarketingScreenProps {
   style?: StyleProp<ViewStyle>;

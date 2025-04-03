@@ -29,6 +29,7 @@ import { ToolbarProvider } from "@/context/Toolbar";
 import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SkeletonProvider } from "@/context/Skeleton";
+import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
 
 enableFreeze();
 registerExampleDecks();
@@ -67,10 +68,10 @@ function Content({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <>
+    <ScreenContentLayoutProvider>
       {component}
       {children}
-    </>
+    </ScreenContentLayoutProvider>
   );
 }
 

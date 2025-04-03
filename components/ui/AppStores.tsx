@@ -1,13 +1,7 @@
 import { Image } from "expo-image";
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
-import { Link } from "expo-router";
+import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
+import Link from "@/components/ui/Link";
 import { iosAppStoreLink, playStoreLink } from "@/constants/links";
 
 export interface AppStoresProps {
@@ -21,23 +15,29 @@ export default function AppStores({
 }: AppStoresProps): React.ReactNode {
   return (
     <View style={[styles.container, style]}>
-      <Link asChild href={iosAppStoreLink} target="_blank" style={styles.link}>
-        <Pressable style={styles.pressable}>
-          <Image
-            style={[styles.appStore, { height }]}
-            source={require("../../assets/images/app-store.svg")}
-            contentFit="contain"
-          />
-        </Pressable>
+      <Link
+        href={iosAppStoreLink}
+        target="_blank"
+        style={styles.link}
+        TouchableProps={{ style: styles.pressable }}
+      >
+        <Image
+          style={[styles.appStore, { height }]}
+          source={require("../../assets/images/app-store.svg")}
+          contentFit="contain"
+        />
       </Link>
-      <Link asChild href={playStoreLink} target="_blank" style={styles.link}>
-        <Pressable style={styles.pressable}>
-          <Image
-            style={[styles.playStore, { height }]}
-            source={require("../../assets/images/play-store.svg")}
-            contentFit="contain"
-          />
-        </Pressable>
+      <Link
+        href={playStoreLink}
+        target="_blank"
+        style={styles.link}
+        TouchableProps={{ style: styles.pressable }}
+      >
+        <Image
+          style={[styles.playStore, { height }]}
+          source={require("../../assets/images/play-store.svg")}
+          contentFit="contain"
+        />
       </Link>
     </View>
   );

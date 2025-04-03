@@ -63,10 +63,11 @@ export default function IconButton({
           width: size,
           borderRadius: size / 2,
           backgroundColor: background,
+          borderColor: text,
         },
         styleProp,
       ]),
-    [styleProp, size, background, variant],
+    [styleProp, size, background, variant, text],
   );
 
   const onPressProps = useOnPressProps(props);
@@ -112,6 +113,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    borderWidth: 1,
   },
   floating: {
     position: "absolute",

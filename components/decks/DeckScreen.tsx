@@ -5,7 +5,6 @@ import {
   ViewStyle,
   FlatList,
   FlatListProps,
-  ViewProps,
   Platform,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
@@ -24,7 +23,7 @@ import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/ui/Loader";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
-import ContentWidth from "@/components/ui/ContentWidth";
+import ContentWidth, { getContentWidth } from "@/components/ui/ContentWidth";
 import DeckDefaults, {
   DeckDefaultsSkeleton,
 } from "@/components/decks/DeckDefaults";
@@ -36,6 +35,7 @@ import SettingsDeck from "@/components/settings/SettingsDeck";
 export interface DeckScreenProps {
   deckId: string;
   style?: ViewStyle;
+  width: number;
 }
 
 type FlatListData = null | {
@@ -61,38 +61,28 @@ type FlatListLayoutProps = Pick<
   | "removeClippedSubviews"
 >;
 
-function useDeckCardListProps(): {
-  onLayout: ViewProps["onLayout"];
-  cardListProps: null | {
+const contentWidthPadding = undefined;
+
+function useDeckCardListProps(availableWidth: number): {
+  cardListProps: {
     cardWidth: number;
     flatList: FlatListLayoutProps;
   };
 } {
-  const [contentWidth, setContentWidth] = React.useState<number | null>(null);
+  const contentWidth = getContentWidth({
+    availableWidth,
+    padding: contentWidthPadding,
+  });
 
-  const onLayout = React.useCallback<NonNullable<ViewProps["onLayout"]>>(
-    (event) => {
-      setContentWidth(event.nativeEvent.layout.width);
-    },
-    [],
-  );
-
-  if (contentWidth === null) {
-    return {
-      onLayout,
-      cardListProps: null,
-    };
-  }
-
-  const numColumns = Math.floor(
-    contentWidth / (cardWidth + minCardHorizontalMargin),
+  // Needs to be a ref as it can't change dynamically
+  const { current: numColumns } = React.useRef(
+    Math.floor(contentWidth / (cardWidth + minCardHorizontalMargin)),
   );
 
   return {
     // We can't dynamically update the number of columns
     // based on the width of the container, so we don't need to
     // update the layout
-    onLayout: undefined,
     cardListProps: {
       cardWidth,
       flatList: {
@@ -272,8 +262,8 @@ function AddButton({ deckId, open }: { deckId: string; open: Open }) {
 }
 
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
-  const { onLayout, cardListProps } = useDeckCardListProps();
-  const skeleton = useScreenSkeleton(DeckScreen.name) && cardListProps !== null;
+  const { cardListProps } = useDeckCardListProps(props.width);
+  const skeleton = useScreenSkeleton(DeckScreen.name);
 
   useDeckLastScreen({
     deckId: props.deckId,
@@ -290,22 +280,28 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
     id: props.deckId,
   });
 
+  const skeletonContent =
+    skeleton === "show-nothing" ? null : (
+      <DeckScreenSkeleton flatListProps={cardListProps.flatList} />
+    );
+
   return (
     <>
       {component}
-      <DeckToolbar deckId={props.deckId} loading={skeleton} />
+      <DeckToolbar deckId={props.deckId} loading={!!skeleton} />
       <DrawerChildren>
         <SettingsDeck deckId={props.deckId} />
       </DrawerChildren>
       <ContentWidth
         style={containerStyle}
         contentContainerStyle={styles.container}
+        padding={contentWidthPadding}
       >
-        <View style={styles.inner} onLayout={onLayout}>
+        <View style={styles.inner}>
           {cardListProps && (
             <CardConstraintsProvider width={cardListProps.cardWidth}>
               {skeleton ? (
-                <DeckScreenSkeleton flatListProps={cardListProps.flatList} />
+                skeletonContent
               ) : (
                 <ConnectedDeckScreen
                   deckId={props.deckId}

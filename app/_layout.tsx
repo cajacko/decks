@@ -42,7 +42,7 @@ function RootLayout() {
       marketing: {
         animation: "none",
       },
-      deck: ({ route: { params } }) => ({
+      deck: () => ({
         animation: animateStack ? "slide_from_right" : "none",
       }),
     }),

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Pressable,
-  Platform,
-} from "react-native";
+import { StyleSheet, ScrollView, View, Platform } from "react-native";
 import ThemedView from "@/components/ui/ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DevMenu from "@/components/settings/Dev/DevMenu";
@@ -15,7 +9,6 @@ import SettingsBackupSync from "@/components/settings/SettingsBackupSync";
 import FieldSet from "@/components/forms/FieldSet";
 import { useTextLogo } from "@/hooks/useLogo";
 import { Image } from "expo-image";
-import { Link } from "expo-router";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
@@ -23,6 +16,7 @@ import Button from "@/components/forms/Button";
 import AppStores from "@/components/ui/AppStores";
 import { playfaceWebsite, dexWebLink } from "@/constants/links";
 import useFlag from "@/hooks/useFlag";
+import Link from "@/components/ui/Link";
 
 export interface DrawerProps {
   closeDrawer: () => void;
@@ -68,27 +62,23 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
             </View>
             {Platform.OS === "web" && <AppStores />}
             {dexWebLink ? (
-              <Link href={dexWebLink} asChild>
-                <Pressable>
-                  <Image
-                    style={styles.logo}
-                    source={source}
-                    contentFit="contain"
-                  />
-                </Pressable>
+              <Link href={dexWebLink}>
+                <Image
+                  style={styles.logo}
+                  source={source}
+                  contentFit="contain"
+                />
               </Link>
             ) : (
               <Image style={styles.logo} source={source} contentFit="contain" />
             )}
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
-            <Link href={playfaceWebsite} target="_blank" asChild>
-              <Pressable>
-                <Image
-                  style={styles.playface}
-                  source={require("../../assets/images/playface-circle-logo-text-right.png")}
-                  contentFit="contain"
-                />
-              </Pressable>
+            <Link href={playfaceWebsite} target="_blank">
+              <Image
+                style={styles.playface}
+                source={require("../../assets/images/playface-circle-logo-text-right.png")}
+                contentFit="contain"
+              />
             </Link>
             <Version />
           </View>

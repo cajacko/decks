@@ -33,7 +33,7 @@ export default function Tabletop({
 }: TabletopProps): React.ReactNode {
   const stackListRef = React.useRef<StackListRef>(null);
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
-  const { hasTabletop } = useEnsureTabletop({ tabletopId });
+  useEnsureTabletop({ tabletopId });
   const dispatch = useAppDispatch();
   const tabletopNeedsResetting = useAppSelector((state) =>
     selectTabletopNeedsResetting(state, { tabletopId }),
@@ -75,7 +75,7 @@ export default function Tabletop({
     };
   });
 
-  const skeleton = useScreenSkeleton(Tabletop.name) || !hasTabletop;
+  const skeleton = useScreenSkeleton(Tabletop.name);
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
@@ -115,6 +115,11 @@ export default function Tabletop({
     [deckId],
   );
 
+  const skeletonContent =
+    skeleton === "show-nothing" ? null : (
+      <StackListSkeleton style={styles.stackList} />
+    );
+
   return (
     <TabletopProvider
       availableHeight={size.height}
@@ -133,7 +138,7 @@ export default function Tabletop({
         <SettingsDeck deckId={deckId} />
       </DrawerChildren>
       <TabletopToolbar
-        loading={skeleton}
+        loading={!!skeleton}
         tabletopId={tabletopId}
         deckId={deckId}
         beforeUndo={beforeUndo}
@@ -146,7 +151,7 @@ export default function Tabletop({
           </View>
         )}
         {skeleton ? (
-          <StackListSkeleton style={styles.stackList} />
+          skeletonContent
         ) : (
           <StackList ref={stackListRef} style={styles.stackList} />
         )}

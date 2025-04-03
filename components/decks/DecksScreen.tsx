@@ -101,21 +101,20 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DecksScreen.name);
   const cardWidth = useCardListWidth();
 
+  const skeletonContent =
+    skeleton === "show-nothing" ? null : (
+      <DecksScreenContent
+        style={props.style}
+        myDecks={<MyDecksSkeleton style={styles.myDecks} />}
+        preBuiltDecks={<PreBuiltDecksSkeleton style={styles.preBuiltDecks} />}
+      />
+    );
+
   return (
     <>
-      <Toolbar loading={skeleton} />
+      <Toolbar loading={!!skeleton} />
       <CardConstraintsProvider width={cardWidth}>
-        {skeleton ? (
-          <DecksScreenContent
-            style={props.style}
-            myDecks={<MyDecksSkeleton style={styles.myDecks} />}
-            preBuiltDecks={
-              <PreBuiltDecksSkeleton style={styles.preBuiltDecks} />
-            }
-          />
-        ) : (
-          <ConnectedDecksScreen {...props} />
-        )}
+        {skeleton ? skeletonContent : <ConnectedDecksScreen {...props} />}
       </CardConstraintsProvider>
     </>
   );

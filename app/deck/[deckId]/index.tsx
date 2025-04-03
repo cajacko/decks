@@ -4,9 +4,11 @@ import { StyleSheet } from "react-native";
 import TextureBackground from "@/components/ui/TextureBackground";
 import Screen from "@/components/ui/Screen";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
+import { useScreenContentLayout } from "@/context/ScreenContentLayout";
 
 export default function DeckRoute() {
   const deckId = useScreenDeckId("screen", DeckRoute.name);
+  const { width } = useScreenContentLayout();
 
   if (!deckId) {
     return null;
@@ -14,7 +16,7 @@ export default function DeckRoute() {
 
   return (
     <Screen background={<TextureBackground />}>
-      <DeckScreen deckId={deckId} style={styles.container} />
+      <DeckScreen width={width} deckId={deckId} style={styles.container} />
     </Screen>
   );
 }

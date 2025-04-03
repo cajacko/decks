@@ -1,8 +1,15 @@
 import React from "react";
-import { StyleProp, StyleSheet, ViewProps, ViewStyle } from "react-native";
+import {
+  StyleProp,
+  StyleSheet,
+  ViewProps,
+  ViewStyle,
+  View,
+} from "react-native";
 import Animated from "react-native-reanimated";
 import { useSkeletonAnimation } from "@/context/Skeleton";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import useFlag from "@/hooks/useFlag";
 
 export interface SkeletonProps extends ViewProps {
   variant?: "card" | "text" | "image" | "button";
@@ -27,8 +34,11 @@ export default function Skeleton({
   textSpacingVertical,
   ...props
 }: SkeletonProps): React.ReactNode {
+  const shouldAnimate = useFlag("SKELETON_ANIMATIONS") === "enabled";
+  const showNothing = useFlag("SKELETON_LOADER") === "show-nothing";
   const { backgroundColorStyle } = useSkeletonAnimation();
   const skeletonCardColor = useThemeColor("skeletonCard");
+  const backgroundColor = useThemeColor("skeleton");
 
   const style = React.useMemo<StyleProp<ViewStyle>>(() => {
     const sizes: ViewStyle = {};
@@ -68,7 +78,8 @@ export default function Skeleton({
         sizes,
         styleProp,
       ]),
-      variant !== "card" && backgroundColorStyle,
+      variant !== "card" &&
+        (shouldAnimate ? backgroundColorStyle : { backgroundColor }),
     ];
   }, [
     styleProp,
@@ -82,9 +93,17 @@ export default function Skeleton({
     textSpacingBottom,
     textSpacingVertical,
     skeletonCardColor,
+    shouldAnimate,
+    backgroundColor,
   ]);
 
-  return <Animated.View {...props} style={style} />;
+  if (showNothing) return null;
+
+  if (shouldAnimate) {
+    return <Animated.View {...props} style={style} />;
+  }
+
+  return <View {...props} style={style} />;
 }
 
 const textParagraphSpacing = 5;

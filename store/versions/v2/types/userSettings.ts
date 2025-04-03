@@ -14,6 +14,7 @@ export const flagMap = {
   SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
+  TOOLBAR_LOADING_ANIMATION: ["enabled", "disabled"],
   TOOLBAR_HEIGHT_ANIMATION: ["enabled", "disabled"],
   BACKUP_SYNC: ["disabled", "enabled"],
   AUTO_SYNC: ["disabled", "enabled"],
@@ -28,8 +29,17 @@ export const flagMap = {
   CARD_ACTIONS_ALWAYS_VISIBLE: [false, true],
   EDIT_CARD_MORE_INFO: ["disabled", "enabled"],
   CARD_ANIMATIONS: ["enabled", "disabled"],
-  SKELETON_LOADER: ["enabled", "disabled"],
-  SKELETON_ANIMATIONS: ["enabled", "disabled"],
+  /**
+   * Disabled is actually the worst option here as the screens freeze until the entire content has
+   * loaded.
+   */
+  SKELETON_LOADER: ["show-nothing", "enabled", "disabled"],
+  /**
+   * This can be a big performance hog if enabled, something about having a tone of animated
+   * components rendering of screen causing navigation transitions to seize up. Potentially waiting
+   * to enable them might help. But it does seem to block the next navigation transition after that.
+   */
+  SKELETON_ANIMATIONS: ["disabled", "enabled"],
   SCREEN_ANIMATIONS: [
     "disabled",
     "react-navigation",

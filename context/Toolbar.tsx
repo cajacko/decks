@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import Animated, {
   useSharedValue,
@@ -18,7 +12,7 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
 import ProfilePic from "@/components/ui/ProfilePic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter, Href, Link } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { Image } from "expo-image";
 import { useTextLogo } from "@/hooks/useLogo";
 import IconButton from "@/components/forms/IconButton";
@@ -29,6 +23,7 @@ import withScreenControlContext, {
   ContextState as CreateContextState,
 } from "@/context/withScreenControlContext";
 import { useSkeletonAnimation } from "./Skeleton";
+import Link from "@/components/ui/Link";
 
 interface ToolbarProps {
   hidden?: boolean;
@@ -139,6 +134,8 @@ function WholeToolbar({
   const backgroundColor = useThemeColor("background");
   const primaryColor = useThemeColor("primary");
   const { loopAnimation } = useSkeletonAnimation();
+  const shouldAnimateLoading =
+    useFlag("TOOLBAR_LOADING_ANIMATION") === "enabled" && loading;
 
   const back = React.useMemo(() => {
     if (!backPath) return undefined;
@@ -177,6 +174,8 @@ function WholeToolbar({
     const width = 10;
     const midPosition = 50 - width / 2;
 
+    if (!shouldAnimateLoading) return {};
+
     return {
       left: `${interpolate(loopAnimation.value, [0, 0.1, 0.5, 1], [0, 0, midPosition, 100])}%`,
       right: `${interpolate(loopAnimation.value, [0, 0.5, 0.9, 1], [100, midPosition, 0, 0])}%`,
@@ -214,14 +213,16 @@ function WholeToolbar({
           )}
           {logoVisible && (
             <Animated.View entering={entering} exiting={exiting}>
-              <Link asChild href="/">
-                <Pressable style={imageContainerStyle}>
-                  <Image
-                    style={styles.image}
-                    contentFit="contain"
-                    source={source}
-                  />
-                </Pressable>
+              <Link
+                href="/"
+                TouchableProps={{ style: imageContainerStyle }}
+                vibrate
+              >
+                <Image
+                  style={styles.image}
+                  contentFit="contain"
+                  source={source}
+                />
               </Link>
             </Animated.View>
           )}
@@ -255,7 +256,7 @@ function WholeToolbar({
           </View>
         </View>
       </ContentWidth>
-      {loading && (
+      {shouldAnimateLoading && (
         <Animated.View
           entering={entering}
           exiting={exiting}

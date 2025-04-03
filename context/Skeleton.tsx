@@ -1,4 +1,3 @@
-import useFlag from "@/hooks/useFlag";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import React from "react";
 import { ViewStyle } from "react-native";
@@ -22,9 +21,10 @@ const Context = React.createContext<ContextState | undefined>(undefined);
 
 const loopDuration = 1500;
 
+// NOTE: Don't turn off the animation via flags here as multiple different features use this same
+// animation. Call the flags in the components that use this animation instead.
 // Loop the animation from 0-1 and then it hops back to 1
-function useAnimations(_animate = true): ContextState {
-  const animate = useFlag("SKELETON_ANIMATIONS") === "enabled" && _animate;
+function useAnimations(animate = true): ContextState {
   const backgroundColor = useThemeColor("skeleton");
   const backgroundColorPulse = useThemeColor("skeletonPulse");
   const loopAnimation = useSharedValue(0);

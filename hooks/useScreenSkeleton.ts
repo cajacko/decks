@@ -6,13 +6,10 @@ import useStateChangeThrottle from "./useStateChangeThrottle";
 
 export default function useScreenSkeleton(
   key: string,
-  options: {
-    trueToFalseMinDelay?: number;
-    falseToTrueMinDelay?: number;
-  } = {},
-) {
+): "enabled" | "show-nothing" | null {
   const navigation = useNavigation();
-  const featureDisabled = useFlag("SKELETON_LOADER") === "disabled";
+  const skeletonLoader = useFlag("SKELETON_LOADER");
+  const featureDisabled = skeletonLoader === "disabled";
   const [skeleton, setSkeleton] = React.useState(
     featureDisabled ? false : true,
   );
@@ -46,10 +43,13 @@ export default function useScreenSkeleton(
   }, [navigation, key, featureDisabled]);
 
   const throttledSkeleton = useStateChangeThrottle(skeleton, {
-    maxUpdateInterval: 1000,
+    // The minimum amount of time to keep the skeleton on screen for
+    maxUpdateInterval: 500,
   });
 
-  return true;
+  if (featureDisabled) {
+    return null;
+  }
 
-  return featureDisabled ? false : throttledSkeleton;
+  return throttledSkeleton ? skeletonLoader : null;
 }
