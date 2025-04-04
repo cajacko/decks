@@ -1,9 +1,16 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ViewStyle,
+  ViewProps,
+} from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  runOnJS,
 } from "react-native-reanimated";
 import IconSymbol from "./IconSymbol";
 import ThemedText, { ThemedTextProps } from "./ThemedText";
@@ -17,8 +24,6 @@ export interface CollapsibleProps {
   style?: ViewStyle;
   collapsible?: boolean;
   initialCollapsed?: boolean;
-  collapsed?: boolean;
-  onCollapse?: (collapsed: boolean) => void;
   titleProps?: Partial<LabelProps>;
   subTitleProps?: Partial<ThemedTextProps>;
   headerStyle?: ViewStyle;
@@ -34,55 +39,88 @@ export function useLeftAdornmentSize(
 export default function Collapsible(props: CollapsibleProps): React.ReactNode {
   const {
     title,
-    children,
+    children: childrenProp,
     style: styleProp,
     collapsible = true,
     initialCollapsed = true,
-    collapsed: controlledCollapsed,
-    onCollapse,
     titleProps,
     subTitleProps,
     subTitle,
     headerStyle,
     leftAdornment,
   } = props;
-
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
-  const [isCollapsed, setIsCollapsed] = useState(
-    controlledCollapsed === undefined ? initialCollapsed : controlledCollapsed,
+  const [_isCollapsed, setIsCollapsed] = useState(initialCollapsed);
+  const isCollapsed = collapsible ? _isCollapsed : false;
+
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const contentHeight = useSharedValue<number | undefined>(undefined);
+
+  const onContentLayout = React.useCallback<NonNullable<ViewProps["onLayout"]>>(
+    (event) => {
+      contentHeight.value = event.nativeEvent.layout.height;
+    },
+    [contentHeight],
   );
 
   const leftAdornmentSize = useLeftAdornmentSize(props);
+  const heightProgress = useSharedValue(isCollapsed ? 0 : 1);
 
   // Manage internal state when uncontrolled
   const toggleCollapse = useCallback(() => {
-    const newState = !isCollapsed;
-    setIsCollapsed(newState);
-    onCollapse?.(newState);
-  }, [isCollapsed, onCollapse]);
+    const newValue = isCollapsed ? 1 : 0;
 
-  useEffect(() => {
-    if (controlledCollapsed === undefined) return;
+    setIsCollapsed(!isCollapsed);
 
-    setIsCollapsed(controlledCollapsed);
-  }, [controlledCollapsed]);
-
-  const height = useSharedValue(isCollapsed ? 0 : 1);
-
-  useEffect(() => {
-    const newValue = isCollapsed ? 0 : 1;
-
+    // Keep height in sync in case performance mode turns off later
     if (performanceMode) {
-      height.value = newValue;
-    } else {
-      height.value = withTiming(newValue, { duration: 300 });
-    }
-  }, [isCollapsed, height, performanceMode]);
+      heightProgress.value = newValue;
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: height.value === 0 ? 0 : "auto",
-    opacity: height.value,
-  }));
+      return;
+    }
+
+    setIsAnimating(true);
+
+    let duration: number;
+
+    if (contentHeight.value === undefined) {
+      // Default
+      duration = 500;
+    } else {
+      // Calculate duration based off our desired velocity rather than a certain time as it looks
+      // strange when the content is very small
+      const velocity = 0.5; // pixels per millisecond
+
+      const targetHeight = contentHeight.value * newValue;
+      const currentHeight = contentHeight.value * heightProgress.value;
+      const distance = Math.abs(targetHeight - currentHeight);
+      duration = distance / velocity;
+    }
+
+    duration = Math.min(duration, 500); // Cap the max duration
+
+    heightProgress.value = withTiming(newValue, { duration }, (isFinished) => {
+      if (isFinished) {
+        runOnJS(setIsAnimating)(false);
+      }
+    });
+  }, [isCollapsed, performanceMode, heightProgress, contentHeight]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    let height =
+      contentHeight.value === undefined
+        ? undefined
+        : contentHeight.value * heightProgress.value;
+
+    if (!isAnimating) {
+      height = isCollapsed ? 0 : height;
+    }
+
+    return {
+      height,
+      opacity: heightProgress.value,
+    };
+  });
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.container, styleProp]),
@@ -94,9 +132,22 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
     [headerStyle],
   );
 
-  const contentStyle = React.useMemo(
-    () => [styles.content, collapsible && animatedStyle],
+  const animatedContentStyle = React.useMemo(
+    () => [styles.animatedContent, collapsible && animatedStyle],
     [collapsible, animatedStyle],
+  );
+
+  let doNotRenderChildren = performanceMode === true && isCollapsed;
+  const children = doNotRenderChildren ? null : childrenProp;
+  const hideButRender = isCollapsed && !isAnimating;
+
+  const nonAnimatedContentStyle = React.useMemo(
+    () =>
+      StyleSheet.flatten([
+        collapsible && styles.nonAnimatedContent,
+        collapsible && hideButRender && styles.outOfViewContent,
+      ]),
+    [hideButRender, collapsible],
   );
 
   return (
@@ -145,12 +196,24 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
           )}
         </TouchableOpacity>
       )}
-      <Animated.View style={contentStyle}>{children}</Animated.View>
+      <Animated.View style={animatedContentStyle}>
+        <View style={nonAnimatedContentStyle} onLayout={onContentLayout}>
+          {children}
+        </View>
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  nonAnimatedContent: {
+    position: "absolute",
+    width: "100%",
+  },
+  outOfViewContent: {
+    left: -999999,
+    pointerEvents: "none",
+  },
   container: {
     overflow: "hidden",
   },
@@ -173,7 +236,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     flex: 1,
   },
-  content: {
+  animatedContent: {
     overflow: "hidden",
+    position: "relative",
   },
 });

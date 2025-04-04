@@ -12,8 +12,6 @@ export { useLeftAdornmentSize };
 export interface FieldSetProps
   extends Pick<
     CollapsibleProps,
-    | "collapsed"
-    | "onCollapse"
     | "initialCollapsed"
     | "collapsible"
     | "titleProps"
