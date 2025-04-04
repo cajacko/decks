@@ -7,6 +7,9 @@ import { selectSync } from "@/store/slices/sync";
 import { sync, pull, push, remove } from "@/api/dex/sync";
 import useFlag from "@/hooks/useFlag";
 import { useAuthentication } from "./Authentication";
+import withDebugLog from "@/utils/withDebugLog";
+
+const debugLog = withDebugLog(() => false, "Sync Context");
 
 type ContextState = {
   featureEnabled: boolean;
@@ -17,6 +20,8 @@ type ContextState = {
   pull: () => Promise<void>;
   remove: () => Promise<void>;
 };
+
+const autoSyncMaxFrequency = 1000 * 60 * 5; // 5 minutes
 
 const Context = React.createContext<ContextState | undefined>(undefined);
 
@@ -103,54 +108,76 @@ export function SyncProvider(props: { children: React.ReactNode }) {
     [withRequest],
   );
 
-  // FIXME:
-  // React.useEffect(() => {
-  //   if (!autoSyncEnabled) return;
+  React.useEffect(() => {
+    if (!autoSyncEnabled) return;
 
-  //   let timeout: NodeJS.Timeout;
+    debugLog("Auto sync enabled");
 
-  //   const maybeAutoSync = async () => {
-  //     const { isConnected } = await NetInfo.fetch();
-  //     const now = Date.now();
-  //     const last = lastSynced ? new Date(lastSynced).getTime() : 0;
-  //     const timeSinceLast = now - last;
+    async function syncIfShould() {
+      debugLog("Auto sync check");
 
-  //     const minInterval = 1000 * 60 * 5; // 5 minutes
+      if (loading) {
+        debugLog("Auto sync check - loading");
+        return;
+      }
 
-  //     if (
-  //       loading ||
-  //       !isConnected ||
-  //       AppState.currentState !== "active" ||
-  //       timeSinceLast < minInterval
-  //     ) {
-  //       // Retry again in 30 seconds
-  //       timeout = setTimeout(maybeAutoSync, 1000 * 30);
-  //       return;
-  //     }
+      if (lastSynced) {
+        const timeSinceLastSync = Date.now() - new Date(lastSynced).getTime();
+        const tooSoon = timeSinceLastSync < autoSyncMaxFrequency;
 
-  //     try {
-  //       await requests.sync();
-  //     } finally {
-  //       timeout = setTimeout(maybeAutoSync, minInterval);
-  //     }
-  //   };
+        if (tooSoon) {
+          debugLog("Auto sync check - too soon");
 
-  //   // Initial check
-  //   maybeAutoSync();
+          return;
+        }
+      }
 
-  //   // AppState listener to re-trigger sync when app comes into focus
-  //   const sub = AppState.addEventListener("change", (nextAppState) => {
-  //     if (nextAppState === "active" && !loading) {
-  //       maybeAutoSync();
-  //     }
-  //   });
+      const state = await AppState.currentState;
 
-  //   return () => {
-  //     clearTimeout(timeout);
+      if (state !== "active") {
+        debugLog("Auto sync check - not active");
+        return;
+      }
 
-  //     sub.remove();
-  //   };
-  // }, [autoSyncEnabled, lastSynced, loading, requests]);
+      const netInfo = await NetInfo.fetch();
+
+      if (!netInfo.isConnected) {
+        debugLog("Auto sync check - not connected");
+        return;
+      }
+
+      if (netInfo.isInternetReachable === false) {
+        debugLog("Auto sync check - not reachable");
+        return;
+      }
+
+      debugLog("Auto sync check - syncing");
+
+      try {
+        await requests.sync();
+
+        debugLog("Auto sync check - synced");
+      } catch (unknownError) {
+        debugLog("Auto sync check - error", unknownError);
+        setError(
+          AppError.getError(
+            unknownError,
+            `${SyncProvider.name} - Auto sync failed`,
+          ),
+        );
+      }
+    }
+
+    syncIfShould();
+
+    const interval = setInterval(() => {
+      syncIfShould();
+    }, 1000 * 10);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [autoSyncEnabled, lastSynced, loading, requests]);
 
   const value = React.useMemo<ContextState>(
     () => ({
