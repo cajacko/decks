@@ -21,8 +21,8 @@ type ContextState = {
   remove: () => Promise<void>;
 };
 
-const autoSyncMinFrequency = 1000 * 60 * 5; // 5 minutes
-const autoSyncMaxFrequency = 1000 * 30; // 30 seconds
+const autoSyncMinFrequency = 1000 * 60 * 2;
+const autoSyncMaxFrequency = 1000 * 30;
 
 const Context = React.createContext<ContextState | undefined>(undefined);
 

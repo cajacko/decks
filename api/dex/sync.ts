@@ -121,11 +121,11 @@ export async function sync() {
     }),
   );
 
+  await push();
+
   store.dispatch(
     setSyncState({
       lastPushed: now,
     }),
   );
-
-  return push();
 }
