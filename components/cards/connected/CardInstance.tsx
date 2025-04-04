@@ -3,13 +3,20 @@ import AnimatedCardSides, {
   AnimatedCardSidesRef,
   AnimatedCardSidesProps,
 } from "@/components/cards/connected/AnimatedCardSides";
-import { selectCardInstance } from "@/store/slices/tabletop";
+import { selectCardInstance } from "@/store/selectors/tabletops";
 import { useRequiredAppSelector } from "@/store/hooks";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { Target } from "@/utils/cardTarget";
+import CardSkeleton from "./CardSkeleton";
 
 export interface CardInstanceProps extends Partial<AnimatedCardSidesProps> {
   cardInstanceId: string;
+}
+
+export function CardInstanceSkeleton({
+  style,
+}: Pick<CardInstanceProps, "style">) {
+  return <CardSkeleton style={style} />;
 }
 
 export default React.forwardRef<AnimatedCardSidesRef, CardInstanceProps>(

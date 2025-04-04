@@ -2,12 +2,6 @@ import { createAction } from "@reduxjs/toolkit";
 import { Cards, DateString, Decks, Tabletops } from "../types";
 import { SetCardData } from "./types";
 
-export const deleteDeck = createAction<{
-  deckId: Decks.Id;
-  cardIds: Cards.Id[];
-  date: DateString;
-}>("deleteDeck");
-
 export const updateCard = createAction<{
   cardId: Cards.Id;
   deckId: Decks.Id;

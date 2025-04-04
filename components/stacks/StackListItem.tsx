@@ -1,7 +1,9 @@
 import React from "react";
 import { Tabletops } from "@/store/types";
 import { StyleSheet } from "react-native";
-import CardInstance from "@/components/cards/connected/CardInstance";
+import CardInstance, {
+  CardInstanceSkeleton,
+} from "@/components/cards/connected/CardInstance";
 import StackTopCard from "@/components/stacks/StackTopCard";
 import useFlag from "@/hooks/useFlag";
 import { StackListRef } from "@/components/stacks/StackList";
@@ -18,16 +20,28 @@ export interface StackListItemProps {
   stackListRef: React.RefObject<StackListRef>;
 }
 
+function useStyle(zIndex: number) {
+  return React.useMemo(
+    () => StyleSheet.flatten([styles.card, { zIndex }]),
+    [zIndex],
+  );
+}
+
+export function StackListItemSkeleton({
+  zIndex,
+}: Pick<StackListItemProps, "zIndex">) {
+  const style = useStyle(zIndex);
+
+  return <CardInstanceSkeleton style={style} />;
+}
+
 export default function StackListItem(
   props: StackListItemProps,
 ): React.ReactNode {
   const { cardInstanceId, zIndex, isTopCard, cardOffsetPosition } = props;
   const allTouchable = useFlag("STACK_LIST_ITEM_BEHAVIOUR") === "all-touchable";
 
-  const style = React.useMemo(
-    () => StyleSheet.flatten([styles.card, { zIndex }]),
-    [zIndex],
-  );
+  const style = useStyle(zIndex);
 
   // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
   // rename that component to something like StackCard.

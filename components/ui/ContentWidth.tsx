@@ -14,6 +14,20 @@ export interface ContentWidthProps extends ViewProps {
 
 export const contentMaxWidth = 800;
 
+export function getContentWidth(
+  props: Pick<ContentWidthProps, "padding"> & {
+    availableWidth: number;
+  },
+) {
+  const fullWidth = Math.min(props.availableWidth, contentMaxWidth);
+  const padding =
+    props.padding === "standard"
+      ? styles.standardPadding.paddingHorizontal * 2
+      : 0;
+
+  return fullWidth - padding;
+}
+
 export default function ContentWidth({
   style: styleProp,
   contentContainerStyle: contentContainerStyleProp,

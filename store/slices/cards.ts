@@ -1,9 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState, Cards, SliceName } from "../types";
+import { Cards, SliceName } from "../types";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
-import withBuiltInState from "../utils/withBuiltInState";
 import { setState, syncState } from "../combinedActions/sync";
 import { mergeMap } from "../utils/mergeData";
 
@@ -105,10 +104,5 @@ export const cardsSlice = createSlice({
     });
   },
 });
-
-export const selectCard = withBuiltInState(
-  (state: RootState, props: { cardId: string }): Card | undefined =>
-    state[cardsSlice.name].cardsById[props.cardId],
-);
 
 export default cardsSlice;

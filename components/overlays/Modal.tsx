@@ -3,18 +3,62 @@ import { StyleSheet, View } from "react-native";
 import {
   Modal as ContextModal,
   ModalProps as ContextModalProps,
+  withSetModalProps,
 } from "@/context/Modal";
 import { fixed } from "@/constants/colors";
 
 export type ModalProps = ContextModalProps;
+
+const defaultModalProps: ModalProps = {
+  animationType: "fade",
+  transparent: true,
+};
+
+function ModalContent(props: { children: React.ReactNode }) {
+  return <View style={styles.container}>{props.children}</View>;
+}
+
+export function withModal() {
+  const { setModalProps, unmount: onRequestClose } = withSetModalProps();
+
+  function update(modalProps: ModalProps) {
+    setModalProps({
+      ...defaultModalProps,
+      onRequestClose,
+      visible: true,
+      ...modalProps,
+      children: <ModalContent>{modalProps.children}</ModalContent>,
+    });
+
+    return {
+      update,
+      onRequestClose,
+    };
+  }
+
+  return {
+    update,
+    onRequestClose,
+  };
+}
+
+export function modal(
+  callback: (props: { onRequestClose: () => void }) => ModalProps,
+) {
+  const { update, onRequestClose } = withModal();
+
+  const modalProps = callback({ onRequestClose });
+
+  return update(modalProps);
+}
 
 export default function Modal({
   children,
   ...props
 }: ModalProps): React.ReactNode {
   return (
-    <ContextModal animationType="fade" transparent {...props}>
-      <View style={styles.container}>{children}</View>
+    <ContextModal {...defaultModalProps} {...props}>
+      <ModalContent>{children}</ModalContent>
     </ContextModal>
   );
 }

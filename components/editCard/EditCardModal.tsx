@@ -9,8 +9,13 @@ export interface EditCardModalProps extends EditCardProps {
   onRequestClose?: () => void;
 }
 
+export type Open = (
+  target?: Target,
+  options?: { initialSide?: Cards.Side },
+) => void;
+
 export function useEditCardModal(initialTargetProp: Target): {
-  open: (target?: Target, options?: { initialSide?: Cards.Side }) => void;
+  open: Open;
   close: () => void;
   target: Target;
   visible: boolean;
@@ -31,8 +36,8 @@ export function useEditCardModal(initialTargetProp: Target): {
 
   const close = React.useCallback(() => setVisible(false), []);
 
-  const open = React.useCallback(
-    (openTarget?: Target, options?: { initialSide?: Cards.Side }) => {
+  const open = React.useCallback<Open>(
+    (openTarget, options) => {
       setTarget(openTarget ?? initialTarget);
       setVisible(true);
 

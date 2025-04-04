@@ -4,7 +4,8 @@ import {
   useBuiltInStateSelector,
   useAppDispatch,
 } from "@/store/hooks";
-import { selectTabletop, setTabletop } from "@/store/slices/tabletop";
+import { setTabletop } from "@/store/slices/tabletop";
+import { selectTabletop } from "@/store/selectors/tabletops";
 
 export default function useEnsureTabletop(props: { tabletopId: string }): {
   hasTabletop: boolean;

@@ -2,9 +2,6 @@ import React from "react";
 import CardContainer, { CardContainerProps } from "./CardContainer";
 import { StyleSheet } from "react-native";
 
-// type CardSpacerProps = CardSize &
-//   Pick<CardContainerProps, "backgroundColor" | "style" | "borderRadius">;
-
 type InjectedProps = Pick<
   CardContainerProps,
   "backgroundColor" | "style" | "borderRadius"

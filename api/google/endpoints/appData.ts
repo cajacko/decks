@@ -1,5 +1,4 @@
-import AppError from "@/classes/AppError";
-import { getState, withAuthenticatedFetch } from "./auth";
+import { authenticatedFetch } from "../auth/authenticatedFetch";
 
 const DRIVE_FILES_API = "https://www.googleapis.com/drive/v3/files";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files";
@@ -10,31 +9,23 @@ const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files";
 export async function getAppDataFile<T = unknown>(
   filename: string,
 ): Promise<T | null> {
-  const state = getState();
-
-  if (!state.tokens) throw new AppError("Not authenticated");
-
   // 1. Search for the file by name
-  const list = await withAuthenticatedFetch<{
+  const list = await authenticatedFetch<{
     files: { id: string }[];
   }>({
     url: `${DRIVE_FILES_API}?spaces=appDataFolder&q=name='${filename}' and trashed=false`,
     method: "GET",
-  })(state.tokens);
+  });
 
   const fileId = list.files?.[0]?.id;
+
   if (!fileId) return null;
 
   // 2. Download the file contents
-  const res = await fetch(`${DRIVE_FILES_API}/${fileId}?alt=media`, {
-    headers: {
-      Authorization: `Bearer ${state.tokens.accessToken}`,
-    },
+  return await authenticatedFetch<T>({
+    url: `${DRIVE_FILES_API}/${fileId}?alt=media`,
+    method: "GET",
   });
-
-  if (!res.ok) throw new AppError("Failed to fetch file content");
-
-  return await res.json();
 }
 
 /**
@@ -44,19 +35,13 @@ export async function setAppDataFile<T = unknown>(
   filename: string,
   data: T,
 ): Promise<void> {
-  const state = getState();
-
-  if (!state.tokens) throw new AppError("Not authenticated");
-
-  const accessToken = state.tokens.accessToken;
-
   // 1. Check if file exists
-  const list = await withAuthenticatedFetch<{
+  const list = await authenticatedFetch<{
     files: { id: string }[];
   }>({
     url: `${DRIVE_FILES_API}?spaces=appDataFolder&q=name='${filename}' and trashed=false`,
     method: "GET",
-  })(state.tokens);
+  });
 
   const fileId = list.files?.[0]?.id;
   const metadata = {
@@ -66,12 +51,9 @@ export async function setAppDataFile<T = unknown>(
 
   if (fileId) {
     // 2a. Update existing file
-    await fetch(`${DRIVE_UPLOAD_API}/${fileId}?uploadType=media`, {
+    await authenticatedFetch({
+      url: `${DRIVE_UPLOAD_API}/${fileId}?uploadType=media`,
       method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(data),
     });
   } else {
@@ -89,13 +71,20 @@ export async function setAppDataFile<T = unknown>(
       JSON.stringify(data) +
       closeDelimiter;
 
-    await fetch(`${DRIVE_UPLOAD_API}?uploadType=multipart`, {
+    await authenticatedFetch({
+      url: `${DRIVE_UPLOAD_API}?uploadType=multipart`,
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
         "Content-Type": `multipart/related; boundary=${boundary}`,
       },
       body: multipartBody,
     });
   }
+}
+
+export function removeAppDatafile(filename: string) {
+  return authenticatedFetch({
+    url: `${DRIVE_FILES_API}?spaces=appDataFolder&q=name='${filename}' and trashed=false`,
+    method: "DELETE",
+  });
 }

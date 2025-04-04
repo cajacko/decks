@@ -59,6 +59,31 @@ export function useModal(props: ModalProps) {
   return null;
 }
 
+let _globalSetModalProps: ContextState["setModalProps"] | null = null;
+
+export function withSetModalProps() {
+  const id = uuid();
+
+  function unmount() {
+    _globalSetModalProps?.(id, null);
+  }
+
+  function setModalProps(modalProps: ModalProps) {
+    if (!_globalSetModalProps) {
+      throw new AppError(``);
+    }
+
+    _globalSetModalProps(id, modalProps);
+
+    return unmount;
+  }
+
+  return {
+    setModalProps,
+    unmount,
+  };
+}
+
 export const Modal = React.memo<ModalProps>(function Modal(props) {
   return useModal(props);
 });
@@ -116,6 +141,8 @@ export function ModalProvider(props: { children: React.ReactNode }) {
     }),
     [],
   );
+
+  _globalSetModalProps = value.setModalProps;
 
   const modalChildren = React.useMemo(
     () =>

@@ -18,6 +18,11 @@ export interface ButtonProps extends TouchableOpacityProps {
   ThemedTextProps?: Partial<ThemedTextProps>;
 }
 
+export type UseOnPressProps = Pick<
+  ButtonProps,
+  "onPress" | "onPressOut" | "vibrate"
+>;
+
 /**
  * Sometimes we have to use onPressOut instead of onPress, because onPress doesn't seem to work in
  * the react-navigation headers
@@ -26,10 +31,7 @@ export function useOnPressProps({
   onPress,
   vibrate: shouldVibrate = false,
   onPressOut,
-}: Pick<ButtonProps, "onPress" | "onPressOut" | "vibrate">): Pick<
-  TouchableOpacityProps,
-  "onPress" | "onPressOut"
-> {
+}: UseOnPressProps): Pick<TouchableOpacityProps, "onPress" | "onPressOut"> {
   const { vibrate } = useVibrate();
 
   const withOnPress = React.useCallback(

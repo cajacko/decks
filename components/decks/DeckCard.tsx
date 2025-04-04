@@ -1,29 +1,35 @@
 import React from "react";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, ViewStyle, View } from "react-native";
 import Card from "@/components/cards/connected/Card";
 import { Target } from "@/utils/cardTarget";
 import useVibrate from "@/hooks/useVibrate";
+import CardSkeleton from "@/components/cards/connected/CardSkeleton";
 
 export type DeckCardProps = Target & {
   quantity?: number;
   style?: ViewStyle;
-  skeleton?: boolean;
   editCard: (target: Target) => void;
   deckId: string;
 };
+
+export function DeckCardSkeleton({ style }: Pick<DeckCardProps, "style">) {
+  return (
+    <View style={style}>
+      <CardSkeleton />
+    </View>
+  );
+}
 
 export default function DeckCard({
   id,
   type,
   style,
-  skeleton,
   editCard,
-  deckId,
 }: DeckCardProps): React.ReactNode {
   const { vibrate } = useVibrate();
   const target = React.useMemo<Target>(() => ({ id, type }), [id, type]);
 
-  const cardSide = <Card target={target} side="front" skeleton={skeleton} />;
+  const cardSide = <Card target={target} side="front" />;
 
   const open = React.useCallback(() => {
     vibrate?.("DeckCard");
@@ -32,7 +38,7 @@ export default function DeckCard({
   }, [editCard, target, vibrate]);
 
   return (
-    <Pressable onPress={skeleton ? undefined : open} style={style}>
+    <Pressable onPress={open} style={style}>
       {cardSide}
     </Pressable>
   );

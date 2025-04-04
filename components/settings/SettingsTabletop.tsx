@@ -1,10 +1,13 @@
 import React from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import FieldSet, { FieldSetProps } from "../forms/FieldSet";
+import FieldSet, {
+  FieldSetProps,
+  useLeftAdornmentSize,
+} from "../forms/FieldSet";
 import text from "@/constants/text";
 import Button from "@/components/forms/Button";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
-import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeck } from "@/store/selectors/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import {
   resetTabletopHelper,
@@ -18,6 +21,7 @@ import useTabletopHistory, {
 import { setTabletopSetting } from "@/store/slices/tabletop";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
 import { dateToDateString } from "@/utils/dates";
+import IconSymbol from "../ui/IconSymbol";
 
 const titleProps = { type: "h2" } as const;
 
@@ -117,6 +121,8 @@ export default function SettingsTabletop({
     [dispatch, tabletopId],
   );
 
+  const iconSize = useLeftAdornmentSize({ titleProps });
+
   return (
     <>
       {resetTabletopModal.component}
@@ -126,6 +132,7 @@ export default function SettingsTabletop({
         subTitle={`(${deckName})`}
         initialCollapsed
         collapsible
+        leftAdornment={<IconSymbol name="play-arrow" size={iconSize} />}
         {...props}
       >
         <StackActions tabletopId={tabletopId} collapsible initialCollapsed />

@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Templates, RootState, SliceName } from "../types";
-import withBuiltInState from "../utils/withBuiltInState";
-import { builtInTemplatesById } from "@/constants/builtInTemplates";
+import { Templates, SliceName } from "../types";
 // import { setState, syncState } from "../combinedActions/sync";
 // import { mergeMap } from "../utils/mergeData";
 
@@ -26,23 +24,5 @@ export const templatesSlice = createSlice({
     // });
   },
 });
-
-export const selectTemplate = withBuiltInState(
-  (
-    state: RootState,
-    props: { templateId: Templates.Id },
-  ): Templates.Props | undefined =>
-    state[templatesSlice.name].templatesById[props.templateId] ??
-    builtInTemplatesById[props.templateId],
-);
-
-export const selectTemplateSchemaItem = (
-  state: RootState,
-  props: {
-    templateId: Templates.Id;
-    templateDataId: Templates.DataId;
-  },
-): Templates.DataItem | null =>
-  selectTemplate(state, props)?.schema[props.templateDataId] ?? null;
 
 export default templatesSlice;

@@ -1,6 +1,7 @@
 import React from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectDeckLastScreen, setLastScreen } from "@/store/slices/decks";
+import { setLastScreen } from "@/store/slices/decks";
+import { selectDeckLastScreen } from "@/store/selectors/decks";
 import { useFocusEffect } from "expo-router";
 
 export default function useDeckLastScreen({

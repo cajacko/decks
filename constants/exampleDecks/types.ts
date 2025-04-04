@@ -24,4 +24,5 @@ export interface ExampleDeck<
   tabletopSettings?: Tabletops.Settings;
   devOnly: boolean;
   sortOrder: number | null;
+  version: string | null;
 }

@@ -1,8 +1,8 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle, StyleProp } from "react-native";
-import { useMmToDp } from "../context/PhysicalMeasures";
+import { useMmToDp, UseMmToDpProps } from "../context/PhysicalMeasures";
 
-export interface CardSideBySideProps {
+export interface CardSideBySideProps extends UseMmToDpProps {
   children: [React.ReactNode, React.ReactNode, React.ReactNode];
 }
 
@@ -11,8 +11,9 @@ const topOffset = 12;
 
 export default function CardSideBySide({
   children: [front, back, spacer],
+  ...props
 }: CardSideBySideProps): React.ReactNode {
-  const mmToDp = useMmToDp();
+  const mmToDp = useMmToDp(props);
 
   // TODO: These aren't accurate, need to do trigonometry to get the correct
   // offsets based off the rotation of the cards

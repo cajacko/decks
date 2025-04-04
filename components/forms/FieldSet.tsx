@@ -1,20 +1,24 @@
 import React from "react";
 // import ThemedText from "./ThemedText";
 import { View, ViewStyle, StyleSheet } from "react-native";
-import Collapsible, { CollapsibleProps } from "../ui/Collapsible";
+import Collapsible, {
+  CollapsibleProps,
+  useLeftAdornmentSize,
+} from "../ui/Collapsible";
 import { ThemedTextProps } from "../ui/ThemedText";
+
+export { useLeftAdornmentSize };
 
 export interface FieldSetProps
   extends Pick<
     CollapsibleProps,
-    | "collapsed"
-    | "onCollapse"
     | "initialCollapsed"
     | "collapsible"
     | "titleProps"
     | "subTitleProps"
     | "subTitle"
     | "title"
+    | "leftAdornment"
   > {
   children?: React.ReactNode;
   style?: ViewStyle;

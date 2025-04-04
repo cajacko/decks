@@ -1,21 +1,53 @@
 import React from "react";
 import { StyleSheet, ViewStyle } from "react-native";
 import { useBuiltInStateSelector } from "@/store/hooks";
-import { selectDeckIds } from "@/store/slices/decks";
-import ExpandedDeckListItem from "@/components/decks/ExpandedDeckListItem";
-import useScreenSkeleton from "@/hooks/useScreenSkeleton";
+import { selectDeckIds } from "@/store/selectors/decks";
+import ExpandedDeckListItem, {
+  ExpandedDeckListItemSkeleton,
+} from "@/components/decks/ExpandedDeckListItem";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 import ContentWidth from "@/components/ui/ContentWidth";
+import Skeleton from "../ui/Skeleton";
 
 export interface PreBuiltDecksProps {
   style?: ViewStyle;
 }
 
+function PreBuiltDecksContent({
+  style,
+  children,
+  text,
+}: PreBuiltDecksProps & {
+  children: React.ReactNode;
+  text: React.ReactNode;
+}) {
+  return (
+    <>
+      <ContentWidth padding="standard" style={style}>
+        {text}
+      </ContentWidth>
+      {children}
+    </>
+  );
+}
+
+export function PreBuiltDecksSkeleton(props: PreBuiltDecksProps) {
+  return (
+    <PreBuiltDecksContent
+      style={props.style}
+      text={<Skeleton variant="text" style={styles.title} width={200} />}
+    >
+      <ExpandedDeckListItemSkeleton style={styles.listItem} />
+      <ExpandedDeckListItemSkeleton style={styles.listItem} />
+      <ExpandedDeckListItemSkeleton style={styles.listItem} />
+    </PreBuiltDecksContent>
+  );
+}
+
 export default function PreBuiltDecks(
   props: PreBuiltDecksProps,
 ): React.ReactNode {
-  const skeleton = useScreenSkeleton(PreBuiltDecks.name);
   const deckIds = useBuiltInStateSelector((state) =>
     selectDeckIds(state, { sortBy: "sortOrder", direction: "asc" }),
   );
@@ -27,21 +59,22 @@ export default function PreBuiltDecks(
           key={deckId}
           style={styles.listItem}
           deckId={deckId}
-          skeleton={deckId ? skeleton : false}
         />
       )),
-    [deckIds, skeleton],
+    [deckIds],
   );
 
   return (
-    <>
-      <ContentWidth padding="standard" style={props.style}>
+    <PreBuiltDecksContent
+      style={props.style}
+      text={
         <ThemedText type="h1" style={styles.title}>
           {text["decks_screen.pre_built_decks.title"]}
         </ThemedText>
-      </ContentWidth>
+      }
+    >
       {children}
-    </>
+    </PreBuiltDecksContent>
   );
 }
 

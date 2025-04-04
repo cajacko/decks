@@ -32,6 +32,7 @@ const deck: ExampleDeck<
   devOnly: false,
   description: "A standard deck of 52 playing cards",
   sortOrder: null,
+  version: null,
   templates: {
     back: {
       templateId: back.templateId,

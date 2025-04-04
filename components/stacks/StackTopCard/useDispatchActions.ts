@@ -4,8 +4,8 @@ import {
   moveCard,
   changeCardState,
   MoveCardInstanceMethod,
-  selectCardInstance,
 } from "@/store/slices/tabletop";
+import { selectCardInstance } from "@/store/selectors/tabletops";
 import { AnimatedCardSidesRef } from "@/components/cards/connected/AnimatedCardSides";
 import { StackTopCardProps } from "./types";
 import useFlag from "@/hooks/useFlag";

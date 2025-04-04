@@ -2,7 +2,7 @@ import { createCachedSelector } from "re-reselect";
 import {
   selectTabletop,
   selectDoesTabletopHaveCardInstances,
-} from "../slices/tabletop";
+} from "../selectors/tabletops";
 import { RootState, Decks, Tabletops } from "../types";
 
 type TabletopProps = { tabletopId: Tabletops.Id };

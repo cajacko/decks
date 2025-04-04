@@ -1,10 +1,11 @@
 import React from "react";
 import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectDeckCards, selectDeckLastScreen } from "@/store/slices/decks";
+import { selectDeckCards, selectDeckLastScreen } from "@/store/selectors/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "@/components/cards/connected/CardSideBySide";
+import CardSideBySideSkeleton from "@/components/cards/connected/CardSideBySideSkeleton";
 import { newDeckCardTarget } from "@/constants/newDeckData";
 import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
@@ -14,7 +15,40 @@ import useVibrate from "@/hooks/useVibrate";
 export interface DeckListItemProps {
   deckId: string | null;
   style?: ViewStyle;
-  skeleton?: boolean;
+}
+
+function DeckListItemContent({
+  style,
+  children,
+  onPress,
+}: Pick<DeckListItemProps, "style"> & {
+  children?: React.ReactNode;
+  onPress?: () => void;
+}) {
+  const containerStyle = React.useMemo(
+    () => [styles.container, style],
+    [style],
+  );
+
+  return (
+    <View style={containerStyle}>
+      {onPress ? (
+        <Pressable style={styles.cards} onPress={onPress}>
+          {children}
+        </Pressable>
+      ) : (
+        <View style={styles.cards}>{children}</View>
+      )}
+    </View>
+  );
+}
+
+export function DeckListItemSkeleton({ style }: Partial<DeckListItemProps>) {
+  return (
+    <DeckListItemContent style={style}>
+      <CardSideBySideSkeleton />
+    </DeckListItemContent>
+  );
 }
 
 export default function DeckListItem(
@@ -62,18 +96,11 @@ export default function DeckListItem(
     );
   }, [props.deckId, navigate, lastScreen, dispatch, vibrate]);
 
-  const containerStyle = React.useMemo(
-    () => [styles.container, props.style],
-    [props.style],
-  );
-
   return (
     <CardTargetProvider target={target}>
-      <View style={containerStyle}>
-        <Pressable style={styles.cards} onPress={onPress}>
-          <CardSideBySide topSide="back" target={target} />
-        </Pressable>
-      </View>
+      <DeckListItemContent style={props.style} onPress={onPress}>
+        <CardSideBySide topSide="back" target={target} />
+      </DeckListItemContent>
     </CardTargetProvider>
   );
 }

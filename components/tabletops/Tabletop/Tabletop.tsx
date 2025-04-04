@@ -2,7 +2,10 @@ import React from "react";
 import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
 import TabletopToolbar from "@/components/tabletops/TabletopToolbar";
 import { TabletopProps } from "@/components/tabletops/Tabletop/Tabletop.types";
-import StackList, { StackListRef } from "@/components/stacks/StackList";
+import StackList, {
+  StackListRef,
+  StackListSkeleton,
+} from "@/components/stacks/StackList";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,7 +33,7 @@ export default function Tabletop({
 }: TabletopProps): React.ReactNode {
   const stackListRef = React.useRef<StackListRef>(null);
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
-  const { hasTabletop } = useEnsureTabletop({ tabletopId });
+  useEnsureTabletop({ tabletopId });
   const dispatch = useAppDispatch();
   const tabletopNeedsResetting = useAppSelector((state) =>
     selectTabletopNeedsResetting(state, { tabletopId }),
@@ -72,7 +75,7 @@ export default function Tabletop({
     };
   });
 
-  const skeleton = useScreenSkeleton(Tabletop.name) || !hasTabletop;
+  const skeleton = useScreenSkeleton(Tabletop.name);
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
@@ -112,6 +115,11 @@ export default function Tabletop({
     [deckId],
   );
 
+  const skeletonContent =
+    skeleton === "show-nothing" ? null : (
+      <StackListSkeleton style={styles.stackList} />
+    );
+
   return (
     <TabletopProvider
       availableHeight={size.height}
@@ -130,6 +138,7 @@ export default function Tabletop({
         <SettingsDeck deckId={deckId} />
       </DrawerChildren>
       <TabletopToolbar
+        loading={!!skeleton}
         tabletopId={tabletopId}
         deckId={deckId}
         beforeUndo={beforeUndo}
@@ -141,12 +150,10 @@ export default function Tabletop({
             <TabletopNotification {...notification} />
           </View>
         )}
-        {!skeleton && (
-          <StackList
-            ref={stackListRef}
-            skeleton={skeleton}
-            style={styles.stackList}
-          />
+        {skeleton ? (
+          skeletonContent
+        ) : (
+          <StackList ref={stackListRef} style={styles.stackList} />
         )}
       </Animated.View>
     </TabletopProvider>
