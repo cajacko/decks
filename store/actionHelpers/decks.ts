@@ -98,6 +98,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
         },
       },
     },
+    version: undefined,
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
     name: deckName,
@@ -311,6 +312,7 @@ export function copyDeckHelper(props: {
     id: deckId,
     defaultTabletopId: newTabletopId,
     canEdit: true,
+    version: deckToCopy.version,
   };
 
   return createDeck({

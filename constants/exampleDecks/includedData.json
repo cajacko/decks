@@ -2,6 +2,7 @@
   {
     "props": {
       "title": "Playing Cards",
+      "version": "1",
       "sortOrder": "1",
       "description": "A standard deck of 52 playing cards",
       "devOnly": false,
@@ -12,6 +13,7 @@
   {
     "props": {
       "title": "Charades",
+      "version": "1",
       "sortOrder": "2",
       "description": "One player acts - everyone else guesses!\n\n1. Flip a card to reveal a word or phrase.\n2. Without speaking or making sounds, the player must act it out using gestures.\n3. The rest of the group tries to guess what it is.\n\n- Set a timer (e.g. 1 minute) for each round.\n- If the group guesses correctly before time runs out, they win the point!\n- No talking, mouthing words, or pointing at objects in the room. Just pure mime!",
       "color": "#FFDCCC",
@@ -1188,8 +1190,1323 @@
   },
   {
     "props": {
-      "title": "Most Likely",
+      "title": "Guess the Flag!",
+      "version": "1",
       "sortOrder": "3",
+      "description": "250+ flags, but where do they represent? Flip the card for the answer. Learn the flags or give clues for others to guess the location.",
+      "color": "#c8e9a0",
+      "devOnly": false,
+      "gid": "1980334248",
+      "key": "flags"
+    },
+    "data": [
+      {
+        "emoji": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+        "description": "Flip for answer",
+        "backText": "Wales"
+      },
+      {
+        "emoji": "🇦🇨",
+        "description": "Flip for answer",
+        "backText": "Ascension Island"
+      },
+      {
+        "emoji": "🇦🇩",
+        "description": "Flip for answer",
+        "backText": "Andorra"
+      },
+      {
+        "emoji": "🇦🇪",
+        "description": "Flip for answer",
+        "backText": "United Arab Emirates"
+      },
+      {
+        "emoji": "🇦🇫",
+        "description": "Flip for answer",
+        "backText": "Afghanistan"
+      },
+      {
+        "emoji": "🇦🇬",
+        "description": "Flip for answer",
+        "backText": "Antigua & Barbuda"
+      },
+      {
+        "emoji": "🇦🇮",
+        "description": "Flip for answer",
+        "backText": "Anguilla"
+      },
+      {
+        "emoji": "🇦🇱",
+        "description": "Flip for answer",
+        "backText": "Albania"
+      },
+      {
+        "emoji": "🇦🇲",
+        "description": "Flip for answer",
+        "backText": "Armenia"
+      },
+      {
+        "emoji": "🇦🇴",
+        "description": "Flip for answer",
+        "backText": "Angola"
+      },
+      {
+        "emoji": "🇦🇶",
+        "description": "Flip for answer",
+        "backText": "Antarctica"
+      },
+      {
+        "emoji": "🇦🇷",
+        "description": "Flip for answer",
+        "backText": "Argentina"
+      },
+      {
+        "emoji": "🇦🇸",
+        "description": "Flip for answer",
+        "backText": "American Samoa"
+      },
+      {
+        "emoji": "🇦🇹",
+        "description": "Flip for answer",
+        "backText": "Austria"
+      },
+      {
+        "emoji": "🇦🇺",
+        "description": "Flip for answer",
+        "backText": "Australia"
+      },
+      {
+        "emoji": "🇦🇼",
+        "description": "Flip for answer",
+        "backText": "Aruba"
+      },
+      {
+        "emoji": "🇦🇽",
+        "description": "Flip for answer",
+        "backText": "Åland Islands"
+      },
+      {
+        "emoji": "🇦🇿",
+        "description": "Flip for answer",
+        "backText": "Azerbaijan"
+      },
+      {
+        "emoji": "🇧🇦",
+        "description": "Flip for answer",
+        "backText": "Bosnia & Herzegovina"
+      },
+      {
+        "emoji": "🇧🇧",
+        "description": "Flip for answer",
+        "backText": "Barbados"
+      },
+      {
+        "emoji": "🇧🇩",
+        "description": "Flip for answer",
+        "backText": "Bangladesh"
+      },
+      {
+        "emoji": "🇧🇪",
+        "description": "Flip for answer",
+        "backText": "Belgium"
+      },
+      {
+        "emoji": "🇧🇫",
+        "description": "Flip for answer",
+        "backText": "Burkina Faso"
+      },
+      {
+        "emoji": "🇧🇬",
+        "description": "Flip for answer",
+        "backText": "Bulgaria"
+      },
+      {
+        "emoji": "🇧🇭",
+        "description": "Flip for answer",
+        "backText": "Bahrain"
+      },
+      {
+        "emoji": "🇧🇮",
+        "description": "Flip for answer",
+        "backText": "Burundi"
+      },
+      {
+        "emoji": "🇧🇯",
+        "description": "Flip for answer",
+        "backText": "Benin"
+      },
+      {
+        "emoji": "🇧🇱",
+        "description": "Flip for answer",
+        "backText": "St. Barthélemy"
+      },
+      {
+        "emoji": "🇧🇲",
+        "description": "Flip for answer",
+        "backText": "Bermuda"
+      },
+      {
+        "emoji": "🇧🇳",
+        "description": "Flip for answer",
+        "backText": "Brunei"
+      },
+      {
+        "emoji": "🇧🇴",
+        "description": "Flip for answer",
+        "backText": "Bolivia"
+      },
+      {
+        "emoji": "🇧🇶",
+        "description": "Flip for answer",
+        "backText": "Caribbean Netherlands"
+      },
+      {
+        "emoji": "🇧🇷",
+        "description": "Flip for answer",
+        "backText": "Brazil"
+      },
+      {
+        "emoji": "🇧🇸",
+        "description": "Flip for answer",
+        "backText": "Bahamas"
+      },
+      {
+        "emoji": "🇧🇹",
+        "description": "Flip for answer",
+        "backText": "Bhutan"
+      },
+      {
+        "emoji": "🇧🇻",
+        "description": "Flip for answer",
+        "backText": "Bouvet Island"
+      },
+      {
+        "emoji": "🇧🇼",
+        "description": "Flip for answer",
+        "backText": "Botswana"
+      },
+      {
+        "emoji": "🇧🇾",
+        "description": "Flip for answer",
+        "backText": "Belarus"
+      },
+      {
+        "emoji": "🇧🇿",
+        "description": "Flip for answer",
+        "backText": "Belize"
+      },
+      {
+        "emoji": "🇨🇦",
+        "description": "Flip for answer",
+        "backText": "Canada"
+      },
+      {
+        "emoji": "🇨🇨",
+        "description": "Flip for answer",
+        "backText": "Cocos (Keeling) Islands"
+      },
+      {
+        "emoji": "🇨🇩",
+        "description": "Flip for answer",
+        "backText": "Congo - Kinshasa"
+      },
+      {
+        "emoji": "🇨🇫",
+        "description": "Flip for answer",
+        "backText": "Central African Republic"
+      },
+      {
+        "emoji": "🇨🇬",
+        "description": "Flip for answer",
+        "backText": "Congo - Brazzaville"
+      },
+      {
+        "emoji": "🇨🇭",
+        "description": "Flip for answer",
+        "backText": "Switzerland"
+      },
+      {
+        "emoji": "🇨🇮",
+        "description": "Flip for answer",
+        "backText": "Côte D’Ivoire"
+      },
+      {
+        "emoji": "🇨🇰",
+        "description": "Flip for answer",
+        "backText": "Cook Islands"
+      },
+      {
+        "emoji": "🇨🇱",
+        "description": "Flip for answer",
+        "backText": "Chile"
+      },
+      {
+        "emoji": "🇨🇲",
+        "description": "Flip for answer",
+        "backText": "Cameroon"
+      },
+      {
+        "emoji": "🇨🇳",
+        "description": "Flip for answer",
+        "backText": "China"
+      },
+      {
+        "emoji": "🇨🇴",
+        "description": "Flip for answer",
+        "backText": "Colombia"
+      },
+      {
+        "emoji": "🇨🇵",
+        "description": "Flip for answer",
+        "backText": "Clipperton Island"
+      },
+      {
+        "emoji": "🇨🇷",
+        "description": "Flip for answer",
+        "backText": "Costa Rica"
+      },
+      {
+        "emoji": "🇨🇺",
+        "description": "Flip for answer",
+        "backText": "Cuba"
+      },
+      {
+        "emoji": "🇨🇻",
+        "description": "Flip for answer",
+        "backText": "Cape Verde"
+      },
+      {
+        "emoji": "🇨🇼",
+        "description": "Flip for answer",
+        "backText": "Curaçao"
+      },
+      {
+        "emoji": "🇨🇽",
+        "description": "Flip for answer",
+        "backText": "Christmas Island"
+      },
+      {
+        "emoji": "🇨🇾",
+        "description": "Flip for answer",
+        "backText": "Cyprus"
+      },
+      {
+        "emoji": "🇨🇿",
+        "description": "Flip for answer",
+        "backText": "Czechia"
+      },
+      {
+        "emoji": "🇩🇪",
+        "description": "Flip for answer",
+        "backText": "Germany"
+      },
+      {
+        "emoji": "🇩🇬",
+        "description": "Flip for answer",
+        "backText": "Diego Garcia"
+      },
+      {
+        "emoji": "🇩🇯",
+        "description": "Flip for answer",
+        "backText": "Djibouti"
+      },
+      {
+        "emoji": "🇩🇰",
+        "description": "Flip for answer",
+        "backText": "Denmark"
+      },
+      {
+        "emoji": "🇩🇲",
+        "description": "Flip for answer",
+        "backText": "Dominica"
+      },
+      {
+        "emoji": "🇩🇴",
+        "description": "Flip for answer",
+        "backText": "Dominican Republic"
+      },
+      {
+        "emoji": "🇩🇿",
+        "description": "Flip for answer",
+        "backText": "Algeria"
+      },
+      {
+        "emoji": "🇪🇦",
+        "description": "Flip for answer",
+        "backText": "Ceuta & Melilla"
+      },
+      {
+        "emoji": "🇪🇨",
+        "description": "Flip for answer",
+        "backText": "Ecuador"
+      },
+      {
+        "emoji": "🇪🇪",
+        "description": "Flip for answer",
+        "backText": "Estonia"
+      },
+      {
+        "emoji": "🇪🇬",
+        "description": "Flip for answer",
+        "backText": "Egypt"
+      },
+      {
+        "emoji": "🇪🇭",
+        "description": "Flip for answer",
+        "backText": "Western Sahara"
+      },
+      {
+        "emoji": "🇪🇷",
+        "description": "Flip for answer",
+        "backText": "Eritrea"
+      },
+      {
+        "emoji": "🇪🇸",
+        "description": "Flip for answer",
+        "backText": "Spain"
+      },
+      {
+        "emoji": "🇪🇹",
+        "description": "Flip for answer",
+        "backText": "Ethiopia"
+      },
+      {
+        "emoji": "🇪🇺",
+        "description": "Flip for answer",
+        "backText": "European Union"
+      },
+      {
+        "emoji": "🇫🇮",
+        "description": "Flip for answer",
+        "backText": "Finland"
+      },
+      {
+        "emoji": "🇫🇯",
+        "description": "Flip for answer",
+        "backText": "Fiji"
+      },
+      {
+        "emoji": "🇫🇰",
+        "description": "Flip for answer",
+        "backText": "Falkland Islands"
+      },
+      {
+        "emoji": "🇫🇲",
+        "description": "Flip for answer",
+        "backText": "Micronesia"
+      },
+      {
+        "emoji": "🇫🇴",
+        "description": "Flip for answer",
+        "backText": "Faroe Islands"
+      },
+      {
+        "emoji": "🇫🇷",
+        "description": "Flip for answer",
+        "backText": "France"
+      },
+      {
+        "emoji": "🇬🇦",
+        "description": "Flip for answer",
+        "backText": "Gabon"
+      },
+      {
+        "emoji": "🇬🇧",
+        "description": "Flip for answer",
+        "backText": "United Kingdom"
+      },
+      {
+        "emoji": "🇬🇩",
+        "description": "Flip for answer",
+        "backText": "Grenada"
+      },
+      {
+        "emoji": "🇬🇪",
+        "description": "Flip for answer",
+        "backText": "Georgia"
+      },
+      {
+        "emoji": "🇬🇫",
+        "description": "Flip for answer",
+        "backText": "French Guiana"
+      },
+      {
+        "emoji": "🇬🇬",
+        "description": "Flip for answer",
+        "backText": "Guernsey"
+      },
+      {
+        "emoji": "🇬🇭",
+        "description": "Flip for answer",
+        "backText": "Ghana"
+      },
+      {
+        "emoji": "🇬🇮",
+        "description": "Flip for answer",
+        "backText": "Gibraltar"
+      },
+      {
+        "emoji": "🇬🇱",
+        "description": "Flip for answer",
+        "backText": "Greenland"
+      },
+      {
+        "emoji": "🇬🇲",
+        "description": "Flip for answer",
+        "backText": "Gambia"
+      },
+      {
+        "emoji": "🇬🇳",
+        "description": "Flip for answer",
+        "backText": "Guinea"
+      },
+      {
+        "emoji": "🇬🇵",
+        "description": "Flip for answer",
+        "backText": "Guadeloupe"
+      },
+      {
+        "emoji": "🇬🇶",
+        "description": "Flip for answer",
+        "backText": "Equatorial Guinea"
+      },
+      {
+        "emoji": "🇬🇷",
+        "description": "Flip for answer",
+        "backText": "Greece"
+      },
+      {
+        "emoji": "🇬🇸",
+        "description": "Flip for answer",
+        "backText": "South Georgia & South Sandwich Islands"
+      },
+      {
+        "emoji": "🇬🇹",
+        "description": "Flip for answer",
+        "backText": "Guatemala"
+      },
+      {
+        "emoji": "🇬🇺",
+        "description": "Flip for answer",
+        "backText": "Guam"
+      },
+      {
+        "emoji": "🇬🇼",
+        "description": "Flip for answer",
+        "backText": "Guinea-Bissau"
+      },
+      {
+        "emoji": "🇬🇾",
+        "description": "Flip for answer",
+        "backText": "Guyana"
+      },
+      {
+        "emoji": "🇭🇰",
+        "description": "Flip for answer",
+        "backText": "Hong Kong SAR China"
+      },
+      {
+        "emoji": "🇭🇲",
+        "description": "Flip for answer",
+        "backText": "Heard & McDonald Islands"
+      },
+      {
+        "emoji": "🇭🇳",
+        "description": "Flip for answer",
+        "backText": "Honduras"
+      },
+      {
+        "emoji": "🇭🇷",
+        "description": "Flip for answer",
+        "backText": "Croatia"
+      },
+      {
+        "emoji": "🇭🇹",
+        "description": "Flip for answer",
+        "backText": "Haiti"
+      },
+      {
+        "emoji": "🇭🇺",
+        "description": "Flip for answer",
+        "backText": "Hungary"
+      },
+      {
+        "emoji": "🇮🇨",
+        "description": "Flip for answer",
+        "backText": "Canary Islands"
+      },
+      {
+        "emoji": "🇮🇩",
+        "description": "Flip for answer",
+        "backText": "Indonesia"
+      },
+      {
+        "emoji": "🇮🇪",
+        "description": "Flip for answer",
+        "backText": "Ireland"
+      },
+      {
+        "emoji": "🇮🇱",
+        "description": "Flip for answer",
+        "backText": "Israel"
+      },
+      {
+        "emoji": "🇮🇲",
+        "description": "Flip for answer",
+        "backText": "Isle of Man"
+      },
+      {
+        "emoji": "🇮🇳",
+        "description": "Flip for answer",
+        "backText": "India"
+      },
+      {
+        "emoji": "🇮🇴",
+        "description": "Flip for answer",
+        "backText": "British Indian Ocean Territory"
+      },
+      {
+        "emoji": "🇮🇶",
+        "description": "Flip for answer",
+        "backText": "Iraq"
+      },
+      {
+        "emoji": "🇮🇷",
+        "description": "Flip for answer",
+        "backText": "Iran"
+      },
+      {
+        "emoji": "🇮🇸",
+        "description": "Flip for answer",
+        "backText": "Iceland"
+      },
+      {
+        "emoji": "🇮🇹",
+        "description": "Flip for answer",
+        "backText": "Italy"
+      },
+      {
+        "emoji": "🇯🇪",
+        "description": "Flip for answer",
+        "backText": "Jersey"
+      },
+      {
+        "emoji": "🇯🇲",
+        "description": "Flip for answer",
+        "backText": "Jamaica"
+      },
+      {
+        "emoji": "🇯🇴",
+        "description": "Flip for answer",
+        "backText": "Jordan"
+      },
+      {
+        "emoji": "🇯🇵",
+        "description": "Flip for answer",
+        "backText": "Japan"
+      },
+      {
+        "emoji": "🇰🇪",
+        "description": "Flip for answer",
+        "backText": "Kenya"
+      },
+      {
+        "emoji": "🇰🇬",
+        "description": "Flip for answer",
+        "backText": "Kyrgyzstan"
+      },
+      {
+        "emoji": "🇰🇭",
+        "description": "Flip for answer",
+        "backText": "Cambodia"
+      },
+      {
+        "emoji": "🇰🇮",
+        "description": "Flip for answer",
+        "backText": "Kiribati"
+      },
+      {
+        "emoji": "🇰🇲",
+        "description": "Flip for answer",
+        "backText": "Comoros"
+      },
+      {
+        "emoji": "🇰🇳",
+        "description": "Flip for answer",
+        "backText": "St. Kitts & Nevis"
+      },
+      {
+        "emoji": "🇰🇵",
+        "description": "Flip for answer",
+        "backText": "North Korea"
+      },
+      {
+        "emoji": "🇰🇷",
+        "description": "Flip for answer",
+        "backText": "South Korea"
+      },
+      {
+        "emoji": "🇰🇼",
+        "description": "Flip for answer",
+        "backText": "Kuwait"
+      },
+      {
+        "emoji": "🇰🇾",
+        "description": "Flip for answer",
+        "backText": "Cayman Islands"
+      },
+      {
+        "emoji": "🇰🇿",
+        "description": "Flip for answer",
+        "backText": "Kazakhstan"
+      },
+      {
+        "emoji": "🇱🇦",
+        "description": "Flip for answer",
+        "backText": "Laos"
+      },
+      {
+        "emoji": "🇱🇧",
+        "description": "Flip for answer",
+        "backText": "Lebanon"
+      },
+      {
+        "emoji": "🇱🇨",
+        "description": "Flip for answer",
+        "backText": "St. Lucia"
+      },
+      {
+        "emoji": "🇱🇮",
+        "description": "Flip for answer",
+        "backText": "Liechtenstein"
+      },
+      {
+        "emoji": "🇱🇰",
+        "description": "Flip for answer",
+        "backText": "Sri Lanka"
+      },
+      {
+        "emoji": "🇱🇷",
+        "description": "Flip for answer",
+        "backText": "Liberia"
+      },
+      {
+        "emoji": "🇱🇸",
+        "description": "Flip for answer",
+        "backText": "Lesotho"
+      },
+      {
+        "emoji": "🇱🇹",
+        "description": "Flip for answer",
+        "backText": "Lithuania"
+      },
+      {
+        "emoji": "🇱🇺",
+        "description": "Flip for answer",
+        "backText": "Luxembourg"
+      },
+      {
+        "emoji": "🇱🇻",
+        "description": "Flip for answer",
+        "backText": "Latvia"
+      },
+      {
+        "emoji": "🇱🇾",
+        "description": "Flip for answer",
+        "backText": "Libya"
+      },
+      {
+        "emoji": "🇲🇦",
+        "description": "Flip for answer",
+        "backText": "Morocco"
+      },
+      {
+        "emoji": "🇲🇨",
+        "description": "Flip for answer",
+        "backText": "Monaco"
+      },
+      {
+        "emoji": "🇲🇩",
+        "description": "Flip for answer",
+        "backText": "Moldova"
+      },
+      {
+        "emoji": "🇲🇪",
+        "description": "Flip for answer",
+        "backText": "Montenegro"
+      },
+      {
+        "emoji": "🇲🇫",
+        "description": "Flip for answer",
+        "backText": "St. Martin"
+      },
+      {
+        "emoji": "🇲🇬",
+        "description": "Flip for answer",
+        "backText": "Madagascar"
+      },
+      {
+        "emoji": "🇲🇭",
+        "description": "Flip for answer",
+        "backText": "Marshall Islands"
+      },
+      {
+        "emoji": "🇲🇰",
+        "description": "Flip for answer",
+        "backText": "Macedonia"
+      },
+      {
+        "emoji": "🇲🇱",
+        "description": "Flip for answer",
+        "backText": "Mali"
+      },
+      {
+        "emoji": "🇲🇲",
+        "description": "Flip for answer",
+        "backText": "Myanmar (Burma)"
+      },
+      {
+        "emoji": "🇲🇳",
+        "description": "Flip for answer",
+        "backText": "Mongolia"
+      },
+      {
+        "emoji": "🇲🇴",
+        "description": "Flip for answer",
+        "backText": "Macau SAR China"
+      },
+      {
+        "emoji": "🇲🇵",
+        "description": "Flip for answer",
+        "backText": "Northern Mariana Islands"
+      },
+      {
+        "emoji": "🇲🇶",
+        "description": "Flip for answer",
+        "backText": "Martinique"
+      },
+      {
+        "emoji": "🇲🇷",
+        "description": "Flip for answer",
+        "backText": "Mauritania"
+      },
+      {
+        "emoji": "🇲🇸",
+        "description": "Flip for answer",
+        "backText": "Montserrat"
+      },
+      {
+        "emoji": "🇲🇹",
+        "description": "Flip for answer",
+        "backText": "Malta"
+      },
+      {
+        "emoji": "🇲🇺",
+        "description": "Flip for answer",
+        "backText": "Mauritius"
+      },
+      {
+        "emoji": "🇲🇻",
+        "description": "Flip for answer",
+        "backText": "Maldives"
+      },
+      {
+        "emoji": "🇲🇼",
+        "description": "Flip for answer",
+        "backText": "Malawi"
+      },
+      {
+        "emoji": "🇲🇽",
+        "description": "Flip for answer",
+        "backText": "Mexico"
+      },
+      {
+        "emoji": "🇲🇾",
+        "description": "Flip for answer",
+        "backText": "Malaysia"
+      },
+      {
+        "emoji": "🇲🇿",
+        "description": "Flip for answer",
+        "backText": "Mozambique"
+      },
+      {
+        "emoji": "🇳🇦",
+        "description": "Flip for answer",
+        "backText": "Namibia"
+      },
+      {
+        "emoji": "🇳🇨",
+        "description": "Flip for answer",
+        "backText": "New Caledonia"
+      },
+      {
+        "emoji": "🇳🇪",
+        "description": "Flip for answer",
+        "backText": "Niger"
+      },
+      {
+        "emoji": "🇳🇫",
+        "description": "Flip for answer",
+        "backText": "Norfolk Island"
+      },
+      {
+        "emoji": "🇳🇬",
+        "description": "Flip for answer",
+        "backText": "Nigeria"
+      },
+      {
+        "emoji": "🇳🇮",
+        "description": "Flip for answer",
+        "backText": "Nicaragua"
+      },
+      {
+        "emoji": "🇳🇱",
+        "description": "Flip for answer",
+        "backText": "Netherlands"
+      },
+      {
+        "emoji": "🇳🇴",
+        "description": "Flip for answer",
+        "backText": "Norway"
+      },
+      {
+        "emoji": "🇳🇵",
+        "description": "Flip for answer",
+        "backText": "Nepal"
+      },
+      {
+        "emoji": "🇳🇷",
+        "description": "Flip for answer",
+        "backText": "Nauru"
+      },
+      {
+        "emoji": "🇳🇺",
+        "description": "Flip for answer",
+        "backText": "Niue"
+      },
+      {
+        "emoji": "🇳🇿",
+        "description": "Flip for answer",
+        "backText": "New Zealand"
+      },
+      {
+        "emoji": "🇴🇲",
+        "description": "Flip for answer",
+        "backText": "Oman"
+      },
+      {
+        "emoji": "🇵🇦",
+        "description": "Flip for answer",
+        "backText": "Panama"
+      },
+      {
+        "emoji": "🇵🇪",
+        "description": "Flip for answer",
+        "backText": "Peru"
+      },
+      {
+        "emoji": "🇵🇫",
+        "description": "Flip for answer",
+        "backText": "French Polynesia"
+      },
+      {
+        "emoji": "🇵🇬",
+        "description": "Flip for answer",
+        "backText": "Papua New Guinea"
+      },
+      {
+        "emoji": "🇵🇭",
+        "description": "Flip for answer",
+        "backText": "Philippines"
+      },
+      {
+        "emoji": "🇵🇰",
+        "description": "Flip for answer",
+        "backText": "Pakistan"
+      },
+      {
+        "emoji": "🇵🇱",
+        "description": "Flip for answer",
+        "backText": "Poland"
+      },
+      {
+        "emoji": "🇵🇲",
+        "description": "Flip for answer",
+        "backText": "St. Pierre & Miquelon"
+      },
+      {
+        "emoji": "🇵🇳",
+        "description": "Flip for answer",
+        "backText": "Pitcairn Islands"
+      },
+      {
+        "emoji": "🇵🇷",
+        "description": "Flip for answer",
+        "backText": "Puerto Rico"
+      },
+      {
+        "emoji": "🇵🇸",
+        "description": "Flip for answer",
+        "backText": "Palestinian Territories"
+      },
+      {
+        "emoji": "🇵🇹",
+        "description": "Flip for answer",
+        "backText": "Portugal"
+      },
+      {
+        "emoji": "🇵🇼",
+        "description": "Flip for answer",
+        "backText": "Palau"
+      },
+      {
+        "emoji": "🇵🇾",
+        "description": "Flip for answer",
+        "backText": "Paraguay"
+      },
+      {
+        "emoji": "🇶🇦",
+        "description": "Flip for answer",
+        "backText": "Qatar"
+      },
+      {
+        "emoji": "🇷🇪",
+        "description": "Flip for answer",
+        "backText": "Réunion"
+      },
+      {
+        "emoji": "🇷🇴",
+        "description": "Flip for answer",
+        "backText": "Romania"
+      },
+      {
+        "emoji": "🇷🇸",
+        "description": "Flip for answer",
+        "backText": "Serbia"
+      },
+      {
+        "emoji": "🇷🇺",
+        "description": "Flip for answer",
+        "backText": "Russia"
+      },
+      {
+        "emoji": "🇷🇼",
+        "description": "Flip for answer",
+        "backText": "Rwanda"
+      },
+      {
+        "emoji": "🇸🇦",
+        "description": "Flip for answer",
+        "backText": "Saudi Arabia"
+      },
+      {
+        "emoji": "🇸🇧",
+        "description": "Flip for answer",
+        "backText": "Solomon Islands"
+      },
+      {
+        "emoji": "🇸🇨",
+        "description": "Flip for answer",
+        "backText": "Seychelles"
+      },
+      {
+        "emoji": "🇸🇩",
+        "description": "Flip for answer",
+        "backText": "Sudan"
+      },
+      {
+        "emoji": "🇸🇪",
+        "description": "Flip for answer",
+        "backText": "Sweden"
+      },
+      {
+        "emoji": "🇸🇬",
+        "description": "Flip for answer",
+        "backText": "Singapore"
+      },
+      {
+        "emoji": "🇸🇭",
+        "description": "Flip for answer",
+        "backText": "St. Helena"
+      },
+      {
+        "emoji": "🇸🇮",
+        "description": "Flip for answer",
+        "backText": "Slovenia"
+      },
+      {
+        "emoji": "🇸🇯",
+        "description": "Flip for answer",
+        "backText": "Svalbard & Jan Mayen"
+      },
+      {
+        "emoji": "🇸🇰",
+        "description": "Flip for answer",
+        "backText": "Slovakia"
+      },
+      {
+        "emoji": "🇸🇱",
+        "description": "Flip for answer",
+        "backText": "Sierra Leone"
+      },
+      {
+        "emoji": "🇸🇲",
+        "description": "Flip for answer",
+        "backText": "San Marino"
+      },
+      {
+        "emoji": "🇸🇳",
+        "description": "Flip for answer",
+        "backText": "Senegal"
+      },
+      {
+        "emoji": "🇸🇴",
+        "description": "Flip for answer",
+        "backText": "Somalia"
+      },
+      {
+        "emoji": "🇸🇷",
+        "description": "Flip for answer",
+        "backText": "Suriname"
+      },
+      {
+        "emoji": "🇸🇸",
+        "description": "Flip for answer",
+        "backText": "South Sudan"
+      },
+      {
+        "emoji": "🇸🇹",
+        "description": "Flip for answer",
+        "backText": "São Tomé & Príncipe"
+      },
+      {
+        "emoji": "🇸🇻",
+        "description": "Flip for answer",
+        "backText": "El Salvador"
+      },
+      {
+        "emoji": "🇸🇽",
+        "description": "Flip for answer",
+        "backText": "Sint Maarten"
+      },
+      {
+        "emoji": "🇸🇾",
+        "description": "Flip for answer",
+        "backText": "Syria"
+      },
+      {
+        "emoji": "🇸🇿",
+        "description": "Flip for answer",
+        "backText": "Swaziland"
+      },
+      {
+        "emoji": "🇹🇦",
+        "description": "Flip for answer",
+        "backText": "Tristan Da Cunha"
+      },
+      {
+        "emoji": "🇹🇨",
+        "description": "Flip for answer",
+        "backText": "Turks & Caicos Islands"
+      },
+      {
+        "emoji": "🇹🇩",
+        "description": "Flip for answer",
+        "backText": "Chad"
+      },
+      {
+        "emoji": "🇹🇫",
+        "description": "Flip for answer",
+        "backText": "French Southern Territories"
+      },
+      {
+        "emoji": "🇹🇬",
+        "description": "Flip for answer",
+        "backText": "Togo"
+      },
+      {
+        "emoji": "🇹🇭",
+        "description": "Flip for answer",
+        "backText": "Thailand"
+      },
+      {
+        "emoji": "🇹🇯",
+        "description": "Flip for answer",
+        "backText": "Tajikistan"
+      },
+      {
+        "emoji": "🇹🇰",
+        "description": "Flip for answer",
+        "backText": "Tokelau"
+      },
+      {
+        "emoji": "🇹🇱",
+        "description": "Flip for answer",
+        "backText": "Timor-Leste"
+      },
+      {
+        "emoji": "🇹🇲",
+        "description": "Flip for answer",
+        "backText": "Turkmenistan"
+      },
+      {
+        "emoji": "🇹🇳",
+        "description": "Flip for answer",
+        "backText": "Tunisia"
+      },
+      {
+        "emoji": "🇹🇴",
+        "description": "Flip for answer",
+        "backText": "Tonga"
+      },
+      {
+        "emoji": "🇹🇷",
+        "description": "Flip for answer",
+        "backText": "Turkey"
+      },
+      {
+        "emoji": "🇹🇹",
+        "description": "Flip for answer",
+        "backText": "Trinidad & Tobago"
+      },
+      {
+        "emoji": "🇹🇻",
+        "description": "Flip for answer",
+        "backText": "Tuvalu"
+      },
+      {
+        "emoji": "🇹🇼",
+        "description": "Flip for answer",
+        "backText": "Taiwan"
+      },
+      {
+        "emoji": "🇹🇿",
+        "description": "Flip for answer",
+        "backText": "Tanzania"
+      },
+      {
+        "emoji": "🇺🇦",
+        "description": "Flip for answer",
+        "backText": "Ukraine"
+      },
+      {
+        "emoji": "🇺🇬",
+        "description": "Flip for answer",
+        "backText": "Uganda"
+      },
+      {
+        "emoji": "🇺🇳",
+        "description": "Flip for answer",
+        "backText": "United Nations"
+      },
+      {
+        "emoji": "🇺🇸",
+        "description": "Flip for answer",
+        "backText": "United States"
+      },
+      {
+        "emoji": "🇺🇾",
+        "description": "Flip for answer",
+        "backText": "Uruguay"
+      },
+      {
+        "emoji": "🇺🇿",
+        "description": "Flip for answer",
+        "backText": "Uzbekistan"
+      },
+      {
+        "emoji": "🇻🇦",
+        "description": "Flip for answer",
+        "backText": "Vatican City"
+      },
+      {
+        "emoji": "🇻🇨",
+        "description": "Flip for answer",
+        "backText": "St. Vincent & Grenadines"
+      },
+      {
+        "emoji": "🇻🇪",
+        "description": "Flip for answer",
+        "backText": "Venezuela"
+      },
+      {
+        "emoji": "🇻🇬",
+        "description": "Flip for answer",
+        "backText": "British Virgin Islands"
+      },
+      {
+        "emoji": "🇻🇮",
+        "description": "Flip for answer",
+        "backText": "U.S. Virgin Islands"
+      },
+      {
+        "emoji": "🇻🇳",
+        "description": "Flip for answer",
+        "backText": "Vietnam"
+      },
+      {
+        "emoji": "🇻🇺",
+        "description": "Flip for answer",
+        "backText": "Vanuatu"
+      },
+      {
+        "emoji": "🇼🇫",
+        "description": "Flip for answer",
+        "backText": "Wallis & Futuna"
+      },
+      {
+        "emoji": "🇼🇸",
+        "description": "Flip for answer",
+        "backText": "Samoa"
+      },
+      {
+        "emoji": "🇽🇰",
+        "description": "Flip for answer",
+        "backText": "Kosovo"
+      },
+      {
+        "emoji": "🇾🇪",
+        "description": "Flip for answer",
+        "backText": "Yemen"
+      },
+      {
+        "emoji": "🇾🇹",
+        "description": "Flip for answer",
+        "backText": "Mayotte"
+      },
+      {
+        "emoji": "🇿🇦",
+        "description": "Flip for answer",
+        "backText": "South Africa"
+      },
+      {
+        "emoji": "🇿🇲",
+        "description": "Flip for answer",
+        "backText": "Zambia"
+      },
+      {
+        "emoji": "🇿🇼",
+        "description": "Flip for answer",
+        "backText": "Zimbabwe"
+      },
+      {
+        "emoji": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+        "description": "Flip for answer",
+        "backText": "England"
+      },
+      {
+        "emoji": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "description": "Flip for answer",
+        "backText": "Scotland"
+      }
+    ]
+  },
+  {
+    "props": {
+      "title": "Most Likely",
+      "version": "1",
+      "sortOrder": "4",
       "description": "Who's the most likely to do something? Find out with this fun game!\n\nDraw a card, read aloud, and on the count of 5 everyone points to the person they think is most likely to do that thing. The person with the most fingers pointed at them wins the round!",
       "backgroundColor": "#1d1a26",
       "borderColor": "#131118",
@@ -1332,318 +2649,9 @@
   },
   {
     "props": {
-      "title": "Morning Pages",
-      "sortOrder": "4",
-      "description": "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started",
-      "color": "#B7B1F2",
-      "devOnly": false,
-      "gid": "2125141909",
-      "key": "morning-pages"
-    },
-    "data": [
-      {
-        "title": "What's on your mind?"
-      },
-      {
-        "title": "What are you grateful for?"
-      },
-      {
-        "title": "Describe your perfect day."
-      },
-      {
-        "title": "What are your biggest goals?"
-      },
-      {
-        "title": "What are you afraid of?"
-      },
-      {
-        "title": "Who inspires you?"
-      },
-      {
-        "title": "What are your strengths?"
-      },
-      {
-        "title": "What are your weaknesses?"
-      },
-      {
-        "title": "What makes you happy?"
-      },
-      {
-        "title": "What makes you sad?"
-      },
-      {
-        "title": "What are your favorite memories?"
-      },
-      {
-        "title": "What are your dreams?"
-      },
-      {
-        "title": "What are your hobbies?"
-      },
-      {
-        "title": "What are your favorite memories from childhood?"
-      },
-      {
-        "title": "What are you looking forward to today?"
-      },
-      {
-        "title": "What challenges do you anticipate today?"
-      },
-      {
-        "title": "What is one thing you can do to make today great?"
-      },
-      {
-        "title": "What are you most proud of?"
-      },
-      {
-        "title": "What is something new you want to try?"
-      },
-      {
-        "title": "What is a recent accomplishment you're happy about?"
-      },
-      {
-        "title": "What is one thing you want to improve about yourself?"
-      },
-      {
-        "title": "What is a lesson you learned recently?"
-      },
-      {
-        "title": "What is something you want to let go of?"
-      },
-      {
-        "title": "What is one thing you can do to help someone today?"
-      },
-      {
-        "title": "What is your favorite way to relax?"
-      },
-      {
-        "title": "What is a habit you want to build?"
-      },
-      {
-        "title": "What is a habit you want to break?"
-      },
-      {
-        "title": "What is something you love about yourself?"
-      },
-      {
-        "title": "What is a skill you want to learn?"
-      },
-      {
-        "title": "What is your favorite way to spend time alone?"
-      },
-      {
-        "title": "What is a book or movie that inspired you recently?"
-      },
-      {
-        "title": "What is one thing you are curious about?"
-      },
-      {
-        "title": "What is something you want to create?"
-      },
-      {
-        "title": "What is a place you want to visit?"
-      },
-      {
-        "title": "What is a memory that makes you smile?"
-      },
-      {
-        "title": "What is a fear you want to overcome?"
-      },
-      {
-        "title": "What is something you want to forgive yourself for?"
-      },
-      {
-        "title": "What is something you want to forgive someone else for?"
-      },
-      {
-        "title": "What is a relationship you want to nurture?"
-      },
-      {
-        "title": "What is something you are excited about?"
-      },
-      {
-        "title": "What is a goal you want to achieve this week?"
-      },
-      {
-        "title": "What is a goal you want to achieve this month?"
-      },
-      {
-        "title": "What is a goal you want to achieve this year?"
-      },
-      {
-        "title": "What is something you want to learn more about?"
-      },
-      {
-        "title": "What is a way you can practice self-care today?"
-      },
-      {
-        "title": "What is something you want to declutter from your life?"
-      },
-      {
-        "title": "What is a way you can express gratitude today?"
-      },
-      {
-        "title": "What is a way you can show kindness today?"
-      },
-      {
-        "title": "What is something you want to celebrate?"
-      },
-      {
-        "title": "What is a dream you want to pursue?"
-      },
-      {
-        "title": "What is a value that is important to you?"
-      },
-      {
-        "title": "How can you stay present today?"
-      },
-      {
-        "title": "What is a way you can challenge yourself today?"
-      },
-      {
-        "title": "What is a way you can connect with nature today?"
-      },
-      {
-        "title": "What is a way you can connect with someone you care about today?"
-      },
-      {
-        "title": "What is a way you can simplify your life today?"
-      },
-      {
-        "title": "What is a way you can bring joy to someone else today?"
-      },
-      {
-        "title": "What is a way you can bring joy to yourself today?"
-      },
-      {
-        "title": "What is something you want to be more intentional about?"
-      },
-      {
-        "title": "What is a mantra or affirmation you want to focus on today?"
-      }
-    ]
-  },
-  {
-    "props": {
-      "title": "Juggling",
-      "sortOrder": "5",
-      "description": "Use the Dex App for learning habits! This example deck shows you one way you can build a habit using Dex. \n\nPractice the top card for 5 minutes, move that card to the discard pile and move on to the next card. Each day practice as many as you can and when you've done them all, shuffle the discard pile and start again. Add new cards as you learn new tricks and remove cards you don't enjoy.\n\nYou can use the same idea to practice your music habits, art, exercises and more!",
-      "color": "#F0F0D7",
-      "devOnly": false,
-      "gid": "399382777",
-      "key": "juggling-practice"
-    },
-    "data": [
-      {
-        "title": "3 ball cascade",
-        "description": "The basic pattern of juggling. Throw each ball in an arc from one hand to the other, so that each ball is caught in the opposite hand."
-      },
-      {
-        "title": "3 ball shower",
-        "description": "Throw two balls in an arc from one hand to the other, and the third ball in a high arc from the same hand to the other. The balls should be caught in the same order they were thrown."
-      },
-      {
-        "title": "3 ball columns",
-        "description": "Throw all three balls straight up and down, so that they land in the same hand they were thrown from."
-      },
-      {
-        "title": "3 ball reverse cascade",
-        "description": "Throw each ball in an arc from one hand to the other, but catch them in the same hand they were thrown from."
-      },
-      {
-        "title": "3 ball mills mess",
-        "description": "Throw the balls in a circular pattern, so that each ball is caught by the opposite hand."
-      },
-      {
-        "title": "3 ball box",
-        "description": "Throw the balls in a square pattern, so that each ball is caught by the opposite hand."
-      },
-      {
-        "title": "3 ball half shower",
-        "description": "Throw one ball in a high arc and the other two in a lower arc, catching them in the same order they were thrown."
-      },
-      {
-        "title": "3 ball tennis",
-        "description": "Throw one ball in a high arc and the other two in a lower arc, catching them in the same order they were thrown, but with one ball always being thrown higher."
-      },
-      {
-        "title": "3 ball snake",
-        "description": "Throw the balls in a pattern that resembles a snake, with each ball following the previous one."
-      },
-      {
-        "title": "3 ball windmill",
-        "description": "Throw the balls in a circular pattern, with each ball following the previous one in a windmill-like motion."
-      },
-      {
-        "title": "3 ball factory",
-        "description": "Throw the balls in a pattern that resembles a factory, with each ball following the previous one in a mechanical motion."
-      },
-      {
-        "title": "3 ball yo-yo",
-        "description": "Throw the balls in a pattern that resembles a yo-yo, with each ball following the previous one in an up-and-down motion."
-      },
-      {
-        "title": "3 ball shower with a twist",
-        "description": "Throw the balls in a shower pattern, but with a twist in the middle of the pattern."
-      },
-      {
-        "title": "3 ball under the leg",
-        "description": "Throw the balls in a pattern that involves throwing one ball under your leg."
-      },
-      {
-        "title": "3 ball behind the back",
-        "description": "Throw the balls in a pattern that involves throwing one ball behind your back."
-      },
-      {
-        "title": "3 ball over the shoulder",
-        "description": "Throw the balls in a pattern that involves throwing one ball over your shoulder."
-      },
-      {
-        "title": "3 ball under the arm",
-        "description": "Throw the balls in a pattern that involves throwing one ball under your arm."
-      },
-      {
-        "title": "3 ball claw catch",
-        "description": "Catch the balls with a claw-like motion, grabbing them out of the air."
-      },
-      {
-        "title": "3 ball penguin catch",
-        "description": "Catch the balls with your hands turned inward, like a penguin."
-      },
-      {
-        "title": "3 ball backcross",
-        "description": "Throw the balls in a pattern that involves crossing your arms behind your back."
-      },
-      {
-        "title": "3 ball multiplex",
-        "description": "Throw multiple balls at once, catching them in the same order they were thrown."
-      },
-      {
-        "title": "3 ball flash",
-        "description": "Throw all three balls in the air at once, catching them in the same order they were thrown."
-      },
-      {
-        "title": "3 ball cascade with a spin",
-        "description": "Throw the balls in a cascade pattern, but with a spin in the middle of the pattern."
-      },
-      {
-        "title": "3 ball shower with a spin",
-        "description": "Throw the balls in a shower pattern, but with a spin in the middle of the pattern."
-      },
-      {
-        "title": "3 ball columns with a spin",
-        "description": "Throw the balls in a columns pattern, but with a spin in the middle of the pattern."
-      },
-      {
-        "title": "3 ball reverse cascade with a spin",
-        "description": "Throw the balls in a reverse cascade pattern, but with a spin in the middle of the pattern."
-      }
-    ]
-  },
-  {
-    "props": {
       "title": "Categories",
-      "sortOrder": "6",
+      "version": "1",
+      "sortOrder": "5",
       "description": "Get ready to go head-to-head in Categories!\nSplit into two teams and flip a card to reveal the category. Teams take turns naming one unique item from that category. If a team can’t think of an answer, they lose the round!\n\n👉 Everyone on a team must take a turn before someone can go again.",
       "color": "#351e29",
       "devOnly": false,
@@ -2048,7 +3056,202 @@
   },
   {
     "props": {
+      "title": "Morning Pages",
+      "version": "1",
+      "sortOrder": "6",
+      "description": "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started",
+      "color": "#B7B1F2",
+      "devOnly": false,
+      "gid": "2125141909",
+      "key": "morning-pages"
+    },
+    "data": [
+      {
+        "title": "What's on your mind?"
+      },
+      {
+        "title": "What are you grateful for?"
+      },
+      {
+        "title": "Describe your perfect day."
+      },
+      {
+        "title": "What are your biggest goals?"
+      },
+      {
+        "title": "What are you afraid of?"
+      },
+      {
+        "title": "Who inspires you?"
+      },
+      {
+        "title": "What are your strengths?"
+      },
+      {
+        "title": "What are your weaknesses?"
+      },
+      {
+        "title": "What makes you happy?"
+      },
+      {
+        "title": "What makes you sad?"
+      },
+      {
+        "title": "What are your favorite memories?"
+      },
+      {
+        "title": "What are your dreams?"
+      },
+      {
+        "title": "What are your hobbies?"
+      },
+      {
+        "title": "What are your favorite memories from childhood?"
+      },
+      {
+        "title": "What are you looking forward to today?"
+      },
+      {
+        "title": "What challenges do you anticipate today?"
+      },
+      {
+        "title": "What is one thing you can do to make today great?"
+      },
+      {
+        "title": "What are you most proud of?"
+      },
+      {
+        "title": "What is something new you want to try?"
+      },
+      {
+        "title": "What is a recent accomplishment you're happy about?"
+      },
+      {
+        "title": "What is one thing you want to improve about yourself?"
+      },
+      {
+        "title": "What is a lesson you learned recently?"
+      },
+      {
+        "title": "What is something you want to let go of?"
+      },
+      {
+        "title": "What is one thing you can do to help someone today?"
+      },
+      {
+        "title": "What is your favorite way to relax?"
+      },
+      {
+        "title": "What is a habit you want to build?"
+      },
+      {
+        "title": "What is a habit you want to break?"
+      },
+      {
+        "title": "What is something you love about yourself?"
+      },
+      {
+        "title": "What is a skill you want to learn?"
+      },
+      {
+        "title": "What is your favorite way to spend time alone?"
+      },
+      {
+        "title": "What is a book or movie that inspired you recently?"
+      },
+      {
+        "title": "What is one thing you are curious about?"
+      },
+      {
+        "title": "What is something you want to create?"
+      },
+      {
+        "title": "What is a place you want to visit?"
+      },
+      {
+        "title": "What is a memory that makes you smile?"
+      },
+      {
+        "title": "What is a fear you want to overcome?"
+      },
+      {
+        "title": "What is something you want to forgive yourself for?"
+      },
+      {
+        "title": "What is something you want to forgive someone else for?"
+      },
+      {
+        "title": "What is a relationship you want to nurture?"
+      },
+      {
+        "title": "What is something you are excited about?"
+      },
+      {
+        "title": "What is a goal you want to achieve this week?"
+      },
+      {
+        "title": "What is a goal you want to achieve this month?"
+      },
+      {
+        "title": "What is a goal you want to achieve this year?"
+      },
+      {
+        "title": "What is something you want to learn more about?"
+      },
+      {
+        "title": "What is a way you can practice self-care today?"
+      },
+      {
+        "title": "What is something you want to declutter from your life?"
+      },
+      {
+        "title": "What is a way you can express gratitude today?"
+      },
+      {
+        "title": "What is a way you can show kindness today?"
+      },
+      {
+        "title": "What is something you want to celebrate?"
+      },
+      {
+        "title": "What is a dream you want to pursue?"
+      },
+      {
+        "title": "What is a value that is important to you?"
+      },
+      {
+        "title": "How can you stay present today?"
+      },
+      {
+        "title": "What is a way you can challenge yourself today?"
+      },
+      {
+        "title": "What is a way you can connect with nature today?"
+      },
+      {
+        "title": "What is a way you can connect with someone you care about today?"
+      },
+      {
+        "title": "What is a way you can simplify your life today?"
+      },
+      {
+        "title": "What is a way you can bring joy to someone else today?"
+      },
+      {
+        "title": "What is a way you can bring joy to yourself today?"
+      },
+      {
+        "title": "What is something you want to be more intentional about?"
+      },
+      {
+        "title": "What is a mantra or affirmation you want to focus on today?"
+      }
+    ]
+  },
+  {
+    "props": {
       "title": "Emojis!\n🤡👍🐶",
+      "version": "1",
       "sortOrder": "7",
       "description": "All the emojis! Use these cards to play charades, pictionary, or any other game that needs a random emoji!",
       "color": "#F2358D",
@@ -5657,1314 +6860,119 @@
   },
   {
     "props": {
-      "title": "Guess the Flag!",
+      "title": "Juggling",
+      "version": "1",
       "sortOrder": "8",
-      "description": "250+ flags, but where do they represent? Flip the card for the answer. Learn the flags or give clues for others to guess the location.",
-      "color": "#c8e9a0",
+      "description": "Use the Dex App for learning habits! This example deck shows you one way you can build a habit using Dex. \n\nPractice the top card for 5 minutes, move that card to the discard pile and move on to the next card. Each day practice as many as you can and when you've done them all, shuffle the discard pile and start again. Add new cards as you learn new tricks and remove cards you don't enjoy.\n\nYou can use the same idea to practice your music habits, art, exercises and more!",
+      "color": "#F0F0D7",
       "devOnly": false,
-      "gid": "1980334248",
-      "key": "flags"
+      "gid": "399382777",
+      "key": "juggling-practice"
     },
     "data": [
       {
-        "emoji": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
-        "description": "Flip for answer",
-        "backText": "Wales"
+        "title": "3 ball cascade",
+        "description": "The basic pattern of juggling. Throw each ball in an arc from one hand to the other, so that each ball is caught in the opposite hand."
       },
       {
-        "emoji": "🇦🇨",
-        "description": "Flip for answer",
-        "backText": "Ascension Island"
+        "title": "3 ball shower",
+        "description": "Throw two balls in an arc from one hand to the other, and the third ball in a high arc from the same hand to the other. The balls should be caught in the same order they were thrown."
       },
       {
-        "emoji": "🇦🇩",
-        "description": "Flip for answer",
-        "backText": "Andorra"
+        "title": "3 ball columns",
+        "description": "Throw all three balls straight up and down, so that they land in the same hand they were thrown from."
       },
       {
-        "emoji": "🇦🇪",
-        "description": "Flip for answer",
-        "backText": "United Arab Emirates"
+        "title": "3 ball reverse cascade",
+        "description": "Throw each ball in an arc from one hand to the other, but catch them in the same hand they were thrown from."
       },
       {
-        "emoji": "🇦🇫",
-        "description": "Flip for answer",
-        "backText": "Afghanistan"
+        "title": "3 ball mills mess",
+        "description": "Throw the balls in a circular pattern, so that each ball is caught by the opposite hand."
       },
       {
-        "emoji": "🇦🇬",
-        "description": "Flip for answer",
-        "backText": "Antigua & Barbuda"
+        "title": "3 ball box",
+        "description": "Throw the balls in a square pattern, so that each ball is caught by the opposite hand."
       },
       {
-        "emoji": "🇦🇮",
-        "description": "Flip for answer",
-        "backText": "Anguilla"
+        "title": "3 ball half shower",
+        "description": "Throw one ball in a high arc and the other two in a lower arc, catching them in the same order they were thrown."
       },
       {
-        "emoji": "🇦🇱",
-        "description": "Flip for answer",
-        "backText": "Albania"
+        "title": "3 ball tennis",
+        "description": "Throw one ball in a high arc and the other two in a lower arc, catching them in the same order they were thrown, but with one ball always being thrown higher."
       },
       {
-        "emoji": "🇦🇲",
-        "description": "Flip for answer",
-        "backText": "Armenia"
+        "title": "3 ball snake",
+        "description": "Throw the balls in a pattern that resembles a snake, with each ball following the previous one."
       },
       {
-        "emoji": "🇦🇴",
-        "description": "Flip for answer",
-        "backText": "Angola"
+        "title": "3 ball windmill",
+        "description": "Throw the balls in a circular pattern, with each ball following the previous one in a windmill-like motion."
       },
       {
-        "emoji": "🇦🇶",
-        "description": "Flip for answer",
-        "backText": "Antarctica"
+        "title": "3 ball factory",
+        "description": "Throw the balls in a pattern that resembles a factory, with each ball following the previous one in a mechanical motion."
       },
       {
-        "emoji": "🇦🇷",
-        "description": "Flip for answer",
-        "backText": "Argentina"
+        "title": "3 ball yo-yo",
+        "description": "Throw the balls in a pattern that resembles a yo-yo, with each ball following the previous one in an up-and-down motion."
       },
       {
-        "emoji": "🇦🇸",
-        "description": "Flip for answer",
-        "backText": "American Samoa"
+        "title": "3 ball shower with a twist",
+        "description": "Throw the balls in a shower pattern, but with a twist in the middle of the pattern."
       },
       {
-        "emoji": "🇦🇹",
-        "description": "Flip for answer",
-        "backText": "Austria"
+        "title": "3 ball under the leg",
+        "description": "Throw the balls in a pattern that involves throwing one ball under your leg."
       },
       {
-        "emoji": "🇦🇺",
-        "description": "Flip for answer",
-        "backText": "Australia"
+        "title": "3 ball behind the back",
+        "description": "Throw the balls in a pattern that involves throwing one ball behind your back."
       },
       {
-        "emoji": "🇦🇼",
-        "description": "Flip for answer",
-        "backText": "Aruba"
+        "title": "3 ball over the shoulder",
+        "description": "Throw the balls in a pattern that involves throwing one ball over your shoulder."
       },
       {
-        "emoji": "🇦🇽",
-        "description": "Flip for answer",
-        "backText": "Åland Islands"
+        "title": "3 ball under the arm",
+        "description": "Throw the balls in a pattern that involves throwing one ball under your arm."
       },
       {
-        "emoji": "🇦🇿",
-        "description": "Flip for answer",
-        "backText": "Azerbaijan"
+        "title": "3 ball claw catch",
+        "description": "Catch the balls with a claw-like motion, grabbing them out of the air."
       },
       {
-        "emoji": "🇧🇦",
-        "description": "Flip for answer",
-        "backText": "Bosnia & Herzegovina"
+        "title": "3 ball penguin catch",
+        "description": "Catch the balls with your hands turned inward, like a penguin."
       },
       {
-        "emoji": "🇧🇧",
-        "description": "Flip for answer",
-        "backText": "Barbados"
+        "title": "3 ball backcross",
+        "description": "Throw the balls in a pattern that involves crossing your arms behind your back."
       },
       {
-        "emoji": "🇧🇩",
-        "description": "Flip for answer",
-        "backText": "Bangladesh"
+        "title": "3 ball multiplex",
+        "description": "Throw multiple balls at once, catching them in the same order they were thrown."
       },
       {
-        "emoji": "🇧🇪",
-        "description": "Flip for answer",
-        "backText": "Belgium"
+        "title": "3 ball flash",
+        "description": "Throw all three balls in the air at once, catching them in the same order they were thrown."
       },
       {
-        "emoji": "🇧🇫",
-        "description": "Flip for answer",
-        "backText": "Burkina Faso"
+        "title": "3 ball cascade with a spin",
+        "description": "Throw the balls in a cascade pattern, but with a spin in the middle of the pattern."
       },
       {
-        "emoji": "🇧🇬",
-        "description": "Flip for answer",
-        "backText": "Bulgaria"
+        "title": "3 ball shower with a spin",
+        "description": "Throw the balls in a shower pattern, but with a spin in the middle of the pattern."
       },
       {
-        "emoji": "🇧🇭",
-        "description": "Flip for answer",
-        "backText": "Bahrain"
+        "title": "3 ball columns with a spin",
+        "description": "Throw the balls in a columns pattern, but with a spin in the middle of the pattern."
       },
       {
-        "emoji": "🇧🇮",
-        "description": "Flip for answer",
-        "backText": "Burundi"
-      },
-      {
-        "emoji": "🇧🇯",
-        "description": "Flip for answer",
-        "backText": "Benin"
-      },
-      {
-        "emoji": "🇧🇱",
-        "description": "Flip for answer",
-        "backText": "St. Barthélemy"
-      },
-      {
-        "emoji": "🇧🇲",
-        "description": "Flip for answer",
-        "backText": "Bermuda"
-      },
-      {
-        "emoji": "🇧🇳",
-        "description": "Flip for answer",
-        "backText": "Brunei"
-      },
-      {
-        "emoji": "🇧🇴",
-        "description": "Flip for answer",
-        "backText": "Bolivia"
-      },
-      {
-        "emoji": "🇧🇶",
-        "description": "Flip for answer",
-        "backText": "Caribbean Netherlands"
-      },
-      {
-        "emoji": "🇧🇷",
-        "description": "Flip for answer",
-        "backText": "Brazil"
-      },
-      {
-        "emoji": "🇧🇸",
-        "description": "Flip for answer",
-        "backText": "Bahamas"
-      },
-      {
-        "emoji": "🇧🇹",
-        "description": "Flip for answer",
-        "backText": "Bhutan"
-      },
-      {
-        "emoji": "🇧🇻",
-        "description": "Flip for answer",
-        "backText": "Bouvet Island"
-      },
-      {
-        "emoji": "🇧🇼",
-        "description": "Flip for answer",
-        "backText": "Botswana"
-      },
-      {
-        "emoji": "🇧🇾",
-        "description": "Flip for answer",
-        "backText": "Belarus"
-      },
-      {
-        "emoji": "🇧🇿",
-        "description": "Flip for answer",
-        "backText": "Belize"
-      },
-      {
-        "emoji": "🇨🇦",
-        "description": "Flip for answer",
-        "backText": "Canada"
-      },
-      {
-        "emoji": "🇨🇨",
-        "description": "Flip for answer",
-        "backText": "Cocos (Keeling) Islands"
-      },
-      {
-        "emoji": "🇨🇩",
-        "description": "Flip for answer",
-        "backText": "Congo - Kinshasa"
-      },
-      {
-        "emoji": "🇨🇫",
-        "description": "Flip for answer",
-        "backText": "Central African Republic"
-      },
-      {
-        "emoji": "🇨🇬",
-        "description": "Flip for answer",
-        "backText": "Congo - Brazzaville"
-      },
-      {
-        "emoji": "🇨🇭",
-        "description": "Flip for answer",
-        "backText": "Switzerland"
-      },
-      {
-        "emoji": "🇨🇮",
-        "description": "Flip for answer",
-        "backText": "Côte D’Ivoire"
-      },
-      {
-        "emoji": "🇨🇰",
-        "description": "Flip for answer",
-        "backText": "Cook Islands"
-      },
-      {
-        "emoji": "🇨🇱",
-        "description": "Flip for answer",
-        "backText": "Chile"
-      },
-      {
-        "emoji": "🇨🇲",
-        "description": "Flip for answer",
-        "backText": "Cameroon"
-      },
-      {
-        "emoji": "🇨🇳",
-        "description": "Flip for answer",
-        "backText": "China"
-      },
-      {
-        "emoji": "🇨🇴",
-        "description": "Flip for answer",
-        "backText": "Colombia"
-      },
-      {
-        "emoji": "🇨🇵",
-        "description": "Flip for answer",
-        "backText": "Clipperton Island"
-      },
-      {
-        "emoji": "🇨🇷",
-        "description": "Flip for answer",
-        "backText": "Costa Rica"
-      },
-      {
-        "emoji": "🇨🇺",
-        "description": "Flip for answer",
-        "backText": "Cuba"
-      },
-      {
-        "emoji": "🇨🇻",
-        "description": "Flip for answer",
-        "backText": "Cape Verde"
-      },
-      {
-        "emoji": "🇨🇼",
-        "description": "Flip for answer",
-        "backText": "Curaçao"
-      },
-      {
-        "emoji": "🇨🇽",
-        "description": "Flip for answer",
-        "backText": "Christmas Island"
-      },
-      {
-        "emoji": "🇨🇾",
-        "description": "Flip for answer",
-        "backText": "Cyprus"
-      },
-      {
-        "emoji": "🇨🇿",
-        "description": "Flip for answer",
-        "backText": "Czechia"
-      },
-      {
-        "emoji": "🇩🇪",
-        "description": "Flip for answer",
-        "backText": "Germany"
-      },
-      {
-        "emoji": "🇩🇬",
-        "description": "Flip for answer",
-        "backText": "Diego Garcia"
-      },
-      {
-        "emoji": "🇩🇯",
-        "description": "Flip for answer",
-        "backText": "Djibouti"
-      },
-      {
-        "emoji": "🇩🇰",
-        "description": "Flip for answer",
-        "backText": "Denmark"
-      },
-      {
-        "emoji": "🇩🇲",
-        "description": "Flip for answer",
-        "backText": "Dominica"
-      },
-      {
-        "emoji": "🇩🇴",
-        "description": "Flip for answer",
-        "backText": "Dominican Republic"
-      },
-      {
-        "emoji": "🇩🇿",
-        "description": "Flip for answer",
-        "backText": "Algeria"
-      },
-      {
-        "emoji": "🇪🇦",
-        "description": "Flip for answer",
-        "backText": "Ceuta & Melilla"
-      },
-      {
-        "emoji": "🇪🇨",
-        "description": "Flip for answer",
-        "backText": "Ecuador"
-      },
-      {
-        "emoji": "🇪🇪",
-        "description": "Flip for answer",
-        "backText": "Estonia"
-      },
-      {
-        "emoji": "🇪🇬",
-        "description": "Flip for answer",
-        "backText": "Egypt"
-      },
-      {
-        "emoji": "🇪🇭",
-        "description": "Flip for answer",
-        "backText": "Western Sahara"
-      },
-      {
-        "emoji": "🇪🇷",
-        "description": "Flip for answer",
-        "backText": "Eritrea"
-      },
-      {
-        "emoji": "🇪🇸",
-        "description": "Flip for answer",
-        "backText": "Spain"
-      },
-      {
-        "emoji": "🇪🇹",
-        "description": "Flip for answer",
-        "backText": "Ethiopia"
-      },
-      {
-        "emoji": "🇪🇺",
-        "description": "Flip for answer",
-        "backText": "European Union"
-      },
-      {
-        "emoji": "🇫🇮",
-        "description": "Flip for answer",
-        "backText": "Finland"
-      },
-      {
-        "emoji": "🇫🇯",
-        "description": "Flip for answer",
-        "backText": "Fiji"
-      },
-      {
-        "emoji": "🇫🇰",
-        "description": "Flip for answer",
-        "backText": "Falkland Islands"
-      },
-      {
-        "emoji": "🇫🇲",
-        "description": "Flip for answer",
-        "backText": "Micronesia"
-      },
-      {
-        "emoji": "🇫🇴",
-        "description": "Flip for answer",
-        "backText": "Faroe Islands"
-      },
-      {
-        "emoji": "🇫🇷",
-        "description": "Flip for answer",
-        "backText": "France"
-      },
-      {
-        "emoji": "🇬🇦",
-        "description": "Flip for answer",
-        "backText": "Gabon"
-      },
-      {
-        "emoji": "🇬🇧",
-        "description": "Flip for answer",
-        "backText": "United Kingdom"
-      },
-      {
-        "emoji": "🇬🇩",
-        "description": "Flip for answer",
-        "backText": "Grenada"
-      },
-      {
-        "emoji": "🇬🇪",
-        "description": "Flip for answer",
-        "backText": "Georgia"
-      },
-      {
-        "emoji": "🇬🇫",
-        "description": "Flip for answer",
-        "backText": "French Guiana"
-      },
-      {
-        "emoji": "🇬🇬",
-        "description": "Flip for answer",
-        "backText": "Guernsey"
-      },
-      {
-        "emoji": "🇬🇭",
-        "description": "Flip for answer",
-        "backText": "Ghana"
-      },
-      {
-        "emoji": "🇬🇮",
-        "description": "Flip for answer",
-        "backText": "Gibraltar"
-      },
-      {
-        "emoji": "🇬🇱",
-        "description": "Flip for answer",
-        "backText": "Greenland"
-      },
-      {
-        "emoji": "🇬🇲",
-        "description": "Flip for answer",
-        "backText": "Gambia"
-      },
-      {
-        "emoji": "🇬🇳",
-        "description": "Flip for answer",
-        "backText": "Guinea"
-      },
-      {
-        "emoji": "🇬🇵",
-        "description": "Flip for answer",
-        "backText": "Guadeloupe"
-      },
-      {
-        "emoji": "🇬🇶",
-        "description": "Flip for answer",
-        "backText": "Equatorial Guinea"
-      },
-      {
-        "emoji": "🇬🇷",
-        "description": "Flip for answer",
-        "backText": "Greece"
-      },
-      {
-        "emoji": "🇬🇸",
-        "description": "Flip for answer",
-        "backText": "South Georgia & South Sandwich Islands"
-      },
-      {
-        "emoji": "🇬🇹",
-        "description": "Flip for answer",
-        "backText": "Guatemala"
-      },
-      {
-        "emoji": "🇬🇺",
-        "description": "Flip for answer",
-        "backText": "Guam"
-      },
-      {
-        "emoji": "🇬🇼",
-        "description": "Flip for answer",
-        "backText": "Guinea-Bissau"
-      },
-      {
-        "emoji": "🇬🇾",
-        "description": "Flip for answer",
-        "backText": "Guyana"
-      },
-      {
-        "emoji": "🇭🇰",
-        "description": "Flip for answer",
-        "backText": "Hong Kong SAR China"
-      },
-      {
-        "emoji": "🇭🇲",
-        "description": "Flip for answer",
-        "backText": "Heard & McDonald Islands"
-      },
-      {
-        "emoji": "🇭🇳",
-        "description": "Flip for answer",
-        "backText": "Honduras"
-      },
-      {
-        "emoji": "🇭🇷",
-        "description": "Flip for answer",
-        "backText": "Croatia"
-      },
-      {
-        "emoji": "🇭🇹",
-        "description": "Flip for answer",
-        "backText": "Haiti"
-      },
-      {
-        "emoji": "🇭🇺",
-        "description": "Flip for answer",
-        "backText": "Hungary"
-      },
-      {
-        "emoji": "🇮🇨",
-        "description": "Flip for answer",
-        "backText": "Canary Islands"
-      },
-      {
-        "emoji": "🇮🇩",
-        "description": "Flip for answer",
-        "backText": "Indonesia"
-      },
-      {
-        "emoji": "🇮🇪",
-        "description": "Flip for answer",
-        "backText": "Ireland"
-      },
-      {
-        "emoji": "🇮🇱",
-        "description": "Flip for answer",
-        "backText": "Israel"
-      },
-      {
-        "emoji": "🇮🇲",
-        "description": "Flip for answer",
-        "backText": "Isle of Man"
-      },
-      {
-        "emoji": "🇮🇳",
-        "description": "Flip for answer",
-        "backText": "India"
-      },
-      {
-        "emoji": "🇮🇴",
-        "description": "Flip for answer",
-        "backText": "British Indian Ocean Territory"
-      },
-      {
-        "emoji": "🇮🇶",
-        "description": "Flip for answer",
-        "backText": "Iraq"
-      },
-      {
-        "emoji": "🇮🇷",
-        "description": "Flip for answer",
-        "backText": "Iran"
-      },
-      {
-        "emoji": "🇮🇸",
-        "description": "Flip for answer",
-        "backText": "Iceland"
-      },
-      {
-        "emoji": "🇮🇹",
-        "description": "Flip for answer",
-        "backText": "Italy"
-      },
-      {
-        "emoji": "🇯🇪",
-        "description": "Flip for answer",
-        "backText": "Jersey"
-      },
-      {
-        "emoji": "🇯🇲",
-        "description": "Flip for answer",
-        "backText": "Jamaica"
-      },
-      {
-        "emoji": "🇯🇴",
-        "description": "Flip for answer",
-        "backText": "Jordan"
-      },
-      {
-        "emoji": "🇯🇵",
-        "description": "Flip for answer",
-        "backText": "Japan"
-      },
-      {
-        "emoji": "🇰🇪",
-        "description": "Flip for answer",
-        "backText": "Kenya"
-      },
-      {
-        "emoji": "🇰🇬",
-        "description": "Flip for answer",
-        "backText": "Kyrgyzstan"
-      },
-      {
-        "emoji": "🇰🇭",
-        "description": "Flip for answer",
-        "backText": "Cambodia"
-      },
-      {
-        "emoji": "🇰🇮",
-        "description": "Flip for answer",
-        "backText": "Kiribati"
-      },
-      {
-        "emoji": "🇰🇲",
-        "description": "Flip for answer",
-        "backText": "Comoros"
-      },
-      {
-        "emoji": "🇰🇳",
-        "description": "Flip for answer",
-        "backText": "St. Kitts & Nevis"
-      },
-      {
-        "emoji": "🇰🇵",
-        "description": "Flip for answer",
-        "backText": "North Korea"
-      },
-      {
-        "emoji": "🇰🇷",
-        "description": "Flip for answer",
-        "backText": "South Korea"
-      },
-      {
-        "emoji": "🇰🇼",
-        "description": "Flip for answer",
-        "backText": "Kuwait"
-      },
-      {
-        "emoji": "🇰🇾",
-        "description": "Flip for answer",
-        "backText": "Cayman Islands"
-      },
-      {
-        "emoji": "🇰🇿",
-        "description": "Flip for answer",
-        "backText": "Kazakhstan"
-      },
-      {
-        "emoji": "🇱🇦",
-        "description": "Flip for answer",
-        "backText": "Laos"
-      },
-      {
-        "emoji": "🇱🇧",
-        "description": "Flip for answer",
-        "backText": "Lebanon"
-      },
-      {
-        "emoji": "🇱🇨",
-        "description": "Flip for answer",
-        "backText": "St. Lucia"
-      },
-      {
-        "emoji": "🇱🇮",
-        "description": "Flip for answer",
-        "backText": "Liechtenstein"
-      },
-      {
-        "emoji": "🇱🇰",
-        "description": "Flip for answer",
-        "backText": "Sri Lanka"
-      },
-      {
-        "emoji": "🇱🇷",
-        "description": "Flip for answer",
-        "backText": "Liberia"
-      },
-      {
-        "emoji": "🇱🇸",
-        "description": "Flip for answer",
-        "backText": "Lesotho"
-      },
-      {
-        "emoji": "🇱🇹",
-        "description": "Flip for answer",
-        "backText": "Lithuania"
-      },
-      {
-        "emoji": "🇱🇺",
-        "description": "Flip for answer",
-        "backText": "Luxembourg"
-      },
-      {
-        "emoji": "🇱🇻",
-        "description": "Flip for answer",
-        "backText": "Latvia"
-      },
-      {
-        "emoji": "🇱🇾",
-        "description": "Flip for answer",
-        "backText": "Libya"
-      },
-      {
-        "emoji": "🇲🇦",
-        "description": "Flip for answer",
-        "backText": "Morocco"
-      },
-      {
-        "emoji": "🇲🇨",
-        "description": "Flip for answer",
-        "backText": "Monaco"
-      },
-      {
-        "emoji": "🇲🇩",
-        "description": "Flip for answer",
-        "backText": "Moldova"
-      },
-      {
-        "emoji": "🇲🇪",
-        "description": "Flip for answer",
-        "backText": "Montenegro"
-      },
-      {
-        "emoji": "🇲🇫",
-        "description": "Flip for answer",
-        "backText": "St. Martin"
-      },
-      {
-        "emoji": "🇲🇬",
-        "description": "Flip for answer",
-        "backText": "Madagascar"
-      },
-      {
-        "emoji": "🇲🇭",
-        "description": "Flip for answer",
-        "backText": "Marshall Islands"
-      },
-      {
-        "emoji": "🇲🇰",
-        "description": "Flip for answer",
-        "backText": "Macedonia"
-      },
-      {
-        "emoji": "🇲🇱",
-        "description": "Flip for answer",
-        "backText": "Mali"
-      },
-      {
-        "emoji": "🇲🇲",
-        "description": "Flip for answer",
-        "backText": "Myanmar (Burma)"
-      },
-      {
-        "emoji": "🇲🇳",
-        "description": "Flip for answer",
-        "backText": "Mongolia"
-      },
-      {
-        "emoji": "🇲🇴",
-        "description": "Flip for answer",
-        "backText": "Macau SAR China"
-      },
-      {
-        "emoji": "🇲🇵",
-        "description": "Flip for answer",
-        "backText": "Northern Mariana Islands"
-      },
-      {
-        "emoji": "🇲🇶",
-        "description": "Flip for answer",
-        "backText": "Martinique"
-      },
-      {
-        "emoji": "🇲🇷",
-        "description": "Flip for answer",
-        "backText": "Mauritania"
-      },
-      {
-        "emoji": "🇲🇸",
-        "description": "Flip for answer",
-        "backText": "Montserrat"
-      },
-      {
-        "emoji": "🇲🇹",
-        "description": "Flip for answer",
-        "backText": "Malta"
-      },
-      {
-        "emoji": "🇲🇺",
-        "description": "Flip for answer",
-        "backText": "Mauritius"
-      },
-      {
-        "emoji": "🇲🇻",
-        "description": "Flip for answer",
-        "backText": "Maldives"
-      },
-      {
-        "emoji": "🇲🇼",
-        "description": "Flip for answer",
-        "backText": "Malawi"
-      },
-      {
-        "emoji": "🇲🇽",
-        "description": "Flip for answer",
-        "backText": "Mexico"
-      },
-      {
-        "emoji": "🇲🇾",
-        "description": "Flip for answer",
-        "backText": "Malaysia"
-      },
-      {
-        "emoji": "🇲🇿",
-        "description": "Flip for answer",
-        "backText": "Mozambique"
-      },
-      {
-        "emoji": "🇳🇦",
-        "description": "Flip for answer",
-        "backText": "Namibia"
-      },
-      {
-        "emoji": "🇳🇨",
-        "description": "Flip for answer",
-        "backText": "New Caledonia"
-      },
-      {
-        "emoji": "🇳🇪",
-        "description": "Flip for answer",
-        "backText": "Niger"
-      },
-      {
-        "emoji": "🇳🇫",
-        "description": "Flip for answer",
-        "backText": "Norfolk Island"
-      },
-      {
-        "emoji": "🇳🇬",
-        "description": "Flip for answer",
-        "backText": "Nigeria"
-      },
-      {
-        "emoji": "🇳🇮",
-        "description": "Flip for answer",
-        "backText": "Nicaragua"
-      },
-      {
-        "emoji": "🇳🇱",
-        "description": "Flip for answer",
-        "backText": "Netherlands"
-      },
-      {
-        "emoji": "🇳🇴",
-        "description": "Flip for answer",
-        "backText": "Norway"
-      },
-      {
-        "emoji": "🇳🇵",
-        "description": "Flip for answer",
-        "backText": "Nepal"
-      },
-      {
-        "emoji": "🇳🇷",
-        "description": "Flip for answer",
-        "backText": "Nauru"
-      },
-      {
-        "emoji": "🇳🇺",
-        "description": "Flip for answer",
-        "backText": "Niue"
-      },
-      {
-        "emoji": "🇳🇿",
-        "description": "Flip for answer",
-        "backText": "New Zealand"
-      },
-      {
-        "emoji": "🇴🇲",
-        "description": "Flip for answer",
-        "backText": "Oman"
-      },
-      {
-        "emoji": "🇵🇦",
-        "description": "Flip for answer",
-        "backText": "Panama"
-      },
-      {
-        "emoji": "🇵🇪",
-        "description": "Flip for answer",
-        "backText": "Peru"
-      },
-      {
-        "emoji": "🇵🇫",
-        "description": "Flip for answer",
-        "backText": "French Polynesia"
-      },
-      {
-        "emoji": "🇵🇬",
-        "description": "Flip for answer",
-        "backText": "Papua New Guinea"
-      },
-      {
-        "emoji": "🇵🇭",
-        "description": "Flip for answer",
-        "backText": "Philippines"
-      },
-      {
-        "emoji": "🇵🇰",
-        "description": "Flip for answer",
-        "backText": "Pakistan"
-      },
-      {
-        "emoji": "🇵🇱",
-        "description": "Flip for answer",
-        "backText": "Poland"
-      },
-      {
-        "emoji": "🇵🇲",
-        "description": "Flip for answer",
-        "backText": "St. Pierre & Miquelon"
-      },
-      {
-        "emoji": "🇵🇳",
-        "description": "Flip for answer",
-        "backText": "Pitcairn Islands"
-      },
-      {
-        "emoji": "🇵🇷",
-        "description": "Flip for answer",
-        "backText": "Puerto Rico"
-      },
-      {
-        "emoji": "🇵🇸",
-        "description": "Flip for answer",
-        "backText": "Palestinian Territories"
-      },
-      {
-        "emoji": "🇵🇹",
-        "description": "Flip for answer",
-        "backText": "Portugal"
-      },
-      {
-        "emoji": "🇵🇼",
-        "description": "Flip for answer",
-        "backText": "Palau"
-      },
-      {
-        "emoji": "🇵🇾",
-        "description": "Flip for answer",
-        "backText": "Paraguay"
-      },
-      {
-        "emoji": "🇶🇦",
-        "description": "Flip for answer",
-        "backText": "Qatar"
-      },
-      {
-        "emoji": "🇷🇪",
-        "description": "Flip for answer",
-        "backText": "Réunion"
-      },
-      {
-        "emoji": "🇷🇴",
-        "description": "Flip for answer",
-        "backText": "Romania"
-      },
-      {
-        "emoji": "🇷🇸",
-        "description": "Flip for answer",
-        "backText": "Serbia"
-      },
-      {
-        "emoji": "🇷🇺",
-        "description": "Flip for answer",
-        "backText": "Russia"
-      },
-      {
-        "emoji": "🇷🇼",
-        "description": "Flip for answer",
-        "backText": "Rwanda"
-      },
-      {
-        "emoji": "🇸🇦",
-        "description": "Flip for answer",
-        "backText": "Saudi Arabia"
-      },
-      {
-        "emoji": "🇸🇧",
-        "description": "Flip for answer",
-        "backText": "Solomon Islands"
-      },
-      {
-        "emoji": "🇸🇨",
-        "description": "Flip for answer",
-        "backText": "Seychelles"
-      },
-      {
-        "emoji": "🇸🇩",
-        "description": "Flip for answer",
-        "backText": "Sudan"
-      },
-      {
-        "emoji": "🇸🇪",
-        "description": "Flip for answer",
-        "backText": "Sweden"
-      },
-      {
-        "emoji": "🇸🇬",
-        "description": "Flip for answer",
-        "backText": "Singapore"
-      },
-      {
-        "emoji": "🇸🇭",
-        "description": "Flip for answer",
-        "backText": "St. Helena"
-      },
-      {
-        "emoji": "🇸🇮",
-        "description": "Flip for answer",
-        "backText": "Slovenia"
-      },
-      {
-        "emoji": "🇸🇯",
-        "description": "Flip for answer",
-        "backText": "Svalbard & Jan Mayen"
-      },
-      {
-        "emoji": "🇸🇰",
-        "description": "Flip for answer",
-        "backText": "Slovakia"
-      },
-      {
-        "emoji": "🇸🇱",
-        "description": "Flip for answer",
-        "backText": "Sierra Leone"
-      },
-      {
-        "emoji": "🇸🇲",
-        "description": "Flip for answer",
-        "backText": "San Marino"
-      },
-      {
-        "emoji": "🇸🇳",
-        "description": "Flip for answer",
-        "backText": "Senegal"
-      },
-      {
-        "emoji": "🇸🇴",
-        "description": "Flip for answer",
-        "backText": "Somalia"
-      },
-      {
-        "emoji": "🇸🇷",
-        "description": "Flip for answer",
-        "backText": "Suriname"
-      },
-      {
-        "emoji": "🇸🇸",
-        "description": "Flip for answer",
-        "backText": "South Sudan"
-      },
-      {
-        "emoji": "🇸🇹",
-        "description": "Flip for answer",
-        "backText": "São Tomé & Príncipe"
-      },
-      {
-        "emoji": "🇸🇻",
-        "description": "Flip for answer",
-        "backText": "El Salvador"
-      },
-      {
-        "emoji": "🇸🇽",
-        "description": "Flip for answer",
-        "backText": "Sint Maarten"
-      },
-      {
-        "emoji": "🇸🇾",
-        "description": "Flip for answer",
-        "backText": "Syria"
-      },
-      {
-        "emoji": "🇸🇿",
-        "description": "Flip for answer",
-        "backText": "Swaziland"
-      },
-      {
-        "emoji": "🇹🇦",
-        "description": "Flip for answer",
-        "backText": "Tristan Da Cunha"
-      },
-      {
-        "emoji": "🇹🇨",
-        "description": "Flip for answer",
-        "backText": "Turks & Caicos Islands"
-      },
-      {
-        "emoji": "🇹🇩",
-        "description": "Flip for answer",
-        "backText": "Chad"
-      },
-      {
-        "emoji": "🇹🇫",
-        "description": "Flip for answer",
-        "backText": "French Southern Territories"
-      },
-      {
-        "emoji": "🇹🇬",
-        "description": "Flip for answer",
-        "backText": "Togo"
-      },
-      {
-        "emoji": "🇹🇭",
-        "description": "Flip for answer",
-        "backText": "Thailand"
-      },
-      {
-        "emoji": "🇹🇯",
-        "description": "Flip for answer",
-        "backText": "Tajikistan"
-      },
-      {
-        "emoji": "🇹🇰",
-        "description": "Flip for answer",
-        "backText": "Tokelau"
-      },
-      {
-        "emoji": "🇹🇱",
-        "description": "Flip for answer",
-        "backText": "Timor-Leste"
-      },
-      {
-        "emoji": "🇹🇲",
-        "description": "Flip for answer",
-        "backText": "Turkmenistan"
-      },
-      {
-        "emoji": "🇹🇳",
-        "description": "Flip for answer",
-        "backText": "Tunisia"
-      },
-      {
-        "emoji": "🇹🇴",
-        "description": "Flip for answer",
-        "backText": "Tonga"
-      },
-      {
-        "emoji": "🇹🇷",
-        "description": "Flip for answer",
-        "backText": "Turkey"
-      },
-      {
-        "emoji": "🇹🇹",
-        "description": "Flip for answer",
-        "backText": "Trinidad & Tobago"
-      },
-      {
-        "emoji": "🇹🇻",
-        "description": "Flip for answer",
-        "backText": "Tuvalu"
-      },
-      {
-        "emoji": "🇹🇼",
-        "description": "Flip for answer",
-        "backText": "Taiwan"
-      },
-      {
-        "emoji": "🇹🇿",
-        "description": "Flip for answer",
-        "backText": "Tanzania"
-      },
-      {
-        "emoji": "🇺🇦",
-        "description": "Flip for answer",
-        "backText": "Ukraine"
-      },
-      {
-        "emoji": "🇺🇬",
-        "description": "Flip for answer",
-        "backText": "Uganda"
-      },
-      {
-        "emoji": "🇺🇳",
-        "description": "Flip for answer",
-        "backText": "United Nations"
-      },
-      {
-        "emoji": "🇺🇸",
-        "description": "Flip for answer",
-        "backText": "United States"
-      },
-      {
-        "emoji": "🇺🇾",
-        "description": "Flip for answer",
-        "backText": "Uruguay"
-      },
-      {
-        "emoji": "🇺🇿",
-        "description": "Flip for answer",
-        "backText": "Uzbekistan"
-      },
-      {
-        "emoji": "🇻🇦",
-        "description": "Flip for answer",
-        "backText": "Vatican City"
-      },
-      {
-        "emoji": "🇻🇨",
-        "description": "Flip for answer",
-        "backText": "St. Vincent & Grenadines"
-      },
-      {
-        "emoji": "🇻🇪",
-        "description": "Flip for answer",
-        "backText": "Venezuela"
-      },
-      {
-        "emoji": "🇻🇬",
-        "description": "Flip for answer",
-        "backText": "British Virgin Islands"
-      },
-      {
-        "emoji": "🇻🇮",
-        "description": "Flip for answer",
-        "backText": "U.S. Virgin Islands"
-      },
-      {
-        "emoji": "🇻🇳",
-        "description": "Flip for answer",
-        "backText": "Vietnam"
-      },
-      {
-        "emoji": "🇻🇺",
-        "description": "Flip for answer",
-        "backText": "Vanuatu"
-      },
-      {
-        "emoji": "🇼🇫",
-        "description": "Flip for answer",
-        "backText": "Wallis & Futuna"
-      },
-      {
-        "emoji": "🇼🇸",
-        "description": "Flip for answer",
-        "backText": "Samoa"
-      },
-      {
-        "emoji": "🇽🇰",
-        "description": "Flip for answer",
-        "backText": "Kosovo"
-      },
-      {
-        "emoji": "🇾🇪",
-        "description": "Flip for answer",
-        "backText": "Yemen"
-      },
-      {
-        "emoji": "🇾🇹",
-        "description": "Flip for answer",
-        "backText": "Mayotte"
-      },
-      {
-        "emoji": "🇿🇦",
-        "description": "Flip for answer",
-        "backText": "South Africa"
-      },
-      {
-        "emoji": "🇿🇲",
-        "description": "Flip for answer",
-        "backText": "Zambia"
-      },
-      {
-        "emoji": "🇿🇼",
-        "description": "Flip for answer",
-        "backText": "Zimbabwe"
-      },
-      {
-        "emoji": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-        "description": "Flip for answer",
-        "backText": "England"
-      },
-      {
-        "emoji": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-        "description": "Flip for answer",
-        "backText": "Scotland"
+        "title": "3 ball reverse cascade with a spin",
+        "description": "Throw the balls in a reverse cascade pattern, but with a spin in the middle of the pattern."
       }
     ]
   }

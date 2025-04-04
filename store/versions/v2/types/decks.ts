@@ -85,6 +85,7 @@ export interface Props extends TimestampMetadata {
   cardSize: CardSize;
   lastScreen?: "deck" | "play";
   sortOrder?: number;
+  version?: string;
 }
 
 export interface State {

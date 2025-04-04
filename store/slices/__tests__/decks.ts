@@ -11,6 +11,7 @@ function createTestDeck(
   props?: Partial<Decks.Props>,
 ): Decks.Props {
   return {
+    version: undefined,
     dateDeleted: null,
     dateCreated: testDate,
     dateUpdated: testDate,

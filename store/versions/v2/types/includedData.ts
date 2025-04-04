@@ -26,6 +26,7 @@ export type Card = {
 export type DeckProps = {
   title: string;
   description: string;
+  version?: string;
   devOnly?: boolean;
   gid?: string;
   key: string;

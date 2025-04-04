@@ -38,6 +38,7 @@ export default createMigration<V1, V2>({
       if (!deck) return;
 
       const newDeck = {
+        version: undefined,
         ...deck,
         dateCreated,
         dateUpdated,

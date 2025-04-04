@@ -49,6 +49,7 @@ function includedDataToExampleDecks(
         textColor,
         backTextSize,
         sortOrder: _sortOrder,
+        version = null,
       },
     }) => {
       const prebuiltDeck = prebuildDecks[key];
@@ -61,6 +62,7 @@ function includedDataToExampleDecks(
       if (prebuiltDeck) {
         map[key] = {
           ...prebuiltDeck,
+          version,
           name: title,
           description,
           devOnly: !!devOnly,
@@ -73,6 +75,7 @@ function includedDataToExampleDecks(
 
       const deck: ExampleDeck = {
         name: title,
+        version,
         description,
         devOnly: !!devOnly,
         cards: cards ?? [],
@@ -300,6 +303,7 @@ export function includedDataToRootState(
     const dataSchema = exampleDeck.dataSchema ?? {};
 
     const deck: Decks.Props = {
+      version: exampleDeck.version ?? undefined,
       id: deckId,
       name: exampleDeck.name,
       description: exampleDeck.description,

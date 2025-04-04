@@ -20,7 +20,7 @@ import { useAuthentication } from "@/context/Authentication";
 import Field from "@/components/forms/Field";
 import Loader from "@/components/ui/Loader";
 import useIncludedData from "@/hooks/useIncludedData";
-import { useAppSelector } from "@/store/hooks";
+import { useBuiltInStateSelector } from "@/store/hooks";
 import { selectDecksById } from "@/store/selectors/decks";
 
 const titleProps = { type: "h2" } as const;
@@ -46,7 +46,7 @@ export default function DevMenu({
     lastCheckForUpdateTimeSinceRestart,
   } = useUpdates();
 
-  const decksByDeckId = useAppSelector((state) => selectDecksById(state));
+  const decksByDeckId = useBuiltInStateSelector(selectDecksById);
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -179,11 +179,11 @@ export default function DevMenu({
           />
         )}
       </FieldSet>
-      <FieldSet title="Example Deck Links" collapsible initialCollapsed>
+      <FieldSet title="Example Decks" collapsible initialCollapsed>
         {Object.entries(decksByDeckId).map(([id, deck]) => (
           <Button
             key={id}
-            title={deck?.name ?? "N/A"}
+            title={`${deck?.name ?? "N/A"} ${deck?.version ? `(${deck.version})` : ""}`}
             variant="outline"
             onPress={() => {
               navigate(`/deck/${exampleDeckIds(id).deckId}`);
