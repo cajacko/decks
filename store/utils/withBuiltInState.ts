@@ -1,5 +1,9 @@
 import { RootState, SliceName } from "../types";
 import merge from "lodash/merge";
+import includedData from "@/constants/exampleDecks/includedData";
+import { createSelector } from "@reduxjs/toolkit";
+import { selectIncludedData } from "../slices/includedData";
+import { includedDataToRootState } from "@/utils/includedData";
 
 /**
  * Built in state is used to provide a consistent experience in consuming data from selectors, but
@@ -27,14 +31,15 @@ let builtInState: RootState = {
     lastPulled: null,
     lastPushed: null,
     lastSynced: null,
+    lastModifiedImportantChangesLocally: null,
+  },
+  [SliceName.IncludedData]: {
+    data: includedData,
+    dateFetched: null,
   },
 };
 
-export type BuiltInState = Partial<RootState>;
-
-export function getBuiltInState() {
-  return builtInState;
-}
+type BuiltInState = Partial<RootState>;
 
 /**
  * Add stuff to the built in state
@@ -43,27 +48,61 @@ export function registerBuiltInState(state: BuiltInState) {
   builtInState = merge(builtInState, state);
 }
 
-export default function withBuiltInState<
+const selectIncludedDataRootState = createSelector(
+  (state: RootState) => selectIncludedData(state).data,
+  (data): Partial<RootState> => {
+    try {
+      return includedDataToRootState(data);
+    } catch {
+      return includedDataToRootState(includedData);
+    }
+  },
+);
+
+export const selectBuiltInState = createSelector(
+  () => builtInState,
+  selectIncludedDataRootState,
+  (builtInState, includedData): RootState => {
+    return merge(builtInState, includedData);
+  },
+);
+
+export type BuiltInStateSelectorProps<P extends object = object> = P & {
+  behaviour?:
+    | "built-in-only"
+    | "state-only"
+    | "prefer-state"
+    | "prefer-built-in";
+};
+
+export default function withBuiltInStateSelector<
   R extends unknown,
   S extends RootState = RootState,
 >(selector: (state: S) => R): (state: RootState) => R;
 
-export default function withBuiltInState<
+export default function withBuiltInStateSelector<
   R extends unknown,
-  P extends unknown,
+  P extends BuiltInStateSelectorProps,
   S extends RootState = RootState,
 >(selector: (state: S, props: P) => R): (state: RootState, props: P) => R;
 
-export default function withBuiltInState(
-  selector: (state: RootState, props?: unknown) => unknown,
+export default function withBuiltInStateSelector(
+  selector: (state: RootState, props?: BuiltInStateSelectorProps) => unknown,
 ) {
-  return (state: RootState, props?: unknown) => {
-    const storeValue = selector(state, props);
+  return createSelector(
+    (state: RootState, props?: BuiltInStateSelectorProps) =>
+      props?.behaviour === "built-in-only" ? undefined : selector(state, props),
+    (state: RootState, props?: BuiltInStateSelectorProps) =>
+      props?.behaviour === "state-only"
+        ? undefined
+        : selector(selectBuiltInState(state), props),
+    (state: RootState, props?: BuiltInStateSelectorProps) => props?.behaviour,
+    (stateValue, builtInStateValue, behaviour = "prefer-state") => {
+      if (behaviour === "prefer-built-in") {
+        return builtInStateValue === undefined ? stateValue : builtInStateValue;
+      }
 
-    if (storeValue !== undefined) {
-      return storeValue;
-    }
-
-    return selector(builtInState, props);
-  };
+      return stateValue === undefined ? builtInStateValue : stateValue;
+    },
+  );
 }

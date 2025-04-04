@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, ViewStyle, View, ScrollView } from "react-native";
 import { useAppSelector } from "@/store/hooks";
-import { selectDeckIds } from "@/store/slices/decks";
+import { selectDeckIds } from "@/store/selectors/decks";
 import DeckListItem, {
   DeckListItemSkeleton,
 } from "@/components/decks/DeckListItem";

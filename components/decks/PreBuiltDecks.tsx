@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, ViewStyle } from "react-native";
 import { useBuiltInStateSelector } from "@/store/hooks";
-import { selectDeckIds } from "@/store/slices/decks";
+import { selectDeckIds } from "@/store/selectors/decks";
 import ExpandedDeckListItem, {
   ExpandedDeckListItemSkeleton,
 } from "@/components/decks/ExpandedDeckListItem";

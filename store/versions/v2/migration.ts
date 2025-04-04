@@ -2,6 +2,7 @@ import createMigration from "../createMigration";
 import { RootState as V1 } from "../v1/types";
 import { RootState as V2 } from "../v2/types";
 import { dateToDateString } from "@/utils/dates";
+import includedData from "@/constants/exampleDecks/includedData";
 
 export default createMigration<V1, V2>({
   fromVersion: 1,
@@ -105,6 +106,11 @@ export default createMigration<V1, V2>({
         lastSynced: null,
         lastPulled: null,
         lastPushed: null,
+        lastModifiedImportantChangesLocally: null,
+      },
+      includedData: {
+        data: includedData,
+        dateFetched: null,
       },
     };
 

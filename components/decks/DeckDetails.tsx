@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import TextInput from "../forms/TextInput";
-import { selectDeck, setDeckDetails } from "@/store/slices/decks";
+import { selectDeck, selectCanEditDeck } from "@/store/selectors/decks";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import useAutoSave from "@/hooks/useAutoSave";
 import text from "@/constants/text";
-import { selectCanEditDeck } from "@/store/slices/decks";
+import { setDeckDetails } from "@/store/slices/decks";
 import ThemedText from "../ui/ThemedText";
 import { dateToDateString } from "@/utils/dates";
 import Skeleton from "../ui/Skeleton";

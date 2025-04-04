@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./store";
 import { RootState as TRootState } from "./types";
 import AppError from "@/classes/AppError";
-import { getBuiltInState } from "./utils/withBuiltInState";
+import { selectBuiltInState } from "./utils/withBuiltInState";
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
@@ -11,7 +11,7 @@ export const useAppSelector = useSelector.withTypes<RootState>();
 type Selector<T> = (state: TRootState) => T;
 
 export const useBuiltInStateSelector = <T>(selector: Selector<T>): T => {
-  return selector(getBuiltInState());
+  return useAppSelector((state) => selector(selectBuiltInState(state)));
 };
 
 export const useRequiredAppSelector = <T>(

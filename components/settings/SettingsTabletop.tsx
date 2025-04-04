@@ -7,7 +7,7 @@ import FieldSet, {
 import text from "@/constants/text";
 import Button from "@/components/forms/Button";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
-import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeck } from "@/store/selectors/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import {
   resetTabletopHelper,

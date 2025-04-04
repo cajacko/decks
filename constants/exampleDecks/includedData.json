@@ -1,20 +1,25 @@
 [
   {
-    "title": "Playing Cards",
-    "sortOrder": "1",
-    "description": "A standard deck of 52 playing cards",
-    "devOnly": false,
-    "key": "playing-cards"
+    "props": {
+      "title": "Playing Cards",
+      "sortOrder": "1",
+      "description": "A standard deck of 52 playing cards",
+      "devOnly": false,
+      "key": "playing-cards"
+    },
+    "data": null
   },
   {
-    "title": "Charades",
-    "sortOrder": "2",
-    "description": "One player acts - everyone else guesses!\n\n1. Flip a card to reveal a word or phrase.\n2. Without speaking or making sounds, the player must act it out using gestures.\n3. The rest of the group tries to guess what it is.\n\n- Set a timer (e.g. 1 minute) for each round.\n- If the group guesses correctly before time runs out, they win the point!\n- No talking, mouthing words, or pointing at objects in the room. Just pure mime!",
-    "color": "#FFDCCC",
-    "devOnly": false,
-    "gid": "1131225632",
-    "key": "charades",
-    "cards": [
+    "props": {
+      "title": "Charades",
+      "sortOrder": "2",
+      "description": "One player acts - everyone else guesses!\n\n1. Flip a card to reveal a word or phrase.\n2. Without speaking or making sounds, the player must act it out using gestures.\n3. The rest of the group tries to guess what it is.\n\n- Set a timer (e.g. 1 minute) for each round.\n- If the group guesses correctly before time runs out, they win the point!\n- No talking, mouthing words, or pointing at objects in the room. Just pure mime!",
+      "color": "#FFDCCC",
+      "devOnly": false,
+      "gid": "1131225632",
+      "key": "charades"
+    },
+    "data": [
       {
         "title": "Unicorn",
         "emoji": "🦄"
@@ -1182,16 +1187,18 @@
     ]
   },
   {
-    "title": "Most Likely",
-    "sortOrder": "3",
-    "description": "Who's the most likely to do something? Find out with this fun game!\n\nDraw a card, read aloud, and on the count of 5 everyone points to the person they think is most likely to do that thing. The person with the most fingers pointed at them wins the round!",
-    "backgroundColor": "#1d1a26",
-    "borderColor": "#131118",
-    "textColor": "#ededed",
-    "devOnly": false,
-    "gid": "644582151",
-    "key": "most-likely",
-    "cards": [
+    "props": {
+      "title": "Most Likely",
+      "sortOrder": "3",
+      "description": "Who's the most likely to do something? Find out with this fun game!\n\nDraw a card, read aloud, and on the count of 5 everyone points to the person they think is most likely to do that thing. The person with the most fingers pointed at them wins the round!",
+      "backgroundColor": "#1d1a26",
+      "borderColor": "#131118",
+      "textColor": "#ededed",
+      "devOnly": false,
+      "gid": "644582151",
+      "key": "most-likely"
+    },
+    "data": [
       {
         "title": "Who is most likely to get stuck in a bathroom stall?"
       },
@@ -1324,14 +1331,16 @@
     ]
   },
   {
-    "title": "Morning Pages",
-    "sortOrder": "4",
-    "description": "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started",
-    "color": "#B7B1F2",
-    "devOnly": false,
-    "gid": "2125141909",
-    "key": "morning-pages",
-    "cards": [
+    "props": {
+      "title": "Morning Pages",
+      "sortOrder": "4",
+      "description": "Morning Pages is a daily journaling practice where you write three pages of stream-of-consciousness writing. Here are some prompts to get you started",
+      "color": "#B7B1F2",
+      "devOnly": false,
+      "gid": "2125141909",
+      "key": "morning-pages"
+    },
+    "data": [
       {
         "title": "What's on your mind?"
       },
@@ -1515,14 +1524,16 @@
     ]
   },
   {
-    "title": "Juggling",
-    "sortOrder": "5",
-    "description": "Use the Dex App for learning habits! This example deck shows you one way you can build a habit using Dex. \n\nPractice the top card for 5 minutes, move that card to the discard pile and move on to the next card. Each day practice as many as you can and when you've done them all, shuffle the discard pile and start again. Add new cards as you learn new tricks and remove cards you don't enjoy.\n\nYou can use the same idea to practice your music habits, art, exercises and more!",
-    "color": "#F0F0D7",
-    "devOnly": false,
-    "gid": "399382777",
-    "key": "juggling-practice",
-    "cards": [
+    "props": {
+      "title": "Juggling",
+      "sortOrder": "5",
+      "description": "Use the Dex App for learning habits! This example deck shows you one way you can build a habit using Dex. \n\nPractice the top card for 5 minutes, move that card to the discard pile and move on to the next card. Each day practice as many as you can and when you've done them all, shuffle the discard pile and start again. Add new cards as you learn new tricks and remove cards you don't enjoy.\n\nYou can use the same idea to practice your music habits, art, exercises and more!",
+      "color": "#F0F0D7",
+      "devOnly": false,
+      "gid": "399382777",
+      "key": "juggling-practice"
+    },
+    "data": [
       {
         "title": "3 ball cascade",
         "description": "The basic pattern of juggling. Throw each ball in an arc from one hand to the other, so that each ball is caught in the opposite hand."
@@ -1630,15 +1641,17 @@
     ]
   },
   {
-    "title": "Categories",
-    "sortOrder": "6",
-    "description": "Get ready to go head-to-head in Categories!\nSplit into two teams and flip a card to reveal the category. Teams take turns naming one unique item from that category. If a team can’t think of an answer, they lose the round!\n\n👉 Everyone on a team must take a turn before someone can go again.",
-    "color": "#351e29",
-    "devOnly": false,
-    "gid": "920177326",
-    "key": "categories",
-    "backTextSize": "9",
-    "cards": [
+    "props": {
+      "title": "Categories",
+      "sortOrder": "6",
+      "description": "Get ready to go head-to-head in Categories!\nSplit into two teams and flip a card to reveal the category. Teams take turns naming one unique item from that category. If a team can’t think of an answer, they lose the round!\n\n👉 Everyone on a team must take a turn before someone can go again.",
+      "color": "#351e29",
+      "devOnly": false,
+      "gid": "920177326",
+      "key": "categories",
+      "backTextSize": "9"
+    },
+    "data": [
       {
         "title": "Famous Actors",
         "emoji": "🎬"
@@ -2034,14 +2047,16 @@
     ]
   },
   {
-    "title": "Emojis!\n🤡👍🐶",
-    "sortOrder": "7",
-    "description": "All the emojis! Use these cards to play charades, pictionary, or any other game that needs a random emoji!",
-    "color": "#F2358D",
-    "devOnly": false,
-    "gid": "804646829",
-    "key": "emojis",
-    "cards": [
+    "props": {
+      "title": "Emojis!\n🤡👍🐶",
+      "sortOrder": "7",
+      "description": "All the emojis! Use these cards to play charades, pictionary, or any other game that needs a random emoji!",
+      "color": "#F2358D",
+      "devOnly": false,
+      "gid": "804646829",
+      "key": "emojis"
+    },
+    "data": [
       {
         "emoji": "🤡",
         "title": "Clown Face"
@@ -5641,14 +5656,16 @@
     ]
   },
   {
-    "title": "Guess the Flag!",
-    "sortOrder": "8",
-    "description": "250+ flags, but where do they represent? Flip the card for the answer. Learn the flags or give clues for others to guess the location.",
-    "color": "#c8e9a0",
-    "devOnly": false,
-    "gid": "1980334248",
-    "key": "flags",
-    "cards": [
+    "props": {
+      "title": "Guess the Flag!",
+      "sortOrder": "8",
+      "description": "250+ flags, but where do they represent? Flip the card for the answer. Learn the flags or give clues for others to guess the location.",
+      "color": "#c8e9a0",
+      "devOnly": false,
+      "gid": "1980334248",
+      "key": "flags"
+    },
+    "data": [
       {
         "emoji": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
         "description": "Flip for answer",

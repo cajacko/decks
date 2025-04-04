@@ -6,6 +6,7 @@ const initialState: Sync.State = {
   lastPulled: null,
   lastPushed: null,
   lastSynced: null,
+  lastModifiedImportantChangesLocally: null,
 };
 
 export const syncSlice = createSlice({

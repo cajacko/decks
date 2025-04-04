@@ -9,4 +9,5 @@ export interface State {
   lastSynced: DateString | null;
   lastPushed: DateString | null;
   lastPulled: DateString | null;
+  lastModifiedImportantChangesLocally: DateString | null;
 }

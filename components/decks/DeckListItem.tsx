@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectDeckCards, selectDeckLastScreen } from "@/store/slices/decks";
+import { selectDeckCards, selectDeckLastScreen } from "@/store/selectors/decks";
 import { useRouter } from "expo-router";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "@/components/cards/connected/CardSideBySide";

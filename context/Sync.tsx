@@ -21,7 +21,8 @@ type ContextState = {
   remove: () => Promise<void>;
 };
 
-const autoSyncMaxFrequency = 1000 * 60 * 5; // 5 minutes
+const autoSyncMinFrequency = 1000 * 60 * 5; // 5 minutes
+const autoSyncMaxFrequency = 1000 * 30; // 30 seconds
 
 const Context = React.createContext<ContextState | undefined>(undefined);
 
@@ -55,7 +56,23 @@ export function SyncProvider(props: { children: React.ReactNode }) {
   const featureEnabled = useFlag("BACKUP_SYNC") === "enabled" && isLoggedIn;
   const autoSyncEnabled =
     useFlag("AUTO_SYNC") === "enabled" && isLoggedIn && featureEnabled;
-  const { lastSynced } = useAppSelector(selectSync);
+  const { lastSynced, lastModifiedImportantChangesLocally } =
+    useAppSelector(selectSync);
+
+  const hasImportantChangesToSync = React.useMemo((): boolean => {
+    if (!lastModifiedImportantChangesLocally) {
+      return false;
+    }
+
+    if (!lastSynced) {
+      return true;
+    }
+
+    const lastModified = new Date(lastModifiedImportantChangesLocally);
+    const lastSyncedDate = new Date(lastSynced);
+
+    return lastModified > lastSyncedDate;
+  }, [lastSynced, lastModifiedImportantChangesLocally]);
 
   const error: AppError | undefined = React.useMemo(() => {
     if (!isLoggedIn) {
@@ -130,6 +147,19 @@ export function SyncProvider(props: { children: React.ReactNode }) {
 
           return;
         }
+
+        if (hasImportantChangesToSync) {
+          debugLog("Auto sync check - important changes to sync");
+        } else {
+          // We're now in polling auto sync mode
+          const tooSoon = timeSinceLastSync < autoSyncMinFrequency;
+
+          if (tooSoon) {
+            debugLog("Auto sync check - too soon");
+
+            return;
+          }
+        }
       }
 
       const state = await AppState.currentState;
@@ -177,7 +207,13 @@ export function SyncProvider(props: { children: React.ReactNode }) {
     return () => {
       clearInterval(interval);
     };
-  }, [autoSyncEnabled, lastSynced, loading, requests]);
+  }, [
+    autoSyncEnabled,
+    lastSynced,
+    loading,
+    requests,
+    hasImportantChangesToSync,
+  ]);
 
   const value = React.useMemo<ContextState>(
     () => ({

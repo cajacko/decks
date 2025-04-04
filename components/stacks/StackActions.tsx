@@ -1,7 +1,7 @@
 import React from "react";
 import FieldSet, { FieldSetProps } from "../forms/FieldSet";
 import Picker from "../forms/Picker";
-import { selectStackIds } from "@/store/slices/tabletop";
+import { selectStackIds } from "@/store/selectors/tabletops";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Field from "../forms/Field";
 import Button from "../forms/Button";

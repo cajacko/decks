@@ -1,19 +1,17 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setStackOrder } from "@/store/slices/tabletop";
 import {
   selectCardInstanceIds,
   selectFirstXCardInstances,
-  setStackOrder,
-} from "@/store/slices/tabletop";
+  selectDoesTabletopHaveCardInstances,
+} from "@/store/selectors/tabletops";
 import { StackProps } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import seededShuffle, { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
-import {
-  deleteStack,
-  selectDoesTabletopHaveCardInstances,
-} from "@/store/slices/tabletop";
+import { deleteStack } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
 import useFlag from "@/hooks/useFlag";
 import useOffsetPositions from "@/components/cards/ui/AnimatedCard/useOffsetPositions";

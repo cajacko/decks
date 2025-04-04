@@ -21,7 +21,6 @@ import { Roboto_400Regular } from "@expo-google-fonts/roboto";
 import { DrawerProvider } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
 import { useHasRehydrated } from "@/store/hooks";
-import registerExampleDecks from "@/utils/registerExampleDecks";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import { SyncProvider } from "@/context/Sync";
 import { AuthenticationProvider } from "@/context/Authentication";
@@ -32,7 +31,6 @@ import { SkeletonProvider } from "@/context/Skeleton";
 import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
 
 enableFreeze();
-registerExampleDecks();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

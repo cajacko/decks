@@ -1,10 +1,10 @@
 import { Decks, Tabletops } from "../types";
 import {
   resetTabletop,
-  selectTabletop,
   setTabletop,
   addMissingTabletopCards,
 } from "../slices/tabletop";
+import { selectTabletop } from "../selectors/tabletops";
 import { store } from "../store";
 import {
   selectTabletopAvailableDeckCards,
@@ -12,7 +12,7 @@ import {
 } from "../combinedSelectors/tabletops";
 import { createInitStacks } from "@/utils/minStacks";
 import uuid from "@/utils/uuid";
-import { getBuiltInState } from "../utils/withBuiltInState";
+import { selectBuiltInState } from "../utils/withBuiltInState";
 import { dateToDateString } from "@/utils/dates";
 
 function deckCardsToCardInstances(
@@ -64,7 +64,10 @@ export function getResetHistoryState(
 export function resetTabletopHelper(props: { tabletopId: Tabletops.Id }) {
   // This gets the user settings for the tabletop (if they exist)
   const tableTopSettings = selectTabletopSettings(store.getState(), props);
-  const builtInTabletop = selectTabletop(getBuiltInState(), props);
+  const builtInTabletop = selectTabletop(
+    selectBuiltInState(store.getState()),
+    props,
+  );
 
   if (builtInTabletop) {
     return setTabletop({

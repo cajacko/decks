@@ -1,6 +1,6 @@
 import React from "react";
 import { Slot, useSegments } from "expo-router";
-import { selectCanEditDeck } from "@/store/slices/decks";
+import { selectCanEditDeck } from "@/store/selectors/decks";
 import text from "@/constants/text";
 import { useAppSelector } from "@/store/hooks";
 import useScreenDeckId from "@/hooks/useScreenDeckId";

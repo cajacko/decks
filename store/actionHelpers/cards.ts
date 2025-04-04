@@ -1,6 +1,6 @@
 import { Cards, Decks, Tabletops } from "../types";
 import AppError from "@/classes/AppError";
-import { selectCard } from "../slices/cards";
+import { selectCard } from "../selectors/cards";
 import {
   updateCard,
   deleteCard,
@@ -10,7 +10,7 @@ import {
 import { store } from "../store";
 import { SetCardData } from "../combinedActions/types";
 import uuid from "@/utils/uuid";
-import { selectDeck } from "../slices/decks";
+import { selectDeck } from "../selectors/decks";
 import { dateToDateString } from "@/utils/dates";
 
 export function updateCardHelper(props: {

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useRouter } from "expo-router";
 import text from "@/constants/text";
 import Button from "../forms/Button";
-import { selectCanEditDeck } from "@/store/slices/decks";
+import { selectCanEditDeck } from "@/store/selectors/decks";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import { Toolbar, styles } from "@/context/Toolbar";

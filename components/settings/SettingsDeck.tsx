@@ -9,7 +9,7 @@ import Button from "@/components/forms/Button";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { copyDeckHelper, deleteDeckHelper } from "@/store/actionHelpers/decks";
 import { useRouter } from "expo-router";
-import { selectCanEditDeck, selectDeck } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeck } from "@/store/selectors/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import uuid from "@/utils/uuid";
 import { useDrawer } from "@/context/Drawer";

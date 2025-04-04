@@ -16,6 +16,7 @@ import decksSlice from "./slices/decks";
 import userSettingsSlice from "./slices/userSettings";
 import templatesSlice from "./slices/templates";
 import sync from "./slices/sync";
+import includedData from "./slices/includedData";
 // import { HistoryTransform } from "./transforms";
 
 enablePatches();
@@ -27,6 +28,7 @@ const reducerMap = {
   [userSettingsSlice.name]: userSettingsSlice.reducer,
   [templatesSlice.name]: templatesSlice.reducer,
   [sync.name]: sync.reducer,
+  [includedData.name]: includedData.reducer,
 };
 
 const appReducer = combineReducers(reducerMap);
@@ -56,6 +58,7 @@ const persistedReducer = persistReducer(
       cardsSlice.name,
       userSettingsSlice.name,
       sync.name,
+      includedData.name,
     ],
     // Enable to not persist history, currently we're invalidating it during migration instead,
     // which allows us to persist history until we change the state which is nice if it works

@@ -8,7 +8,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
-import { selectStackIds } from "@/store/slices/tabletop";
+import { selectStackIds } from "@/store/selectors/tabletops";
 import { useAppSelector } from "@/store/hooks";
 import { StackListRef, ScrollOptions } from "./StackList.types";
 

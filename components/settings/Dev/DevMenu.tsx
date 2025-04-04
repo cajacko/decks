@@ -9,7 +9,6 @@ import FieldSet, {
   useLeftAdornmentSize,
 } from "@/components/forms/FieldSet";
 import { useRouter } from "expo-router";
-import exampleDecks from "@/constants/exampleDecks";
 import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
@@ -20,6 +19,9 @@ import { useSync } from "@/context/Sync";
 import { useAuthentication } from "@/context/Authentication";
 import Field from "@/components/forms/Field";
 import Loader from "@/components/ui/Loader";
+import useIncludedData from "@/hooks/useIncludedData";
+import { useAppSelector } from "@/store/hooks";
+import { selectDecksById } from "@/store/selectors/decks";
 
 const titleProps = { type: "h2" } as const;
 
@@ -43,6 +45,8 @@ export default function DevMenu({
     initializationError,
     lastCheckForUpdateTimeSinceRestart,
   } = useUpdates();
+
+  const decksByDeckId = useAppSelector((state) => selectDecksById(state));
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -70,6 +74,7 @@ export default function DevMenu({
 
   const auth = useAuthentication();
   const sync = useSync();
+  const includedData = useIncludedData();
 
   return (
     <FieldSet
@@ -80,6 +85,22 @@ export default function DevMenu({
       leftAdornment={<IconSymbol name="bug-report" size={iconSize} />}
     >
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
+
+      <Field
+        subLabel={
+          includedData.loading
+            ? "Loading..."
+            : includedData.error
+              ? `Error: ${includedData.error.message}`
+              : (includedData.dateFetched ?? "Using build time data")
+        }
+      >
+        <Button
+          title="Update Included Data"
+          onPress={includedData.update}
+          variant="outline"
+        />
+      </Field>
 
       {isDevClient && (
         <Button
@@ -159,10 +180,10 @@ export default function DevMenu({
         )}
       </FieldSet>
       <FieldSet title="Example Deck Links" collapsible initialCollapsed>
-        {Object.entries(exampleDecks).map(([id, { name }]) => (
+        {Object.entries(decksByDeckId).map(([id, deck]) => (
           <Button
             key={id}
-            title={name}
+            title={deck?.name ?? "N/A"}
             variant="outline"
             onPress={() => {
               navigate(`/deck/${exampleDeckIds(id).deckId}`);

@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
-import { selectCanEditDeck, selectDeckCards } from "@/store/slices/decks";
+import { selectCanEditDeck, selectDeckCards } from "@/store/selectors/decks";
 import DeckDetails, {
   DeckDetailsSkeleton,
 } from "@/components/decks/DeckDetails";

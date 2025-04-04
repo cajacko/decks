@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createCachedSelector } from "re-reselect";
 import { WritableDraft } from "immer";
 import { configureHistory } from "../history";
 import {
@@ -543,91 +542,11 @@ export const {
   addMissingTabletopCards,
 } = tabletopsSlice.actions;
 
-export const selectTabletop = (
-  state: RootState,
-  props: { tabletopId: string },
-): Tabletop | undefined =>
-  state[tabletopsSlice.name].tabletopsById[props.tabletopId];
-
-export const selectPresentState = (
-  state: RootState,
-  props: { tabletopId: string },
-): TabletopHistoryState | null =>
-  selectTabletop(state, props)?.history.present ?? null;
-
-export const selectStackIds = (
-  state: RootState,
-  props: { tabletopId: string },
-): string[] | null => selectPresentState(state, props)?.stacksIds ?? null;
-
-export const selectStack = (
-  state: RootState,
-  props: { tabletopId: string; stackId: string },
-): Stack | null =>
-  selectPresentState(state, props)?.stacksById[props.stackId] ?? null;
-
-export const selectCardInstanceIds = (
-  state: RootState,
-  props: { stackId: string; tabletopId: string },
-): string[] | null => selectStack(state, props)?.cardInstances ?? null;
-
-export const selectCardInstance = (
-  state: RootState,
-  props: { cardInstanceId: string; tabletopId: string },
-): CardInstance | null =>
-  selectPresentState(state, props)?.cardInstancesById?.[props.cardInstanceId] ??
-  null;
-
 const historySelectors = history.withSelectors<RootState>(
   (state) => state.tabletops,
 );
 
 export const selectTabletopHasPast = historySelectors.selectHasPast;
 export const selectTabletopHasFuture = historySelectors.selectHasFuture;
-
-// Uses createCachedSelector to select the first 3 cards only from selectCardInstances or null if
-// there were none, or whatever we have if there's less than 3
-export const selectFirstXCardInstances = createCachedSelector<
-  RootState,
-  { stackId: string; limit: number; tabletopId: string },
-  string[] | null,
-  number,
-  string[] | null
->(
-  selectCardInstanceIds,
-  (_, props) => props.limit,
-  (cardInstances, limit) => {
-    const sliced = cardInstances?.slice(0, limit) ?? [];
-
-    if (sliced.length === 0) {
-      return null;
-    }
-
-    return sliced;
-  },
-)((_, props) => `${props.stackId}-${props.limit}`);
-
-export const selectDoesTabletopHaveCardInstances = createCachedSelector(
-  selectPresentState,
-  (presentState): boolean => {
-    if (!presentState) {
-      return false;
-    }
-
-    for (const stackId of presentState.stacksIds) {
-      const stack = presentState.stacksById[stackId];
-
-      if (!stack) continue;
-
-      for (const cardInstanceId of stack.cardInstances) {
-        if (presentState.cardInstancesById[cardInstanceId]) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  },
-)((_, props: { tabletopId: string }) => props.tabletopId);
 
 export default tabletopsSlice;

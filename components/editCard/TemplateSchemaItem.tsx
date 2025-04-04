@@ -2,7 +2,7 @@ import React from "react";
 import { ViewStyle } from "react-native";
 import TextInput from "@/components/forms/TextInput";
 import { useRequiredAppSelector } from "@/store/hooks";
-import { selectTemplateSchemaItem } from "@/store/slices/templates";
+import { selectTemplateSchemaItem } from "@/store/selectors/templates";
 import {
   useEditCardTemplateSchemaItem,
   useIsNewCard,

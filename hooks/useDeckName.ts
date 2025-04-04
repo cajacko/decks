@@ -1,4 +1,4 @@
-import { selectDeck } from "@/store/slices/decks";
+import { selectDeck } from "@/store/selectors/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import { useAppSelector } from "@/store/hooks";
 
