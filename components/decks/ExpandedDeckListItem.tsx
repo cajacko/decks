@@ -149,18 +149,21 @@ export default function ExpandedDeckListItem(
               onPress={view}
               size={iconSize}
               variant="transparent"
+              vibrate
             />
             <IconButton
               icon="play-arrow"
               onPress={play}
               size={iconSize}
               variant="transparent"
+              vibrate
             />
             <IconButton
               icon="content-copy"
               size={iconSize}
               onPress={copyDeck}
               variant="transparent"
+              vibrate
             />
           </>
         }

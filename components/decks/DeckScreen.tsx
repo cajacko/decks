@@ -257,7 +257,12 @@ function AddButton({ deckId, open }: { deckId: string; open: Open }) {
   if (!canEditDeck) return null;
 
   return (
-    <IconButton icon="add" onPress={addNew} style={iconButtonStyles.floating} />
+    <IconButton
+      icon="add"
+      onPress={addNew}
+      style={iconButtonStyles.floating}
+      vibrate
+    />
   );
 }
 

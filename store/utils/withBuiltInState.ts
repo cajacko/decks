@@ -82,9 +82,11 @@ export default function withBuiltInStateSelector<
 
 export default function withBuiltInStateSelector<
   R extends unknown,
-  P extends BuiltInStateSelectorProps,
+  P extends object,
   S extends RootState = RootState,
->(selector: (state: S, props: P) => R): (state: RootState, props: P) => R;
+>(
+  selector: (state: S, props: BuiltInStateSelectorProps<P>) => R,
+): (state: RootState, props: BuiltInStateSelectorProps<P>) => R;
 
 export default function withBuiltInStateSelector(
   selector: (state: RootState, props?: BuiltInStateSelectorProps) => unknown,

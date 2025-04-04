@@ -91,6 +91,7 @@ function ConnectedDecksScreen(props: DecksScreenProps) {
           icon="add"
           onPress={createDeck}
           style={iconButtonStyles.floating}
+          vibrate
         />
       }
     />
