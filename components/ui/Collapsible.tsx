@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   View,
   TouchableOpacity,
@@ -10,7 +10,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  runOnJS,
 } from "react-native-reanimated";
 import IconSymbol from "./IconSymbol";
 import ThemedText, { ThemedTextProps } from "./ThemedText";
@@ -39,7 +38,7 @@ export function useLeftAdornmentSize(
 export default function Collapsible(props: CollapsibleProps): React.ReactNode {
   const {
     title,
-    children: childrenProp,
+    children,
     style: styleProp,
     collapsible = true,
     initialCollapsed = true,
@@ -50,11 +49,11 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
     leftAdornment,
   } = props;
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
-  const [_isCollapsed, setIsCollapsed] = useState(initialCollapsed);
-  const isCollapsed = collapsible ? _isCollapsed : false;
-
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const isAnimating = useSharedValue<boolean>(false);
   const contentHeight = useSharedValue<number | undefined>(undefined);
+  const isCollapsed = useSharedValue<boolean>(
+    collapsible ? initialCollapsed : false,
+  );
 
   const onContentLayout = React.useCallback<NonNullable<ViewProps["onLayout"]>>(
     (event) => {
@@ -68,9 +67,8 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
 
   // Manage internal state when uncontrolled
   const toggleCollapse = useCallback(() => {
-    const newValue = isCollapsed ? 1 : 0;
-
-    setIsCollapsed(!isCollapsed);
+    const newValue = isCollapsed.value ? 1 : 0;
+    isCollapsed.value = !isCollapsed.value;
 
     // Keep height in sync in case performance mode turns off later
     if (performanceMode) {
@@ -79,7 +77,7 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
       return;
     }
 
-    setIsAnimating(true);
+    isAnimating.value = true;
 
     let duration: number;
 
@@ -99,28 +97,46 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
 
     duration = Math.min(duration, 500); // Cap the max duration
 
-    heightProgress.value = withTiming(newValue, { duration }, (isFinished) => {
-      if (isFinished) {
-        runOnJS(setIsAnimating)(false);
+    heightProgress.value = withTiming(newValue, { duration }, (finished) => {
+      if (finished) {
+        isAnimating.value = false;
       }
     });
-  }, [isCollapsed, performanceMode, heightProgress, contentHeight]);
+  }, [
+    isCollapsed,
+    performanceMode,
+    heightProgress,
+    contentHeight,
+    isAnimating,
+  ]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    let height =
+  const contentContainerAnimatedStyle = useAnimatedStyle(() => {
+    if (!collapsible) {
+      return {
+        height: "auto",
+        opacity: 1,
+      };
+    }
+
+    let height: "auto" | number =
       contentHeight.value === undefined
-        ? undefined
+        ? "auto"
         : contentHeight.value * heightProgress.value;
 
-    if (!isAnimating) {
-      height = isCollapsed ? 0 : height;
+    if (isAnimating.value) {
+      height =
+        contentHeight.value === undefined
+          ? "auto"
+          : contentHeight.value * heightProgress.value;
+    } else {
+      height = isCollapsed.value ? 0 : "auto";
     }
 
     return {
       height,
       opacity: heightProgress.value,
     };
-  });
+  }, [collapsible, isAnimating, heightProgress, isCollapsed]);
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.container, styleProp]),
@@ -132,23 +148,29 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
     [headerStyle],
   );
 
-  const animatedContentStyle = React.useMemo(
-    () => [styles.animatedContent, collapsible && animatedStyle],
-    [collapsible, animatedStyle],
+  const contentContainerStyle = React.useMemo(
+    () => [styles.contentContainer, contentContainerAnimatedStyle],
+    [contentContainerAnimatedStyle],
   );
 
-  let doNotRenderChildren = performanceMode === true && isCollapsed;
-  const children = doNotRenderChildren ? null : childrenProp;
-  const hideButRender = isCollapsed && !isAnimating;
+  const iconAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          rotate: `${isCollapsed.value ? "-" : ""}${heightProgress.value * 180}deg`,
+        },
+      ],
+    };
+  });
 
-  const nonAnimatedContentStyle = React.useMemo(
-    () =>
-      StyleSheet.flatten([
-        collapsible && styles.nonAnimatedContent,
-        collapsible && hideButRender && styles.outOfViewContent,
-      ]),
-    [hideButRender, collapsible],
-  );
+  const contentAnimatedStyle = useAnimatedStyle(() => {
+    const hide = isCollapsed.value && !isAnimating.value;
+
+    return {
+      position: hide ? "absolute" : "relative",
+      left: hide ? -999999 : 0,
+    };
+  });
 
   return (
     <View style={style}>
@@ -189,31 +211,34 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
             </View>
           </View>
           {collapsible && (
-            <IconSymbol
-              name={isCollapsed ? "expand-more" : "expand-less"}
-              size={20}
-            />
+            <Animated.View style={iconAnimatedStyle}>
+              <IconSymbol name="expand-more" size={20} />
+            </Animated.View>
           )}
         </TouchableOpacity>
       )}
-      <Animated.View style={animatedContentStyle}>
-        <View style={nonAnimatedContentStyle} onLayout={onContentLayout}>
-          {children}
-        </View>
+      <Animated.View style={contentContainerStyle}>
+        <Animated.View style={contentAnimatedStyle}>
+          <View onLayout={onContentLayout}>{children}</View>
+        </Animated.View>
       </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  nonAnimatedContent: {
-    position: "absolute",
-    width: "100%",
-  },
-  outOfViewContent: {
-    left: -999999,
-    pointerEvents: "none",
-  },
+  // content: {
+  //   position: "relative",
+  //   width: "100%",
+  // },
+  // animatingContent: {
+  //   position: "absolute",
+  // },
+  // outOfViewContent: {
+  //   position: "absolute",
+  //   left: -999999,
+  //   pointerEvents: "none",
+  // },
   container: {
     overflow: "hidden",
   },
@@ -236,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     flex: 1,
   },
-  animatedContent: {
+  contentContainer: {
     overflow: "hidden",
     position: "relative",
   },
