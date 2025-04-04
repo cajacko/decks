@@ -44,7 +44,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 {backupSyncEnabled && <SettingsBackupSync />}
                 {devMode && <DevMenu closeDrawer={props.closeDrawer} />}
                 {updates.canApplyUpdate && (
-                  <View>
+                  <View style={styles.mt}>
                     <ThemedText style={styles.updateText} type="h2">
                       {updates.title}
                     </ThemedText>
@@ -60,7 +60,7 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 )}
               </FieldSet>
             </View>
-            {Platform.OS === "web" && <AppStores />}
+            {Platform.OS === "web" && <AppStores style={styles.mt} />}
             {dexWebLink ? (
               <Link href={dexWebLink}>
                 <Image
@@ -91,6 +91,9 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  mt: {
+    marginTop: 20,
   },
   updateText: {
     marginBottom: 20,

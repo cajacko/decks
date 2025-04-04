@@ -16,7 +16,10 @@ import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
 import ThemedText from "@/components/ui/ThemedText";
 import IconSymbol from "@/components/ui/IconSymbol";
-import { alert } from "@/components/overlays/Alert";
+import { useSync } from "@/context/Sync";
+import { useAuthentication } from "@/context/Authentication";
+import Field from "@/components/forms/Field";
+import Loader from "@/components/ui/Loader";
 
 const titleProps = { type: "h2" } as const;
 
@@ -65,6 +68,9 @@ export default function DevMenu({
   const isDevClient = DevClient.isDevelopmentBuild();
   const iconSize = useLeftAdornmentSize({ titleProps });
 
+  const auth = useAuthentication();
+  const sync = useSync();
+
   return (
     <FieldSet
       title={text["settings.dev_mode.title"]}
@@ -73,27 +79,6 @@ export default function DevMenu({
       titleProps={titleProps}
       leftAdornment={<IconSymbol name="bug-report" size={iconSize} />}
     >
-      <Button
-        title="Demo Alert"
-        onPress={() => {
-          alert(({ onRequestClose }) => ({
-            title: "Test Alert",
-            message: "This is a test alert",
-            buttons: [
-              {
-                text: "OK",
-                onPress: onRequestClose,
-              },
-              {
-                text: "Cancel",
-                onPress: onRequestClose,
-              },
-            ],
-          }));
-        }}
-        variant="outline"
-      />
-
       <Button title="Reload App" onPress={reloadAsync} variant="outline" />
 
       {isDevClient && (
@@ -109,6 +94,70 @@ export default function DevMenu({
         onPress={purgeStore}
         variant="outline"
       />
+      {auth.isLoggedIn && (
+        <FieldSet title="Sync" collapsible initialCollapsed>
+          <Field
+            subLabel={`Last synced: ${sync.loading ? "Syncing..." : (sync.lastSynced ?? "null")}`}
+            errorMessage={
+              auth.error ? text["settings.backup_sync.error"] : undefined
+            }
+          >
+            <Button
+              title="Sync"
+              onPress={() => sync.sync()}
+              variant="outline"
+            />
+          </Field>
+
+          <Field subLabel={`Last pulled: ${sync.lastPulled ?? "null"}`}>
+            <Button
+              title="Pull"
+              onPress={() => sync.pull()}
+              variant="outline"
+            />
+          </Field>
+
+          <Field subLabel={`Last pushed: ${sync.lastPushed ?? "null"}`}>
+            <Button
+              title="Push"
+              onPress={() => sync.push()}
+              variant="outline"
+            />
+          </Field>
+        </FieldSet>
+      )}
+
+      <FieldSet title="Auth" collapsible initialCollapsed>
+        {auth.error && (
+          <ThemedText>Auth Error: {auth.error.message}</ThemedText>
+        )}
+
+        {auth.loading && <Loader />}
+
+        {!auth.isLoggedIn && (
+          <Button
+            title="Sign In"
+            onPress={() => auth.login()}
+            variant="outline"
+          />
+        )}
+
+        {auth.isLoggedIn && (
+          <Button
+            title="Refresh Auth Token"
+            onPress={() => auth._refreshAuthToken()}
+            variant="outline"
+          />
+        )}
+
+        {auth.isLoggedIn && (
+          <Button
+            title="Logout"
+            onPress={() => auth.logout()}
+            variant="outline"
+          />
+        )}
+      </FieldSet>
       <FieldSet title="Example Deck Links" collapsible initialCollapsed>
         {Object.entries(exampleDecks).map(([id, { name }]) => (
           <Button

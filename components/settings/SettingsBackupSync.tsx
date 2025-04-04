@@ -17,6 +17,8 @@ import useRelativeTimeText from "@/hooks/useRelativeTimeText";
 import ThemedText from "../ui/ThemedText";
 import { StyleSheet, View } from "react-native";
 import ProfilePic from "@/components/ui/ProfilePic";
+import Collapsible from "../ui/Collapsible";
+import { alert } from "../overlays/Alert";
 
 const titleProps = { type: "h2" } as const;
 
@@ -25,14 +27,11 @@ export type SettingsBackupSyncProps = FieldSetProps;
 export default function SettingsBackupSync(
   props: SettingsBackupSyncProps,
 ): React.ReactNode {
-  const devMode = useFlag("DEV_MODE") === true;
   const dispatch = useAppDispatch();
   const autoSync = useFlag("AUTO_SYNC") === "enabled";
   const auth = useAuthentication();
   const sync = useSync();
   const lastSynced = useRelativeTimeText(sync.lastSynced);
-  const lastPulled = useRelativeTimeText(sync.lastPulled);
-  const lastPushed = useRelativeTimeText(sync.lastPushed);
   const humanNumber = React.useMemo(
     () => Math.round(Math.random() * 10000),
     [],
@@ -74,38 +73,12 @@ export default function SettingsBackupSync(
 
       {auth.isLoggedIn && (
         <Field
-          subLabel={`Last synced: ${sync.loading ? "Syncing..." : (lastSynced ?? "Never")}`}
+          subLabel={`Last synced: ${sync.loading ? "Syncing..." : (lastSynced ?? "Waiting to sync")}`}
           errorMessage={
             auth.error ? text["settings.backup_sync.error"] : undefined
           }
         >
           <Button title="Sync" onPress={() => sync.sync()} variant="outline" />
-        </Field>
-      )}
-
-      {auth.isLoggedIn && devMode && (
-        <Field
-          subLabel={`Last pulled: ${lastPulled ?? "Never"}\nOverwrites what's on your device with what's in the cloud`}
-        >
-          <Button title="Pull" onPress={() => sync.pull()} variant="outline" />
-        </Field>
-      )}
-
-      {auth.isLoggedIn && devMode && (
-        <Field
-          subLabel={`Last pushed: ${lastPushed ?? "Never"}\nOverwrites the saved data in the cloud with what's on your device now`}
-        >
-          <Button title="Push" onPress={() => sync.push()} variant="outline" />
-        </Field>
-      )}
-
-      {auth.isLoggedIn && (
-        <Field subLabel={text["settings.backup_sync.delete_cloud_data_helper"]}>
-          <Button
-            title="Delete Cloud Data"
-            onPress={() => sync.remove()}
-            variant="outline"
-          />
         </Field>
       )}
 
@@ -131,6 +104,41 @@ export default function SettingsBackupSync(
           onPress={() => auth.logout()}
           variant="outline"
         />
+      )}
+
+      {auth.isLoggedIn && (
+        <Collapsible title="Danger Zone" initialCollapsed>
+          <Field
+            subLabel={text["settings.backup_sync.delete_cloud_data_helper"]}
+            style={{ marginTop: 10 }}
+          >
+            <Button
+              title="Delete Cloud Data"
+              onPress={() =>
+                alert(({ onRequestClose }) => ({
+                  title: "Delete Cloud Data",
+                  message:
+                    "Are you sure you want to delete all your cloud data? This action cannot be undone.",
+                  buttons: [
+                    {
+                      text: "Cancel",
+                      onPress: onRequestClose,
+                      style: "cancel",
+                    },
+                    {
+                      text: "Delete",
+                      onPress: () => {
+                        sync.remove();
+                      },
+                      style: "destructive",
+                    },
+                  ],
+                }))
+              }
+              variant="outline"
+            />
+          </Field>
+        </Collapsible>
       )}
 
       <View>

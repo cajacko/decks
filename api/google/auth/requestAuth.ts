@@ -5,6 +5,7 @@ import waitForPersistedState from "./waitForPersistedState";
 import updateTokens from "./updateTokens";
 import processTokens from "./processTokens";
 import { userInfo } from "./fetch";
+import { setState } from "./state";
 
 export default async function requestAuth(
   redirectUri?: string,
@@ -38,6 +39,11 @@ export default async function requestAuth(
         type: "timeout",
       };
     }
+
+    setState({
+      type: "AUTH_FROM_STORAGE",
+      ...state.payload,
+    });
 
     debugLog("requestAuth - result 3", state);
 

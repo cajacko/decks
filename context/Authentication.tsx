@@ -7,6 +7,7 @@ import {
   requestAuth,
   listenToState,
   GoogleUser,
+  refreshAuth,
 } from "@/api/google";
 
 type ContextState = {
@@ -17,6 +18,7 @@ type ContextState = {
   loading: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
+  _refreshAuthToken: () => Promise<void>;
 };
 
 const Context = React.createContext<ContextState | undefined>(undefined);
@@ -94,6 +96,30 @@ export function AuthenticationProvider(props: { children: React.ReactNode }) {
     setLoading(false);
   }, [featureEnabled]);
 
+  const _refreshAuthToken = React.useCallback(async () => {
+    setLoading(true);
+    setError(undefined);
+
+    try {
+      if (!featureEnabled) {
+        throw new AppError(
+          `${AuthenticationProvider.name} - _refreshAuthToken attempted when feature is disabled`,
+        );
+      }
+
+      await refreshAuth();
+    } catch (unknownError) {
+      setError(
+        AppError.getError(
+          unknownError,
+          `${AuthenticationProvider.name} - _refreshAuthToken encountered an error`,
+        ),
+      );
+    }
+
+    setLoading(false);
+  }, [featureEnabled]);
+
   const logout = React.useCallback(async () => {
     setLoading(true);
     setError(undefined);
@@ -123,8 +149,18 @@ export function AuthenticationProvider(props: { children: React.ReactNode }) {
       user,
       login,
       logout,
+      _refreshAuthToken,
     }),
-    [error, loading, featureEnabled, login, logout, user, isLoggedIn],
+    [
+      error,
+      loading,
+      featureEnabled,
+      login,
+      logout,
+      user,
+      isLoggedIn,
+      _refreshAuthToken,
+    ],
   );
 
   return <Context.Provider value={value}>{props.children}</Context.Provider>;

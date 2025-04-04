@@ -1,5 +1,5 @@
 import AppError from "@/classes/AppError";
-import refreshAuth from "./refreshAuth";
+import refreshAuth from "./internalRefreshAuth";
 import logout from "./logout";
 import { alert } from "@/components/overlays/Alert";
 import text from "@/constants/text";
