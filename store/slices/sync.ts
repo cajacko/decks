@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, Sync, SliceName, DateString } from "../types";
 import { syncState, setState as pullState } from "../combinedActions/sync";
+import { createCard, deleteCard, updateCard } from "../combinedActions/cards";
+import { createDeck, deleteDeck } from "../combinedActions/decks";
+import { setDeckCardDefaults, setDeckDetails } from "./decks";
+import { setUserSetting, setUserFlag } from "./userSettings";
 
 const initialState: Sync.State = {
   lastPulled: null,
@@ -35,6 +39,22 @@ export const syncSlice = createSlice({
       .addCase(pullState, (state, action) => {
         state.lastPulled = action.payload.date;
       });
+
+    [
+      createCard,
+      deleteCard,
+      updateCard,
+      createDeck,
+      deleteDeck,
+      setDeckCardDefaults,
+      setDeckDetails,
+      setUserSetting,
+      setUserFlag,
+    ].forEach((action) => {
+      builder.addCase(action, (state, action) => {
+        state.lastModifiedImportantChangesLocally = action.payload.date;
+      });
+    });
   },
 });
 
