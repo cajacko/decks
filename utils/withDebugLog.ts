@@ -1,5 +1,5 @@
 import { UserSettings } from "@/store/types";
-import { getFlag } from "@/store/combinedSelectors/flags";
+import { getFlag } from "@/store/selectors/flags";
 import logger from "@/utils/logger";
 
 export default function withDebugLog(

@@ -1,28 +1,22 @@
 import React from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Pressable,
-  Platform,
-} from "react-native";
+import { StyleSheet, ScrollView, View, Platform } from "react-native";
 import ThemedView from "@/components/ui/ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAppSelector } from "@/store/hooks";
-import { selectFlag } from "@/store/combinedSelectors/flags";
 import DevMenu from "@/components/settings/Dev/DevMenu";
 import Version from "@/components/settings/Version";
 import SettingsApp from "@/components/settings/SettingsApp";
+import SettingsBackupSync from "@/components/settings/SettingsBackupSync";
 import FieldSet from "@/components/forms/FieldSet";
 import { useTextLogo } from "@/hooks/useLogo";
-import { Image } from "expo-image";
-import { Link } from "expo-router";
+import Image from "@/components/ui/Image";
 import ThemedText from "@/components/ui/ThemedText";
 import text from "@/constants/text";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import Button from "@/components/forms/Button";
 import AppStores from "@/components/ui/AppStores";
 import { playfaceWebsite, dexWebLink } from "@/constants/links";
+import useFlag from "@/hooks/useFlag";
+import Link from "@/components/ui/Link";
 
 export interface DrawerProps {
   closeDrawer: () => void;
@@ -30,10 +24,10 @@ export interface DrawerProps {
 }
 
 export default function Drawer(props: DrawerProps): React.ReactNode {
-  const textLogo = useTextLogo();
+  const { source } = useTextLogo();
   const updates = useApplyUpdateAlert();
-  const devMode =
-    useAppSelector((state) => selectFlag(state, { key: "DEV_MODE" })) === true;
+  const devMode = useFlag("DEV_MODE") === true;
+  const backupSyncEnabled = useFlag("BACKUP_SYNC") === "enabled";
 
   return (
     <ScrollView
@@ -47,9 +41,10 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
               <FieldSet itemSpacing={30}>
                 {props.children}
                 <SettingsApp />
+                {backupSyncEnabled && <SettingsBackupSync />}
                 {devMode && <DevMenu closeDrawer={props.closeDrawer} />}
                 {updates.canApplyUpdate && (
-                  <View>
+                  <View style={styles.mt}>
                     <ThemedText style={styles.updateText} type="h2">
                       {updates.title}
                     </ThemedText>
@@ -65,33 +60,25 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
                 )}
               </FieldSet>
             </View>
-            {Platform.OS === "web" && <AppStores />}
+            {Platform.OS === "web" && <AppStores style={styles.mt} />}
             {dexWebLink ? (
-              <Link href={dexWebLink} asChild>
-                <Pressable>
-                  <Image
-                    style={styles.logo}
-                    source={textLogo}
-                    contentFit="contain"
-                  />
-                </Pressable>
-              </Link>
-            ) : (
-              <Image
-                style={styles.logo}
-                source={textLogo}
-                contentFit="contain"
-              />
-            )}
-            <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
-            <Link href={playfaceWebsite} target="_blank" asChild>
-              <Pressable>
+              <Link href={dexWebLink}>
                 <Image
-                  style={styles.playface}
-                  source={require("../../assets/images/playface-circle-logo-text-right.png")}
+                  style={styles.logo}
+                  source={source}
                   contentFit="contain"
                 />
-              </Pressable>
+              </Link>
+            ) : (
+              <Image style={styles.logo} source={source} contentFit="contain" />
+            )}
+            <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
+            <Link href={playfaceWebsite} target="_blank">
+              <Image
+                style={styles.playface}
+                source={require("../../assets/images/playface-circle-logo-text-right.png")}
+                contentFit="contain"
+              />
             </Link>
             <Version />
           </View>
@@ -104,6 +91,9 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  mt: {
+    marginTop: 20,
   },
   updateText: {
     marginBottom: 20,

@@ -4,22 +4,40 @@ import DrawerContent from "@/components/overlays/Drawer";
 import AppError from "@/classes/AppError";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { StyleSheet } from "react-native";
+import withScreenControlContext, {
+  ContextState as CreateContextState,
+} from "@/context/withScreenControlContext";
 
-interface ContextValue {
+type Props = React.ReactNode;
+
+type ContextState = CreateContextState<Props> & {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   open: () => void;
   close: () => void;
-  children: React.ReactNode;
-  setChildren: (children: React.ReactNode) => void;
-}
+};
 
-const Context = React.createContext<ContextValue | null>(null);
+const { Context, useScreenControlContext, useScreenControlProvider } =
+  withScreenControlContext<Props, ContextState>(
+    {
+      close: () => undefined,
+      open: () => undefined,
+      isOpen: false,
+      setIsOpen: () => undefined,
+      onPropsChange: () => undefined,
+      onUnmount: () => undefined,
+      props: null,
+    },
+    null,
+    {
+      resetOnUnmount: true,
+    },
+  );
 
 export function useDrawerChildren(): React.ReactNode {
   const context = React.useContext(Context);
 
-  return context?.children ?? null;
+  return context?.props ?? null;
 }
 
 export function useDrawer() {
@@ -33,19 +51,7 @@ export function useDrawer() {
 }
 
 export function DrawerChildren({ children }: { children: React.ReactNode }) {
-  const { setChildren } = useDrawer() ?? {};
-
-  React.useEffect(() => {
-    if (!setChildren) {
-      new AppError(
-        `${DrawerChildren.name} must be used within a DrawerProvider`,
-      ).log("warn");
-
-      return;
-    }
-
-    setChildren(children);
-  }, [setChildren, children]);
+  useScreenControlContext(children);
 
   return null;
 }
@@ -53,7 +59,12 @@ export function DrawerChildren({ children }: { children: React.ReactNode }) {
 export function DrawerProvider(props: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const backgroundColor = useThemeColor("background");
-  const [children, setChildren] = React.useState<React.ReactNode>(null);
+
+  const {
+    onPropsChange,
+    onUnmount,
+    props: children,
+  } = useScreenControlProvider();
 
   const open = React.useCallback(() => {
     setIsOpen(true);
@@ -63,16 +74,17 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
     setIsOpen(false);
   }, []);
 
-  const value = React.useMemo<ContextValue>(
+  const value = React.useMemo<ContextState>(
     () => ({
       isOpen,
       setIsOpen,
       open,
       close,
-      children,
-      setChildren,
+      onPropsChange,
+      props: children,
+      onUnmount,
     }),
-    [open, close, isOpen, children],
+    [open, close, isOpen, children, onUnmount, onPropsChange],
   );
 
   const renderDrawerContent = React.useCallback(

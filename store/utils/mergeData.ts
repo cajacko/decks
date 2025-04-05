@@ -31,12 +31,12 @@ export function getMostRecentItem<E extends Metadata, I extends Metadata>({
 export function mergeMap<
   D extends Metadata,
   M extends Record<string, D | undefined>,
->(draft: WritableDraft<M>, incoming: M) {
+>(draft: WritableDraft<M>, incoming: M): WritableDraft<M> {
   for (const key in draft) {
     const incomingItem: D | undefined = incoming[key];
 
     // Nothing to merge, do nothing to the draft
-    if (!incomingItem) return;
+    if (!incomingItem) continue;
 
     const draftItem = draft[key];
 
@@ -55,4 +55,14 @@ export function mergeMap<
     // @ts-ignore
     draft[key] = incomingItem;
   }
+
+  // Adds any new items that are not in the draft
+  for (const key in incoming) {
+    if (draft[key]) continue;
+
+    // @ts-ignore
+    draft[key] = incoming[key];
+  }
+
+  return draft;
 }

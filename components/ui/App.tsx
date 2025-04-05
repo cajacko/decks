@@ -21,11 +21,16 @@ import { Roboto_400Regular } from "@expo-google-fonts/roboto";
 import { DrawerProvider } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
 import { useHasRehydrated } from "@/store/hooks";
-import registerExampleDecks from "@/utils/registerExampleDecks";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
+import { SyncProvider } from "@/context/Sync";
+import { AuthenticationProvider } from "@/context/Authentication";
+import { ToolbarProvider } from "@/context/Toolbar";
+import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SkeletonProvider } from "@/context/Skeleton";
+import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
 
 enableFreeze();
-registerExampleDecks();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -61,10 +66,10 @@ function Content({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <>
+    <ScreenContentLayoutProvider>
       {component}
       {children}
-    </>
+    </ScreenContentLayoutProvider>
   );
 }
 
@@ -75,9 +80,15 @@ function HasStore({ children }: { children: React.ReactNode }) {
     LuckiestGuy: LuckiestGuy_400Regular,
   });
 
+  const isSafeAreaReady = useIsSafeAreaContextReady({
+    timeout: 2000,
+    timeoutWithoutChange: 1500,
+  });
+
   const [isStoreReady, setIsStoreReady] = React.useState(false);
   const hasRehydrated = useHasRehydrated();
   const shouldPurgeStoreOnStart = useFlag("PURGE_STORE_ON_START");
+  const scheme = useColorScheme();
 
   React.useEffect(() => {
     if (!hasRehydrated) return;
@@ -93,7 +104,7 @@ function HasStore({ children }: { children: React.ReactNode }) {
     setIsStoreReady(true);
   }, [hasRehydrated, shouldPurgeStoreOnStart]);
 
-  const loaded = loadedFonts && isStoreReady;
+  const loaded = loadedFonts && isStoreReady && isSafeAreaReady;
 
   useEffect(() => {
     initMousePointer();
@@ -112,12 +123,20 @@ function HasStore({ children }: { children: React.ReactNode }) {
   return (
     <PersistGate loading={null} persistor={persistor}>
       <NavigationThemeProvider value={navigationTheme}>
-        <ModalProvider>
-          <DrawerProvider>
-            <Content>{children}</Content>
-            <StatusBar style="auto" />
-          </DrawerProvider>
-        </ModalProvider>
+        <AuthenticationProvider>
+          <SyncProvider>
+            <SkeletonProvider>
+              <ModalProvider>
+                <DrawerProvider>
+                  <ToolbarProvider>
+                    <Content>{children}</Content>
+                    <StatusBar style={scheme === "dark" ? "light" : "dark"} />
+                  </ToolbarProvider>
+                </DrawerProvider>
+              </ModalProvider>
+            </SkeletonProvider>
+          </SyncProvider>
+        </AuthenticationProvider>
       </NavigationThemeProvider>
     </PersistGate>
   );
@@ -125,9 +144,11 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
 export default function App({ children }: { children: React.ReactNode }) {
   return (
-    <ReduxProvider store={store}>
-      <HasStore>{children}</HasStore>
-    </ReduxProvider>
+    <SafeAreaProvider>
+      <ReduxProvider store={store}>
+        <HasStore>{children}</HasStore>
+      </ReduxProvider>
+    </SafeAreaProvider>
   );
 }
 

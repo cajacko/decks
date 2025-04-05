@@ -2,10 +2,14 @@ import React from "react";
 import { InteractionManager } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import useFlag from "./useFlag";
+import useStateChangeThrottle from "./useStateChangeThrottle";
 
-export default function useScreenSkeleton(key: string) {
+export default function useScreenSkeleton(
+  key: string,
+): "enabled" | "show-nothing" | null {
   const navigation = useNavigation();
-  const featureDisabled = useFlag("SKELETON_LOADER") === "disabled";
+  const skeletonLoader = useFlag("SKELETON_LOADER");
+  const featureDisabled = skeletonLoader === "disabled";
   const [skeleton, setSkeleton] = React.useState(
     featureDisabled ? false : true,
   );
@@ -38,5 +42,14 @@ export default function useScreenSkeleton(key: string) {
     };
   }, [navigation, key, featureDisabled]);
 
-  return featureDisabled ? false : skeleton;
+  const throttledSkeleton = useStateChangeThrottle(skeleton, {
+    // The minimum amount of time to keep the skeleton on screen for
+    maxUpdateInterval: 500,
+  });
+
+  if (featureDisabled) {
+    return null;
+  }
+
+  return throttledSkeleton ? skeletonLoader : null;
 }

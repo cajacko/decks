@@ -1,19 +1,16 @@
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import { store } from "../store";
-import { selectDeck } from "../slices/decks";
+import { selectDeck } from "../selectors/decks";
 import { Cards, Decks, Tabletops } from "../types";
 import uuid from "@/utils/uuid";
 import builtInTemplates from "@/constants/builtInTemplates";
 import { createInitStacks } from "@/utils/minStacks";
 import text, { TextKey } from "@/constants/text";
-import { selectTabletop } from "../slices/tabletop";
-import { getBuiltInState } from "../utils/withBuiltInState";
-import { selectCard } from "../slices/cards";
+import { selectTabletop } from "../selectors/tabletops";
+import { selectBuiltInState } from "../utils/withBuiltInState";
+import { selectCard } from "../selectors/cards";
 import { ReservedDataSchemaIds } from "@/constants/reservedDataSchemaItems";
-import {
-  selectDeckDefaultColors,
-  selectDeckNames,
-} from "../combinedSelectors/decks";
+import { selectDeckDefaultColors, selectDeckNames } from "../selectors/decks";
 import pickLeastUsedColor from "@/utils/pickLeastUsedColor";
 import { fixed } from "@/constants/colors";
 import { getResetHistoryState } from "./tabletop";
@@ -101,6 +98,7 @@ export function createDeckHelper({ deckId }: { deckId: Decks.Id }) {
         },
       },
     },
+    version: undefined,
     dataSchemaOrder: [],
     defaultTabletopId: tabletopId,
     name: deckName,
@@ -225,7 +223,7 @@ export function copyDeckHelper(props: {
     ? selectTabletop(store.getState(), {
         tabletopId: deckToCopy.defaultTabletopId,
       })
-    : selectTabletop(getBuiltInState(), {
+    : selectTabletop(selectBuiltInState(store.getState()), {
         tabletopId: deckToCopy.defaultTabletopId,
       });
 
@@ -314,6 +312,7 @@ export function copyDeckHelper(props: {
     id: deckId,
     defaultTabletopId: newTabletopId,
     canEdit: true,
+    version: deckToCopy.version,
   };
 
   return createDeck({

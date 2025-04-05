@@ -24,3 +24,5 @@ export const privacyPolicyLink: ExternalPathString =
 
 export const charlieJacksonLink: ExternalPathString =
   "https://www.playface.fun/s/e10f07d8";
+
+export const appHome = Platform.OS === "web" ? "/app" : "/";

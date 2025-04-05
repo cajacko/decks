@@ -14,7 +14,7 @@ export interface StackListIndicatorProps {
 export function StackListIndicator({
   isActive,
 }: StackListIndicatorProps): React.ReactNode {
-  const backgroundColor = useThemeColor("background");
+  const backgroundColor = useThemeColor("text");
   const scale = useSharedValue(1);
 
   React.useEffect(() => {

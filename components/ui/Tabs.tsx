@@ -1,17 +1,13 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 import IconSymbol, { IconSymbolName } from "./IconSymbol";
 import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { Link, LinkProps } from "expo-router";
+import { LinkProps } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ContentWidth from "./ContentWidth";
+import { iconSize, _contentHeight } from "@/context/Toolbar";
+import Link from "@/components/ui/Link";
 
 export interface TabsProps {
   children?: React.ReactNode;
@@ -30,21 +26,25 @@ export function Tab(props: TabProps): React.ReactNode {
   const { bottom } = useSafeAreaInsets();
 
   return (
-    <Link style={styles.tab} href={props.href} asChild>
-      <Pressable
-        style={StyleSheet.flatten([
+    <Link
+      style={styles.tab}
+      href={props.href}
+      vibrate
+      TouchableProps={{
+        style: StyleSheet.flatten([
           styles.pressable,
           { paddingBottom: bottom },
-        ])}
-      >
-        <View style={styles.tabContent}>
-          <IconSymbol
-            name={props.icon}
-            color={props.isActive ? colors : undefined}
-          />
-          <ThemedText style={styles.tabText}>{props.title}</ThemedText>
-        </View>
-      </Pressable>
+        ]),
+      }}
+    >
+      <View style={styles.tabContent}>
+        <IconSymbol
+          name={props.icon}
+          color={props.isActive ? colors : undefined}
+          size={iconSize}
+        />
+        <ThemedText style={styles.tabText}>{props.title}</ThemedText>
+      </View>
     </Link>
   );
 }
@@ -53,7 +53,7 @@ export default function Tabs(props: TabsProps): React.ReactNode {
   const backgroundColor = useThemeColor("background");
   const colors = useThemeColor("inputOutline");
   const { bottom } = useSafeAreaInsets();
-  const height = 60 + bottom;
+  const height = _contentHeight + bottom;
 
   return (
     <ContentWidth

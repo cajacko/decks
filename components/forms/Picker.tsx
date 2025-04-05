@@ -1,3 +1,10 @@
+/**
+ * NOTE: We had some issues with falsey values, so we now convert everything to json strings and
+ * then parse that back. We also only allow passing of an items array so we can be very opinionated
+ * about how we handle the values and select items. There's quite a few issues and caveats with
+ * @react-native-picker/picker so it may be better to build our own at some point.
+ */
+
 import React from "react";
 import {
   Picker as RNPicker,
@@ -14,38 +21,39 @@ import ThemedView from "../ui/ThemedView";
 import { styles as alertStyles } from "../overlays/Alert";
 import Button from "./Button";
 
-export type PickerProps<T> = Omit<RNPickerProps<T>, "style"> & {
+export type PickerValue = string | number | boolean | null;
+
+export type PickerProps<T extends PickerValue> = Omit<
+  RNPickerProps<string>,
+  "style" | "selectedValue" | "onValueChange" | "children"
+> & {
   style?: ViewStyle;
-  pickerStyle?: RNPickerProps<T>["style"];
-  iosButtonTitle: string;
+  selectedValue: T;
+  onValueChange?: (itemValue: T, itemIndex: number) => void;
+  pickerStyle?: RNPickerProps<string>["style"];
+  iosButtonTitle?: string;
+  items: PickerItemProps<T>[];
 };
 
-export type PickerItemProps<T> = RNPickerItemProps<T>;
-
-function valueToPickerValue<T>(value: T): string | undefined {
-  if (value === undefined) return undefined;
-
-  return String(value);
+interface PickerItemProps<T extends PickerValue>
+  extends Omit<RNPickerItemProps<T>, "value" | "key" | "label"> {
+  label: string;
+  value: T;
+  key?: string;
 }
 
-function pickerValueToValue<T>(value: string): T {
-  switch (value) {
-    case "true":
-      return true as T;
-    case "false":
-      return false as T;
-    case "null":
-      return null as T;
-    default:
-      return value as T;
-  }
+function valueToPickerValue<T extends PickerValue>(value: T): string {
+  return JSON.stringify({ value });
 }
 
-export function PickerItem<T>({
-  value,
+function pickerValueToValue<T extends PickerValue>(value: string): T {
+  return JSON.parse(value).value;
+}
+
+function PickerItem({
   style: styleProp,
   ...props
-}: PickerItemProps<T>): React.ReactNode {
+}: PickerItemProps<string>): React.ReactNode {
   const colors = useThemeColors();
   const textStyle = useThemedTextStyle({ type: "body1" });
 
@@ -62,23 +70,17 @@ export function PickerItem<T>({
     [colors, styleProp, textStyle],
   );
 
-  return (
-    <RNPicker.Item
-      color={colors.text}
-      {...props}
-      style={style}
-      value={valueToPickerValue(value)}
-    />
-  );
+  return <RNPicker.Item color={colors.text} {...props} style={style} />;
 }
 
-export default function Picker<T>({
+export default function Picker<T extends PickerValue>({
   onValueChange: onValueChangeProp,
   style: styleProp,
   iosButtonTitle,
   selectedValue: selectedValueProp,
   pickerStyle: pickerStyleProp,
   itemStyle: itemStyleProp,
+  items,
   ...props
 }: PickerProps<T>): React.ReactNode {
   const textStyle = useThemedTextStyle({ type: "body1" });
@@ -136,17 +138,44 @@ export default function Picker<T>({
     [onValueChangeProp],
   );
 
+  const selectedValueString = valueToPickerValue(selectedValueProp);
+
+  const { children, selectedItemLabel } = React.useMemo(() => {
+    let selectedItemLabel: string | undefined;
+
+    const children = items.map(
+      ({ value: itemValue, key, label, ...itemProps }) => {
+        const itemValueString = valueToPickerValue(itemValue);
+
+        if (selectedValueString === itemValueString) {
+          selectedItemLabel = label;
+        }
+
+        return (
+          <PickerItem
+            value={itemValueString}
+            key={key ?? itemValueString}
+            label={label}
+            {...itemProps}
+          />
+        );
+      },
+    );
+
+    return { children, selectedItemLabel };
+  }, [items, selectedValueString]);
+
   const picker = (
     <RNPicker<string>
       dropdownIconColor={colors.text}
       mode="dialog"
       {...props}
-      selectedValue={valueToPickerValue(selectedValueProp)}
+      selectedValue={selectedValueString}
       onValueChange={onValueChange}
       style={pickerStyle}
       itemStyle={itemStyle}
     >
-      {props.children}
+      {children}
     </RNPicker>
   );
 
@@ -167,17 +196,11 @@ export default function Picker<T>({
     return (
       <View style={styleProp}>
         <Button
-          title={iosButtonTitle}
+          title={iosButtonTitle ?? selectedItemLabel ?? ""}
           variant="outline"
           onPress={openModal}
           rightIcon="arrow-drop-down"
-          ThemedTextProps={{
-            style: {
-              textTransform: "none",
-              textAlign: "left",
-            },
-          }}
-          // style={{ }}
+          ThemedTextProps={ThemedTextProps}
         />
         <Modal visible={open} onRequestClose={closeModal}>
           <View style={alertStyles.centeredView}>
@@ -196,6 +219,10 @@ export default function Picker<T>({
 }
 
 const styles = StyleSheet.create({
+  iosButtonText: {
+    textTransform: "none",
+    textAlign: "left",
+  },
   container: {
     borderWidth: buttonStyles.outline.borderWidth,
     borderRadius: buttonStyles.button.borderRadius,
@@ -217,3 +244,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
 });
+
+const ThemedTextProps = {
+  style: styles.iosButtonText,
+};

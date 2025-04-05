@@ -8,29 +8,51 @@ import {
 } from "react-native";
 import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import useVibrate from "@/hooks/useVibrate";
+import { useOnPressProps } from "@/components/forms/Button";
+import { useSkeletonAnimation } from "@/context/Skeleton";
+import Animated from "react-native-reanimated";
+import Skeleton from "../ui/Skeleton";
+
+export type { IconSymbolName };
 
 export interface IconButtonProps extends TouchableOpacityProps {
-  icon: IconSymbolName;
+  icon: IconSymbolName | { _children: React.ReactNode };
   style?: StyleProp<ViewStyle>;
   size?: number;
   variant?: "filled" | "transparent";
   vibrate?: boolean;
+  loading?: boolean;
+  skeleton?: boolean;
 }
 
 const defaultSize = 80;
+
+export function IconButtonSkeleton({
+  size = defaultSize,
+  style,
+}: Pick<IconButtonProps, "size" | "style">) {
+  return (
+    <Skeleton
+      variant="button"
+      shape="circle"
+      height={size}
+      width={size}
+      style={style}
+    />
+  );
+}
 
 export default function IconButton({
   icon,
   style: styleProp,
   size = defaultSize,
   variant = "filled",
-  vibrate: shouldVibrate = false,
-  onPress: onPressProp,
+  loading = false,
+  skeleton,
   ...props
 }: IconButtonProps): React.ReactNode {
-  const { vibrate } = useVibrate();
   const { background, text } = useThemeColors();
+  const { backgroundColorStyle } = useSkeletonAnimation();
 
   const style = React.useMemo(
     () =>
@@ -41,33 +63,39 @@ export default function IconButton({
           width: size,
           borderRadius: size / 2,
           backgroundColor: background,
+          borderColor: text,
         },
         styleProp,
       ]),
-    [styleProp, size, background, variant],
+    [styleProp, size, background, variant, text],
   );
 
-  const onPress = React.useMemo<IconButtonProps["onPress"]>(
-    () =>
-      onPressProp
-        ? (event) => {
-            if (shouldVibrate) {
-              vibrate?.(`CardAction (${icon})`);
-            }
+  const onPressProps = useOnPressProps(props);
 
-            return onPressProp(event);
-          }
-        : undefined,
-    [onPressProp, vibrate, shouldVibrate, icon],
-  );
+  const children = React.useMemo((): React.ReactNode => {
+    const iconSize = variant === "filled" ? size * 0.5 : size;
+
+    if (skeleton) {
+      return (
+        <Animated.View
+          style={[
+            { width: iconSize, height: iconSize, borderRadius: iconSize / 2 },
+            backgroundColorStyle,
+          ]}
+        />
+      );
+    }
+
+    if (typeof icon === "string") {
+      return <IconSymbol name={icon} color={text} size={iconSize} />;
+    }
+
+    return icon._children;
+  }, [icon, size, text, variant, skeleton, backgroundColorStyle]);
 
   return (
-    <TouchableOpacity {...props} onPress={onPress} style={style}>
-      <IconSymbol
-        name={icon}
-        color={text}
-        size={variant === "filled" ? (size * 2) / 3 : size}
-      />
+    <TouchableOpacity {...props} {...onPressProps} style={style}>
+      {children}
     </TouchableOpacity>
   );
 }
@@ -85,6 +113,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    borderWidth: 1,
   },
   floating: {
     position: "absolute",

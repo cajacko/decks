@@ -18,7 +18,6 @@ export interface CardProps extends CardContainerProps {
   markup: Required<TemplateProps>["markup"] | null;
   values: Required<TemplateProps>["values"] | null;
   cardSideCacheKey: string;
-  skeleton?: boolean;
   /**
    * Use to re-mount the template component/ forcing a re-render. Only used for some bug fixes,
    * check the use of _templateKey to see how it's fixing issues
@@ -36,7 +35,6 @@ export default function Card({
   markup,
   values: valuesProp,
   cardSideCacheKey,
-  skeleton = false,
   children,
   _templateKey = "template",
   ...cardContainerProps
@@ -53,7 +51,7 @@ export default function Card({
   return (
     <CardContainer {...cardContainerProps}>
       {children}
-      {markup && !skeleton && (
+      {markup && (
         <Template key={_templateKey} values={values} markup={markup} />
       )}
     </CardContainer>

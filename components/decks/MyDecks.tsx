@@ -1,9 +1,11 @@
 import React from "react";
 import { StyleSheet, ViewStyle, View, ScrollView } from "react-native";
 import { useAppSelector } from "@/store/hooks";
-import { selectDeckIds } from "@/store/slices/decks";
-import DeckListItem from "@/components/decks/DeckListItem";
-import useScreenSkeleton from "@/hooks/useScreenSkeleton";
+import { selectDeckIds } from "@/store/selectors/decks";
+import DeckListItem, {
+  DeckListItemSkeleton,
+} from "@/components/decks/DeckListItem";
+import Skeleton from "@/components/ui/Skeleton";
 import ThemedText from "../ui/ThemedText";
 import text from "@/constants/text";
 import ContentWidth, {
@@ -16,8 +18,49 @@ export interface MyDecksProps {
 
 type FlatListItem = string | null;
 
-export default function MyDecks(props: MyDecksProps): React.ReactNode {
-  const skeleton = useScreenSkeleton(MyDecks.name);
+function MyDecksContent({
+  style,
+  children,
+  text,
+}: Pick<MyDecksProps, "style"> & {
+  children: React.ReactNode;
+  text: React.ReactNode;
+}) {
+  return (
+    <View style={style}>
+      <ContentWidth padding="standard">
+        <View style={styles.title}>{text}</View>
+      </ContentWidth>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
+        horizontal
+      >
+        {children}
+      </ScrollView>
+    </View>
+  );
+}
+
+export function MyDecksSkeleton({
+  style,
+}: Partial<MyDecksProps>): React.ReactNode {
+  return (
+    <MyDecksContent
+      style={style}
+      text={<Skeleton variant="text" width={200} />}
+    >
+      <DeckListItemSkeleton style={styles.listItem} />
+      <DeckListItemSkeleton style={styles.listItem} />
+      <DeckListItemSkeleton style={styles.listItem} />
+      <DeckListItemSkeleton style={styles.listItem} />
+      <DeckListItemSkeleton style={styles.listItem} />
+    </MyDecksContent>
+  );
+}
+
+export default function MyDecks({ style }: MyDecksProps): React.ReactNode {
   const deckIdsState = useAppSelector(selectDeckIds);
 
   const deckIds = React.useMemo((): FlatListItem[] => {
@@ -27,34 +70,20 @@ export default function MyDecks(props: MyDecksProps): React.ReactNode {
   const children = React.useMemo(
     () =>
       deckIds.map((deckId) => (
-        <DeckListItem
-          key={deckId}
-          style={styles.listItem}
-          deckId={deckId}
-          skeleton={deckId ? skeleton : false}
-        />
+        <DeckListItem key={deckId} style={styles.listItem} deckId={deckId} />
       )),
-    [deckIds, skeleton],
+    [deckIds],
   );
 
   return (
-    <View style={props.style}>
-      <ContentWidth padding="standard">
-        <ThemedText type="h1" style={styles.title}>
-          {text["decks_screen.my_decks.title"]}
-        </ThemedText>
-      </ContentWidth>
-      {!skeleton && (
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          horizontal
-        >
-          {children}
-        </ScrollView>
-      )}
-    </View>
+    <MyDecksContent
+      style={style}
+      text={
+        <ThemedText type="h1">{text["decks_screen.my_decks.title"]}</ThemedText>
+      }
+    >
+      {children}
+    </MyDecksContent>
   );
 }
 

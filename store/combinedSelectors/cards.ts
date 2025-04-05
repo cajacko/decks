@@ -1,10 +1,15 @@
 import { createCachedSelector } from "re-reselect";
-import { selectCard } from "../slices/cards";
 import {
   selectCanEditDeck,
   selectDeck as selectDeckByDeckId,
-} from "../slices/decks";
-import { selectTemplate } from "../slices/templates";
+} from "../selectors/decks";
+import { selectTemplate } from "../selectors/templates";
+import {
+  selectCard,
+  cardOrDeckKey,
+  CardIdProps,
+  DeckOrCardOptionalSideProps,
+} from "../selectors/cards";
 import { RootState, Decks, Cards } from "../types";
 import { getIsCardId, Target } from "@/utils/cardTarget";
 import {
@@ -13,14 +18,9 @@ import {
   ResolveCardDataProps,
 } from "@/utils/resolveCardData";
 
-type CardIdProps = { cardId: Cards.Id };
-export type DeckOrCardSideProps = Target & { side: Cards.Side };
-type DeckOrCardOptionalSideProps = Target & { side?: Cards.Side };
+export { cardOrDeckKey };
 
-export const cardOrDeckKey = (
-  _: unknown,
-  props: DeckOrCardOptionalSideProps,
-): string => `${props.type}:${props.id}-${props.side}`;
+export type DeckOrCardSideProps = Target & { side: Cards.Side };
 
 // Is a lookup, doesn't need to be cached
 export const selectDeckByCard = (

@@ -1,21 +1,34 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import TextInput from "../forms/TextInput";
-import { selectDeck, setDeckDetails } from "@/store/slices/decks";
+import { selectDeck, selectCanEditDeck } from "@/store/selectors/decks";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import useAutoSave from "@/hooks/useAutoSave";
 import text from "@/constants/text";
-import { selectCanEditDeck } from "@/store/slices/decks";
+import { setDeckDetails } from "@/store/slices/decks";
 import ThemedText from "../ui/ThemedText";
 import { dateToDateString } from "@/utils/dates";
+import Skeleton from "../ui/Skeleton";
 
 export interface DeckDetailsProps {
   deckId: string;
-  skeleton?: boolean;
 }
 
 const titleType = "h1";
 const descriptionType = "body1";
+
+export function DeckDetailsSkeleton() {
+  return (
+    <View style={styles.container}>
+      <Skeleton style={styles.name} variant="text" width="50%" />
+      <View style={styles.description}>
+        <Skeleton variant="text" width="100%" />
+        <Skeleton variant="text" width="90%" textSpacingVertical />
+        <Skeleton variant="text" width="40%" />
+      </View>
+    </View>
+  );
+}
 
 export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
   const dispatch = useAppDispatch();
@@ -57,7 +70,7 @@ export default function DeckDetails(props: DeckDetailsProps): React.ReactNode {
   useAutoSave({
     hasChanges,
     save,
-    autoSave: props.skeleton || !canEditDeck ? false : true,
+    autoSave: !canEditDeck ? false : true,
   });
 
   return (

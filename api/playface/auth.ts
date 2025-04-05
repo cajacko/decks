@@ -131,6 +131,34 @@ export function checkAuthInHref(): Tokens | null {
   }
 }
 
+interface PlayfaceRefreshResponse {
+  access_token: string;
+  // id_token: string;
+  expires_in: number;
+  // refresh_token_expires_in: number;
+  // scope: string;
+  // token_type: string;
+}
+
+function validateRefreshResponse(
+  json: unknown,
+): json is PlayfaceRefreshResponse {
+  if (typeof json !== "object" || json === null) return false;
+
+  if (!("access_token" in json)) return false;
+  if (!("expires_in" in json)) return false;
+  if (typeof json.access_token !== "string") return false;
+  if (typeof json.expires_in !== "number") return false;
+
+  // This ensures we do actually have a valid response
+  const response: PlayfaceRefreshResponse = {
+    access_token: json.access_token,
+    expires_in: json.expires_in,
+  };
+
+  return !!response;
+}
+
 export async function refreshAuth(refreshToken: string): Promise<Tokens> {
   debugLog("refreshAuth - refreshing auth");
 
@@ -144,18 +172,19 @@ export async function refreshAuth(refreshToken: string): Promise<Tokens> {
     }),
   });
 
-  const json: {
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-    refresh_token_expires_in: number;
-    scope: string;
-    token_type: string;
-  } = await result.json();
+  const json: unknown = await result.json();
+
+  if (validateRefreshResponse(json) === false) {
+    throw new AppError(
+      `${refreshAuth.name} Invalid response from playface api`,
+      { json, status: result.status },
+    );
+  }
 
   return {
     accessToken: json.access_token,
-    refreshToken: json.refresh_token,
+    // Doesn't change
+    refreshToken,
     accessTokenExpiresAt: expiresInToExpiresAt(json.expires_in),
   };
 }

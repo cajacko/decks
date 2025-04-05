@@ -8,11 +8,14 @@ import IconButton, {
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import DecksToolbar from "@/components/decks/DecksToolbar";
-import MyDecks from "@/components/decks/MyDecks";
-import PreBuiltDecks from "@/components/decks/PreBuiltDecks";
+import MyDecks, { MyDecksSkeleton } from "@/components/decks/MyDecks";
+import PreBuiltDecks, {
+  PreBuiltDecksSkeleton,
+} from "@/components/decks/PreBuiltDecks";
 import useDeviceSize from "@/hooks/useDeviceSize";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
+import { Toolbar } from "@/context/Toolbar";
+import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 const minCardListWidth = 100;
 const maxCardListWidth = 150;
@@ -37,7 +40,36 @@ export interface DecksScreenProps {
   style?: ViewStyle;
 }
 
-export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
+function DecksScreenContent({
+  style,
+  button,
+  myDecks,
+  preBuiltDecks,
+}: DecksScreenProps & {
+  myDecks: React.ReactNode;
+  preBuiltDecks: React.ReactNode;
+  button?: React.ReactNode;
+}) {
+  const containerStyle = React.useMemo(
+    () => [styles.container, style],
+    [style],
+  );
+
+  return (
+    <>
+      <ScrollView
+        style={containerStyle}
+        contentContainerStyle={styles.contentContainerStyle}
+      >
+        {myDecks}
+        {preBuiltDecks}
+      </ScrollView>
+      {button}
+    </>
+  );
+}
+
+function ConnectedDecksScreen(props: DecksScreenProps) {
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
 
@@ -49,29 +81,43 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
     navigate(`/deck/${deckId}`);
   }, [navigate, dispatch]);
 
-  const containerStyle = React.useMemo(
-    () => [styles.container, props.style],
-    [props.style],
+  return (
+    <DecksScreenContent
+      style={props.style}
+      myDecks={<MyDecks style={styles.myDecks} />}
+      preBuiltDecks={<PreBuiltDecks style={styles.preBuiltDecks} />}
+      button={
+        <IconButton
+          icon="add"
+          onPress={createDeck}
+          style={iconButtonStyles.floating}
+          vibrate
+        />
+      }
+    />
   );
+}
 
+export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
+  const skeleton = useScreenSkeleton(DecksScreen.name);
   const cardWidth = useCardListWidth();
 
-  return (
-    <CardConstraintsProvider width={cardWidth}>
-      <DecksToolbar />
-      <ScrollView
-        style={containerStyle}
-        contentContainerStyle={styles.contentContainerStyle}
-      >
-        <MyDecks style={styles.myDecks} />
-        <PreBuiltDecks style={styles.preBuiltDecks} />
-      </ScrollView>
-      <IconButton
-        icon="add"
-        onPress={createDeck}
-        style={iconButtonStyles.floating}
+  const skeletonContent =
+    skeleton === "show-nothing" ? null : (
+      <DecksScreenContent
+        style={props.style}
+        myDecks={<MyDecksSkeleton style={styles.myDecks} />}
+        preBuiltDecks={<PreBuiltDecksSkeleton style={styles.preBuiltDecks} />}
       />
-    </CardConstraintsProvider>
+    );
+
+  return (
+    <>
+      <Toolbar loading={!!skeleton} />
+      <CardConstraintsProvider width={cardWidth}>
+        {skeleton ? skeletonContent : <ConnectedDecksScreen {...props} />}
+      </CardConstraintsProvider>
+    </>
   );
 }
 

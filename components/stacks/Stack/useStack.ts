@@ -1,19 +1,17 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setStackOrder } from "@/store/slices/tabletop";
 import {
   selectCardInstanceIds,
   selectFirstXCardInstances,
-  setStackOrder,
-} from "@/store/slices/tabletop";
+  selectDoesTabletopHaveCardInstances,
+} from "@/store/selectors/tabletops";
 import { StackProps } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import seededShuffle, { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
 import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
-import {
-  deleteStack,
-  selectDoesTabletopHaveCardInstances,
-} from "@/store/slices/tabletop";
+import { deleteStack } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
 import useFlag from "@/hooks/useFlag";
 import useOffsetPositions from "@/components/cards/ui/AnimatedCard/useOffsetPositions";
@@ -23,6 +21,18 @@ import text from "@/constants/text";
 import useShakeEffect from "@/hooks/useShakeEffect";
 import useVibrate from "@/hooks/useVibrate";
 import { dateToDateString } from "@/utils/dates";
+
+export function useStackWidth() {
+  const { stackWidth } = useTabletopContext();
+
+  const width = useSharedValue(stackWidth);
+
+  React.useEffect(() => {
+    width.value = stackWidth;
+  }, [width, stackWidth]);
+
+  return width;
+}
 
 export default function useStack({
   stackId,
@@ -36,14 +46,13 @@ export default function useStack({
   const offsetPositions = useOffsetPositions();
   // Our fallback needs to be enough for see a card behind when animating
   const offsetPositionsCount = offsetPositions ? offsetPositions.length : 2;
-
+  const width = useStackWidth();
   const canAnimateCards = useFlag("CARD_ANIMATIONS") === "enabled";
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
   const animateShuffle = useFlag("SHUFFLE_ANIMATION") === "enabled";
   const dispatch = useAppDispatch();
-  const { tabletopId, stackWidth, deckId } = useTabletopContext();
-  const width = useSharedValue(stackWidth);
+  const { tabletopId, deckId } = useTabletopContext();
   const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
   const rotation = useSharedValue(0);
@@ -54,10 +63,6 @@ export default function useStack({
   const doesTabletopHaveAvailableCards = useAppSelector((state) =>
     selectDoesTabletopHaveAvailableCards(state, { tabletopId }),
   );
-
-  React.useEffect(() => {
-    width.value = stackWidth;
-  }, [width, stackWidth]);
 
   const { getCardOffsetPosition, onUpdateCardList, stackCountLimit } =
     React.useMemo(

@@ -2,7 +2,7 @@ import createCardDataSchemaId from "@/store/utils/createCardDataSchemaId";
 import * as Types from "./types";
 import { Cards, Templates } from "@/store/types";
 import { WritableDraft } from "immer";
-import { getFlag } from "@/store/combinedSelectors/flags";
+import { getFlag } from "@/store/selectors/flags";
 
 const originPriority: Types.ValueOrigin[] = [
   "editing",

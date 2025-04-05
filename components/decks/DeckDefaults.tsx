@@ -6,15 +6,65 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import Card from "../cards/connected/Card";
+import Card from "@/components/cards/connected/Card";
+import CardSkeleton from "@/components/cards/connected/CardSkeleton";
 import { Target } from "@/utils/cardTarget";
 import ThemedText from "../ui/ThemedText";
 import { useEditCardModal } from "../editCard/EditCardModal";
 import text from "@/constants/text";
+import Skeleton from "../ui/Skeleton";
 
 export interface DeckDefaultsProps {
   deckId: string;
   style?: StyleProp<ViewStyle>;
+}
+
+function DeckDefaultsContent(
+  props: Pick<DeckDefaultsProps, "style"> & {
+    titles?: React.ReactNode;
+    front: React.ReactNode;
+    back: React.ReactNode;
+    onPressFront?: () => void;
+    onPressBack?: () => void;
+  },
+) {
+  return (
+    <>
+      <View style={props.style}>
+        {props.titles}
+        <View style={styles.sides}>
+          {props.onPressFront ? (
+            <Pressable onPress={props.onPressFront} style={styles.side}>
+              {props.front}
+            </Pressable>
+          ) : (
+            <View style={styles.side}>{props.front}</View>
+          )}
+
+          {props.onPressBack ? (
+            <Pressable onPress={props.onPressBack} style={styles.side}>
+              {props.back}
+            </Pressable>
+          ) : (
+            <View style={styles.side}>{props.back}</View>
+          )}
+        </View>
+      </View>
+    </>
+  );
+}
+
+export function DeckDefaultsSkeleton({
+  style,
+}: Pick<DeckDefaultsProps, "style">) {
+  const side = (
+    <>
+      <CardSkeleton />
+      <Skeleton variant="text" width={80} style={styles.sideText} />
+    </>
+  );
+
+  return <DeckDefaultsContent style={style} back={side} front={side} />;
 }
 
 export default function DeckDefaults(
@@ -30,34 +80,37 @@ export default function DeckDefaults(
   return (
     <>
       {component}
-      <View style={props.style}>
-        <ThemedText type="h2">
-          {text["deck_screen.deck_defaults.title"]}
-        </ThemedText>
-        <ThemedText style={styles.description}>
-          {text["deck_screen.deck_defaults.description"]}
-        </ThemedText>
-        <View style={styles.sides}>
-          <Pressable
-            onPress={() => open(deckDefaultTarget, { initialSide: "front" })}
-            style={styles.side}
-          >
+      <DeckDefaultsContent
+        style={props.style}
+        onPressFront={() => open(deckDefaultTarget, { initialSide: "front" })}
+        onPressBack={() => open(deckDefaultTarget, { initialSide: "back" })}
+        titles={
+          <>
+            <ThemedText type="h2">
+              {text["deck_screen.deck_defaults.title"]}
+            </ThemedText>
+            <ThemedText style={styles.description}>
+              {text["deck_screen.deck_defaults.description"]}
+            </ThemedText>
+          </>
+        }
+        front={
+          <>
             <Card target={deckDefaultTarget} side="front" />
             <ThemedText style={styles.sideText} type="h4">
               {text["deck_screen.deck_defaults.front"]}
             </ThemedText>
-          </Pressable>
-          <Pressable
-            onPress={() => open(deckDefaultTarget, { initialSide: "back" })}
-            style={styles.side}
-          >
+          </>
+        }
+        back={
+          <>
             <Card target={deckDefaultTarget} side="back" />
             <ThemedText style={styles.sideText} type="h4">
               {text["deck_screen.deck_defaults.back"]}
             </ThemedText>
-          </Pressable>
-        </View>
-      </View>
+          </>
+        }
+      />
     </>
   );
 }

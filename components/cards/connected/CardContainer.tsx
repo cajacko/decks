@@ -4,10 +4,13 @@ import UICardContainer, {
   CardContainerProps as UICardContainerProps,
   CardSize,
 } from "../ui/CardContainer";
-import { useCardsPhysicalSize } from "../context/CardPhysicalSize";
 import {
-  withCardTargetProvider,
+  useCardsPhysicalSize,
+  UseCardsPhysicalSizeProps,
+} from "../context/CardPhysicalSize";
+import {
   Target,
+  withCardTargetProvider,
 } from "@/components/cards/context/CardTarget";
 
 export interface UseCardContainerSizeProps {
@@ -28,14 +31,15 @@ const boxShadowConfig = {
 
 export function useCardContainerSizeProps({
   shadow = true,
-  target,
-}: UseCardContainerSizeProps): CardSize {
+  ...cardSizeProps
+}: Omit<UseCardsPhysicalSizeProps, "debugLocation"> &
+  Omit<UseCardContainerSizeProps, "target">): CardSize {
   const { mmBorderRadius, mmHeight, mmWidth } = useCardsPhysicalSize({
     debugLocation: useCardContainerSizeProps.name,
-    target,
+    ...cardSizeProps,
   });
 
-  const mmToDp = useMmToDp();
+  const mmToDp = useMmToDp(cardSizeProps);
 
   return React.useMemo<CardSize>(
     () => ({

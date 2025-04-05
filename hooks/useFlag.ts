@@ -2,7 +2,7 @@ import { useAppSelector } from "@/store/hooks";
 import { UserSettings, RootState } from "@/store/types";
 import { getFlags, Flags } from "@/utils/flags";
 import { createCachedSelector } from "re-reselect";
-import { selectFlag } from "@/store/combinedSelectors/flags";
+import { selectFlag } from "@/store/selectors/flags";
 
 export default function useFlag<FlagKey extends UserSettings.FlagKey>(
   key: FlagKey,
