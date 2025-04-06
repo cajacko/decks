@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, ViewStyle, ScrollView } from "react-native";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import IconButton, {
   getFloatingButtonVerticalAllowance,
   styles as iconButtonStyles,
@@ -8,7 +8,7 @@ import IconButton, {
 import { useRouter } from "expo-router";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
-import MyDecks, { MyDecksSkeleton } from "@/components/decks/MyDecks";
+import MyDecks from "@/components/decks/MyDecks";
 import PreBuiltDecks, {
   PreBuiltDecksSkeleton,
 } from "@/components/decks/PreBuiltDecks";
@@ -16,6 +16,7 @@ import useDeviceSize from "@/hooks/useDeviceSize";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
 import { Toolbar } from "@/context/Toolbar";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
+import { selectHasOwnDecks } from "@/store/selectors/decks";
 
 const minCardListWidth = 100;
 const maxCardListWidth = 150;
@@ -46,7 +47,7 @@ function DecksScreenContent({
   myDecks,
   preBuiltDecks,
 }: DecksScreenProps & {
-  myDecks: React.ReactNode;
+  myDecks?: React.ReactNode;
   preBuiltDecks: React.ReactNode;
   button?: React.ReactNode;
 }) {
@@ -72,6 +73,7 @@ function DecksScreenContent({
 function ConnectedDecksScreen(props: DecksScreenProps) {
   const { navigate } = useRouter();
   const dispatch = useAppDispatch();
+  const hasOwnDecks = useAppSelector(selectHasOwnDecks);
 
   const createDeck = React.useCallback(() => {
     const deckId = uuid();
@@ -84,8 +86,10 @@ function ConnectedDecksScreen(props: DecksScreenProps) {
   return (
     <DecksScreenContent
       style={props.style}
-      myDecks={<MyDecks style={styles.myDecks} />}
-      preBuiltDecks={<PreBuiltDecks style={styles.preBuiltDecks} />}
+      myDecks={hasOwnDecks ? <MyDecks style={styles.myDecks} /> : undefined}
+      preBuiltDecks={
+        <PreBuiltDecks hideTitle={!hasOwnDecks} style={styles.preBuiltDecks} />
+      }
       button={
         <IconButton
           icon="add"
@@ -106,7 +110,6 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
     skeleton === "show-nothing" ? null : (
       <DecksScreenContent
         style={props.style}
-        myDecks={<MyDecksSkeleton style={styles.myDecks} />}
         preBuiltDecks={<PreBuiltDecksSkeleton style={styles.preBuiltDecks} />}
       />
     );

@@ -12,6 +12,7 @@ import Skeleton from "../ui/Skeleton";
 
 export interface PreBuiltDecksProps {
   style?: ViewStyle;
+  hideTitle?: boolean;
 }
 
 function PreBuiltDecksContent({
@@ -20,13 +21,15 @@ function PreBuiltDecksContent({
   text,
 }: PreBuiltDecksProps & {
   children: React.ReactNode;
-  text: React.ReactNode;
+  text?: React.ReactNode;
 }) {
   return (
     <>
-      <ContentWidth padding="standard" style={style}>
-        {text}
-      </ContentWidth>
+      {text && (
+        <ContentWidth padding="standard" style={style}>
+          {text}
+        </ContentWidth>
+      )}
       {children}
     </>
   );
@@ -36,7 +39,11 @@ export function PreBuiltDecksSkeleton(props: PreBuiltDecksProps) {
   return (
     <PreBuiltDecksContent
       style={props.style}
-      text={<Skeleton variant="text" style={styles.title} width={200} />}
+      text={
+        props.hideTitle ? undefined : (
+          <Skeleton variant="text" style={styles.title} width={200} />
+        )
+      }
     >
       <ExpandedDeckListItemSkeleton style={styles.listItem} />
       <ExpandedDeckListItemSkeleton style={styles.listItem} />
@@ -68,9 +75,11 @@ export default function PreBuiltDecks(
     <PreBuiltDecksContent
       style={props.style}
       text={
-        <ThemedText type="h1" style={styles.title}>
-          {text["decks_screen.pre_built_decks.title"]}
-        </ThemedText>
+        props.hideTitle ? undefined : (
+          <ThemedText type="h1" style={styles.title}>
+            {text["decks_screen.pre_built_decks.title"]}
+          </ThemedText>
+        )
       }
     >
       {children}
