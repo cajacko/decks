@@ -15,9 +15,9 @@ import BottonDrawer, {
   useMaxHeight,
 } from "@/components/ui/BottomDrawer";
 import EditCardForm from "@/components/editCard/EditCardForm";
-import AnimatedCardSides, {
+import EditingAnimatedCardSides, {
   AnimatedCardSidesRef,
-} from "@/components/cards/connected/AnimatedCardSides";
+} from "@/components/cards/connected/EditingAnimatedCardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
@@ -106,7 +106,7 @@ export default function EditCard({
           >
             <View style={styles.scrollContent}>
               <Pressable onPress={onPress}>
-                <AnimatedCardSides
+                <EditingAnimatedCardSides
                   ref={cardSidesRef}
                   target={props.target}
                   side={side}

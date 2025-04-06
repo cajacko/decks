@@ -32,13 +32,13 @@ function updateDeckTemplateMapping(
     const map = props.data.templateMapping[side];
     const templateMapping = deck.templates[side].dataTemplateMapping;
 
-    Object.entries(map).forEach(([dataId, templateDataId]) => {
-      if (!templateDataId) return;
+    Object.entries(map).forEach(([templateDataId, dataId]) => {
+      if (!dataId) return;
 
-      if (templateMapping[dataId]?.templateDataId !== templateDataId) {
+      if (templateMapping[templateDataId]?.templateDataId !== templateDataId) {
         hasUpdated = true;
 
-        templateMapping[dataId] = {
+        templateMapping[templateDataId] = {
           dataId,
           templateDataId,
         };
