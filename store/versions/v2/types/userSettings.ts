@@ -14,7 +14,11 @@ export const flagMap = {
   SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
-  TOOLBAR_LOADING_ANIMATION: ["enabled", "disabled"],
+  /**
+   * This causes issues when we navigate. HAving any animations running when the nav transitions
+   * packs everything up.
+   */
+  TOOLBAR_LOADING_ANIMATION: ["disabled", "enabled"],
   TOOLBAR_HEIGHT_ANIMATION: ["enabled", "disabled"],
   BACKUP_SYNC: ["disabled", "enabled"],
   AUTO_SYNC: ["enabled", "disabled"],
