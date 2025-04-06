@@ -11,6 +11,8 @@ export interface LinkProps extends ERLinkProps, Pick<ThemedTextProps, "type"> {
   vibrate?: boolean;
 }
 
+export type Href = LinkProps["href"];
+
 export default function Link({
   text: textProp,
   type = "link",
