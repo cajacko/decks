@@ -79,6 +79,11 @@ export const selectDeckIds = createSelector(
   },
 );
 
+export const selectHasOwnDecks = createSelector(
+  selectDeckIds,
+  (deckIds) => deckIds.length > 0,
+);
+
 export const selectDecks = createSelector(
   selectDeckIds,
   selectDecksById,
