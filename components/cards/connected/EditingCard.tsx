@@ -1,11 +1,22 @@
 import React from "react";
-import Card, { CardProps } from "./Card";
+import { useCardProps, CardProps } from "./Card";
+import UICard, { CardProps as UICardProps } from "@/components/cards/ui/Card";
 import { useEditCardSideState } from "@/context/EditCard";
 
 export type EditingCardProps = Omit<CardProps, "values">;
 
-export default function EditingCard(props: EditingCardProps): React.ReactNode {
+export function useEditCardProps(props: EditingCardProps): UICardProps {
+  const cardProps = useCardProps(props);
   const values = useEditCardSideState(props.side, props.target);
 
-  return <Card {...props} values={values} />;
+  return {
+    ...cardProps,
+    values: values ?? cardProps.values,
+  };
+}
+
+export default function EditingCard(props: EditingCardProps): React.ReactNode {
+  const editCardProps = useEditCardProps(props);
+
+  return <UICard {...editCardProps} />;
 }
