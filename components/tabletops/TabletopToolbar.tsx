@@ -10,6 +10,7 @@ import { appHome } from "@/constants/links";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useEditDeckModal } from "../editDeck/EditDeckModal";
+import { useDeckInfoModal } from "../decks/DeckInfoModal";
 
 export interface TabletopToolbarProps extends UseTabletopHistoryOptions {
   deckId: string;
@@ -24,10 +25,12 @@ export default function TabletopToolbar(
   const title = useDeckName(props.deckId);
   const { entering, exiting } = useLayoutAnimations();
   const editDeckModal = useEditDeckModal(props.deckId);
+  const infoModal = useDeckInfoModal(props.deckId);
 
   return (
     <>
       {editDeckModal.component}
+      {infoModal.component}
 
       <Toolbar
         backPath={appHome}
@@ -60,6 +63,16 @@ export default function TabletopToolbar(
             ])}
             vibrate
             onPress={redo}
+          />
+        </Animated.View>
+        <Animated.View entering={entering} exiting={exiting}>
+          <IconButton
+            icon="info-outline"
+            variant="transparent"
+            size={iconSize}
+            style={styles.action}
+            vibrate
+            onPress={infoModal.open}
           />
         </Animated.View>
       </Toolbar>

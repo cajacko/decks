@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
   },
   contentContainerStyle: {
     paddingBottom: getFloatingButtonVerticalAllowance(),
+    paddingTop: 30,
   },
   scroll: {
     maxHeight: "100%",
