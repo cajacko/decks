@@ -9,6 +9,7 @@ import useDeckName from "@/hooks/useDeckName";
 import { appHome } from "@/constants/links";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
+import { useEditDeckModal } from "../editDeck/EditDeckModal";
 
 export interface TabletopToolbarProps extends UseTabletopHistoryOptions {
   deckId: string;
@@ -22,40 +23,46 @@ export default function TabletopToolbar(
   const { undo, redo } = useTabletopHistory(props.tabletopId, props);
   const title = useDeckName(props.deckId);
   const { entering, exiting } = useLayoutAnimations();
+  const editDeckModal = useEditDeckModal(props.deckId);
 
   return (
-    <Toolbar
-      backPath={appHome}
-      logoVisible={false}
-      title={title}
-      loading={props.loading}
-    >
-      <Animated.View entering={entering} exiting={exiting}>
-        <IconButton
-          icon="undo"
-          size={iconSize}
-          variant="transparent"
-          style={StyleSheet.flatten([
-            styles.action,
-            { opacity: undo ? 1 : 0.5 },
-          ])}
-          vibrate
-          onPress={undo}
-        />
-      </Animated.View>
-      <Animated.View entering={entering} exiting={exiting}>
-        <IconButton
-          icon="redo"
-          size={iconSize}
-          variant="transparent"
-          style={StyleSheet.flatten([
-            styles.action,
-            { opacity: redo ? 1 : 0.5 },
-          ])}
-          vibrate
-          onPress={redo}
-        />
-      </Animated.View>
-    </Toolbar>
+    <>
+      {editDeckModal.component}
+
+      <Toolbar
+        backPath={appHome}
+        logoVisible={false}
+        title={title}
+        loading={props.loading}
+        onPressTitle={editDeckModal.open}
+      >
+        <Animated.View entering={entering} exiting={exiting}>
+          <IconButton
+            icon="undo"
+            size={iconSize}
+            variant="transparent"
+            style={StyleSheet.flatten([
+              styles.action,
+              { opacity: undo ? 1 : 0.5 },
+            ])}
+            vibrate
+            onPress={undo}
+          />
+        </Animated.View>
+        <Animated.View entering={entering} exiting={exiting}>
+          <IconButton
+            icon="redo"
+            size={iconSize}
+            variant="transparent"
+            style={StyleSheet.flatten([
+              styles.action,
+              { opacity: redo ? 1 : 0.5 },
+            ])}
+            vibrate
+            onPress={redo}
+          />
+        </Animated.View>
+      </Toolbar>
+    </>
   );
 }

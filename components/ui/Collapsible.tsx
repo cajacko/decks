@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ViewStyle,
   ViewProps,
+  StyleProp,
 } from "react-native";
 import Animated, {
   useSharedValue,
@@ -20,7 +21,7 @@ export interface CollapsibleProps {
   title?: string | null;
   subTitle?: string | null;
   children?: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   collapsible?: boolean;
   initialCollapsed?: boolean;
   titleProps?: Partial<LabelProps>;

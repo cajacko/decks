@@ -47,7 +47,7 @@ const keyExtractor: NonNullable<FlatListProps<FlatListData>["keyExtractor"]> = (
   item,
 ) => item?.cardId ?? "null";
 
-const cardWidth = 100;
+const cardWidth = 170;
 const minCardHorizontalMargin = 10;
 const initialRows = 4;
 
@@ -120,7 +120,6 @@ function DeckScreenContent<D>(props: {
       showsVerticalScrollIndicator={Platform.OS !== "web"}
       ListHeaderComponent={
         <ContentWidth padding="standard">
-          {props.deckDetails}
           {props.showLoader ? (
             <View style={styles.loader}>
               <Loader />

@@ -7,12 +7,12 @@ import {
   ViewStyle,
 } from "react-native";
 import Card from "@/components/cards/connected/Card";
-import CardSkeleton from "@/components/cards/connected/CardSkeleton";
 import { Target } from "@/utils/cardTarget";
 import ThemedText from "../ui/ThemedText";
 import { useEditCardModal } from "../editCard/EditCardModal";
 import text from "@/constants/text";
 import Skeleton from "../ui/Skeleton";
+import Collapsible from "../ui/Collapsible";
 
 export interface DeckDefaultsProps {
   deckId: string;
@@ -29,42 +29,33 @@ function DeckDefaultsContent(
   },
 ) {
   return (
-    <>
-      <View style={props.style}>
-        {props.titles}
-        <View style={styles.sides}>
-          {props.onPressFront ? (
-            <Pressable onPress={props.onPressFront} style={styles.side}>
-              {props.front}
-            </Pressable>
-          ) : (
-            <View style={styles.side}>{props.front}</View>
-          )}
+    <View style={props.style}>
+      {props.titles}
+      <View style={styles.sides}>
+        {props.onPressFront ? (
+          <Pressable onPress={props.onPressFront} style={styles.side}>
+            {props.front}
+          </Pressable>
+        ) : (
+          <View style={styles.side}>{props.front}</View>
+        )}
 
-          {props.onPressBack ? (
-            <Pressable onPress={props.onPressBack} style={styles.side}>
-              {props.back}
-            </Pressable>
-          ) : (
-            <View style={styles.side}>{props.back}</View>
-          )}
-        </View>
+        {props.onPressBack ? (
+          <Pressable onPress={props.onPressBack} style={styles.side}>
+            {props.back}
+          </Pressable>
+        ) : (
+          <View style={styles.side}>{props.back}</View>
+        )}
       </View>
-    </>
+    </View>
   );
 }
 
 export function DeckDefaultsSkeleton({
   style,
 }: Pick<DeckDefaultsProps, "style">) {
-  const side = (
-    <>
-      <CardSkeleton />
-      <Skeleton variant="text" width={80} style={styles.sideText} />
-    </>
-  );
-
-  return <DeckDefaultsContent style={style} back={side} front={side} />;
+  return <Skeleton variant="text" width={80} style={style} />;
 }
 
 export default function DeckDefaults(
@@ -80,37 +71,40 @@ export default function DeckDefaults(
   return (
     <>
       {component}
-      <DeckDefaultsContent
+      <Collapsible
         style={props.style}
-        onPressFront={() => open(deckDefaultTarget, { initialSide: "front" })}
-        onPressBack={() => open(deckDefaultTarget, { initialSide: "back" })}
-        titles={
-          <>
-            <ThemedText type="h2">
-              {text["deck_screen.deck_defaults.title"]}
-            </ThemedText>
+        initialCollapsed
+        title={text["deck_screen.deck_defaults.title"]}
+        titleProps={{
+          type: "h2",
+        }}
+      >
+        <DeckDefaultsContent
+          onPressFront={() => open(deckDefaultTarget, { initialSide: "front" })}
+          onPressBack={() => open(deckDefaultTarget, { initialSide: "back" })}
+          titles={
             <ThemedText style={styles.description}>
               {text["deck_screen.deck_defaults.description"]}
             </ThemedText>
-          </>
-        }
-        front={
-          <>
-            <Card target={deckDefaultTarget} side="front" />
-            <ThemedText style={styles.sideText} type="h4">
-              {text["deck_screen.deck_defaults.front"]}
-            </ThemedText>
-          </>
-        }
-        back={
-          <>
-            <Card target={deckDefaultTarget} side="back" />
-            <ThemedText style={styles.sideText} type="h4">
-              {text["deck_screen.deck_defaults.back"]}
-            </ThemedText>
-          </>
-        }
-      />
+          }
+          front={
+            <>
+              <Card target={deckDefaultTarget} side="front" />
+              <ThemedText style={styles.sideText} type="h4">
+                {text["deck_screen.deck_defaults.front"]}
+              </ThemedText>
+            </>
+          }
+          back={
+            <>
+              <Card target={deckDefaultTarget} side="back" />
+              <ThemedText style={styles.sideText} type="h4">
+                {text["deck_screen.deck_defaults.back"]}
+              </ThemedText>
+            </>
+          }
+        />
+      </Collapsible>
     </>
   );
 }

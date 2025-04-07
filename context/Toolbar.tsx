@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  View,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacity,
+} from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import Animated, {
   useSharedValue,
@@ -33,6 +39,7 @@ interface ToolbarProps {
   children?: React.ReactNode | null;
   backPath?: Href | null;
   loading?: boolean;
+  onPressTitle?: () => void;
 }
 
 type ContextState = CreateContextState<ToolbarProps> & {
@@ -122,6 +129,7 @@ function WholeToolbar({
   backPath,
   sharedToolbarHeight,
   loading: loadingProp = false,
+  onPressTitle,
 }: Omit<ToolbarProps, "hidden"> & {
   sharedToolbarHeight: SharedValue<number>;
 }) {
@@ -196,6 +204,12 @@ function WholeToolbar({
     [loadingPositionStyle, primaryColor],
   );
 
+  const titleComponent = title ? (
+    <ThemedText type="h3" style={styles.title} numberOfLines={1}>
+      {title}
+    </ThemedText>
+  ) : undefined;
+
   return (
     <Animated.View style={containerStyle}>
       <ContentWidth
@@ -234,9 +248,13 @@ function WholeToolbar({
           <View style={styles.trimmedContent}>
             {title && (
               <Animated.View entering={entering} exiting={exiting}>
-                <ThemedText type="h3" style={styles.title} numberOfLines={1}>
-                  {title}
-                </ThemedText>
+                {onPressTitle ? (
+                  <TouchableOpacity onPress={onPressTitle}>
+                    {titleComponent}
+                  </TouchableOpacity>
+                ) : (
+                  titleComponent
+                )}
               </Animated.View>
             )}
           </View>

@@ -1,4 +1,10 @@
-import { View, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  KeyboardAvoidingViewProps,
+} from "react-native";
 import Animated from "react-native-reanimated";
 import {
   GestureDetector,
@@ -15,7 +21,7 @@ import ThemedText from "../ThemedText";
 export const BottomDrawerWrapper = GestureHandlerRootView;
 
 export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
-  function BottonDrawer({ children, ...props }, ref) {
+  function BottonDrawer({ children, style: styleProp, ...props }, ref) {
     const backgroundColor = useThemeColor("background");
     const state = useBottomDrawer(props, ref);
 
@@ -46,9 +52,14 @@ export default React.forwardRef<BottomDrawerRef, BottomDrawerProps>(
       [state.animatedStyles.bottomStyle],
     );
 
+    const style = React.useMemo<KeyboardAvoidingViewProps["style"]>(
+      () => StyleSheet.flatten([{ flex: 1, position: "relative" }, styleProp]),
+      [styleProp],
+    );
+
     return (
       <KeyboardAvoidingView
-        style={{ flex: 1, position: "relative" }}
+        style={style}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <Animated.View style={drawerStyle}>

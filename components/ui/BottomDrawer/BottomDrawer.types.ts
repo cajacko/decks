@@ -1,4 +1,5 @@
 import React from "react";
+import { KeyboardAvoidingViewProps } from "react-native";
 import { SharedValue } from "react-native-reanimated";
 
 export const defaultProps = {
@@ -14,6 +15,7 @@ export interface BottomDrawerProps {
   minHeight?: number;
   openOnMount?: boolean;
   animateIn?: boolean;
+  style?: KeyboardAvoidingViewProps["style"];
 }
 
 export interface BottomDrawerRef {

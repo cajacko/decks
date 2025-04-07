@@ -15,6 +15,7 @@ import uuid from "@/utils/uuid";
 import { useDrawer } from "@/context/Drawer";
 import { appHome } from "@/constants/links";
 import IconSymbol from "../ui/IconSymbol";
+import { useEditDeckModal } from "../editDeck/EditDeckModal";
 
 const titleProps = { type: "h2" } as const;
 
@@ -32,6 +33,8 @@ export default function SettingsDeck({
   const deckName = deckNameWithFallback(
     useAppSelector((state) => selectDeck(state, { deckId })?.name),
   );
+
+  const editDeckModal = useEditDeckModal(deckId);
 
   const deleteDeck = React.useCallback(() => {
     closeDrawer?.();
@@ -63,6 +66,7 @@ export default function SettingsDeck({
 
   return (
     <>
+      {editDeckModal.component}
       {deleteDeckModal.component}
       <FieldSet
         title={text["settings.deck.title"]}
@@ -73,12 +77,23 @@ export default function SettingsDeck({
         leftAdornment={<IconSymbol name="crop-portrait" size={iconSize} />}
         {...props}
       >
+        {canEditDeck && (
+          <Button
+            title={text["deck.edit.title"]}
+            onPress={() => {
+              closeDrawer();
+              editDeckModal.open();
+            }}
+            variant="outline"
+          />
+        )}
         <Button
           title={text["deck.copy.title"]}
           onPress={copyDeck}
           variant="outline"
           vibrate
         />
+
         {canEditDeck && (
           <Button
             title={text["deck.delete.title"]}

@@ -26,7 +26,7 @@ export type EditCardFormProps = Target & {
   activeSide: Cards.Side;
 };
 
-const iconSize = 30;
+export const iconSize = 30;
 
 export default function EditCardForm({
   flipSide,
