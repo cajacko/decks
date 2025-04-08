@@ -224,6 +224,7 @@ export default function useDispatchActions({
         try {
           await cardInstanceRef.current.animateOut({
             direction: "top",
+            animateOpacity: false,
             animateBack: animateSendToBack
               ? async () => {
                   setAnimatedToBack(cardInstanceId);
@@ -231,6 +232,8 @@ export default function useDispatchActions({
               : undefined,
           });
         } catch {}
+
+        setAnimatedToBack(null);
       }
 
       dispatch(

@@ -322,23 +322,31 @@ export default function useAnimatedCard(
               animateBack().finally(() => {
                 opacity.value = 1;
 
-                opacity.value = withDelay(
-                  duration / 2,
-                  withTiming(
-                    0,
-                    getConfig({
-                      duration: duration / 3,
-                      easing: opacityEasing,
-                    }),
-                  ),
-                );
-                rotate.value = withTiming(0, getConfig({ duration, easing }));
-                translateX.value = withTiming(
-                  0,
+                if (animateOpacity) {
+                  opacity.value = withDelay(
+                    duration / 2,
+                    withTiming(
+                      0,
+                      getConfig({
+                        duration: duration / 3,
+                        easing: opacityEasing,
+                      }),
+                    ),
+                  );
+                }
+
+                rotate.value = withTiming(
+                  initialRotation ?? 0,
                   getConfig({ duration, easing }),
                 );
+
+                translateX.value = withTiming(
+                  initialTranslateX ?? 0,
+                  getConfig({ duration, easing }),
+                );
+
                 translateY.value = withTiming(
-                  0,
+                  initialTranslateY ?? 0,
                   getConfig({ duration, easing }),
                   () => {
                     runOnJS(resolve)(undefined);
@@ -411,7 +419,17 @@ export default function useAnimatedCard(
         }
       }).finally(() => animationUpdateRef.current(animateKey, false));
     },
-    [canAnimate, translateX, translateY, opacity, rotate, animateOutBehaviour],
+    [
+      canAnimate,
+      translateX,
+      translateY,
+      opacity,
+      rotate,
+      animateOutBehaviour,
+      initialRotation,
+      initialTranslateX,
+      initialTranslateY,
+    ],
   );
 
   React.useImperativeHandle(ref, () => ({

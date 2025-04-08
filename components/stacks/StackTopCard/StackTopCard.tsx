@@ -33,7 +33,7 @@ export default function StackTopCard({
         menuItems={state.menuItems}
         handleDoubleTap={state.handlePress}
         style={style}
-        hideActions={hideActions}
+        hideActions={hideActions || state.hideMenuItems}
       >
         <CardInstance
           {...props}
