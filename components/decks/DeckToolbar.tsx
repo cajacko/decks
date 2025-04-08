@@ -4,7 +4,7 @@ import useDeckName from "@/hooks/useDeckName";
 import { appHome } from "@/constants/links";
 
 interface DeckToolbarProps {
-  deckId: string;
+  deckId: string | null;
   loading: boolean;
 }
 
@@ -15,7 +15,7 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
     <Toolbar
       backPath={appHome}
       logoVisible={false}
-      title={title}
+      title={props.deckId ? title : undefined}
       loading={props.loading}
     />
   );

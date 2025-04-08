@@ -6,13 +6,15 @@ import { replaceVariables, conditional } from "./handlebars";
 import { useTemplateDataItem } from "./TemplateContext";
 import AppError from "@/classes/AppError";
 
-export function MarkupChildren(props: MarkupChildrenProps): React.ReactNode {
-  return props.nodes.map((node, i) => (
-    <MarkupNode key={i} node={node} cacheKey={props.cacheKey} />
-  ));
-}
+export const MarkupChildren = React.memo<MarkupChildrenProps>(
+  function MarkupChildren(props) {
+    return props.nodes.map((node, i) => (
+      <MarkupNode key={i} node={node} cacheKey={props.cacheKey} />
+    ));
+  },
+);
 
-export default function MarkupNode({
+const MarkupNode = React.memo(function MarkupNode({
   node,
   cacheKey,
 }: MarkupNodeProps): React.ReactNode {
@@ -56,4 +58,6 @@ export default function MarkupNode({
 
       return null;
   }
-}
+});
+
+export default MarkupNode;

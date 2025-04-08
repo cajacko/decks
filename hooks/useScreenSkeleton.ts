@@ -44,7 +44,7 @@ export default function useScreenSkeleton(
 
   const throttledSkeleton = useStateChangeThrottle(skeleton, {
     // The minimum amount of time to keep the skeleton on screen for
-    maxUpdateInterval: 500,
+    maxUpdateInterval: 1000,
   });
 
   if (featureDisabled) {

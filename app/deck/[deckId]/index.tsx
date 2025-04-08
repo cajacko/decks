@@ -10,13 +10,9 @@ export default function DeckRoute() {
   const deckId = useScreenDeckId("screen", DeckRoute.name);
   const { width } = useScreenContentLayout();
 
-  if (!deckId) {
-    return null;
-  }
-
   return (
     <Screen background={<TextureBackground />}>
-      <DeckScreen width={width} deckId={deckId} style={styles.container} />
+      <DeckScreen width={width} deckId={null} style={styles.container} />
     </Screen>
   );
 }

@@ -8,16 +8,17 @@ export default function useDeckLastScreen({
   deckId,
   screen,
 }: {
-  deckId: string;
+  deckId: string | null;
   screen: "deck" | "play";
 }) {
   const dispatch = useAppDispatch();
   const lastScreen = useAppSelector((state) =>
-    selectDeckLastScreen(state, { deckId }),
+    deckId ? selectDeckLastScreen(state, { deckId }) : undefined,
   );
 
   useFocusEffect(
     React.useCallback(() => {
+      if (!deckId) return;
       if (lastScreen === screen) return;
 
       dispatch(setLastScreen({ deckId, screen }));

@@ -1,4 +1,4 @@
-import { Stack, usePathname } from "expo-router";
+import { usePathname, Tabs } from "expo-router";
 import React from "react";
 import { withApp } from "@/components/ui/App";
 import useFlag from "@/hooks/useFlag";
@@ -17,18 +17,20 @@ export const unstable_settings = {
   initialRouteName: Platform.OS === "web" ? "app" : "index",
 };
 
+const tabBar = () => null;
+
 type NavOptions = {
-  default?: React.ComponentProps<typeof Stack>["screenOptions"];
-  app?: React.ComponentProps<typeof Stack.Screen>["options"];
-  marketing?: React.ComponentProps<typeof Stack.Screen>["options"];
-  deck?: React.ComponentProps<typeof Stack.Screen>["options"];
+  default?: React.ComponentProps<typeof Tabs>["screenOptions"];
+  app?: React.ComponentProps<typeof Tabs.Screen>["options"];
+  marketing?: React.ComponentProps<typeof Tabs.Screen>["options"];
+  deck?: React.ComponentProps<typeof Tabs.Screen>["options"];
 };
 
 const closeIconSize = 40;
 
 function RootLayout() {
   const freezeOnBlur = useFlag("SCREENS_FREEZE_ON_BLUR");
-  const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
+  // const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
   const borderColor = useThemeColor("inputOutline");
   const pathname = usePathname();
 
@@ -55,37 +57,53 @@ function RootLayout() {
   }, [dispatch]);
 
   const navOptions: NavOptions = React.useMemo(
-    () => ({
+    (): NavOptions => ({
       default: {
         freezeOnBlur,
         headerShown: false,
+        tabBarStyle: { display: "none" },
+        lazy: true, // false = renders everything in the tab when nav loads
+        // headerShown: false,
+        animation: "none",
       },
       app: {
-        animation: animateStack ? "slide_from_left" : "none",
+        freezeOnBlur: true,
+        // animation: animateStack ? "slide_from_left" : "none",
+        // animation: "shift",
       },
       marketing: {
         animation: "none",
       },
       deck: () => ({
-        animation: animateStack ? "slide_from_right" : "none",
+        freezeOnBlur: false,
+        // animation: animateStack ? "slide_from_right" : "none",
       }),
     }),
-    [animateStack, freezeOnBlur],
+    [freezeOnBlur],
   );
 
   return (
     <>
-      <Stack screenOptions={navOptions.default}>
+      <Tabs
+        initialRouteName={unstable_settings.initialRouteName}
+        tabBar={tabBar}
+        detachInactiveScreens={false}
+        screenOptions={navOptions.default}
+      >
         {/* Only need to add items if defining options */}
-        <Stack.Screen
+        <Tabs.Screen
           name="index"
           options={
             Platform.OS === "web" ? navOptions.marketing : navOptions.app
           }
         />
-        <Stack.Screen name="app" options={navOptions.app} />
-        <Stack.Screen name="deck/[deckId]" options={navOptions.deck} />
-      </Stack>
+        <Tabs.Screen name="app" options={navOptions.app} />
+        <Tabs.Screen
+          name="deck/[deckId]"
+          options={navOptions.deck}
+          initialParams={{}}
+        />
+      </Tabs>
       {Platform.OS === "web" && showAppStore && pathname !== "/" && (
         <ThemedView style={[styles.appStoreContainer, { borderColor }]}>
           <ContentWidth style={styles.inner}>

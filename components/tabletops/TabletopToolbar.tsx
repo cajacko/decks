@@ -11,8 +11,8 @@ import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 
 export interface TabletopToolbarProps extends UseTabletopHistoryOptions {
-  deckId: string;
-  tabletopId: string;
+  deckId: string | null;
+  tabletopId: string | null;
   loading: boolean;
 }
 
@@ -27,7 +27,7 @@ export default function TabletopToolbar(
     <Toolbar
       backPath={appHome}
       logoVisible={false}
-      title={title}
+      title={props.deckId ? title : undefined}
       loading={props.loading}
     >
       <Animated.View entering={entering} exiting={exiting}>

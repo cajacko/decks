@@ -74,7 +74,7 @@ function compileTemplate(props: {
 
   const cached = handlebarsCache.get(cacheKey);
 
-  if (cached) {
+  if (cached !== undefined) {
     return cached;
   }
 

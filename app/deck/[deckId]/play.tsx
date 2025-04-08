@@ -1,34 +1,39 @@
-import Tabletop from "@/components/tabletops/Tabletop";
+import Tabletop, { TabletopSkeleton } from "@/components/tabletops/Tabletop";
 import React from "react";
-import AppError from "@/classes/AppError";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeck } from "@/store/selectors/decks";
-import { useNavigation } from "expo-router";
 import TextureBackground from "@/components/ui/TextureBackground";
 import Screen from "@/components/ui/Screen";
 import useScreenDeckId from "@/hooks/useScreenDeckId";
+import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 
 export default function DeckTabletopScreen() {
-  const navigation = useNavigation();
+  let skeleton = useScreenSkeleton(DeckTabletopScreen.name);
   const deckId = useScreenDeckId("screen", null);
 
   const defaultTabletopId = useAppSelector((state) =>
     deckId ? selectDeck(state, { deckId })?.defaultTabletopId : undefined,
   );
 
-  if (!defaultTabletopId || !deckId) {
-    if (navigation.isFocused()) {
-      new AppError(
-        `${DeckTabletopScreen.name}: no deckId or defaultTabletopId found`,
-      ).log("error");
-    }
+  let props: { deckId: string; defaultTabletopId: string } | null = null;
 
-    return null;
+  if (deckId && defaultTabletopId) {
+    props = { deckId, defaultTabletopId };
+  }
+
+  if (skeleton) {
+    props = null;
+  } else if ([].length === 0) {
+    props = null;
   }
 
   return (
     <Screen background={<TextureBackground />}>
-      <Tabletop tabletopId={defaultTabletopId} deckId={deckId} />
+      {!props ? (
+        <TabletopSkeleton />
+      ) : (
+        <Tabletop tabletopId={props.defaultTabletopId} deckId={props.deckId} />
+      )}
     </Screen>
   );
 }

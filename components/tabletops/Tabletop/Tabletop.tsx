@@ -11,7 +11,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import useEnsureTabletop from "@/hooks/useEnsureTabletop";
 import useFlag from "@/hooks/useFlag";
@@ -27,39 +26,21 @@ import TabletopNotification, {
   useTabletopNotification,
 } from "../TabletopNotification";
 
-export default function Tabletop({
-  tabletopId,
-  deckId,
-}: TabletopProps): React.ReactNode {
-  const stackListRef = React.useRef<StackListRef>(null);
+function TabletopContent(
+  props: Pick<TabletopProps, "style"> & {
+    children: React.ReactNode;
+    stackListRef: React.RefObject<StackListRef> | null;
+    tabletopId: string;
+    deckId: string;
+    target: Target;
+    beforeUndo?: () => void;
+    beforeRedo?: () => void;
+    loading: boolean;
+  },
+) {
+  const { style } = props;
+
   const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
-  useEnsureTabletop({ tabletopId });
-  const dispatch = useAppDispatch();
-  const tabletopNeedsResetting = useAppSelector((state) =>
-    selectTabletopNeedsResetting(state, { tabletopId }),
-  );
-
-  const { beforeUndo, beforeRedo, notification } = useTabletopNotification({
-    stackListRef,
-  });
-
-  const hasTriedToAutoReset = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!tabletopNeedsResetting) return;
-    // To prevent any bugs causing some infinite loops or something
-    // Our stacks also say if it needs resetting, so it's an okay fallback
-    if (hasTriedToAutoReset.current) return;
-
-    dispatch(resetTabletopHelper({ tabletopId }));
-
-    hasTriedToAutoReset.current = true;
-  }, [tabletopNeedsResetting, dispatch, tabletopId]);
-
-  useDeckLastScreen({
-    deckId,
-    screen: "play",
-  });
 
   const [size, setSize] = React.useState<{ height: number; width: number }>(
     Dimensions.get("screen"),
@@ -74,8 +55,6 @@ export default function Tabletop({
       opacity: opacity.value,
     };
   });
-
-  const skeleton = useScreenSkeleton(Tabletop.name);
 
   const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
     (event) => {
@@ -106,28 +85,92 @@ export default function Tabletop({
   );
 
   const contentStyle = React.useMemo(
-    () => [styles.content, animatedStyle],
-    [animatedStyle],
+    () => [styles.content, style, animatedStyle],
+    [animatedStyle, style],
   );
+
+  return (
+    <TabletopProvider
+      availableHeight={size.height}
+      availableWidth={size.width}
+      tabletopId={props.tabletopId}
+      deckId={props.deckId}
+      target={props.target}
+    >
+      <TabletopToolbar
+        loading={props.loading}
+        tabletopId={props.tabletopId}
+        deckId={props.deckId}
+        beforeUndo={props.beforeUndo}
+        beforeRedo={props.beforeRedo}
+      />
+      <Animated.View style={contentStyle} onLayout={handleLayout}>
+        {props.children}
+      </Animated.View>
+    </TabletopProvider>
+  );
+}
+
+export function TabletopSkeleton(props: Pick<TabletopProps, "style">) {
+  return (
+    <TabletopContent
+      {...props}
+      stackListRef={null}
+      tabletopId=""
+      deckId=""
+      loading
+      target={{
+        id: "",
+        type: "deck-defaults",
+      }}
+    >
+      <StackListSkeleton style={styles.stackList} />
+    </TabletopContent>
+  );
+}
+
+export default React.memo(function Tabletop({
+  tabletopId,
+  deckId,
+  style,
+}: TabletopProps): React.ReactNode {
+  const stackListRef = React.useRef<StackListRef>(null);
+
+  useEnsureTabletop({ tabletopId });
+  const dispatch = useAppDispatch();
+  const tabletopNeedsResetting = useAppSelector((state) =>
+    selectTabletopNeedsResetting(state, { tabletopId }),
+  );
+
+  const hasTriedToAutoReset = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!tabletopNeedsResetting) return;
+    // To prevent any bugs causing some infinite loops or something
+    // Our stacks also say if it needs resetting, so it's an okay fallback
+    if (hasTriedToAutoReset.current) return;
+
+    dispatch(resetTabletopHelper({ tabletopId }));
+
+    hasTriedToAutoReset.current = true;
+  }, [tabletopNeedsResetting, dispatch, tabletopId]);
+
+  useDeckLastScreen({
+    deckId,
+    screen: "play",
+  });
 
   const target = React.useMemo(
     (): Target => ({ id: deckId, type: "deck-defaults" }),
     [deckId],
   );
 
-  const skeletonContent =
-    skeleton === "show-nothing" ? null : (
-      <StackListSkeleton style={styles.stackList} />
-    );
+  const { beforeUndo, beforeRedo, notification } = useTabletopNotification({
+    stackListRef,
+  });
 
   return (
-    <TabletopProvider
-      availableHeight={size.height}
-      availableWidth={size.width}
-      tabletopId={tabletopId}
-      deckId={deckId}
-      target={target}
-    >
+    <>
       <DrawerChildren>
         <SettingsTabletop
           tabletopId={tabletopId}
@@ -137,28 +180,24 @@ export default function Tabletop({
         />
         <SettingsDeck deckId={deckId} />
       </DrawerChildren>
-      <TabletopToolbar
-        loading={!!skeleton}
+      <TabletopContent
+        style={style}
+        target={target}
+        loading={false}
+        stackListRef={stackListRef}
         tabletopId={tabletopId}
         deckId={deckId}
-        beforeUndo={beforeUndo}
-        beforeRedo={beforeRedo}
-      />
-      <Animated.View style={contentStyle} onLayout={handleLayout}>
+      >
         {notification && (
           <View style={styles.alertContainer}>
             <TabletopNotification {...notification} />
           </View>
         )}
-        {skeleton ? (
-          skeletonContent
-        ) : (
-          <StackList ref={stackListRef} style={styles.stackList} />
-        )}
-      </Animated.View>
-    </TabletopProvider>
+        <StackList ref={stackListRef} style={styles.stackList} />
+      </TabletopContent>
+    </>
   );
-}
+});
 
 const styles = StyleSheet.create({
   content: {

@@ -33,7 +33,7 @@ import { DrawerChildren } from "@/context/Drawer";
 import SettingsDeck from "@/components/settings/SettingsDeck";
 
 export interface DeckScreenProps {
-  deckId: string;
+  deckId: string | null;
   style?: ViewStyle;
   width: number;
 }
@@ -143,7 +143,7 @@ type SkeletonData = {
   key: string;
 };
 
-function DeckScreenSkeleton({
+function DeckScreenSkeletonContent({
   flatListProps,
 }: {
   flatListProps: FlatListLayoutProps;
@@ -266,6 +266,12 @@ function AddButton({ deckId, open }: { deckId: string; open: Open }) {
   );
 }
 
+export function DeckScreenSkeleton(
+  props: Pick<DeckScreenProps, "style" | "width">,
+) {
+  return <DeckScreen {...props} deckId={null} />;
+}
+
 export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
   const { cardListProps } = useDeckCardListProps(props.width);
   const skeleton = useScreenSkeleton(DeckScreen.name);
@@ -282,12 +288,12 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
 
   const { open, component } = useEditCardModal({
     type: "new-card-in-deck",
-    id: props.deckId,
+    id: props.deckId ?? "",
   });
 
   const skeletonContent =
     skeleton === "show-nothing" ? null : (
-      <DeckScreenSkeleton flatListProps={cardListProps.flatList} />
+      <DeckScreenSkeletonContent flatListProps={cardListProps.flatList} />
     );
 
   return (
@@ -295,7 +301,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
       {component}
       <DeckToolbar deckId={props.deckId} loading={!!skeleton} />
       <DrawerChildren>
-        <SettingsDeck deckId={props.deckId} />
+        {props.deckId && <SettingsDeck deckId={props.deckId} />}
       </DrawerChildren>
       <ContentWidth
         style={containerStyle}
@@ -305,7 +311,7 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
         <View style={styles.inner}>
           {cardListProps && (
             <CardConstraintsProvider width={cardListProps.cardWidth}>
-              {skeleton ? (
+              {skeleton || !props.deckId ? (
                 skeletonContent
               ) : (
                 <ConnectedDeckScreen
@@ -318,7 +324,9 @@ export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
           )}
         </View>
       </ContentWidth>
-      {!skeleton && <AddButton deckId={props.deckId} open={open} />}
+      {!skeleton && props.deckId && (
+        <AddButton deckId={props.deckId} open={open} />
+      )}
     </>
   );
 }

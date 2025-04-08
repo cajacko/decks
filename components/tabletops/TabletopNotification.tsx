@@ -48,7 +48,7 @@ export interface TabletopNotificationProps extends Notification {
 export function useTabletopNotification({
   stackListRef,
 }: {
-  stackListRef: React.RefObject<StackListRef>;
+  stackListRef: React.RefObject<StackListRef> | null;
 }) {
   const [notification, setNotification] = React.useState<Notification | null>(
     null,
@@ -81,7 +81,7 @@ export function useTabletopNotification({
 
       return () => {
         if (typeof scrollOffset === "number") {
-          stackListRef.current?.scrollToOffset(scrollOffset, {
+          stackListRef?.current?.scrollToOffset(scrollOffset, {
             animated: true,
           });
         }
@@ -115,7 +115,7 @@ export function useTabletopNotification({
 
       return () => {
         if (typeof scrollOffset === "number") {
-          stackListRef.current?.scrollToOffset(scrollOffset, {
+          stackListRef?.current?.scrollToOffset(scrollOffset, {
             animated: true,
           });
         }

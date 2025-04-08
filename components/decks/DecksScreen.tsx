@@ -106,6 +106,10 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
   const skeleton = useScreenSkeleton(DecksScreen.name);
   const cardWidth = useCardListWidth();
 
+  React.useEffect(() => {
+    console.log("DecksScreen - mount");
+  }, []);
+
   const skeletonContent =
     skeleton === "show-nothing" ? null : (
       <DecksScreenContent

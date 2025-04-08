@@ -30,7 +30,7 @@ export interface CardProps extends CardContainerProps {
 // And these can be costly to recompile.
 const { useExternalMemo } = withUseExternalMemo<TemplateProps["values"]>();
 
-export default function Card({
+export default React.memo(function Card({
   deckValues,
   markup,
   values: valuesProp,
@@ -56,4 +56,4 @@ export default function Card({
       )}
     </CardContainer>
   );
-}
+});
