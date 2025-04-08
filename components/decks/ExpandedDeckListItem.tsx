@@ -18,6 +18,20 @@ export interface ExpandedDeckListItemProps {
   style?: ViewStyle;
 }
 
+export function useCoverCardTarget(deckId: string) {
+  const firstDeckCardId = useAppSelector(
+    (state) => selectDeckCards(state, { deckId })?.[0]?.cardId,
+  );
+
+  const coverTarget = React.useMemo((): Target => {
+    return firstDeckCardId
+      ? { id: firstDeckCardId, type: "card" }
+      : { id: deckId, type: "deck-defaults" };
+  }, [firstDeckCardId, deckId]);
+
+  return coverTarget;
+}
+
 const iconSize = 40;
 
 function ExpandedDeckListItemContent({
@@ -88,17 +102,10 @@ export default function ExpandedDeckListItem(
 ): React.ReactNode {
   const { vibrate } = useVibrate();
   const { navigate } = useRouter();
-  const firstDeckCardId = useAppSelector(
-    (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
-  );
+  const coverTarget = useCoverCardTarget(props.deckId);
+
   const { name, description } =
     useAppSelector((state) => selectDeck(state, props)) ?? {};
-
-  const coverTarget = React.useMemo((): Target => {
-    return firstDeckCardId
-      ? { id: firstDeckCardId, type: "card" }
-      : { id: props.deckId, type: "deck-defaults" };
-  }, [firstDeckCardId, props.deckId]);
 
   const play = React.useCallback(() => {
     navigate(`/deck/${props.deckId}/play`);

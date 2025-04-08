@@ -83,8 +83,8 @@ function RootLayout() {
             Platform.OS === "web" ? navOptions.marketing : navOptions.app
           }
         />
-        <Stack.Screen name="app" options={navOptions.app} />
         <Stack.Screen name="deck/[deckId]" options={navOptions.deck} />
+        <Stack.Screen name="app" options={navOptions.app} />
       </Stack>
       {Platform.OS === "web" && showAppStore && pathname !== "/" && (
         <ThemedView style={[styles.appStoreContainer, { borderColor }]}>

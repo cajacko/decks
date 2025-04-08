@@ -6,6 +6,7 @@ import {
   withSetModalProps,
 } from "@/context/Modal";
 import { fixed } from "@/constants/colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export type ModalProps = ContextModalProps;
 
@@ -15,7 +16,11 @@ const defaultModalProps: ModalProps = {
 };
 
 function ModalContent(props: { children: React.ReactNode }) {
-  return <View style={styles.container}>{props.children}</View>;
+  return (
+    <View style={styles.container}>
+      <SafeAreaView style={styles.container}>{props.children}</SafeAreaView>
+    </View>
+  );
 }
 
 export function withModal() {

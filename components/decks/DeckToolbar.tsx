@@ -17,7 +17,10 @@ export default function DeckToolbar(props: DeckToolbarProps): React.ReactNode {
   const title = useDeckName(props.deckId);
   const editModal = useEditDeckModal(props.deckId);
   const { entering, exiting } = useLayoutAnimations();
-  const infoModal = useDeckInfoModal(props.deckId);
+  const infoModal = useDeckInfoModal(
+    props.deckId,
+    React.useMemo(() => ({ showTabs: false }), []),
+  );
 
   return (
     <>

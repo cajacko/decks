@@ -44,6 +44,7 @@ export default function ContentWidth({
     () =>
       StyleSheet.flatten([
         styles.contentContainer,
+        styles.content,
         padding === "standard" && styles.standardPadding,
         contentContainerStyleProp,
       ]),
@@ -68,5 +69,17 @@ export const styles = StyleSheet.create({
   },
   standardPadding: {
     paddingHorizontal: 20,
+  },
+  background: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
+  content: {
+    position: "relative",
+    zIndex: 2,
   },
 });

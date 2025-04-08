@@ -1,14 +1,18 @@
 import React from "react";
-import Modal, { styles } from "../overlays/Modal";
-import DeckInfo, { DeckInfoProps } from "./DeckInfo";
-import { StyleSheet, Pressable } from "react-native";
+import Modal, { styles as modalStyles } from "../overlays/Modal";
+import DeckInfo, { DeckInfoProps, styles as deckInfoStyles } from "./DeckInfo";
+import { Pressable, View } from "react-native";
+import { ModalSurfaceScreen } from "../overlays/ModalSurface";
 
 export interface DeckInfoModalProps extends DeckInfoProps {
   visible?: boolean;
   onRequestClose?: () => void;
 }
 
-export function useDeckInfoModal(deckId: string): {
+export function useDeckInfoModal(
+  deckId: string,
+  props: Partial<DeckInfoModalProps>,
+): {
   open: () => void;
   close: () => void;
   visible: boolean;
@@ -29,8 +33,9 @@ export function useDeckInfoModal(deckId: string): {
       visible,
       onRequestClose: close,
       onDelete: close,
+      ...props,
     }),
-    [close, deckId, visible],
+    [close, deckId, visible, props],
   );
 
   const component = React.useMemo(
@@ -50,14 +55,9 @@ export function useDeckInfoModal(deckId: string): {
 export default function DeckInfoModal({
   visible,
   onRequestClose,
-  style: styleProp,
+  style,
   ...props
 }: DeckInfoModalProps): React.ReactNode {
-  const style = React.useMemo(
-    () => StyleSheet.flatten([styles.content, styleProp]),
-    [styleProp],
-  );
-
   return (
     <Modal
       animationType="fade"
@@ -65,8 +65,28 @@ export default function DeckInfoModal({
       onRequestClose={onRequestClose}
       transparent
     >
-      <Pressable style={styles.backgroundDark} onPress={onRequestClose} />
-      <DeckInfo {...props} style={style} />
+      <View
+        style={[
+          modalStyles.content,
+          deckInfoStyles.modalContainer,
+          { flex: 1, alignItems: "center", justifyContent: "center" },
+        ]}
+      >
+        <ModalSurfaceScreen
+          handleClose={onRequestClose}
+          style={deckInfoStyles.modalContent}
+        >
+          <DeckInfo {...props} style={style} />
+        </ModalSurfaceScreen>
+        <Pressable
+          style={[
+            modalStyles.backgroundDark,
+            { backgroundColor: "transparent" },
+          ]}
+          onPress={onRequestClose}
+        />
+      </View>
+      <Pressable style={modalStyles.backgroundDark} onPress={onRequestClose} />
     </Modal>
   );
 }

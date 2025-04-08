@@ -25,7 +25,10 @@ export default function TabletopToolbar(
   const title = useDeckName(props.deckId);
   const { entering, exiting } = useLayoutAnimations();
   const editDeckModal = useEditDeckModal(props.deckId);
-  const infoModal = useDeckInfoModal(props.deckId);
+  const infoModal = useDeckInfoModal(
+    props.deckId,
+    React.useMemo(() => ({ showTabs: false }), []),
+  );
 
   return (
     <>

@@ -24,20 +24,16 @@ export default function DeckLayout() {
       </View>
       <Tabs style={styles.tabs}>
         <Tab
-          href={`/deck/${deckId}`}
-          icon={canEditDeck ? "edit-document" : "remove-red-eye"}
-          title={
-            canEditDeck
-              ? text["screen.deck.index.title"]
-              : text["screen.deck.view.title"]
-          }
-          isActive={!isPlay}
-        />
-        <Tab
           href={`/deck/${deckId}/play`}
           icon="play-arrow"
           title={text["screen.deck.play.title"]}
           isActive={isPlay}
+        />
+        <Tab
+          href={`/deck/${deckId}`}
+          icon={canEditDeck ? "edit-document" : "remove-red-eye"}
+          title={text["screen.deck.index.title"]}
+          isActive={!isPlay}
         />
       </Tabs>
     </View>

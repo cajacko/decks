@@ -4,9 +4,11 @@ import Modal, {
   styles as modalStyles,
   withModal,
 } from "@/components/overlays/Modal";
-import ThemedView from "@/components/ui/ThemedView";
 import ThemedText from "@/components/ui/ThemedText";
 import Button from "@/components/forms/Button";
+import { styles as modalSurfaceStyles } from "@/components/overlays/ModalSurface";
+import { styles as contentWidthStyles } from "@/components/ui/ContentWidth";
+import { ModalSurfaceContent } from "@/components/overlays/ModalSurface";
 
 export interface AlertButton {
   text: string;
@@ -59,7 +61,7 @@ function AlertContent(props: AlertContentProps) {
 
   return (
     <View style={styles.centeredView}>
-      <ThemedView style={modalStyle}>
+      <ModalSurfaceContent style={modalStyle}>
         {props.title && (
           <ThemedText type="h3" style={styles.title}>
             {props.title}
@@ -71,7 +73,7 @@ function AlertContent(props: AlertContentProps) {
         )}
 
         {buttons}
-      </ThemedView>
+      </ModalSurfaceContent>
       <Pressable
         onPress={props.onRequestClose}
         style={modalStyles.backgroundLight}
@@ -130,13 +132,14 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: contentWidthStyles.standardPadding.paddingHorizontal,
   },
   modalView: {
     maxWidth: 400,
     width: "100%",
-    borderRadius: 5,
-    padding: 20,
+    borderRadius: modalSurfaceStyles.content.borderRadius,
+    padding: modalSurfaceStyles.content.padding,
+    borderWidth: 1,
   },
   buttons: {
     flexDirection: "row",

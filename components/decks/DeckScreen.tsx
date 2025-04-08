@@ -9,9 +9,6 @@ import {
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectCanEditDeck, selectDeckCards } from "@/store/selectors/decks";
-import DeckDetails, {
-  DeckDetailsSkeleton,
-} from "@/components/decks/DeckDetails";
 import DeckCard, { DeckCardSkeleton } from "./DeckCard";
 import { useEditCardModal, Open } from "../editCard/EditCardModal";
 import DeckToolbar from "./DeckToolbar";
@@ -107,7 +104,6 @@ function DeckScreenContent<D>(props: {
   renderItem: NonNullable<FlatListProps<D>["renderItem"]>;
   keyExtractor: NonNullable<FlatListProps<D>["keyExtractor"]>;
   showLoader: boolean;
-  deckDetails: React.ReactNode;
   deckDefaults: React.ReactNode;
   title?: React.ReactNode;
 }) {
@@ -175,7 +171,6 @@ function DeckScreenSkeleton({
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       showLoader={false}
-      deckDetails={<DeckDetailsSkeleton />}
       deckDefaults={<DeckDefaultsSkeleton style={styles.deckDefaults} />}
     />
   );
@@ -228,7 +223,6 @@ function ConnectedDeckScreen({
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       showLoader={showLoader}
-      deckDetails={<DeckDetails deckId={deckId} />}
       deckDefaults={
         <DeckDefaults style={styles.deckDefaults} deckId={deckId} />
       }

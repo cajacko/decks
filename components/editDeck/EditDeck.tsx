@@ -20,6 +20,12 @@ import Button from "@/components/forms/Button";
 import text from "@/constants/text";
 import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
 import EditDeckDetails from "./EditDeckDetails";
+import DeckInfo, {
+  styles as deckInfoStyles,
+} from "@/components/decks/DeckInfo";
+import Animated from "react-native-reanimated";
+import { styles as modalStyles } from "@/components/overlays/Modal";
+import { ModalSurfaceScreen } from "../overlays/ModalSurface";
 
 export type EditDeckProps = {
   deckId: string;
@@ -50,9 +56,21 @@ export default function EditDeck({
     _copyDeck();
   }, [_copyDeck, onPressBackground]);
 
+  const bufferStyle = React.useMemo(
+    () => [styles.drawerBuffer, height.heightStyle],
+    [height.heightStyle],
+  );
+
   return (
     <BottomDrawerWrapper onLayout={onContainerLayout} style={styles.container}>
-      <View style={styles.content}>
+      <View style={[styles.content, deckInfoStyles.modalContainer]}>
+        <ModalSurfaceScreen
+          handleClose={onPressBackground}
+          style={[modalStyles.content, deckInfoStyles.modalContent]}
+        >
+          <DeckInfo deckId={deckId} showTabs={false} />
+        </ModalSurfaceScreen>
+        <Animated.View style={bufferStyle} />
         <Pressable onPress={onPressBackground} style={backgroundStyle} />
       </View>
 
@@ -100,10 +118,18 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   drawer: {
     zIndex: 3,
     position: "relative",
     flex: 0,
+  },
+  drawerBuffer: {
+    opacity: 0,
+    width: "100%",
+    zIndex: 1,
+    position: "relative",
   },
 });
