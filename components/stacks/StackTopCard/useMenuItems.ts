@@ -74,5 +74,6 @@ export default function useMenuItems(props: StackTopCardProps) {
     side: state.side,
     handlePress: state.isAnimating ? undefined : handlePress,
     animatedToBack: state.animatedToBack,
+    hideMenuItems: state.isAnimating,
   };
 }
