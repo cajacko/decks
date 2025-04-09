@@ -3,7 +3,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SymbolWeight } from "expo-symbols";
 import React from "react";
-import { StyleProp, ViewStyle } from "react-native";
+import { StyleProp, ViewStyle, View, StyleSheet } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
 export type IconSymbolName = React.ComponentProps<typeof MaterialIcons>["name"];
@@ -17,23 +17,40 @@ export default function IconSymbol({
   name,
   size = 24,
   color,
-  style,
+  style: styleProp,
+  rotation,
 }: {
   name: IconSymbolName;
   size?: number;
   color?: string;
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
+  rotation?: number;
 }) {
   const themeColor = useThemeColor("text");
 
+  const style = React.useMemo(
+    () =>
+      StyleSheet.flatten([
+        {
+          transform: rotation
+            ? [
+                {
+                  rotate: `${rotation}deg`,
+                },
+              ]
+            : undefined,
+        },
+        styleProp,
+      ]),
+    [styleProp, rotation],
+  );
+
   return (
-    <MaterialIcons
-      color={color ?? themeColor}
-      size={size}
-      name={name}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      style={style as any}
-    />
+    // NOTE: ios doesn't like us using transforms and stuff on the icons, using it on the view is
+    // safer
+    <View style={style}>
+      <MaterialIcons color={color ?? themeColor} size={size} name={name} />
+    </View>
   );
 }

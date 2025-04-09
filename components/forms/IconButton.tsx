@@ -92,20 +92,13 @@ export default function IconButton({
     }
 
     if (typeof icon === "string") {
+      // NOTE: ios doesn't like us rotating the actual icon syymbol
       return (
         <IconSymbol
           name={icon}
           color={iconColor}
           size={iconSize}
-          style={{
-            transform: iconRotation
-              ? [
-                  {
-                    rotate: `${iconRotation}deg`,
-                  },
-                ]
-              : undefined,
-          }}
+          rotation={iconRotation}
         />
       );
     }
