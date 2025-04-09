@@ -36,6 +36,7 @@ export type DeckProps = {
   borderColor?: string;
   backTextSize?: string;
   sortOrder?: string;
+  emojiSize?: string;
 };
 
 export type Deck = Item<DeckProps, Card>;
