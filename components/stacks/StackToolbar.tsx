@@ -38,6 +38,8 @@ export function StackToolbarSkeleton() {
   return <Skeleton shape="rounded" height={stackToolbarHeight} width={200} />;
 }
 
+const fadedOutOpacity = 0.4;
+
 export default function StackToolbar(
   props: StackToolbarProps,
 ): React.ReactNode {
@@ -47,6 +49,7 @@ export default function StackToolbar(
   const closedWidth = useSharedValue<null | number>(null);
   const availableWidth = useSharedValue<null | number>(null);
   const { open: openDrawer } = useDrawer();
+  const actionsWidthPercentage = useSharedValue(0);
 
   const onToolbarInnerLayout = React.useCallback<
     NonNullable<ViewProps["onLayout"]>
@@ -87,16 +90,22 @@ export default function StackToolbar(
   );
 
   const moreLessContainerStyle = React.useMemo(
-    () =>
-      StyleSheet.flatten([
-        styles.moreLessContainer,
-        { backgroundColor: backgroundColor },
-      ]),
+    () => StyleSheet.flatten([{ backgroundColor: backgroundColor }]),
     [backgroundColor],
   );
 
+  const animatedToolbarStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        actionsWidthPercentage.value,
+        [0, 100],
+        [fadedOutOpacity, 1],
+      ),
+    };
+  });
+
   const toolbarStyle = React.useMemo(
-    () =>
+    () => [
       StyleSheet.flatten([
         styles.toolbar,
         {
@@ -104,14 +113,14 @@ export default function StackToolbar(
           borderColor,
         },
       ]),
-    [backgroundColor, borderColor],
+      animatedToolbarStyle,
+    ],
+    [backgroundColor, borderColor, animatedToolbarStyle],
   );
 
   const [lessMore, setLessMore] = React.useState<"unfold-more" | "unfold-less">(
     "unfold-more",
   );
-
-  const actionsWidthPercentage = useSharedValue(0);
 
   const animatedActionsStyle = useAnimatedStyle(() => {
     if (closedWidth.value === null || availableWidth.value === null) {
@@ -236,10 +245,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingLeft: 20,
     paddingRight: 10,
-  },
-  moreLessContainer: {
-    // Fixes a minor non overlapping issue
-    marginLeft: -1,
   },
   moreLess: {
     height: stackToolbarHeight,
