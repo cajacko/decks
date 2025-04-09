@@ -15,9 +15,7 @@ import StackListItem, {
   StackListItemSkeleton,
 } from "@/components/stacks/StackListItem";
 import { Target } from "@/utils/cardTarget";
-import StackToolbar, {
-  StackToolbarSkeleton,
-} from "@/components/stacks/StackToolbar";
+import StackToolbar from "@/components/stacks/StackToolbar";
 import useGetStackName from "@/hooks/useGetStackName";
 
 function StackContent(
@@ -27,7 +25,7 @@ function StackContent(
     cardSpacer: React.ReactNode;
     containerStyle?: StyleProps;
     innerStyle?: StyleProps;
-    toolbar: React.ReactNode;
+    toolbar?: React.ReactNode;
   },
 ) {
   const dimensions = useTabletopContext();
@@ -118,7 +116,6 @@ export function StackSkeleton(
       cards={cards}
       style={props.style}
       containerStyle={containerStyle}
-      toolbar={<StackToolbarSkeleton />}
     />
   );
 }

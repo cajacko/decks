@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import IconButton from "../forms/IconButton";
-import Skeleton from "../ui/Skeleton";
 import ThemedText from "../ui/ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import Color from "color";
@@ -33,10 +32,6 @@ export interface StackToolbarProps {
 export const stackToolbarHeight = 40;
 const iconSize = stackToolbarHeight - 10;
 const moreLessDuration = 500;
-
-export function StackToolbarSkeleton() {
-  return <Skeleton shape="rounded" height={stackToolbarHeight} width={200} />;
-}
 
 const fadedOutOpacity = 0.4;
 
