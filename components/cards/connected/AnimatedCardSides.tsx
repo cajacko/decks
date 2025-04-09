@@ -16,7 +16,10 @@ export interface AnimatedCardSidesProps
 }
 
 export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
-  function AnimatedCardSides({ side, style, cardStyle, ...props }, ref) {
+  function AnimatedCardSides(
+    { side, style, cardStyle, animatedStyle, ...props },
+    ref,
+  ) {
     const front = useCardProps({ ...props, style: cardStyle, side: "front" });
     const back = useCardProps({ ...props, style: cardStyle, side: "back" });
 
@@ -27,6 +30,7 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
         back={back}
         front={front}
         style={style}
+        animatedStyle={animatedStyle}
       />
     );
   },

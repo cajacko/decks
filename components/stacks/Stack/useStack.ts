@@ -306,11 +306,7 @@ export default function useStack({
   }, [firstCardSide, stackId, tabletopId, dispatch, stackListRef, notify]);
 
   const rotation = useDerivedValue<number>(() =>
-    interpolate(
-      shuffleProgress.value,
-      [0, 1],
-      [0, (Math.round(1500 / 360) - 1) * 360],
-    ),
+    interpolate(shuffleProgress.value, [0, 1], [0, 2 * 360]),
   );
 
   return {
@@ -322,5 +318,6 @@ export default function useStack({
     rotation,
     emptyStackButton,
     handleFlipAll,
+    shuffleProgress,
   };
 }

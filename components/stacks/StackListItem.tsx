@@ -7,6 +7,7 @@ import CardInstance, {
 import StackTopCard from "@/components/stacks/StackTopCard";
 import useFlag from "@/hooks/useFlag";
 import { StackListRef } from "@/components/stacks/StackList";
+import { SharedValue, useAnimatedStyle } from "react-native-reanimated";
 
 export interface StackListItemProps {
   cardInstanceId: Tabletops.CardInstanceId;
@@ -17,6 +18,9 @@ export interface StackListItemProps {
   leftStackId?: string;
   rightStackId?: string;
   stackListRef: React.RefObject<StackListRef>;
+  shuffleProgress: SharedValue<number>;
+  index: number;
+  length: number;
 }
 
 function useStyle(zIndex: number) {
@@ -42,6 +46,25 @@ export default function StackListItem(
 
   const style = useStyle(zIndex);
 
+  // Only 1 item is hidden at any given props.shuffleProgress.value. And this changes linerarly
+  // through the progress from 0-1
+  const animatedStyle = useAnimatedStyle(() => {
+    const hiddenIndex = Math.floor(props.shuffleProgress.value * props.length);
+    let isHidden = props.index === hiddenIndex;
+
+    if (props.shuffleProgress.value === 0) {
+      isHidden = false;
+    }
+
+    return {
+      transform: [
+        {
+          translateY: isHidden ? -9999 : 0,
+        },
+      ],
+    };
+  }, [props.index, props.length]);
+
   // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
   // rename that component to something like StackCard.
   // It may prevent some remounting and improv some animations? As we're not switching
@@ -58,6 +81,7 @@ export default function StackListItem(
         offsetPosition={cardOffsetPosition}
         hideActions={!isTopCard}
         stackListRef={props.stackListRef}
+        animatedStyle={animatedStyle}
       />
     );
   }
@@ -68,6 +92,7 @@ export default function StackListItem(
       key={cardInstanceId}
       cardInstanceId={cardInstanceId}
       offsetPosition={cardOffsetPosition}
+      animatedStyle={animatedStyle}
     />
   );
 }

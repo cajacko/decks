@@ -138,6 +138,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     opacity,
     emptyStackButton,
     handleFlipAll,
+    shuffleProgress,
   } = useStack(props);
 
   const innerStyle = useAnimatedStyle(() => ({
@@ -170,6 +171,9 @@ export default function Stack(props: StackProps): React.ReactNode {
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}
         stackListRef={props.stackListRef}
+        shuffleProgress={shuffleProgress}
+        index={i}
+        length={cardInstancesIds.length}
       />
     ));
   }, [
@@ -179,6 +183,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     cardInstancesIds,
     getCardOffsetPosition,
     props.stackListRef,
+    shuffleProgress,
   ]);
 
   return (
