@@ -23,6 +23,8 @@ export interface IconButtonProps extends TouchableOpacityProps {
   vibrate?: boolean;
   loading?: boolean;
   skeleton?: boolean;
+  disabled?: boolean;
+  iconRotation?: number;
 }
 
 const defaultSize = 80;
@@ -49,10 +51,13 @@ export default function IconButton({
   variant = "filled",
   loading = false,
   skeleton,
+  disabled = false,
+  iconRotation,
   ...props
 }: IconButtonProps): React.ReactNode {
-  const { background, text } = useThemeColors();
+  const { background, text: _text, textDisabled } = useThemeColors();
   const { backgroundColorStyle } = useSkeletonAnimation();
+  const iconColor = disabled ? textDisabled : _text;
 
   const style = React.useMemo(
     () =>
@@ -63,11 +68,11 @@ export default function IconButton({
           width: size,
           borderRadius: size / 2,
           backgroundColor: background,
-          borderColor: text,
+          borderColor: iconColor,
         },
         styleProp,
       ]),
-    [styleProp, size, background, variant, text],
+    [styleProp, size, background, variant, iconColor],
   );
 
   const onPressProps = useOnPressProps(props);
@@ -87,14 +92,42 @@ export default function IconButton({
     }
 
     if (typeof icon === "string") {
-      return <IconSymbol name={icon} color={text} size={iconSize} />;
+      return (
+        <IconSymbol
+          name={icon}
+          color={iconColor}
+          size={iconSize}
+          style={{
+            transform: iconRotation
+              ? [
+                  {
+                    rotate: `${iconRotation}deg`,
+                  },
+                ]
+              : undefined,
+          }}
+        />
+      );
     }
 
     return icon._children;
-  }, [icon, size, text, variant, skeleton, backgroundColorStyle]);
+  }, [
+    icon,
+    size,
+    iconColor,
+    variant,
+    skeleton,
+    backgroundColorStyle,
+    iconRotation,
+  ]);
 
   return (
-    <TouchableOpacity {...props} {...onPressProps} style={style}>
+    <TouchableOpacity
+      {...props}
+      {...onPressProps}
+      activeOpacity={disabled ? 1 : props.activeOpacity}
+      style={style}
+    >
       {children}
     </TouchableOpacity>
   );

@@ -6,7 +6,6 @@ import {
   ViewStyle,
   TouchableHighlightProps,
 } from "react-native";
-import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import useVibrate from "@/hooks/useVibrate";
@@ -19,6 +18,7 @@ export interface CardActionProps {
   vibrate?: boolean;
 }
 
+export const cardActionSize = 60;
 export const defaultOpacity = 0.5;
 
 export default function CardAction({
@@ -29,7 +29,6 @@ export default function CardAction({
   vibrate: shouldVibrate = false,
 }: CardActionProps): React.ReactNode {
   const { vibrate } = useVibrate();
-  const { buttonSize } = useTabletopContext();
   const { background, text } = useThemeColors();
 
   const style = React.useMemo(
@@ -37,15 +36,12 @@ export default function CardAction({
       StyleSheet.flatten([
         styles.container,
         {
-          height: buttonSize,
-          width: buttonSize,
-          borderRadius: buttonSize / 2,
           backgroundColor: background,
           opacity: active ? 1 : defaultOpacity,
         },
         styleProp,
       ]),
-    [styleProp, buttonSize, background, active],
+    [styleProp, background, active],
   );
 
   const onPress = React.useMemo<CardActionProps["onPress"]>(
@@ -64,7 +60,7 @@ export default function CardAction({
 
   return (
     <TouchableOpacity onPress={onPress} style={style}>
-      <IconSymbol name={icon} color={text} size={(buttonSize * 2) / 3} />
+      <IconSymbol name={icon} color={text} size={(cardActionSize * 2) / 3} />
     </TouchableOpacity>
   );
 }
@@ -73,5 +69,8 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
+    height: cardActionSize,
+    width: cardActionSize,
+    borderRadius: cardActionSize / 2,
   },
 });

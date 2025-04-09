@@ -1,13 +1,12 @@
 import React from "react";
 import { StackTopCardProps } from "./types";
 import useDispatchActions from "./useDispatchActions";
-import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { MenuItems, MenuItem } from "@/components/ui/HoldMenu";
 import withHoldMenuItem from "./withHoldMenuItem";
+import { cardActionSize } from "@/components/forms/CardAction";
 
 export default function useMenuItems(props: StackTopCardProps) {
   const state = useDispatchActions(props);
-  const { buttonSize } = useTabletopContext();
   const [showEditModal, setShowEditModal] = React.useState(false);
 
   const closeEditModal = React.useCallback(() => {
@@ -16,15 +15,15 @@ export default function useMenuItems(props: StackTopCardProps) {
 
   const menuItems = React.useMemo((): MenuItems => {
     const bottom: MenuItem = {
-      height: buttonSize,
-      width: buttonSize,
+      height: cardActionSize,
+      width: cardActionSize,
       component: withHoldMenuItem("flip", state.handleFlipCard),
       handleAction: state.handleFlipCard,
     };
 
     const top: MenuItem | undefined = state.handleMoveToBottom && {
-      height: buttonSize,
-      width: buttonSize,
+      height: cardActionSize,
+      width: cardActionSize,
       component: withHoldMenuItem(
         "vertical-align-top",
         state.handleMoveToBottom,
@@ -33,15 +32,15 @@ export default function useMenuItems(props: StackTopCardProps) {
     };
 
     const right: MenuItem = {
-      height: buttonSize,
-      width: buttonSize,
+      height: cardActionSize,
+      width: cardActionSize,
       component: withHoldMenuItem("chevron-right", state.moveRight.top),
       handleAction: state.moveRight.top,
     };
 
     const left: MenuItem = {
-      height: buttonSize,
-      width: buttonSize,
+      height: cardActionSize,
+      width: cardActionSize,
       component: withHoldMenuItem("chevron-left", state.moveLeft.top),
       handleAction: state.moveLeft.top,
     };
@@ -53,7 +52,6 @@ export default function useMenuItems(props: StackTopCardProps) {
       left,
     };
   }, [
-    buttonSize,
     state.handleFlipCard,
     state.handleMoveToBottom,
     state.moveRight,
