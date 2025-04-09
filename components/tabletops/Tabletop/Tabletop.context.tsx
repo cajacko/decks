@@ -61,6 +61,9 @@ export interface TabletopProviderProps {
   notify?: Notify;
 }
 
+/**
+ * TODO: Don't need to actually pass the target, can just pass the cardSize?
+ */
 export function TabletopProvider({
   children,
   availableHeight,

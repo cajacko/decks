@@ -16,7 +16,6 @@ import { dateToDateString } from "@/utils/dates";
 export default function useDispatchActions({
   cardInstanceId,
   stackId,
-  canMoveToBottom,
   leftStackId,
   rightStackId,
   stackListRef,
@@ -216,48 +215,43 @@ export default function useDispatchActions({
     stackListRef,
   ]);
 
-  const handleMoveToBottom = React.useMemo(() => {
-    if (!canMoveToBottom) return undefined;
+  const handleMoveToBottom = React.useCallback(async () => {
+    if (cardInstanceRef.current && animateCardMovement) {
+      try {
+        await cardInstanceRef.current.animateOut({
+          direction: "top",
+          animateOpacity: false,
+          animateBack: animateSendToBack
+            ? async () => {
+                setAnimatedToBack(cardInstanceId);
+              }
+            : undefined,
+        });
+      } catch {}
 
-    return async () => {
-      if (cardInstanceRef.current && animateCardMovement) {
-        try {
-          await cardInstanceRef.current.animateOut({
-            direction: "top",
-            animateOpacity: false,
-            animateBack: animateSendToBack
-              ? async () => {
-                  setAnimatedToBack(cardInstanceId);
-                }
-              : undefined,
-          });
-        } catch {}
+      setAnimatedToBack(null);
+    }
 
-        setAnimatedToBack(null);
-      }
-
-      dispatch(
-        moveCard({
-          tabletopId,
-          moveTarget: { cardInstanceId },
-          method: MoveCardInstanceMethod.bottomNoChange,
-          toTarget: { stackId: stackId },
-          date: dateToDateString(new Date()),
-          operation: {
-            type: "MOVE_CARD_TO_BOTTOM",
-            payload: {
-              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
-            },
+    dispatch(
+      moveCard({
+        tabletopId,
+        moveTarget: { cardInstanceId },
+        method: MoveCardInstanceMethod.bottomNoChange,
+        toTarget: { stackId: stackId },
+        date: dateToDateString(new Date()),
+        operation: {
+          type: "MOVE_CARD_TO_BOTTOM",
+          payload: {
+            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
           },
-        }),
-      );
-    };
+        },
+      }),
+    );
   }, [
     animateSendToBack,
     dispatch,
     cardInstanceId,
     stackId,
-    canMoveToBottom,
     cardInstanceRef,
     tabletopId,
     animateCardMovement,

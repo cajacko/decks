@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   StyleProps,
@@ -36,11 +36,16 @@ function StackContent(
     () => [
       styles.inner,
       {
-        paddingVertical: dimensions.buttonSize / 2,
+        paddingVertical: dimensions.stackVerticalPadding,
+        paddingHorizontal: dimensions.stackHorizontalPadding,
       },
       props.innerStyle,
     ],
-    [props.innerStyle, dimensions.buttonSize],
+    [
+      props.innerStyle,
+      dimensions.stackVerticalPadding,
+      dimensions.stackHorizontalPadding,
+    ],
   );
 
   const containerStyle = React.useMemo(
@@ -56,21 +61,38 @@ function StackContent(
     [dimensions.stackHorizontalPadding],
   );
 
+  const positionStyles = React.useMemo(
+    () => ({
+      above: StyleSheet.flatten([
+        styles.position,
+        {
+          top: 0,
+          height: dimensions.aboveStackHeight,
+        },
+      ]),
+      below: StyleSheet.flatten([
+        styles.position,
+        {
+          bottom: 0,
+          height: dimensions.belowStackHeight,
+        },
+      ]),
+    }),
+    [dimensions.belowStackHeight, dimensions.aboveStackHeight],
+  );
+
   return (
     <Animated.View style={containerStyle}>
-      <View style={toolbarContainerStyle}>{props.toolbar}</View>
+      <View style={positionStyles.above}>
+        <View style={toolbarContainerStyle}>{props.toolbar}</View>
+      </View>
       <Animated.View style={innerStyle}>
-        {props.cards && (
-          <View style={styles.cardInstances}>
-            {props.cardSpacer}
-            {props.cards}
-          </View>
-        )}
-
-        {props.emptyStack}
+        <View style={{ position: "relative" }}>
+          <View style={styles.cardInstances}>{props.cards}</View>
+          {props.emptyStack}
+          {props.cardSpacer}
+        </View>
       </Animated.View>
-
-      <View style={styles.toolbarContainer} />
     </Animated.View>
   );
 }
@@ -145,7 +167,6 @@ export default function Stack(props: StackProps): React.ReactNode {
         isTopCard={i === 0}
         cardOffsetPosition={getCardOffsetPosition(cardInstanceId)}
         zIndex={cardInstancesIds.length - i + 1}
-        canMoveToBottom={cardInstancesIds.length > 1}
         stackId={props.stackId}
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}

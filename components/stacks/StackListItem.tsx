@@ -16,7 +16,6 @@ export interface StackListItemProps {
   stackId: string;
   leftStackId?: string;
   rightStackId?: string;
-  canMoveToBottom: boolean;
   stackListRef: React.RefObject<StackListRef>;
 }
 
@@ -56,7 +55,6 @@ export default function StackListItem(
         stackId={props.stackId}
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}
-        canMoveToBottom={props.canMoveToBottom}
         offsetPosition={cardOffsetPosition}
         hideActions={!isTopCard}
         stackListRef={props.stackListRef}

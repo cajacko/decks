@@ -8,6 +8,8 @@ import { minStackCount } from "@/utils/minStacks";
 import StackListIndicators, {
   stackListIndicatorsHeight,
 } from "@/components/stacks/StackListIndicators";
+import { tabletopUISpacing } from "../Stack/stack.style";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 
 function StackListContent(
   props: Pick<StackListProps, "style" | "handleLayout"> & {
@@ -17,10 +19,31 @@ function StackListContent(
   },
 ) {
   const interval = useInterval();
+  const dimensions = useTabletopContext();
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.container, props.style]),
     [props.style],
+  );
+
+  const positionStyles = React.useMemo(
+    () => ({
+      above: StyleSheet.flatten([
+        styles.position,
+        {
+          top: 0,
+          height: dimensions.aboveStackHeight,
+        },
+      ]),
+      below: StyleSheet.flatten([
+        styles.position,
+        {
+          bottom: 0,
+          height: dimensions.belowStackHeight,
+        },
+      ]),
+    }),
+    [dimensions.belowStackHeight, dimensions.aboveStackHeight],
   );
 
   return (
@@ -38,7 +61,9 @@ function StackListContent(
       >
         {props.children}
       </Animated.ScrollView>
-      {props.indicators}
+      {props.indicators && (
+        <View style={positionStyles.below}>{props.indicators}</View>
+      )}
     </View>
   );
 }
@@ -103,25 +128,25 @@ export default React.forwardRef<StackListRef, StackListProps>(
   },
 );
 
-const indicatorsPaddingVertical = 20;
-const indicatorsContainerHeight =
-  stackListIndicatorsHeight + indicatorsPaddingVertical * 2;
-
 const styles = StyleSheet.create({
+  position: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    borderWidth: 1,
+    borderColor: "blue",
+  },
   container: {
     flex: 1,
   },
   indicatorsContainer: {
-    height: indicatorsContainerHeight,
-    width: "100%",
     zIndex: 2,
-    position: "relative",
-  },
-  indicators: {
-    width: "100%",
     position: "absolute",
-    bottom: indicatorsPaddingVertical,
-    zIndex: 2,
+    left: 0,
+    right: 0,
+    height: stackListIndicatorsHeight,
+    bottom: tabletopUISpacing,
+    width: "100%",
   },
   scrollView: {
     flexDirection: "row",
