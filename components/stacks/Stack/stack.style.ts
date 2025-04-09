@@ -137,10 +137,6 @@ export function getStackDimensions(props: {
   let dimensions = getExampleStackDimensions({
     ...props,
     baseOff: "width",
-    // stackWidth: Math.max(
-    //   Math.min(props.availableWidth, maxStackWidth),
-    //   minStackWidth,
-    // ),
   });
 
   if (
@@ -159,10 +155,6 @@ export function getStackDimensions(props: {
   dimensions = getExampleStackDimensions({
     ...props,
     baseOff: "height",
-    // stackHeight: Math.max(
-    //   Math.min(props.availableHeight, maxStackHeight),
-    //   minStackHeight,
-    // ),
   });
 
   return {
@@ -190,8 +182,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    borderWidth: 1,
-    borderColor: "green",
   },
   container: {
     position: "relative",
@@ -203,8 +193,6 @@ const styles = StyleSheet.create({
     position: "relative",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "red",
   },
   cardInstances: {
     position: "absolute",

@@ -88,7 +88,9 @@ function StackContent(
       </View>
       <Animated.View style={innerStyle}>
         <View style={{ position: "relative" }}>
-          <View style={styles.cardInstances}>{props.cards}</View>
+          {props.cards && (
+            <View style={styles.cardInstances}>{props.cards}</View>
+          )}
           {props.emptyStack}
           {props.cardSpacer}
         </View>
