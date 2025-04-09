@@ -11,7 +11,13 @@ import { StackProps } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import seededShuffle, { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
-import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
+import {
+  useSharedValue,
+  withTiming,
+  runOnJS,
+  useDerivedValue,
+  interpolate,
+} from "react-native-reanimated";
 import { deleteStack } from "@/store/slices/tabletop";
 import { useRouter } from "expo-router";
 import useFlag from "@/hooks/useFlag";
@@ -56,8 +62,8 @@ export default function useStack({
   const { tabletopId, deckId, notify } = useTabletopContext();
   const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
-  const rotation = useSharedValue(0);
   const { navigate } = useRouter();
+  const shuffleProgress = useSharedValue(0);
   const doesTabletopHaveCards = useAppSelector((state) =>
     selectDoesTabletopHaveCardInstances(state, { tabletopId }),
   );
@@ -93,17 +99,14 @@ export default function useStack({
     vibrate?.("handleShuffle");
 
     if (animateShuffle) {
-      rotation.value = 0;
       const duration = 1200;
 
       promise = new Promise<void>((resolve) => {
-        rotation.value = withTiming(
-          (Math.round(1500 / 360) - 1) * 360,
-          { duration },
-          () => {
-            runOnJS(resolve)();
-          },
-        );
+        shuffleProgress.value = withTiming(1, { duration }, () => {
+          shuffleProgress.value = 0;
+
+          runOnJS(resolve)();
+        });
       });
     } else if (!performanceMode) {
       const idsToShuffle = allCardInstanceIds ?? _cardInstancesIds;
@@ -161,7 +164,7 @@ export default function useStack({
     dispatch,
     stackId,
     tabletopId,
-    rotation,
+    shuffleProgress,
     animateShuffle,
     vibrate,
     allCardInstanceIds,
@@ -301,6 +304,14 @@ export default function useStack({
       );
     };
   }, [firstCardSide, stackId, tabletopId, dispatch, stackListRef, notify]);
+
+  const rotation = useDerivedValue<number>(() =>
+    interpolate(
+      shuffleProgress.value,
+      [0, 1],
+      [0, (Math.round(1500 / 360) - 1) * 360],
+    ),
+  );
 
   return {
     opacity,
