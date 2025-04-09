@@ -9,7 +9,6 @@ import FieldSet, {
   useLeftAdornmentSize,
 } from "@/components/forms/FieldSet";
 import { useRouter } from "expo-router";
-import { exampleDeckIds } from "@/utils/builtInTemplateIds";
 import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
