@@ -186,7 +186,7 @@ export default function DevMenu({
             title={`${deck?.name ?? "N/A"} ${deck?.version ? `(${deck.version})` : ""}`}
             variant="outline"
             onPress={() => {
-              navigate(`/deck/${exampleDeckIds(id).deckId}`);
+              navigate(`/deck/${id}`);
               closeDrawer?.();
             }}
             style={{ marginTop: 10 }}
