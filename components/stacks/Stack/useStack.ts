@@ -1,10 +1,11 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setStackOrder } from "@/store/slices/tabletop";
+import { changeCardState, setStackOrder } from "@/store/slices/tabletop";
 import {
   selectCardInstanceIds,
   selectFirstXCardInstances,
   selectDoesTabletopHaveCardInstances,
+  selectCardInstance,
 } from "@/store/selectors/tabletops";
 import { StackProps } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
@@ -70,7 +71,7 @@ export default function useStack({
       [offsetPositionsCount],
     );
 
-  const cardInstancesIds = useAppSelector((state) =>
+  const _cardInstancesIds = useAppSelector((state) =>
     selectFirstXCardInstances(state, {
       stackId,
       tabletopId,
@@ -105,7 +106,7 @@ export default function useStack({
         );
       });
     } else if (!performanceMode) {
-      const idsToShuffle = allCardInstanceIds ?? cardInstancesIds;
+      const idsToShuffle = allCardInstanceIds ?? _cardInstancesIds;
 
       if (idsToShuffle) {
         const iterations = 4;
@@ -164,7 +165,7 @@ export default function useStack({
     animateShuffle,
     vibrate,
     allCardInstanceIds,
-    cardInstancesIds,
+    _cardInstancesIds,
     performanceMode,
     stackListRef,
   ]);
@@ -172,12 +173,12 @@ export default function useStack({
   const shakeToShuffleActive: boolean =
     isFocussed === true &&
     shakeToShuffle &&
-    !!cardInstancesIds &&
-    cardInstancesIds.length > 1;
+    !!_cardInstancesIds &&
+    _cardInstancesIds.length > 1;
 
   useShakeEffect(shakeToShuffleActive ? handleShuffle : null);
 
-  onUpdateCardList(cardInstancesIds ?? []);
+  onUpdateCardList(_cardInstancesIds ?? []);
 
   const handleDeleteStack = React.useCallback(async () => {
     stackListRef.current?.onDeleteStack?.(stackId);
@@ -263,14 +264,47 @@ export default function useStack({
     navigate,
   ]);
 
+  const firstCardId = _cardInstancesIds?.[0];
+  const firstCardSide = useAppSelector((state) =>
+    firstCardId
+      ? selectCardInstance(state, { cardInstanceId: firstCardId, tabletopId })
+          ?.side
+      : undefined,
+  );
+
+  const handleFlipAll = React.useMemo(() => {
+    if (!firstCardSide) return undefined;
+
+    return () => {
+      dispatch(
+        changeCardState({
+          operation: {
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+            type:
+              firstCardSide === "front"
+                ? "FLIP_STACK_FACE_DOWN"
+                : "FLIP_STACK_FACE_UP",
+          },
+          date: dateToDateString(new Date()),
+          target: { stackId },
+          tabletopId,
+          side: firstCardSide === "front" ? "back" : "front",
+        }),
+      );
+    };
+  }, [firstCardSide, stackId, tabletopId, dispatch, stackListRef]);
+
   return {
     opacity,
     width,
-    cardInstancesIds: cardInstanceIdsOverride ?? cardInstancesIds,
+    cardInstancesIds: cardInstanceIdsOverride ?? _cardInstancesIds,
     getCardOffsetPosition,
     handleShuffle,
     rotation,
     emptyStackButton,
     shakeToShuffleActive,
+    handleFlipAll,
   };
 }

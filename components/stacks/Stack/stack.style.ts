@@ -169,14 +169,13 @@ export function getStackDimensions(props: {
   };
 }
 
-export function getShuffleStyle(props: {
-  buttonSize: number;
+export function getToolbarContainerStyle(props: {
+  stackHorizontalPadding: number;
 }): StyleProp<ViewStyle> {
   return StyleSheet.flatten([
-    styles.shuffleContainer,
+    styles.toolbarContainer,
     {
-      zIndex: 1,
-      alignItems: "center",
+      paddingHorizontal: props.stackHorizontalPadding,
     },
   ]);
 }
@@ -196,13 +195,11 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 1,
   },
-  shuffleContainer: {
-    opacity: 0.5,
+  toolbarContainer: {
     flex: 1,
-    alignItems: "center",
+    width: "100%",
     justifyContent: "center",
   },
-  shuffleButton: {},
   card: {
     position: "absolute",
   },

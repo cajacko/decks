@@ -5,33 +5,42 @@ import Animated, {
   StyleProps,
 } from "react-native-reanimated";
 import EmptyStack from "@/components/stacks/EmptyStack";
-import CardAction from "@/components/forms/CardAction";
 import CardSpacer from "@/components/cards/connected/CardSpacer";
 import CardSpacerSkeleton from "@/components/cards/connected/CardSpacerSkeleton";
 import { StackProps } from "./stack.types";
-import styles, { getShuffleStyle } from "./stack.style";
+import styles, { getToolbarContainerStyle } from "./stack.style";
 import useStack, { useStackWidth } from "./useStack";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import StackListItem, {
   StackListItemSkeleton,
 } from "@/components/stacks/StackListItem";
 import { Target } from "@/utils/cardTarget";
+import StackToolbar, {
+  StackToolbarSkeleton,
+} from "@/components/stacks/StackToolbar";
+import useGetStackName from "@/hooks/useGetStackName";
 
 function StackContent(
   props: Pick<StackProps, "style"> & {
     emptyStack?: React.ReactNode;
-    button?: React.ReactNode;
     cards?: React.ReactNode;
     cardSpacer: React.ReactNode;
     containerStyle?: StyleProps;
     innerStyle?: StyleProps;
+    toolbar: React.ReactNode;
   },
 ) {
   const dimensions = useTabletopContext();
 
   const innerStyle = React.useMemo(
-    () => [styles.inner, props.innerStyle],
-    [props.innerStyle],
+    () => [
+      styles.inner,
+      {
+        paddingVertical: dimensions.buttonSize / 2,
+      },
+      props.innerStyle,
+    ],
+    [props.innerStyle, dimensions.buttonSize],
   );
 
   const containerStyle = React.useMemo(
@@ -39,17 +48,17 @@ function StackContent(
     [props.style, props.containerStyle],
   );
 
-  const shuffleStyle = React.useMemo(
+  const toolbarContainerStyle = React.useMemo(
     () =>
-      getShuffleStyle({
-        buttonSize: dimensions.buttonSize,
+      getToolbarContainerStyle({
+        stackHorizontalPadding: dimensions.stackHorizontalPadding,
       }),
-    [dimensions.buttonSize],
+    [dimensions.stackHorizontalPadding],
   );
 
   return (
     <Animated.View style={containerStyle}>
-      <View style={styles.shuffleContainer} />
+      <View style={toolbarContainerStyle}>{props.toolbar}</View>
       <Animated.View style={innerStyle}>
         {props.cards && (
           <View style={styles.cardInstances}>
@@ -61,7 +70,7 @@ function StackContent(
         {props.emptyStack}
       </Animated.View>
 
-      <View style={shuffleStyle}>{props.button}</View>
+      <View style={styles.toolbarContainer} />
     </Animated.View>
   );
 }
@@ -85,12 +94,14 @@ export function StackSkeleton(
       cards={cards}
       style={props.style}
       containerStyle={containerStyle}
+      toolbar={<StackToolbarSkeleton />}
     />
   );
 }
 
 export default function Stack(props: StackProps): React.ReactNode {
-  const { deckId } = useTabletopContext();
+  const { deckId, tabletopId } = useTabletopContext();
+  const stackName = useGetStackName(tabletopId)(props.stackId);
 
   const target = React.useMemo(
     (): Target => ({ id: deckId, type: "deck-defaults" }),
@@ -106,6 +117,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     opacity,
     emptyStackButton,
     shakeToShuffleActive,
+    handleFlipAll,
   } = useStack(props);
 
   const innerStyle = useAnimatedStyle(() => ({
@@ -166,16 +178,12 @@ export default function Stack(props: StackProps): React.ReactNode {
       cards={cardInstances}
       containerStyle={containerStyle}
       innerStyle={innerStyle}
-      button={
-        getShouldShowShuffle() && (
-          <CardAction
-            icon="shuffle"
-            style={styles.shuffleButton}
-            onPress={handleShuffle}
-            // Vibrate covered by handleShuffle as it gets called programmatically on shake
-            vibrate={false}
-          />
-        )
+      toolbar={
+        <StackToolbar
+          title={stackName}
+          handleShuffle={getShouldShowShuffle() ? handleShuffle : undefined}
+          handleFlipAll={handleFlipAll}
+        />
       }
     />
   );

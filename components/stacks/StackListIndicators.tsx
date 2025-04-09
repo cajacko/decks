@@ -65,6 +65,7 @@ export default function StackListIndicators({
 }
 
 const indicatorSize = 10;
+export const stackListIndicatorsHeight = indicatorSize;
 
 const styles = StyleSheet.create({
   indicators: {

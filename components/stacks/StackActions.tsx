@@ -16,6 +16,7 @@ import text from "@/constants/text";
 import { generateSeed } from "@/utils/seededShuffle";
 import { StackListRef } from "./StackList";
 import { dateToDateString } from "@/utils/dates";
+import useGetStackName from "@/hooks/useGetStackName";
 
 export interface StackActionsProps extends FieldSetProps {
   tabletopId: string;
@@ -26,23 +27,6 @@ const moveNewStackText = {
   start: text["settings.stack_actions.move.new_stack_start"],
   end: text["settings.stack_actions.move.new_stack_end"],
 };
-
-function stackName(
-  orderedStackIds: string[] | null,
-  stackId: string | null,
-): string {
-  if (!stackId) return "All Stacks";
-
-  if (!orderedStackIds) return stackId;
-
-  const stackNumber = orderedStackIds.indexOf(stackId) + 1;
-
-  // The stack is not in the list of ordered stacks it's probably moveNewStackText.start or
-  // moveNewStackText.end so we return it as is
-  if (stackNumber <= 0) return stackId;
-
-  return `Stack ${stackNumber}`;
-}
 
 const defaultSelectedMoveToStackId = moveNewStackText.end;
 
@@ -70,6 +54,7 @@ export default function StackActions({
   const stackIds = useAppSelector((state) =>
     selectStackIds(state, { tabletopId }),
   );
+  const stackName = useGetStackName(tabletopId);
 
   const [selectedStackId, _setSelectedStackId] = React.useState<string | null>(
     null,
@@ -230,8 +215,8 @@ export default function StackActions({
     [tabletopId, selectedStackId, dispatch, stackListRef],
   );
 
-  const selectedStackName = stackName(stackIds, selectedStackId);
-  const selectedMoveToStackName = stackName(stackIds, selectedMoveToStackId);
+  const selectedStackName = stackName(selectedStackId);
+  const selectedMoveToStackName = stackName(selectedMoveToStackId);
 
   return (
     <FieldSet title="Stack Actions" {...fieldSetProps}>
@@ -243,7 +228,7 @@ export default function StackActions({
             { label: "All Stacks", value: null, key: "all-stacks" },
             ...(stackIds ?? []).map((stackId) => ({
               key: stackId,
-              label: stackName(stackIds, stackId),
+              label: stackName(stackId),
               value: stackId,
             })),
           ]}
@@ -289,7 +274,7 @@ export default function StackActions({
                 ?.filter((stackId) => stackId !== selectedStackId)
                 .map((stackId) => ({
                   key: stackId,
-                  label: stackName(stackIds, stackId),
+                  label: stackName(stackId),
                   value: stackId,
                 })) ?? []),
               {

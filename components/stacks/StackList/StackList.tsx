@@ -5,7 +5,9 @@ import Animated, { AnimatedRef } from "react-native-reanimated";
 import { StackListProps, StackListRef } from "./StackList.types";
 import useStackList, { useInterval } from "./useStackList";
 import { minStackCount } from "@/utils/minStacks";
-import StackListIndicators from "@/components/stacks/StackListIndicators";
+import StackListIndicators, {
+  stackListIndicatorsHeight,
+} from "@/components/stacks/StackListIndicators";
 
 function StackListContent(
   props: Pick<StackListProps, "style" | "handleLayout"> & {
@@ -23,6 +25,7 @@ function StackListContent(
 
   return (
     <View style={style}>
+      {props.indicators && <View style={styles.indicatorsContainer} />}
       <Animated.ScrollView
         ref={props.animatedRef}
         style={styles.scrollView}
@@ -88,7 +91,7 @@ export default React.forwardRef<StackListRef, StackListProps>(
           indicatorIds &&
           indicatorIds.length > 1 && (
             <StackListIndicators
-              style={styles.indicators}
+              style={styles.indicatorsContainer}
               stackIds={indicatorIds}
               focussedStackId={focussedStackId}
             />
@@ -101,14 +104,24 @@ export default React.forwardRef<StackListRef, StackListProps>(
   },
 );
 
+const indicatorsPaddingVertical = 20;
+const indicatorsContainerHeight =
+  stackListIndicatorsHeight + indicatorsPaddingVertical * 2;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  indicatorsContainer: {
+    height: indicatorsContainerHeight,
+    width: "100%",
+    zIndex: 2,
+    position: "relative",
+  },
   indicators: {
     width: "100%",
     position: "absolute",
-    bottom: 20,
+    bottom: indicatorsPaddingVertical,
     zIndex: 2,
   },
   scrollView: {
