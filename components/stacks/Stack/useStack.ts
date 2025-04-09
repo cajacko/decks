@@ -53,7 +53,7 @@ export default function useStack({
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
   const animateShuffle = useFlag("SHUFFLE_ANIMATION") === "enabled";
   const dispatch = useAppDispatch();
-  const { tabletopId, deckId } = useTabletopContext();
+  const { tabletopId, deckId, notify } = useTabletopContext();
   const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
   const rotation = useSharedValue(0);
@@ -174,7 +174,7 @@ export default function useStack({
     isFocussed === true &&
     shakeToShuffle &&
     !!_cardInstancesIds &&
-    _cardInstancesIds.length > 1;
+    _cardInstancesIds.length > 0;
 
   useShakeEffect(shakeToShuffleActive ? handleShuffle : null);
 
@@ -276,6 +276,12 @@ export default function useStack({
     if (!firstCardSide) return undefined;
 
     return () => {
+      notify?.(
+        firstCardSide === "front"
+          ? text["stack.notifications.flip_all_down"]
+          : text["stack.notifications.flip_all_up"],
+      );
+
       dispatch(
         changeCardState({
           operation: {
@@ -294,7 +300,7 @@ export default function useStack({
         }),
       );
     };
-  }, [firstCardSide, stackId, tabletopId, dispatch, stackListRef]);
+  }, [firstCardSide, stackId, tabletopId, dispatch, stackListRef, notify]);
 
   return {
     opacity,
@@ -304,7 +310,6 @@ export default function useStack({
     handleShuffle,
     rotation,
     emptyStackButton,
-    shakeToShuffleActive,
     handleFlipAll,
   };
 }

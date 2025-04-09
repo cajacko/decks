@@ -20,6 +20,7 @@ export function useInterval() {
 
 export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
   const animatedRef = useAnimatedRef<Animated.ScrollView>();
+
   const scrollOffset = useScrollViewOffset(animatedRef);
   const { tabletopId, canOnlyFit1Stack } = useTabletopContext();
   const stackIds = useAppSelector((state) =>

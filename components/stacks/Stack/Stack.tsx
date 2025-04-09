@@ -116,7 +116,6 @@ export default function Stack(props: StackProps): React.ReactNode {
     width,
     opacity,
     emptyStackButton,
-    shakeToShuffleActive,
     handleFlipAll,
   } = useStack(props);
 
@@ -131,9 +130,7 @@ export default function Stack(props: StackProps): React.ReactNode {
 
   function getShouldShowShuffle(): boolean {
     if (!cardInstances) return false;
-    if (cardInstances.length <= 1) return false;
-    if (shakeToShuffleActive) return false;
-    if (props.isFocussed === false) return false;
+    if (cardInstances.length <= 0) return false;
 
     return true;
   }

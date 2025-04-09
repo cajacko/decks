@@ -9,6 +9,8 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import text from "@/constants/text";
 import { Tabletops, RequiredOperations } from "@/store/types";
 
+export type Notify = (text: string) => void;
+
 const notificationTimeoutDuration = 2000;
 
 const textMap: Record<
@@ -56,28 +58,32 @@ export function useTabletopNotification({
 
   const notificationTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
+  const notify = React.useCallback<Notify>((text: string) => {
+    if (notificationTimeout.current) {
+      clearTimeout(notificationTimeout.current);
+    }
+
+    setNotification({ text });
+
+    notificationTimeout.current = setTimeout(() => {
+      setNotification(null);
+    }, notificationTimeoutDuration);
+  }, []);
+
   const beforeUndo = React.useCallback<
     NonNullable<UseTabletopHistoryOptions["beforeUndo"]>
   >(
     (state, undoState) => {
-      if (notificationTimeout.current) {
-        clearTimeout(notificationTimeout.current);
-      }
-
       const type = state?.operation?.type;
       const notificationText = type ? textMap[type] : null;
 
-      setNotification({
-        text: notificationText
+      notify(
+        notificationText
           ? `${text["tabletop.undo.with_operation"]} ${notificationText}`
           : text["tabletop.undo.without_operation"],
-      });
+      );
 
       const scrollOffset = state?.operation?.payload?.scrollOffset;
-
-      notificationTimeout.current = setTimeout(() => {
-        setNotification(null);
-      }, notificationTimeoutDuration);
 
       return () => {
         if (typeof scrollOffset === "number") {
@@ -87,31 +93,23 @@ export function useTabletopNotification({
         }
       };
     },
-    [stackListRef],
+    [stackListRef, notify],
   );
 
   const beforeRedo = React.useCallback<
     NonNullable<UseTabletopHistoryOptions["beforeRedo"]>
   >(
     (state, redoState) => {
-      if (notificationTimeout.current) {
-        clearTimeout(notificationTimeout.current);
-      }
-
       const type = redoState?.operation?.type;
       const notificationText = type ? textMap[type] : null;
 
-      setNotification({
-        text: notificationText
+      notify(
+        notificationText
           ? `${text["tabletop.redo.with_operation"]} ${notificationText}`
           : text["tabletop.redo.without_operation"],
-      });
+      );
 
       const scrollOffset = redoState?.operation?.payload?.scrollOffset;
-
-      notificationTimeout.current = setTimeout(() => {
-        setNotification(null);
-      }, notificationTimeoutDuration);
 
       return () => {
         if (typeof scrollOffset === "number") {
@@ -121,13 +119,14 @@ export function useTabletopNotification({
         }
       };
     },
-    [stackListRef],
+    [stackListRef, notify],
   );
 
   return {
     beforeRedo,
     beforeUndo,
     notification,
+    notify,
   };
 }
 

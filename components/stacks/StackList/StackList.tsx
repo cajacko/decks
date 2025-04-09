@@ -25,7 +25,6 @@ function StackListContent(
 
   return (
     <View style={style}>
-      {props.indicators && <View style={styles.indicatorsContainer} />}
       <Animated.ScrollView
         ref={props.animatedRef}
         style={styles.scrollView}
