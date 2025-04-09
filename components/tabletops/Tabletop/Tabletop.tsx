@@ -39,10 +39,16 @@ export default function Tabletop({
     selectTabletopNeedsResetting(state, { tabletopId }),
   );
 
-  const { beforeUndo, beforeRedo, notification, notify } =
-    useTabletopNotification({
-      stackListRef,
-    });
+  const {
+    beforeUndo,
+    beforeRedo,
+    notification,
+    notify,
+    clear: clearNotification,
+    extendNotification,
+  } = useTabletopNotification({
+    stackListRef,
+  });
 
   const hasTriedToAutoReset = React.useRef(false);
 
@@ -150,7 +156,11 @@ export default function Tabletop({
       <Animated.View style={contentStyle} onLayout={handleLayout}>
         {notification && (
           <View style={styles.alertContainer}>
-            <TabletopNotification {...notification} />
+            <TabletopNotification
+              extendNotification={extendNotification}
+              clear={clearNotification}
+              {...notification}
+            />
           </View>
         )}
         {skeleton ? (
