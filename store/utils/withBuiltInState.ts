@@ -28,9 +28,11 @@ let builtInState: RootState = {
     settings: null,
   },
   [SliceName.Sync]: {
+    lastSyncSize: null,
     lastPulled: null,
     lastPushed: null,
     lastSynced: null,
+    lastRemovedDeletedContent: null,
     lastModifiedImportantChangesLocally: null,
   },
   [SliceName.IncludedData]: {

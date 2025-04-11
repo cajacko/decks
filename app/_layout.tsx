@@ -91,7 +91,7 @@ function RootLayout() {
           <ContentWidth style={styles.inner}>
             <AppStores />
             <IconButton
-              style={[styles.close, { borderColor }]}
+              style={styles.close}
               icon="close"
               onPress={closeAppStorePopUp}
               size={closeIconSize}
@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
     right: padding,
     top: -(closeIconSize / 2 + padding),
     zIndex: 1,
-    borderWidth: 1,
   },
 });
 

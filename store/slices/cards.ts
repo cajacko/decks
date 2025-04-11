@@ -3,8 +3,13 @@ import { Cards, SliceName } from "../types";
 import { updateCard, createCard, deleteCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import createCardDataSchemaId from "../utils/createCardDataSchemaId";
-import { setState, syncState } from "../combinedActions/sync";
+import {
+  setState,
+  syncState,
+  removeDeletedContent,
+} from "../combinedActions/sync";
 import { mergeMap } from "../utils/mergeData";
+import { removeDeletedDataFromMap } from "../utils/removeDeletedData";
 
 export type Card = Cards.Props;
 
@@ -100,7 +105,15 @@ export const cardsSlice = createSlice({
     builder.addCase(syncState, (state, actions) => {
       const { cardsById } = actions.payload.state[SliceName.Cards];
 
-      mergeMap(state.cardsById, cardsById);
+      mergeMap(state.cardsById, cardsById, {
+        removeAllDeletedBefore: actions.payload.removeAllDeletedBefore,
+      });
+    });
+
+    builder.addCase(removeDeletedContent, (state, actions) => {
+      const removeAllDeletedBefore = actions.payload.removeAllDeletedBefore;
+
+      removeDeletedDataFromMap(state.cardsById, removeAllDeletedBefore);
     });
   },
 });

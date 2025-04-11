@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     minWidth: "100%",
   },
   title: {
-    marginVertical: 10,
+    marginBottom: 10,
     marginHorizontal: 20,
   },
   listItem: {

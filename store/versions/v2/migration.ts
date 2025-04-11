@@ -104,9 +104,11 @@ export default createMigration<V1, V2>({
       userSettings,
       templates,
       sync: {
+        lastSyncSize: null,
         lastSynced: null,
         lastPulled: null,
         lastPushed: null,
+        lastRemovedDeletedContent: null,
         lastModifiedImportantChangesLocally: null,
       },
       includedData: {

@@ -117,7 +117,7 @@ export default function DevMenu({
       {auth.isLoggedIn && (
         <FieldSet title="Sync" collapsible initialCollapsed>
           <Field
-            subLabel={`Last synced: ${sync.loading ? "Syncing..." : (sync.lastSynced ?? "null")}`}
+            subLabel={`Last synced: ${sync.loading ? "Syncing..." : `${sync.lastSynced ?? "null"} (${sync.lastSyncSize})`}`}
             errorMessage={
               auth.error ? text["settings.backup_sync.error"] : undefined
             }
@@ -141,6 +141,16 @@ export default function DevMenu({
             <Button
               title="Push"
               onPress={() => sync.push()}
+              variant="outline"
+            />
+          </Field>
+
+          <Field
+            subLabel={`Last removed deleted content: ${sync.lastRemovedDeletedContent ?? "null"}`}
+          >
+            <Button
+              title="Remove Deleted Content & Push"
+              onPress={() => sync.removeDeletedContentAndPush()}
               variant="outline"
             />
           </Field>

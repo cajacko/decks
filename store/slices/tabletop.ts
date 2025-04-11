@@ -15,8 +15,13 @@ import removeFromArray from "@/utils/immer/removeFromArray";
 import { deleteCard, createCard } from "../combinedActions/cards";
 import { deleteDeck, createDeck } from "../combinedActions/decks";
 import { getStackIdForNewCardsAndReset } from "@/utils/minStacks";
-import { setState, syncState } from "../combinedActions/sync";
 import { mergeMap } from "../utils/mergeData";
+import {
+  setState,
+  syncState,
+  removeDeletedContent,
+} from "../combinedActions/sync";
+import { removeDeletedDataFromMap } from "../utils/removeDeletedData";
 
 export type TabletopState = Tabletops.State;
 export type Tabletop = Tabletops.Props;
@@ -524,6 +529,16 @@ export const tabletopsSlice = createSlice({
       mergeMap(
         state.tabletopsById,
         actions.payload.state.tabletops.tabletopsById,
+        {
+          removeAllDeletedBefore: actions.payload.removeAllDeletedBefore,
+        },
+      );
+    });
+
+    builder.addCase(removeDeletedContent, (state, actions) => {
+      removeDeletedDataFromMap(
+        state.tabletopsById,
+        actions.payload.removeAllDeletedBefore,
       );
     });
   },

@@ -6,8 +6,10 @@
 import { DateString } from "./types";
 
 export interface State {
+  lastSyncSize: string | null | undefined;
   lastSynced: DateString | null;
   lastPushed: DateString | null;
   lastPulled: DateString | null;
+  lastRemovedDeletedContent: DateString | null | undefined;
   lastModifiedImportantChangesLocally: DateString | null;
 }
