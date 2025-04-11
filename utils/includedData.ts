@@ -175,10 +175,7 @@ function includedDataToExampleDecks(
                   type: "text",
                   value: emojiSize,
                 }
-              : {
-                  type: "null",
-                  value: null,
-                },
+              : undefined,
           },
           [dataIds.description]: {
             id: dataIds.description,
