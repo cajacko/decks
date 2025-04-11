@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectDeckCards, selectDeckLastScreen } from "@/store/selectors/decks";
 import { useRouter } from "expo-router";
@@ -11,6 +11,7 @@ import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 import useVibrate from "@/hooks/useVibrate";
+import { TouchableScale } from "@/components/ui/Pressables";
 
 export interface DeckListItemProps {
   deckId: string | null;
@@ -33,9 +34,9 @@ function DeckListItemContent({
   return (
     <View style={containerStyle}>
       {onPress ? (
-        <Pressable style={styles.cards} onPress={onPress}>
+        <TouchableScale style={styles.cards} onPress={onPress}>
           {children}
-        </Pressable>
+        </TouchableScale>
       ) : (
         <View style={styles.cards}>{children}</View>
       )}

@@ -1,13 +1,7 @@
 import React from "react";
 import { StackListRef } from "../stacks/StackList";
 import { UseTabletopHistoryOptions } from "@/hooks/useTabletopHistory";
-import {
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 import ThemedText from "@/components/ui/ThemedText";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
@@ -15,6 +9,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import text from "@/constants/text";
 import { Tabletops, RequiredOperations } from "@/store/types";
 import IconSymbol from "../ui/IconSymbol";
+import { TouchableOpacity } from "@/components/ui/Pressables";
 
 export type Notify = (text: string) => void;
 

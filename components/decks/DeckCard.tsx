@@ -1,9 +1,10 @@
 import React from "react";
-import { Pressable, StyleSheet, ViewStyle, View } from "react-native";
+import { StyleSheet, ViewStyle, View } from "react-native";
 import Card from "@/components/cards/connected/Card";
 import { Target } from "@/utils/cardTarget";
 import useVibrate from "@/hooks/useVibrate";
 import CardSkeleton from "@/components/cards/connected/CardSkeleton";
+import { TouchableScale } from "@/components/ui/Pressables";
 
 export type DeckCardProps = Target & {
   quantity?: number;
@@ -38,9 +39,9 @@ export default function DeckCard({
   }, [editCard, target, vibrate]);
 
   return (
-    <Pressable onPress={open} style={style}>
+    <TouchableScale onPress={open} style={style}>
       {cardSide}
-    </Pressable>
+    </TouchableScale>
   );
 }
 

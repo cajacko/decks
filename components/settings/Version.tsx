@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Pressable, Platform, ViewStyle, View } from "react-native";
+import { StyleSheet, Platform, ViewStyle, View } from "react-native";
 import { nativeApplicationVersion, nativeBuildVersion } from "expo-application";
 import ThemedText from "@/components/ui/ThemedText";
 import app from "@/constants/app";
@@ -12,6 +12,7 @@ import { useUpdates } from "expo-updates";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { dateToDateString } from "@/utils/dates";
 import useFlag from "@/hooks/useFlag";
+import { Pressable } from "@/components/ui/Pressables";
 
 let version = nativeApplicationVersion
   ? `${nativeApplicationVersion} (${nativeBuildVersion})`

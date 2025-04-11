@@ -1,19 +1,11 @@
 import React from "react";
-import {
-  TouchableOpacity,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-  TouchableHighlightProps,
-} from "react-native";
-import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
-import { useThemeColors } from "@/hooks/useThemeColor";
-import useVibrate from "@/hooks/useVibrate";
+import { StyleProp, ViewStyle } from "react-native";
+import IconButton, { IconSymbolName } from "./IconButton";
 
 export interface CardActionProps {
   icon: IconSymbolName;
   style?: StyleProp<ViewStyle>;
-  onPress?: TouchableHighlightProps["onPress"];
+  onPress?: () => void;
   active?: boolean;
   vibrate?: boolean;
 }
@@ -23,54 +15,27 @@ export const defaultOpacity = 0.5;
 
 export default function CardAction({
   icon,
-  style: styleProp,
-  onPress: onPressProp,
+  style,
+  onPress,
   active,
   vibrate: shouldVibrate = false,
 }: CardActionProps): React.ReactNode {
-  const { vibrate } = useVibrate();
-  const { background, text } = useThemeColors();
-
-  const style = React.useMemo(
-    () =>
-      StyleSheet.flatten([
-        styles.container,
-        {
-          backgroundColor: background,
-          opacity: active ? 1 : defaultOpacity,
-        },
-        styleProp,
-      ]),
-    [styleProp, background, active],
-  );
-
-  const onPress = React.useMemo<CardActionProps["onPress"]>(
-    () =>
-      onPressProp
-        ? (event) => {
-            if (shouldVibrate) {
-              vibrate?.(`CardAction (${icon})`);
-            }
-
-            return onPressProp(event);
-          }
-        : undefined,
-    [onPressProp, vibrate, shouldVibrate, icon],
+  const contentContainerStyle = React.useMemo(
+    () => ({
+      opacity: active ? 1 : defaultOpacity,
+    }),
+    [active],
   );
 
   return (
-    <TouchableOpacity onPress={onPress} style={style}>
-      <IconSymbol name={icon} color={text} size={(cardActionSize * 2) / 3} />
-    </TouchableOpacity>
+    <IconButton
+      onPress={onPress}
+      style={style}
+      variant="filled"
+      size={cardActionSize}
+      icon={icon}
+      vibrate={shouldVibrate}
+      contentContainerStyle={contentContainerStyle}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    height: cardActionSize,
-    width: cardActionSize,
-    borderRadius: cardActionSize / 2,
-  },
-});

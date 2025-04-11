@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ViewStyle, View, ScrollView } from "react-native";
+import { StyleSheet, ViewStyle, View } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeckIds } from "@/store/selectors/decks";
 import DeckListItem, {
@@ -11,6 +11,7 @@ import text from "@/constants/text";
 import ContentWidth, {
   styles as contentWidthStyles,
 } from "@/components/ui/ContentWidth";
+import { ScrollView } from "react-native-gesture-handler";
 
 export interface MyDecksProps {
   style?: ViewStyle;

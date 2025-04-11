@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  StyleProp,
-  StyleSheet,
-  ViewStyle,
-  ScrollView,
-  Pressable,
-  View,
-} from "react-native";
+import { StyleProp, StyleSheet, ViewStyle, View } from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import ThemedView from "@/components/ui/ThemedView";
 import ContentWidth from "@/components/ui/ContentWidth";
@@ -22,6 +15,8 @@ import {
 } from "@/constants/links";
 import { Toolbar } from "@/context/Toolbar";
 import Link from "@/components/ui/Link";
+import { ScrollView } from "react-native-gesture-handler";
+import { TouchableOpacity } from "@/components/ui/Pressables";
 
 export interface MarketingScreenProps {
   style?: StyleProp<ViewStyle>;
@@ -37,15 +32,13 @@ export default function MarketingScreen({
       <Toolbar hidden />
       <ScrollView style={styles.scrollView}>
         <ContentWidth padding="standard">
-          <Link href="/app" asChild>
-            <Pressable>
-              <Image
-                style={styles.heroImage}
-                source={require("../../assets/images/dex-phones-hero.png")}
-                contentFit="contain"
-              />
-            </Pressable>
-          </Link>
+          <TouchableOpacity href="/app">
+            <Image
+              style={styles.heroImage}
+              source={require("../../assets/images/dex-phones-hero.png")}
+              contentFit="contain"
+            />
+          </TouchableOpacity>
           <View style={styles.descriptionContainer}>
             <ThemedText type="h1" style={styles.title}>
               {text["marketing_screen.dex_title"]}
@@ -75,15 +68,13 @@ export default function MarketingScreen({
               {text["marketing_screen.created.3"]}
             </ThemedText>
             <View style={styles.playfaceContainer}>
-              <Link href={playfaceWebsite} asChild>
-                <Pressable>
-                  <Image
-                    style={styles.playface}
-                    source={require("../../assets/images/playface-circle-logo-text-right.png")}
-                    contentFit="contain"
-                  />
-                </Pressable>
-              </Link>
+              <TouchableOpacity href={playfaceWebsite}>
+                <Image
+                  style={styles.playface}
+                  source={require("../../assets/images/playface-circle-logo-text-right.png")}
+                  contentFit="contain"
+                />
+              </TouchableOpacity>
             </View>
             <ThemedText style={styles.footer}>
               <Link href={privacyPolicyLink}>

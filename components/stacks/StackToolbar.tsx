@@ -5,7 +5,6 @@ import {
   View,
   ViewProps,
   ViewStyle,
-  TouchableOpacity,
 } from "react-native";
 import IconButton from "../forms/IconButton";
 import ThemedText from "../ui/ThemedText";
@@ -17,9 +16,9 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { useOnPressProps } from "../forms/Button";
 import { useDrawer } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
+import { TouchableOpacity } from "@/components/ui/Pressables";
 
 export interface StackToolbarProps {
   style?: StyleProp<ViewStyle>;
@@ -85,7 +84,11 @@ export default function StackToolbar(
   );
 
   const moreLessContainerStyle = React.useMemo(
-    () => StyleSheet.flatten([{ backgroundColor: backgroundColor }]),
+    () =>
+      StyleSheet.flatten([
+        styles.moreLessContainer,
+        { backgroundColor: backgroundColor },
+      ]),
     [backgroundColor],
   );
 
@@ -166,16 +169,16 @@ export default function StackToolbar(
 
   const onPressTitle = props.onPressTitle ?? onPressLessMore;
 
-  const pressNameProps = useOnPressProps({
-    vibrate: true,
-    onPress: onPressTitle,
-  });
-
   return (
     <View style={style} onLayout={onContainerLayout}>
       <Animated.View style={toolbarStyle}>
         <View style={styles.toolbarInner} onLayout={onToolbarInnerLayout}>
-          <TouchableOpacity style={labelContainerStyle} {...pressNameProps}>
+          <TouchableOpacity
+            style={labelContainerStyle}
+            contentContainerStyle={styles.labelContentContainer}
+            vibrate
+            onPress={onPressTitle}
+          >
             <ThemedText type="body2">{props.title}</ThemedText>
           </TouchableOpacity>
           <Animated.View style={actionsStyle}>
@@ -212,6 +215,7 @@ export default function StackToolbar(
               onPress={onPressLessMore}
               iconRotation={90}
               vibrate
+              contentContainerStyle={styles.moreLessContentContainer}
             />
           </View>
         </View>
@@ -236,15 +240,23 @@ const styles = StyleSheet.create({
   },
   labelContainer: {
     height: stackToolbarHeight,
+  },
+  labelContentContainer: {
+    flex: 1,
     alignContent: "center",
     justifyContent: "center",
     paddingLeft: 20,
     paddingRight: 10,
   },
-  moreLess: {
-    height: stackToolbarHeight,
+  moreLessContainer: {
     paddingLeft: 10,
     paddingRight: 10,
+  },
+  moreLess: {
+    height: stackToolbarHeight,
+  },
+  moreLessContentContainer: {
+    flex: 1,
     alignContent: "center",
     justifyContent: "center",
   },
@@ -252,5 +264,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    overflow: "hidden",
   },
 });

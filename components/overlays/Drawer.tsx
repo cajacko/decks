@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, Platform } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 import ThemedView from "@/components/ui/ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DevMenu from "@/components/settings/Dev/DevMenu";
@@ -16,7 +16,8 @@ import Button from "@/components/forms/Button";
 import AppStores from "@/components/ui/AppStores";
 import { playfaceWebsite, dexWebLink } from "@/constants/links";
 import useFlag from "@/hooks/useFlag";
-import Link from "@/components/ui/Link";
+import { TouchableOpacity } from "@/components/ui/Pressables";
+import { ScrollView } from "react-native-gesture-handler";
 
 export interface DrawerProps {
   closeDrawer: () => void;
@@ -62,24 +63,24 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
             </View>
             {Platform.OS === "web" && <AppStores style={styles.mt} />}
             {dexWebLink ? (
-              <Link href={dexWebLink}>
+              <TouchableOpacity href={dexWebLink}>
                 <Image
                   style={styles.logo}
                   source={source}
                   contentFit="contain"
                 />
-              </Link>
+              </TouchableOpacity>
             ) : (
               <Image style={styles.logo} source={source} contentFit="contain" />
             )}
             <ThemedText style={styles.by}>{text["general.by"]}</ThemedText>
-            <Link href={playfaceWebsite} target="_blank">
+            <TouchableOpacity href={playfaceWebsite}>
               <Image
                 style={styles.playface}
                 source={require("../../assets/images/playface-circle-logo-text-right.png")}
                 contentFit="contain"
               />
-            </Link>
+            </TouchableOpacity>
             <Version />
           </View>
         </SafeAreaView>

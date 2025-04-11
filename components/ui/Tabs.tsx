@@ -3,11 +3,11 @@ import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 import IconSymbol, { IconSymbolName } from "./IconSymbol";
 import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { LinkProps } from "expo-router";
+import { LinkProps, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ContentWidth from "./ContentWidth";
 import { iconSize, _contentHeight } from "@/context/Toolbar";
-import Link from "@/components/ui/Link";
+import { TouchableOpacity } from "./Pressables";
 
 export interface TabsProps {
   children?: React.ReactNode;
@@ -22,20 +22,24 @@ export interface TabProps {
 }
 
 export function Tab(props: TabProps): React.ReactNode {
+  const { href } = props;
   const colors = useThemeColor("primary");
   const { bottom } = useSafeAreaInsets();
+  const { navigate } = useRouter();
+
+  const onPress = React.useCallback(() => {
+    navigate(href);
+  }, [href, navigate]);
 
   return (
-    <Link
+    <TouchableOpacity
       style={styles.tab}
-      href={props.href}
+      onPress={onPress}
       vibrate
-      TouchableProps={{
-        style: StyleSheet.flatten([
-          styles.pressable,
-          { paddingBottom: bottom },
-        ]),
-      }}
+      contentContainerStyle={StyleSheet.flatten([
+        styles.pressableContentContainer,
+        { paddingBottom: bottom },
+      ])}
     >
       <View style={styles.tabContent}>
         <IconSymbol
@@ -45,7 +49,7 @@ export function Tab(props: TabProps): React.ReactNode {
         />
         <ThemedText style={styles.tabText}>{props.title}</ThemedText>
       </View>
-    </Link>
+    </TouchableOpacity>
   );
 }
 
@@ -84,7 +88,7 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
   },
-  pressable: {
+  pressableContentContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",

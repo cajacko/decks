@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  ScrollView,
-  ViewStyle,
-  View,
-  Pressable,
-  Dimensions,
-} from "react-native";
+import { StyleSheet, ViewStyle, View, Dimensions } from "react-native";
 import Animated from "react-native-reanimated";
 import React from "react";
 import BottonDrawer, {
@@ -29,6 +22,8 @@ import Button from "@/components/forms/Button";
 import text from "@/constants/text";
 import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
 import { selectDeckId } from "@/store/combinedSelectors/decks";
+import { ScrollView } from "react-native-gesture-handler";
+import { Pressable } from "@/components/ui/Pressables";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,

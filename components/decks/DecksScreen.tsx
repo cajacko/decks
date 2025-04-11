@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ViewStyle, ScrollView } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import IconButton, {
   getFloatingButtonVerticalAllowance,
@@ -17,6 +17,7 @@ import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
 import { Toolbar } from "@/context/Toolbar";
 import useScreenSkeleton from "@/hooks/useScreenSkeleton";
 import { selectHasOwnDecks } from "@/store/selectors/decks";
+import { ScrollView } from "react-native-gesture-handler";
 
 const minCardListWidth = 100;
 const maxCardListWidth = 150;

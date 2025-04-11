@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Pressable,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Card from "@/components/cards/connected/Card";
 import CardSkeleton from "@/components/cards/connected/CardSkeleton";
 import { Target } from "@/utils/cardTarget";
@@ -13,6 +7,7 @@ import ThemedText from "../ui/ThemedText";
 import { useEditCardModal } from "../editCard/EditCardModal";
 import text from "@/constants/text";
 import Skeleton from "../ui/Skeleton";
+import { TouchableScale } from "@/components/ui/Pressables";
 
 export interface DeckDefaultsProps {
   deckId: string;
@@ -34,17 +29,17 @@ function DeckDefaultsContent(
         {props.titles}
         <View style={styles.sides}>
           {props.onPressFront ? (
-            <Pressable onPress={props.onPressFront} style={styles.side}>
+            <TouchableScale onPress={props.onPressFront} style={styles.side}>
               {props.front}
-            </Pressable>
+            </TouchableScale>
           ) : (
             <View style={styles.side}>{props.front}</View>
           )}
 
           {props.onPressBack ? (
-            <Pressable onPress={props.onPressBack} style={styles.side}>
+            <TouchableScale onPress={props.onPressBack} style={styles.side}>
               {props.back}
-            </Pressable>
+            </TouchableScale>
           ) : (
             <View style={styles.side}>{props.back}</View>
           )}
