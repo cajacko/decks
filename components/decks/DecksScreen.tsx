@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainerStyle: {
+    paddingTop: 20,
     paddingBottom: getFloatingButtonVerticalAllowance(),
   },
   myDecks: {

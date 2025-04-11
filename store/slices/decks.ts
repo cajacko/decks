@@ -7,8 +7,13 @@ import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { SetCardData } from "../combinedActions/types";
 import AppError from "@/classes/AppError";
-import { setState, syncState } from "../combinedActions/sync";
 import { mergeMap } from "../utils/mergeData";
+import {
+  setState,
+  syncState,
+  removeDeletedContent,
+} from "../combinedActions/sync";
+import { removeDeletedDataFromMap } from "../utils/removeDeletedData";
 
 const initialState: Decks.State = {
   decksById: {},
@@ -233,7 +238,16 @@ export const cardsSlice = createSlice({
       mergeMap(
         state.decksById,
         actions.payload.state[SliceName.Decks].decksById,
+        {
+          removeAllDeletedBefore: actions.payload.removeAllDeletedBefore,
+        },
       );
+    });
+
+    builder.addCase(removeDeletedContent, (state, actions) => {
+      const removeAllDeletedBefore = actions.payload.removeAllDeletedBefore;
+
+      removeDeletedDataFromMap(state.decksById, removeAllDeletedBefore);
     });
   },
 });

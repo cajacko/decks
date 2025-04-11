@@ -20,6 +20,7 @@ import useFlag from "@/hooks/useFlag";
 import { useSkeletonAnimation } from "@/context/Skeleton";
 import { useSync } from "@/context/Sync";
 import { TouchableOpacity } from "@/components/ui/Pressables";
+import { useAuthentication } from "@/context/Authentication";
 
 export interface ToolbarProps {
   title?: string | null;
@@ -66,6 +67,7 @@ export default function Toolbar({
 
   const loading: boolean = loadingProp || syncing;
 
+  const { isLoggedIn } = useAuthentication();
   const { entering, exiting } = useLayoutAnimations();
   const { open } = useDrawer() ?? {};
   const { source, aspectRatio } = useTextLogo();
@@ -181,19 +183,36 @@ export default function Toolbar({
           <View style={styles.rightContainer}>
             {children}
             {open && (
-              <Animated.View
-                entering={entering}
-                exiting={exiting}
-                style={styles.settings}
-              >
-                <ProfilePic
-                  key="toolbar-profile-pic"
-                  fallbackIcon="settings"
-                  loadingBehaviour="fallback-icon"
-                  size={iconSize}
-                  onPress={open}
-                />
-              </Animated.View>
+              <>
+                {isLoggedIn ? (
+                  <Animated.View
+                    entering={entering}
+                    exiting={exiting}
+                    style={styles.settings}
+                  >
+                    <ProfilePic
+                      key="toolbar-profile-pic"
+                      fallbackIcon="settings"
+                      loadingBehaviour="fallback-icon"
+                      size={iconSize}
+                      onPress={open}
+                    />
+                  </Animated.View>
+                ) : (
+                  <Animated.View
+                    entering={entering}
+                    exiting={exiting}
+                    style={styles.settings}
+                  >
+                    <IconButton
+                      icon="settings"
+                      size={iconSize}
+                      onPress={open}
+                      variant="transparent"
+                    />
+                  </Animated.View>
+                )}
+              </>
             )}
           </View>
         </View>

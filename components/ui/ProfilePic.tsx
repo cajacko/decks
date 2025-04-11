@@ -15,6 +15,7 @@ export interface ProfilePicProps
   style?: StyleProp<ViewStyle>;
   size?: number;
   fallbackIcon?: IconSymbolName;
+  loggedOutIcon?: IconSymbolName;
   loadingBehaviour?:
     | "fallback-icon"
     | "nothing"
@@ -22,12 +23,11 @@ export interface ProfilePicProps
     | "profile-loading";
 }
 
-const defaultFallbackIcon: IconSymbolName = "face";
+const _fallbackIcon: IconSymbolName = "face";
 
 export default function ProfilePic({
   size = 50,
   style: styleProp,
-  fallbackIcon: fallbackIconProp = defaultFallbackIcon,
   loadingBehaviour = "profile-loading",
   ...props
 }: ProfilePicProps): React.ReactNode {
@@ -41,7 +41,7 @@ export default function ProfilePic({
   let renderFallbackIcon: boolean;
   let renderLoading: boolean;
   let showImage: boolean;
-  let fallbackIcon: IconSymbolName = fallbackIconProp;
+  let fallbackIcon: IconSymbolName = _fallbackIcon;
 
   if (uri) {
     renderImage = true;
@@ -61,7 +61,7 @@ export default function ProfilePic({
         }
         case "profile-icon": {
           renderFallbackIcon = true;
-          fallbackIcon = defaultFallbackIcon;
+          fallbackIcon = _fallbackIcon;
           break;
         }
         case "profile-loading": {

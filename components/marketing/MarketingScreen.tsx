@@ -10,6 +10,7 @@ import Button from "@/components/forms/Button";
 import { useRouter } from "expo-router";
 import {
   privacyPolicyLink,
+  termsLink,
   playfaceWebsite,
   charlieJacksonLink,
 } from "@/constants/links";
@@ -80,6 +81,8 @@ export default function MarketingScreen({
               <Link href={privacyPolicyLink}>
                 {text["marketing_screen.privacy"]}
               </Link>
+              {" / "}
+              <Link href={termsLink}>{text["marketing_screen.terms"]}</Link>
             </ThemedText>
           </View>
         </ContentWidth>

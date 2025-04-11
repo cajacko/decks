@@ -52,6 +52,8 @@ describe("decks slice", () => {
       slice.reducer(
         initialTestState,
         syncState({
+          lastSyncSize: "",
+          removeAllDeletedBefore: null,
           date: testDate,
           state: {
             ...initialState,

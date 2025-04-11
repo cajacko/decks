@@ -1,7 +1,9 @@
-import { TimestampMetadata } from "../types";
+import { TimestampMetadata, DateString } from "../types";
 import { WritableDraft } from "immer";
+import { removeDeletedDataFromMap } from "./removeDeletedData";
 
-export type Metadata = Pick<TimestampMetadata, "dateUpdated">;
+export type Metadata = Pick<TimestampMetadata, "dateUpdated"> &
+  Partial<Pick<TimestampMetadata, "dateDeleted">>;
 
 /**
  * We prioritise the existing item if dates are the same. This usually prevents the most state
@@ -31,7 +33,13 @@ export function getMostRecentItem<E extends Metadata, I extends Metadata>({
 export function mergeMap<
   D extends Metadata,
   M extends Record<string, D | undefined>,
->(draft: WritableDraft<M>, incoming: M): WritableDraft<M> {
+>(
+  draft: WritableDraft<M>,
+  incoming: M,
+  options?: {
+    removeAllDeletedBefore?: DateString | null;
+  },
+): WritableDraft<M> {
   for (const key in draft) {
     const incomingItem: D | undefined = incoming[key];
 
@@ -62,6 +70,10 @@ export function mergeMap<
 
     // @ts-ignore
     draft[key] = incoming[key];
+  }
+
+  if (options?.removeAllDeletedBefore) {
+    removeDeletedDataFromMap(draft, options.removeAllDeletedBefore);
   }
 
   return draft;
