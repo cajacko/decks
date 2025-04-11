@@ -1,11 +1,5 @@
 import React, { useCallback } from "react";
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-  ViewProps,
-} from "react-native";
+import { View, StyleSheet, ViewStyle, ViewProps } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,6 +9,7 @@ import IconSymbol from "./IconSymbol";
 import ThemedText, { ThemedTextProps } from "./ThemedText";
 import Label, { LabelProps } from "../forms/Label";
 import useFlag from "@/hooks/useFlag";
+import { TouchableOpacity } from "@/components/ui/Pressables";
 
 export interface CollapsibleProps {
   title?: string | null;
@@ -177,8 +172,9 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
       {(title || subTitle) && (
         <TouchableOpacity
           onPress={toggleCollapse}
-          disabled={!collapsible}
+          activeOpacity={collapsible ? undefined : 1}
           style={headerStyleProp}
+          contentContainerStyle={styles.headerContentContainer}
         >
           <View style={styles.headerElements}>
             {leftAdornment && (
@@ -227,25 +223,14 @@ export default function Collapsible(props: CollapsibleProps): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
-  // content: {
-  //   position: "relative",
-  //   width: "100%",
-  // },
-  // animatingContent: {
-  //   position: "absolute",
-  // },
-  // outOfViewContent: {
-  //   position: "absolute",
-  //   left: -999999,
-  //   pointerEvents: "none",
-  // },
   container: {
     overflow: "hidden",
   },
   leftAdornment: {
     marginRight: 10,
   },
-  header: {
+  header: {},
+  headerContentContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

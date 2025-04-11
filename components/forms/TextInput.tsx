@@ -112,7 +112,7 @@ export const styles = StyleSheet.create({
   display: {},
   outline: {
     borderWidth: buttonStyles.outline.borderWidth,
-    borderRadius: buttonStyles.button.borderRadius,
+    borderRadius: buttonStyles.buttonContentContainer.borderRadius,
     overflow: "hidden",
   },
   outlineInput: {

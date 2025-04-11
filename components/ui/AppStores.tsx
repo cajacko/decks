@@ -1,7 +1,7 @@
 import Image from "@/components/ui/Image";
 import React from "react";
 import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
-import Link from "@/components/ui/Link";
+import { TouchableOpacity } from "@/components/ui/Pressables";
 import { iosAppStoreLink, playStoreLink } from "@/constants/links";
 
 export interface AppStoresProps {
@@ -15,30 +15,28 @@ export default function AppStores({
 }: AppStoresProps): React.ReactNode {
   return (
     <View style={[styles.container, style]}>
-      <Link
+      <TouchableOpacity
         href={iosAppStoreLink}
-        target="_blank"
         style={styles.link}
-        TouchableProps={{ style: styles.pressable }}
+        contentContainerStyle={styles.pressable}
       >
         <Image
           style={[styles.appStore, { height }]}
           source={require("../../assets/images/app-store.svg")}
           contentFit="contain"
         />
-      </Link>
-      <Link
+      </TouchableOpacity>
+      <TouchableOpacity
         href={playStoreLink}
-        target="_blank"
         style={styles.link}
-        TouchableProps={{ style: styles.pressable }}
+        contentContainerStyle={styles.pressable}
       >
         <Image
           style={[styles.playStore, { height }]}
           source={require("../../assets/images/play-store.svg")}
           contentFit="contain"
         />
-      </Link>
+      </TouchableOpacity>
     </View>
   );
 }

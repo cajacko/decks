@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/selectors/decks";
 import { useRouter } from "expo-router";
@@ -12,6 +12,7 @@ import IconButton, { IconButtonSkeleton } from "@/components/forms/IconButton";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 import ContentWidth from "@/components/ui/ContentWidth";
 import useVibrate from "@/hooks/useVibrate";
+import { TouchableScale, TouchableOpacity } from "@/components/ui/Pressables";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -42,17 +43,19 @@ function ExpandedDeckListItemContent({
   return (
     <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
       {onPress ? (
-        <Pressable onPress={onPress} style={styles.cards}>
+        <TouchableScale onPress={onPress} style={styles.cards}>
           {children}
-        </Pressable>
+        </TouchableScale>
       ) : (
         <View style={styles.cards}>{children}</View>
       )}
 
-      <Pressable onPress={onPressText} style={styles.details}>
-        <View style={styles.text}>{text}</View>
+      <View style={styles.details}>
+        <TouchableOpacity onPress={onPressText} style={styles.text}>
+          {text}
+        </TouchableOpacity>
         <View style={styles.actions}>{actions}</View>
-      </Pressable>
+      </View>
     </ContentWidth>
   );
 }

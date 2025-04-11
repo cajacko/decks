@@ -10,11 +10,13 @@ import {
   Target,
   CardTargetProvider,
 } from "@/components/cards/context/CardTarget";
+import { Notify } from "../TabletopNotification";
 
 export type TabletopContextProps = StackDimensions & {
   tabletopId: string;
   // Only one for now, refactor and figure out how to handle more when we need to change it
   deckId: string;
+  notify?: Notify;
 };
 
 export const Context = createContext<TabletopContextProps | undefined>(
@@ -56,8 +58,12 @@ export interface TabletopProviderProps {
   tabletopId: string;
   deckId: string;
   target: Target;
+  notify?: Notify;
 }
 
+/**
+ * TODO: Don't need to actually pass the target, can just pass the cardSize?
+ */
 export function TabletopProvider({
   children,
   availableHeight,
@@ -65,6 +71,7 @@ export function TabletopProvider({
   tabletopId,
   deckId,
   target,
+  notify,
 }: TabletopProviderProps) {
   const physicalSize = useCardsPhysicalSize({
     target,
@@ -82,12 +89,13 @@ export function TabletopProvider({
   );
 
   const value = React.useMemo(
-    () => ({
+    (): TabletopContextProps => ({
       ...stackDimensions,
       tabletopId,
       deckId,
+      notify,
     }),
-    [stackDimensions, tabletopId, deckId],
+    [stackDimensions, tabletopId, deckId, notify],
   );
 
   return (

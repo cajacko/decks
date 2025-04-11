@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import useAnimatedCardSides from "./useAnimatedCardSides";
 import {
   AnimatedCardSidesProps,
@@ -9,9 +9,10 @@ import AnimatedCard, {
   AnimatedCardProps,
 } from "@/components/cards/ui/AnimatedCard";
 import CardSpacer from "@/components/cards/ui/CardSpacer";
+import Animated from "react-native-reanimated";
 
 export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
-  function AnimatedCardSides({ side, back, front, style }, ref) {
+  function AnimatedCardSides({ side, back, front, style, animatedStyle }, ref) {
     const state = useAnimatedCardSides(side, ref);
     const { height, width } = side === "front" ? front : back;
 
@@ -32,12 +33,12 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
     );
 
     const containerStyle = React.useMemo(
-      () => StyleSheet.flatten([styles.container, style]),
-      [style],
+      () => [StyleSheet.flatten([styles.container, style]), animatedStyle],
+      [style, animatedStyle],
     );
 
     return (
-      <View style={containerStyle}>
+      <Animated.View style={containerStyle}>
         {state.renderFaceUp && (
           <AnimatedCard
             {...front}
@@ -61,7 +62,7 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
           />
         )}
         {state.renderSpacer && <CardSpacer height={height} width={width} />}
-      </View>
+      </Animated.View>
     );
   },
 );

@@ -3,9 +3,8 @@ import {
   StyleSheet,
   View,
   ViewStyle,
-  FlatList,
-  FlatListProps,
   Platform,
+  FlatListProps,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectCanEditDeck, selectDeckCards } from "@/store/selectors/decks";
@@ -31,6 +30,7 @@ import ThemedText from "../ui/ThemedText";
 import text from "@/constants/text";
 import { DrawerChildren } from "@/context/Drawer";
 import SettingsDeck from "@/components/settings/SettingsDeck";
+import { FlatList } from "react-native-gesture-handler";
 
 export interface DeckScreenProps {
   deckId: string;

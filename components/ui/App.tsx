@@ -29,6 +29,8 @@ import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SkeletonProvider } from "@/context/Skeleton";
 import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StyleSheet } from "react-native";
 
 enableFreeze();
 
@@ -144,11 +146,13 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
 export default function App({ children }: { children: React.ReactNode }) {
   return (
-    <SafeAreaProvider>
-      <ReduxProvider store={store}>
-        <HasStore>{children}</HasStore>
-      </ReduxProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={style.flex}>
+      <SafeAreaProvider style={style.flex}>
+        <ReduxProvider store={store}>
+          <HasStore>{children}</HasStore>
+        </ReduxProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -161,3 +165,9 @@ export function withApp(Component: React.ComponentType) {
     );
   };
 }
+
+const style = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+});

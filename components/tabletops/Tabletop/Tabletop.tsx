@@ -39,7 +39,14 @@ export default function Tabletop({
     selectTabletopNeedsResetting(state, { tabletopId }),
   );
 
-  const { beforeUndo, beforeRedo, notification } = useTabletopNotification({
+  const {
+    beforeUndo,
+    beforeRedo,
+    notification,
+    notify,
+    clear: clearNotification,
+    extendNotification,
+  } = useTabletopNotification({
     stackListRef,
   });
 
@@ -127,6 +134,7 @@ export default function Tabletop({
       tabletopId={tabletopId}
       deckId={deckId}
       target={target}
+      notify={notify}
     >
       <DrawerChildren>
         <SettingsTabletop
@@ -143,11 +151,16 @@ export default function Tabletop({
         deckId={deckId}
         beforeUndo={beforeUndo}
         beforeRedo={beforeRedo}
+        notify={notify}
       />
       <Animated.View style={contentStyle} onLayout={handleLayout}>
         {notification && (
           <View style={styles.alertContainer}>
-            <TabletopNotification {...notification} />
+            <TabletopNotification
+              extendNotification={extendNotification}
+              clear={clearNotification}
+              {...notification}
+            />
           </View>
         )}
         {skeleton ? (

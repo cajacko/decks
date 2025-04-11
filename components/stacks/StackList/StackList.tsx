@@ -5,7 +5,11 @@ import Animated, { AnimatedRef } from "react-native-reanimated";
 import { StackListProps, StackListRef } from "./StackList.types";
 import useStackList, { useInterval } from "./useStackList";
 import { minStackCount } from "@/utils/minStacks";
-import StackListIndicators from "@/components/stacks/StackListIndicators";
+import StackListIndicators, {
+  stackListIndicatorsHeight,
+} from "@/components/stacks/StackListIndicators";
+import { tabletopUISpacing } from "../Stack/stack.style";
+import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 
 function StackListContent(
   props: Pick<StackListProps, "style" | "handleLayout"> & {
@@ -15,10 +19,31 @@ function StackListContent(
   },
 ) {
   const interval = useInterval();
+  const dimensions = useTabletopContext();
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.container, props.style]),
     [props.style],
+  );
+
+  const positionStyles = React.useMemo(
+    () => ({
+      above: StyleSheet.flatten([
+        styles.position,
+        {
+          top: 0,
+          height: dimensions.aboveStackHeight,
+        },
+      ]),
+      below: StyleSheet.flatten([
+        styles.position,
+        {
+          bottom: 0,
+          height: dimensions.belowStackHeight,
+        },
+      ]),
+    }),
+    [dimensions.belowStackHeight, dimensions.aboveStackHeight],
   );
 
   return (
@@ -36,7 +61,9 @@ function StackListContent(
       >
         {props.children}
       </Animated.ScrollView>
-      {props.indicators}
+      {props.indicators && (
+        <View style={positionStyles.below}>{props.indicators}</View>
+      )}
     </View>
   );
 }
@@ -88,7 +115,7 @@ export default React.forwardRef<StackListRef, StackListProps>(
           indicatorIds &&
           indicatorIds.length > 1 && (
             <StackListIndicators
-              style={styles.indicators}
+              style={styles.indicatorsContainer}
               stackIds={indicatorIds}
               focussedStackId={focussedStackId}
             />
@@ -102,14 +129,22 @@ export default React.forwardRef<StackListRef, StackListProps>(
 );
 
 const styles = StyleSheet.create({
+  position: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+  },
   container: {
     flex: 1,
   },
-  indicators: {
-    width: "100%",
-    position: "absolute",
-    bottom: 20,
+  indicatorsContainer: {
     zIndex: 2,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: stackListIndicatorsHeight,
+    bottom: tabletopUISpacing,
+    width: "100%",
   },
   scrollView: {
     flexDirection: "row",

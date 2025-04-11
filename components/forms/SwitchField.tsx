@@ -3,7 +3,7 @@ import Field, { FieldProps } from "./Field";
 import Switch, { SwitchProps } from "./Switch";
 
 export interface SwitchFieldProps
-  extends SwitchProps,
+  extends Omit<SwitchProps, "label">,
     Pick<FieldProps, "label"> {
   FieldProps?: Partial<FieldProps>;
 }

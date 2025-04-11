@@ -6,7 +6,6 @@ export interface StackTopCardProps extends CardInstanceProps {
   stackId: string;
   leftStackId?: string;
   rightStackId?: string;
-  canMoveToBottom?: boolean;
   hideActions?: boolean;
   stackListRef: React.RefObject<StackListRef>;
 }

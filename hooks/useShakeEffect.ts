@@ -18,6 +18,7 @@ export default function useShakeEffect(callback?: (() => void) | null) {
   });
 
   React.useEffect(() => {
+    if (Platform.OS === "web") return;
     if (!callback) return;
 
     const ROTATION_THRESHOLD = 350; // degrees per second
