@@ -58,9 +58,7 @@ export function useTabletopNotification({
 }: {
   stackListRef: React.RefObject<StackListRef>;
 }) {
-  const [notification, setNotification] = React.useState<Notification | null>(
-    null,
-  );
+  const [notification, setNotification] = React.useState<Notification | null>();
 
   const notificationTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -190,7 +188,10 @@ export default function TabletopNotification({
         style,
       ]}
     >
-      <TouchableOpacity onPress={onPress} style={styles.content}>
+      <TouchableOpacity
+        onPress={onPress}
+        contentContainerStyle={styles.content}
+      >
         <ThemedText type="body2">{text}</ThemedText>
         {canCancel && (
           <View style={styles.closeContainer}>
