@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   container: {
     borderWidth: buttonStyles.outline.borderWidth,
-    borderRadius: buttonStyles.button.borderRadius,
+    borderRadius: buttonStyles.buttonContentContainer.borderRadius,
     overflow: "hidden",
   },
   iosModalContainer: {
