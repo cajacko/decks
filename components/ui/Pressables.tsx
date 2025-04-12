@@ -9,7 +9,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Href } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import useVibrate from "@/hooks/useVibrate";
 
 export interface PressableProps
@@ -25,11 +25,13 @@ export const Pressable = React.forwardRef(function Pressable(
     style: styleProp,
     onPress: onPressProp,
     vibrate: shouldVibrate = false,
+    href,
     ...props
   }: PressableProps,
   ref,
 ): React.ReactNode {
   const { vibrate } = useVibrate();
+  const { navigate } = useRouter();
 
   const style = React.useMemo<RNGPressableProps["style"]>(
     () => StyleSheet.flatten([styles.pressable, styleProp]),
@@ -42,7 +44,11 @@ export const Pressable = React.forwardRef(function Pressable(
     }
 
     onPressProp?.();
-  }, [onPressProp, vibrate, shouldVibrate]);
+
+    if (href) {
+      navigate(href);
+    }
+  }, [onPressProp, vibrate, shouldVibrate, href, navigate]);
 
   return <RNGPressable {...props} onPress={onPress} style={style} />;
 });
