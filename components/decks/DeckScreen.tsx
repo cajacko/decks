@@ -195,12 +195,15 @@ function ConnectedDeckScreen({
     selectDeckCards(state, { deckId }),
   );
 
-  const cards = React.useMemo<FlatListData[] | null>(() => {
+  const { cards, cardCount } = React.useMemo<{
+    cards: FlatListData[];
+    cardCount: number;
+  }>(() => {
     if (!cardsState || cardsState.length === 0) {
-      return [null];
+      return { cards: [null], cardCount: 0 };
     }
 
-    return cardsState;
+    return { cards: cardsState, cardCount: cardsState.length };
   }, [cardsState]);
 
   // Memoized renderItem to prevent unnecessary re-renders
@@ -235,7 +238,7 @@ function ConnectedDeckScreen({
       }
       title={
         <ThemedText style={styles.cardsHeader} type="h2">
-          {text["deck_screen.cards.title"]}
+          {text["deck_screen.cards.title"]} ({cardCount})
         </ThemedText>
       }
     />

@@ -70,6 +70,9 @@ export default function useStack({
   const doesTabletopHaveAvailableCards = useAppSelector((state) =>
     selectDoesTabletopHaveAvailableCards(state, { tabletopId }),
   );
+  const cardCount = useAppSelector(
+    (state) => selectCardInstanceIds(state, { stackId, tabletopId })?.length,
+  );
 
   const { getCardOffsetPosition, onUpdateCardList, stackCountLimit } =
     React.useMemo(
@@ -319,5 +322,6 @@ export default function useStack({
     emptyStackButton,
     handleFlipAll,
     shuffleProgress,
+    cardCount,
   };
 }

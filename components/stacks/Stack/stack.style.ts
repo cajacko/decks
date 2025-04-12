@@ -2,7 +2,7 @@ import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { StackDimensions } from "./stack.types";
 import { CardPhysicalSize } from "../../cards/context/CardPhysicalSize";
 import { Scale } from "../../cards/context/PhysicalMeasures";
-import { stackToolbarHeight } from "../StackToolbar";
+import { stackToolbarHeightAllowance } from "../StackToolbar";
 import { stackListIndicatorsHeight } from "../StackListIndicators";
 import { cardActionSize } from "@/components/forms/CardAction";
 
@@ -49,7 +49,8 @@ function getExampleStackDimensions(props: {
   const stackHorizontalPadding = buttonOverlaySize;
   const stackVerticalPadding = buttonOverlaySize;
 
-  const minSpaceAboveStack = stackToolbarHeight + tabletopUISpacing * 2;
+  const minSpaceAboveStack =
+    stackToolbarHeightAllowance + tabletopUISpacing * 2;
   const minSpaceBelowStack = stackListIndicatorsHeight + tabletopUISpacing * 2;
   const minVerticalSpacing = Math.max(minSpaceAboveStack, minSpaceBelowStack);
 
