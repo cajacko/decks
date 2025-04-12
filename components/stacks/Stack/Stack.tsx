@@ -139,6 +139,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     emptyStackButton,
     handleFlipAll,
     shuffleProgress,
+    cardCount,
   } = useStack(props);
 
   const innerStyle = useAnimatedStyle(() => ({
@@ -205,6 +206,7 @@ export default function Stack(props: StackProps): React.ReactNode {
           title={stackName}
           handleShuffle={getShouldShowShuffle() ? handleShuffle : undefined}
           handleFlipAll={handleFlipAll}
+          cardCount={cardCount}
         />
       }
     />

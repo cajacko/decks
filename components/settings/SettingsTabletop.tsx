@@ -74,6 +74,20 @@ export default function SettingsTabletop({
     [dispatch, tabletopId],
   );
 
+  const onChangeHideCardCount = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setTabletopSetting({
+          tabletopId,
+          key: "hideCardCount",
+          value: value,
+          date: dateToDateString(new Date()),
+        }),
+      );
+    },
+    [dispatch, tabletopId],
+  );
+
   const onChangeDefaultFaceUp = React.useCallback(
     (value: boolean) => {
       dispatch(
@@ -166,6 +180,14 @@ export default function SettingsTabletop({
             onValueChange={onChangeIsNeat}
             FieldProps={{
               subLabel: text["settings.neat_stack.helper"],
+            }}
+          />
+          <SwitchField
+            label={text["settings.tabletop.card_count"]}
+            value={!!settings.hideCardCount}
+            onValueChange={onChangeHideCardCount}
+            FieldProps={{
+              subLabel: text["settings.tabletop.card_count.helper"],
             }}
           />
           {/* Some settings don't make sense if it's a prebuilt deck, specifically things that 

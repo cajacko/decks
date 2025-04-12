@@ -19,6 +19,9 @@ import Animated, {
 import { useDrawer } from "@/context/Drawer";
 import useFlag from "@/hooks/useFlag";
 import { TouchableOpacity } from "@/components/ui/Pressables";
+import { useAppSelector } from "@/store/hooks";
+import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
+import { useTabletopContext } from "../tabletops/Tabletop/Tabletop.context";
 
 export interface StackToolbarProps {
   style?: StyleProp<ViewStyle>;
@@ -26,9 +29,15 @@ export interface StackToolbarProps {
   handleFlipAll?: () => void;
   onPressTitle?: () => void;
   title: string;
+  cardCount?: number;
 }
 
-export const stackToolbarHeight = 40;
+const stackToolbarCardCount = 40;
+const stackToolbarHeight = 40;
+
+export const stackToolbarHeightAllowance =
+  stackToolbarHeight + stackToolbarCardCount;
+
 const iconSize = stackToolbarHeight - 10;
 const moreLessDuration = 500;
 
@@ -37,6 +46,7 @@ const fadedOutOpacity = 0.4;
 export default function StackToolbar(
   props: StackToolbarProps,
 ): React.ReactNode {
+  const { tabletopId } = useTabletopContext();
   const performanceMode: boolean = useFlag("PERFORMANCE_MODE") === "enabled";
   const backgroundColor = useThemeColor("background");
   const borderColor = useThemeColor("inputOutline");
@@ -44,6 +54,9 @@ export default function StackToolbar(
   const availableWidth = useSharedValue<null | number>(null);
   const { open: openDrawer } = useDrawer();
   const actionsWidthPercentage = useSharedValue(0);
+  const hideCardCount = useAppSelector(
+    (state) => selectTabletopSettings(state, { tabletopId })?.hideCardCount,
+  );
 
   const onToolbarInnerLayout = React.useCallback<
     NonNullable<ViewProps["onLayout"]>
@@ -92,7 +105,7 @@ export default function StackToolbar(
     [backgroundColor],
   );
 
-  const animatedToolbarStyle = useAnimatedStyle(() => {
+  const animatedOpacityStyle = useAnimatedStyle(() => {
     return {
       opacity: interpolate(
         actionsWidthPercentage.value,
@@ -111,9 +124,9 @@ export default function StackToolbar(
           borderColor,
         },
       ]),
-      animatedToolbarStyle,
+      animatedOpacityStyle,
     ],
-    [backgroundColor, borderColor, animatedToolbarStyle],
+    [backgroundColor, borderColor, animatedOpacityStyle],
   );
 
   const [lessMore, setLessMore] = React.useState<"unfold-more" | "unfold-less">(
@@ -220,6 +233,15 @@ export default function StackToolbar(
           </View>
         </View>
       </Animated.View>
+      {props.cardCount && !hideCardCount && (
+        <Animated.View
+          style={[styles.cardCountContainer, animatedOpacityStyle]}
+        >
+          <View style={styles.cardCountContent}>
+            <ThemedText type="body2">{props.cardCount}</ThemedText>
+          </View>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -227,6 +249,19 @@ export default function StackToolbar(
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    position: "relative",
+  },
+  cardCountContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  cardCountContent: {
+    height: stackToolbarCardCount,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
   toolbar: {
     height: stackToolbarHeight,

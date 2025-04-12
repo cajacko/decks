@@ -72,6 +72,7 @@ type History = CreateHistoryHelper<HistoryState>;
 export interface Settings {
   preferNeatStacks?: boolean;
   defaultCardSide?: CardSide;
+  hideCardCount?: boolean;
   /**
    * Store the number the user sees (so not 0 indexed)
    */
