@@ -207,6 +207,7 @@ export default function Stack(props: StackProps): React.ReactNode {
           handleShuffle={getShouldShowShuffle() ? handleShuffle : undefined}
           handleFlipAll={handleFlipAll}
           cardCount={cardCount}
+          tabletopId={tabletopId}
         />
       }
     />

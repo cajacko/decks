@@ -21,7 +21,6 @@ import useFlag from "@/hooks/useFlag";
 import { TouchableOpacity } from "@/components/ui/Pressables";
 import { useAppSelector } from "@/store/hooks";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
-import { useTabletopContext } from "../tabletops/Tabletop/Tabletop.context";
 
 export interface StackToolbarProps {
   style?: StyleProp<ViewStyle>;
@@ -30,6 +29,7 @@ export interface StackToolbarProps {
   onPressTitle?: () => void;
   title: string;
   cardCount?: number;
+  tabletopId: string;
 }
 
 const stackToolbarCardCount = 40;
@@ -46,7 +46,6 @@ const fadedOutOpacity = 0.4;
 export default function StackToolbar(
   props: StackToolbarProps,
 ): React.ReactNode {
-  const { tabletopId } = useTabletopContext();
   const performanceMode: boolean = useFlag("PERFORMANCE_MODE") === "enabled";
   const backgroundColor = useThemeColor("background");
   const borderColor = useThemeColor("inputOutline");
@@ -55,7 +54,9 @@ export default function StackToolbar(
   const { open: openDrawer } = useDrawer();
   const actionsWidthPercentage = useSharedValue(0);
   const hideCardCount = useAppSelector(
-    (state) => selectTabletopSettings(state, { tabletopId })?.hideCardCount,
+    (state) =>
+      selectTabletopSettings(state, { tabletopId: props.tabletopId })
+        ?.hideCardCount,
   );
 
   const onToolbarInnerLayout = React.useCallback<
@@ -233,7 +234,7 @@ export default function StackToolbar(
           </View>
         </View>
       </Animated.View>
-      {props.cardCount && !hideCardCount && (
+      {!!props.cardCount && !hideCardCount && (
         <Animated.View
           style={[styles.cardCountContainer, animatedOpacityStyle]}
         >
