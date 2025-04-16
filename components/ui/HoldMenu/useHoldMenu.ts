@@ -25,6 +25,9 @@ export default function useHoldMenu({
   menuItems,
   handleDoubleTap,
   hideActions,
+  handleTap,
+  toggleMenuOnTap,
+  scaleOnTouch,
 }: HoldMenuProps) {
   // Flags
   const devIndicator = useFlag("HOLD_MENU_DEV_INDICATOR") === "enabled";
@@ -96,10 +99,13 @@ export default function useHoldMenu({
     [handleDoubleTap, throttledVibrate],
   );
 
-  const onTap = React.useCallback(
-    () => throttledVibrate("tap"),
-    [throttledVibrate],
-  );
+  const onTap = React.useCallback(() => {
+    if (handleTap || toggleMenuOnTap) {
+      throttledVibrate("tap");
+    }
+
+    handleTap?.();
+  }, [throttledVibrate, handleTap, toggleMenuOnTap]);
 
   const onTouch = React.useCallback(
     () => throttledVibrate("touch", 150),
@@ -129,13 +135,15 @@ export default function useHoldMenu({
         .onEnd(() => {
           runOnJS(onTap)();
 
-          menuOpacity.value = withTiming(menuOpacity.value === 1 ? 0 : 1, {
-            duration:
-              menuOpacity.value === 1 ? fadeOutDuration : fadeInDuration,
-          });
+          if (toggleMenuOnTap) {
+            menuOpacity.value = withTiming(menuOpacity.value === 1 ? 0 : 1, {
+              duration:
+                menuOpacity.value === 1 ? fadeOutDuration : fadeInDuration,
+            });
+          }
         }),
 
-    [menuOpacity, onTap],
+    [toggleMenuOnTap, menuOpacity, onTap],
   );
 
   const doubleTap = React.useMemo(
@@ -164,17 +172,24 @@ export default function useHoldMenu({
       .shouldCancelWhenOutside(false)
       .onStart(() => {
         isTouching.value = true;
-        scaleUpFinished.value = false;
 
-        runOnJS(onTouch)();
+        if (scaleOnTouch) {
+          scaleUpFinished.value = false;
 
-        scale.value = withTiming(scaleSize, { duration: scaleDuration }, () => {
-          scaleUpFinished.value = true;
+          runOnJS(onTouch)();
 
-          if (!isTouching.value) {
-            scale.value = withTiming(1, { duration: scaleDuration });
-          }
-        });
+          scale.value = withTiming(
+            scaleSize,
+            { duration: scaleDuration },
+            () => {
+              scaleUpFinished.value = true;
+
+              if (!isTouching.value) {
+                scale.value = withTiming(1, { duration: scaleDuration });
+              }
+            },
+          );
+        }
       })
       .onEnd(() => {
         isTouching.value = false;
@@ -183,9 +198,11 @@ export default function useHoldMenu({
           runOnJS(clearPendingVibrations)();
         }
 
-        if (!scaleUpFinished.value) return;
+        if (scaleOnTouch) {
+          if (!scaleUpFinished.value) return;
 
-        scale.value = withTiming(1, { duration: scaleDuration });
+          scale.value = withTiming(1, { duration: scaleDuration });
+        }
       });
   }, [
     holdMenuBehaviour,
@@ -195,6 +212,7 @@ export default function useHoldMenu({
     scale,
     onTouch,
     clearPendingVibrations,
+    scaleOnTouch,
   ]);
 
   // Show the menu on hover
@@ -215,7 +233,7 @@ export default function useHoldMenu({
     [alwaysShowCardActions, menuOpacity],
   );
 
-  // Show the menu on a long press
+  // Activate longPress handler
   const longPress = React.useMemo(() => {
     return Gesture.LongPress()
       .enabled(!!onLongPress)

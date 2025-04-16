@@ -17,8 +17,10 @@ export default function useMenuItems(props: StackTopCardProps) {
     const bottom: MenuItem = {
       height: cardActionSize,
       width: cardActionSize,
-      component: withHoldMenuItem("flip", state.handleFlipCard),
-      handleAction: state.handleFlipCard,
+      component: withHoldMenuItem("edit", state.handleFlipCard),
+      handleAction: () => {
+        setShowEditModal(true);
+      },
     };
 
     const top: MenuItem | undefined = state.handleMoveToBottom && {
@@ -58,7 +60,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     state.moveLeft,
   ]);
 
-  const handlePress = React.useCallback(() => {
+  const handleDoubleTap = React.useCallback(() => {
     setShowEditModal(true);
   }, [setShowEditModal]);
 
@@ -70,7 +72,8 @@ export default function useMenuItems(props: StackTopCardProps) {
     showEditModal,
     closeEditModal,
     side: state.side,
-    handlePress: state.isAnimating ? undefined : handlePress,
+    handleDoubleTap: state.isAnimating ? undefined : handleDoubleTap,
+    handleTap: state.isAnimating ? undefined : state.handleFlipCard,
     animatedToBack: state.animatedToBack,
     hideMenuItems: state.isAnimating,
   };

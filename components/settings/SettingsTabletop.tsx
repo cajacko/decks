@@ -22,6 +22,7 @@ import { setTabletopSetting } from "@/store/slices/tabletop";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
 import { dateToDateString } from "@/utils/dates";
 import IconSymbol from "../ui/IconSymbol";
+import useFlag from "@/hooks/useFlag";
 
 const titleProps = { type: "h2" } as const;
 
@@ -38,6 +39,8 @@ export default function SettingsTabletop({
   ...props
 }: SettingsTabletopProps): React.ReactNode {
   const dispatch = useAppDispatch();
+  const hideNeatStackOption =
+    useFlag("GLOBAL_NEAT_STACK_BEHAVIOUR") === "force-neat";
   const canEdit = useAppSelector((state) =>
     selectCanEditDeck(state, { deckId }),
   );
@@ -174,14 +177,16 @@ export default function SettingsTabletop({
             onPress={resetTabletopModal.open}
             variant="outline"
           />
-          <SwitchField
-            label={text["settings.neat_stack"]}
-            value={!!settings.preferNeatStacks}
-            onValueChange={onChangeIsNeat}
-            FieldProps={{
-              subLabel: text["settings.neat_stack.helper"],
-            }}
-          />
+          {!hideNeatStackOption && (
+            <SwitchField
+              label={text["settings.neat_stack"]}
+              value={!!settings.preferNeatStacks}
+              onValueChange={onChangeIsNeat}
+              FieldProps={{
+                subLabel: text["settings.neat_stack.helper"],
+              }}
+            />
+          )}
           <SwitchField
             label={text["settings.tabletop.card_count"]}
             value={!!settings.hideCardCount}
