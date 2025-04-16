@@ -14,7 +14,7 @@ import EditingAnimatedCardSides, {
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
-import { TabletopCardSizeProvider } from "@/components/tabletops/Tabletop/Tabletop.context";
+import { StackProvider } from "@/components/stacks/Stack/Stack.context";
 import { selectCanEdit } from "@/store/combinedSelectors/cards";
 import { useAppSelector, useRequiredAppSelector } from "@/store/hooks";
 import ThemedText from "@/components/ui/ThemedText";
@@ -84,7 +84,7 @@ export default function EditCard({
   }, [_copyDeck, onPressBackground]);
 
   return (
-    <TabletopCardSizeProvider
+    <StackProvider
       availableHeight={containerHeight ?? Dimensions.get("window").height}
       availableWidth={containerWidth ?? Dimensions.get("window").width}
       target={props.target}
@@ -142,7 +142,7 @@ export default function EditCard({
           </BottonDrawer>
         </BottomDrawerWrapper>
       </EditCardProvider>
-    </TabletopCardSizeProvider>
+    </StackProvider>
   );
 }
 

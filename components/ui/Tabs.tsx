@@ -17,19 +17,24 @@ export interface TabsProps {
 export interface TabProps {
   icon: IconSymbolName;
   title: string;
-  isActive: boolean;
-  href: LinkProps["href"];
+  isActive?: boolean;
+  href?: LinkProps["href"];
+  onPress?: () => void;
 }
 
 export function Tab(props: TabProps): React.ReactNode {
-  const { href } = props;
+  const { href, onPress: onPressProp } = props;
   const colors = useThemeColor("primary");
   const { bottom } = useSafeAreaInsets();
   const { navigate } = useRouter();
 
   const onPress = React.useCallback(() => {
-    navigate(href);
-  }, [href, navigate]);
+    if (href) {
+      navigate(href);
+    }
+
+    onPressProp?.();
+  }, [href, navigate, onPressProp]);
 
   return (
     <TouchableOpacity

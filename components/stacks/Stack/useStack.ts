@@ -28,9 +28,10 @@ import text from "@/constants/text";
 import useShakeEffect from "@/hooks/useShakeEffect";
 import useVibrate from "@/hooks/useVibrate";
 import { dateToDateString } from "@/utils/dates";
+import { useStackContext } from "./Stack.context";
 
 export function useStackWidth() {
-  const { stackWidth } = useTabletopContext();
+  const { stackWidth } = useStackContext();
 
   const width = useSharedValue(stackWidth);
 

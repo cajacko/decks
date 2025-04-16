@@ -17,6 +17,7 @@ import StackListItem, {
 import { Target } from "@/utils/cardTarget";
 import StackToolbar from "@/components/stacks/StackToolbar";
 import useGetStackName from "@/hooks/useGetStackName";
+import { useStackContext } from "./Stack.context";
 
 function StackContent(
   props: Pick<StackProps, "style"> & {
@@ -28,7 +29,7 @@ function StackContent(
     toolbar?: React.ReactNode;
   },
 ) {
-  const dimensions = useTabletopContext();
+  const dimensions = useStackContext();
 
   const innerStyle = React.useMemo(
     () => [

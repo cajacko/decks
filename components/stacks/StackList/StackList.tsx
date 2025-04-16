@@ -9,7 +9,7 @@ import StackListIndicators, {
   stackListIndicatorsHeight,
 } from "@/components/stacks/StackListIndicators";
 import { tabletopUISpacing } from "../Stack/stack.style";
-import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
+import { useStackContext } from "@/components/stacks/Stack/Stack.context";
 
 function StackListContent(
   props: Pick<StackListProps, "style" | "handleLayout"> & {
@@ -19,7 +19,7 @@ function StackListContent(
   },
 ) {
   const interval = useInterval();
-  const dimensions = useTabletopContext();
+  const dimensions = useStackContext();
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.container, props.style]),
