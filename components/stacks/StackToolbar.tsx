@@ -185,6 +185,15 @@ export default function StackToolbar(
 
   return (
     <View style={style} onLayout={onContainerLayout}>
+      {!!props.cardCount && !hideCardCount && (
+        <Animated.View
+          style={[styles.cardCountContainer, animatedOpacityStyle]}
+        >
+          <View style={styles.cardCountContent}>
+            <ThemedText type="body2">{props.cardCount}</ThemedText>
+          </View>
+        </Animated.View>
+      )}
       <Animated.View style={toolbarStyle}>
         <View style={styles.toolbarInner} onLayout={onToolbarInnerLayout}>
           <TouchableOpacity
@@ -234,15 +243,6 @@ export default function StackToolbar(
           </View>
         </View>
       </Animated.View>
-      {!!props.cardCount && !hideCardCount && (
-        <Animated.View
-          style={[styles.cardCountContainer, animatedOpacityStyle]}
-        >
-          <View style={styles.cardCountContent}>
-            <ThemedText type="body2">{props.cardCount}</ThemedText>
-          </View>
-        </Animated.View>
-      )}
     </View>
   );
 }
@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
+    bottom: 0,
     alignItems: "center",
     justifyContent: "center",
   },
