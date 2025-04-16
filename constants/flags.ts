@@ -11,7 +11,9 @@ import { Platform } from "react-native";
 import * as DevClient from "expo-dev-client";
 
 // If set, this value will be used
-export const flagOverrides: Partial<UserSettings.FlagMap> = {};
+export const flagOverrides: Partial<UserSettings.FlagMap> = {
+  SKELETON_LOADER: "enabled",
+};
 
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though
@@ -59,16 +61,7 @@ export const flagRelationships: FlagRelationships = {
       return "disabled";
     }
 
-    switch (value) {
-      case "custom-fade-in-content":
-      case "custom-fade-out-top-background": {
-        return getValue("GENERAL_LAYOUT_ANIMATIONS") === "enabled"
-          ? value
-          : "disabled";
-      }
-      default:
-        return value;
-    }
+    return value;
   },
 };
 

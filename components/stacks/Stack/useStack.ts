@@ -19,7 +19,7 @@ import {
   interpolate,
 } from "react-native-reanimated";
 import { deleteStack } from "@/store/slices/tabletop";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import useFlag from "@/hooks/useFlag";
 import useOffsetPositions from "@/components/cards/ui/AnimatedCard/useOffsetPositions";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
@@ -63,7 +63,7 @@ export default function useStack({
   const { tabletopId, deckId, notify } = useTabletopContext();
   const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const shuffleProgress = useSharedValue(0);
   const doesTabletopHaveCards = useAppSelector((state) =>
     selectDoesTabletopHaveCardInstances(state, { tabletopId }),
@@ -255,7 +255,10 @@ export default function useStack({
 
     return {
       action: () => {
-        navigate(`/deck/${deckId}`);
+        navigate({
+          name: "deck",
+          deckId,
+        });
       },
       title: text["stack.actions.edit_deck"],
     };

@@ -1,4 +1,4 @@
-import { Stack, usePathname } from "expo-router";
+import { Stack } from "expo-router";
 import React from "react";
 import { withApp } from "@/components/ui/App";
 import useFlag from "@/hooks/useFlag";
@@ -11,6 +11,7 @@ import IconButton from "@/components/forms/IconButton";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectUserSetting, setUserSetting } from "@/store/slices/userSettings";
 import { dateToDateString } from "@/utils/dates";
+import { useNavigation } from "@/context/Navigation";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
@@ -30,7 +31,7 @@ function RootLayout() {
   const freezeOnBlur = useFlag("SCREENS_FREEZE_ON_BLUR");
   const animateStack = useFlag("NAVIGATION_STACK_ANIMATIONS") === "slide";
   const borderColor = useThemeColor("inputOutline");
-  const pathname = usePathname();
+  const isMarketingPage = useNavigation().screen.name === "marketing";
 
   const hideWebAppStorePopUp = useAppSelector((state) =>
     selectUserSetting(state, { key: "hideWebAppStorePopUp" }),
@@ -86,7 +87,7 @@ function RootLayout() {
         <Stack.Screen name="app" options={navOptions.app} />
         <Stack.Screen name="deck/[deckId]" options={navOptions.deck} />
       </Stack>
-      {Platform.OS === "web" && showAppStore && pathname !== "/" && (
+      {Platform.OS === "web" && showAppStore && !isMarketingPage && (
         <ThemedView style={[styles.appStoreContainer, { borderColor }]}>
           <ContentWidth style={styles.inner}>
             <AppStores />

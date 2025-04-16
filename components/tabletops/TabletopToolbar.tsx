@@ -5,7 +5,6 @@ import useTabletopHistory, {
   UseTabletopHistoryOptions,
 } from "@/hooks/useTabletopHistory";
 import useDeckName from "@/hooks/useDeckName";
-import { appHome } from "@/constants/links";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import useFlag from "@/hooks/useFlag";
@@ -50,12 +49,7 @@ export default function TabletopToolbar(
   }, [dispatch, shakeToShuffleOn, notify]);
 
   return (
-    <Toolbar
-      backPath={appHome}
-      logoVisible={false}
-      title={title}
-      loading={props.loading}
-    >
+    <Toolbar back logoVisible={false} title={title} loading={props.loading}>
       {Platform.OS !== "web" && (
         <Animated.View entering={entering} exiting={exiting}>
           <IconButton

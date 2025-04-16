@@ -3,7 +3,6 @@ import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 import IconSymbol, { IconSymbolName } from "./IconSymbol";
 import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { LinkProps, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ContentWidth from "./ContentWidth";
 import { iconSize, _contentHeight } from "@/context/Toolbar";
@@ -18,23 +17,13 @@ export interface TabProps {
   icon: IconSymbolName;
   title: string;
   isActive?: boolean;
-  href?: LinkProps["href"];
-  onPress?: () => void;
+  onPress: () => void;
 }
 
 export function Tab(props: TabProps): React.ReactNode {
-  const { href, onPress: onPressProp } = props;
+  const { onPress } = props;
   const colors = useThemeColor("primary");
   const { bottom } = useSafeAreaInsets();
-  const { navigate } = useRouter();
-
-  const onPress = React.useCallback(() => {
-    if (href) {
-      navigate(href);
-    }
-
-    onPressProp?.();
-  }, [href, navigate, onPressProp]);
 
   return (
     <TouchableOpacity

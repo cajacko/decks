@@ -107,11 +107,6 @@ export const selectDeckCards = (
   props: { deckId: string },
 ): Decks.Card[] | undefined => selectDeck(state, props)?.cards;
 
-export const selectDeckLastScreen = (
-  state: RootState,
-  props: { deckId: string },
-): "deck" | "play" | undefined => selectDeck(state, props)?.lastScreen;
-
 export const selectBuiltInDeckIds = (state: RootState) =>
   selectDeckIds(selectBuiltInState(state));
 

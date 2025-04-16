@@ -5,7 +5,7 @@ import IconButton, {
   getFloatingButtonVerticalAllowance,
   styles as iconButtonStyles,
 } from "../forms/IconButton";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import uuid from "@/utils/uuid";
 import MyDecks from "@/components/decks/MyDecks";
@@ -88,7 +88,7 @@ export function DecksScreenSkeleton(props: DecksScreenProps): React.ReactNode {
 }
 
 export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const dispatch = useAppDispatch();
   const hasOwnDecks = useAppSelector(selectHasOwnDecks);
 
@@ -97,7 +97,10 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
 
     dispatch(createDeckHelper({ deckId }));
 
-    navigate(`/deck/${deckId}`);
+    navigate({
+      name: "deck",
+      deckId,
+    });
   }, [navigate, dispatch]);
 
   return (

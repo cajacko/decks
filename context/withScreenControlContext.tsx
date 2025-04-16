@@ -2,6 +2,8 @@ import React from "react";
 import uuid from "@/utils/uuid";
 import { useFocusEffect, useNavigation } from "expo-router";
 
+// TODO: Delete
+
 type Options = {
   resetOnUnmount?: boolean;
 };

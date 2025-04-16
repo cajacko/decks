@@ -45,12 +45,7 @@ export const flagMap = {
    * to enable them might help. But it does seem to block the next navigation transition after that.
    */
   SKELETON_ANIMATIONS: ["disabled", "enabled"],
-  SCREEN_ANIMATIONS: [
-    "disabled",
-    "react-navigation",
-    "custom-fade-in-content",
-    "custom-fade-out-top-background",
-  ],
+  SCREEN_ANIMATIONS: ["disabled", "react-navigation"],
   NAVIGATION_STACK_ANIMATIONS: ["disabled", "slide"],
   // Does not play nicely with reanimated effects. When we navigated to tabletop, then to deck edit
   // and then back to tabletop, the stacks wouldn't show. The reanimated opacity value seems to have

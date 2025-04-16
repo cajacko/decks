@@ -1,21 +1,37 @@
 import React from "react";
-import { Slot, useSegments } from "expo-router";
+import { Slot } from "expo-router";
 import { selectCanEditDeck } from "@/store/selectors/decks";
 import text from "@/constants/text";
 import { useAppSelector } from "@/store/hooks";
-import useScreenDeckId from "@/hooks/useScreenDeckId";
 import { StyleSheet, View } from "react-native";
 import Tabs, { Tab } from "@/components/ui/Tabs";
+import { useNavigation } from "@/context/Navigation";
 
 export default function DeckLayout() {
-  const deckId = useScreenDeckId("layout", null);
+  const { navigate, screen, preloadDeckId } = useNavigation();
+  const deckId = screen.deckId || preloadDeckId;
   const canEditDeck = useAppSelector((state) =>
     deckId ? selectCanEditDeck(state, { deckId }) : false,
   );
+  const isPlay = useNavigation().screen.name === "play";
 
-  const segments = useSegments();
-  const lastSegment = segments[segments.length - 1];
-  const isPlay = lastSegment === "play";
+  const onPressDeck = React.useCallback(() => {
+    if (!deckId) return;
+
+    navigate({
+      name: "deck",
+      deckId,
+    });
+  }, [deckId, navigate]);
+
+  const onPressPlay = React.useCallback(() => {
+    if (!deckId) return;
+
+    navigate({
+      name: "play",
+      deckId,
+    });
+  }, [deckId, navigate]);
 
   return (
     <View style={styles.container}>
@@ -24,7 +40,7 @@ export default function DeckLayout() {
       </View>
       <Tabs style={styles.tabs}>
         <Tab
-          href={`/deck/${deckId}`}
+          onPress={onPressDeck}
           icon={canEditDeck ? "edit-document" : "remove-red-eye"}
           title={
             canEditDeck
@@ -34,7 +50,7 @@ export default function DeckLayout() {
           isActive={!isPlay}
         />
         <Tab
-          href={`/deck/${deckId}/play`}
+          onPress={onPressPlay}
           icon="play-arrow"
           title={text["screen.deck.play.title"]}
           isActive={isPlay}

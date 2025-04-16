@@ -10,7 +10,7 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
 import ProfilePic from "@/components/ui/ProfilePic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter, Href } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import Image from "@/components/ui/Image";
 import { useTextLogo } from "@/hooks/useLogo";
 import IconButton from "@/components/forms/IconButton";
@@ -26,7 +26,7 @@ export interface ToolbarProps {
   title?: string | null;
   logoVisible?: boolean;
   children?: React.ReactNode | null;
-  backPath?: Href | null;
+  back?: boolean;
   loading?: boolean;
 }
 
@@ -57,7 +57,7 @@ export default function Toolbar({
   title,
   logoVisible,
   children,
-  backPath,
+  back,
   sharedToolbarHeight,
   loading: loadingProp = false,
 }: Omit<ToolbarProps, "hidden"> & {
@@ -66,12 +66,11 @@ export default function Toolbar({
   const { loading: syncing } = useSync();
 
   const loading: boolean = loadingProp || syncing;
-
   const { isLoggedIn } = useAuthentication();
   const { entering, exiting } = useLayoutAnimations();
   const { open } = useDrawer() ?? {};
   const { source, aspectRatio } = useTextLogo();
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const { height, paddingTop, animatedTopStyle } =
     useToolbarHeight(sharedToolbarHeight);
   const borderBottomColor = useThemeColor("inputOutline");
@@ -81,14 +80,16 @@ export default function Toolbar({
   const shouldAnimateLoading =
     useFlag("TOOLBAR_LOADING_ANIMATION") === "enabled" && loading;
 
-  const back = React.useMemo(() => {
-    if (!backPath) return undefined;
+  const goBack = React.useMemo(() => {
+    if (!back) return undefined;
 
     return () => {
       // Adjust for history?
-      navigate(backPath);
+      navigate({
+        name: "decks",
+      });
     };
-  }, [backPath, navigate]);
+  }, [back, navigate]);
 
   const containerStyle = React.useMemo(
     () => [
@@ -143,12 +144,12 @@ export default function Toolbar({
         contentContainerStyle={styles.contentWidth}
       >
         <View style={styles.content}>
-          {back && (
+          {goBack && (
             <Animated.View entering={entering} exiting={exiting}>
               <IconButton
                 icon="arrow-back"
                 size={iconSize}
-                onPress={back}
+                onPress={goBack}
                 style={styles.backButton}
                 variant="transparent"
                 vibrate
@@ -158,7 +159,7 @@ export default function Toolbar({
           {logoVisible && (
             <Animated.View entering={entering} exiting={exiting}>
               <TouchableOpacity
-                href="/"
+                onPress={() => navigate({ name: "decks" })}
                 style={imageContainerStyle}
                 contentContainerStyle={imageContainerStyle}
                 vibrate

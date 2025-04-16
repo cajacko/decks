@@ -1,20 +1,21 @@
 import React from "react";
-import DeckScreen from "@/components/decks/DeckScreen";
+import DeckScreen, { DeckScreenSkeleton } from "@/components/decks/DeckScreen";
 import { StyleSheet } from "react-native";
 import TextureBackground from "@/components/ui/TextureBackground";
 import Screen from "@/components/ui/Screen";
-import useScreenDeckId from "@/hooks/useScreenDeckId";
+import { useNavigation } from "@/context/Navigation";
 
 export default function DeckRoute() {
-  const deckId = useScreenDeckId("screen", DeckRoute.name);
-
-  if (!deckId) {
-    return null;
-  }
+  const { screen, preloadDeckId } = useNavigation();
+  const deckId = screen.deckId || preloadDeckId;
 
   return (
     <Screen background={<TextureBackground />}>
-      <DeckScreen deckId={deckId} style={styles.container} />
+      {deckId ? (
+        <DeckScreen deckId={deckId} style={styles.container} />
+      ) : (
+        <DeckScreenSkeleton style={styles.container} />
+      )}
     </Screen>
   );
 }

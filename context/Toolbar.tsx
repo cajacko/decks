@@ -33,7 +33,7 @@ const defaultProps: { [K in keyof ToolbarProps]: ToolbarProps[K] } = {
   title: null,
   logoVisible: true,
   children: null,
-  backPath: null,
+  back: false,
   loading: false,
 };
 

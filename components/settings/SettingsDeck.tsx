@@ -8,12 +8,11 @@ import text from "@/constants/text";
 import Button from "@/components/forms/Button";
 import useDeleteWarning from "@/hooks/useDeleteWarning";
 import { copyDeckHelper, deleteDeckHelper } from "@/store/actionHelpers/decks";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import { selectCanEditDeck, selectDeck } from "@/store/selectors/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import uuid from "@/utils/uuid";
 import { useDrawer } from "@/context/Drawer";
-import { appHome } from "@/constants/links";
 import IconSymbol from "../ui/IconSymbol";
 
 const titleProps = { type: "h2" } as const;
@@ -28,14 +27,16 @@ export default function SettingsDeck({
 }: SettingsDeckProps): React.ReactNode {
   const { close: closeDrawer } = useDrawer() ?? {};
   const dispatch = useAppDispatch();
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const deckName = deckNameWithFallback(
     useAppSelector((state) => selectDeck(state, { deckId })?.name),
   );
 
   const deleteDeck = React.useCallback(() => {
     closeDrawer?.();
-    navigate(appHome);
+    navigate({
+      name: "decks",
+    });
 
     dispatch(deleteDeckHelper({ deckId }));
   }, [deckId, dispatch, navigate, closeDrawer]);
@@ -56,7 +57,10 @@ export default function SettingsDeck({
 
     dispatch(copyDeckHelper({ deckId, newDeckId }));
 
-    navigate(`/deck/${newDeckId}`);
+    navigate({
+      name: "deck",
+      deckId: newDeckId,
+    });
   }, [deckId, dispatch, navigate, closeDrawer]);
 
   const iconSize = useLeftAdornmentSize({ titleProps });

@@ -7,7 +7,7 @@ import Image from "@/components/ui/Image";
 import AppStores from "@/components/ui/AppStores";
 import text from "@/constants/text";
 import Button from "@/components/forms/Button";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import {
   privacyPolicyLink,
   termsLink,
@@ -26,14 +26,14 @@ export interface MarketingScreenProps {
 export default function MarketingScreen({
   style,
 }: MarketingScreenProps): React.ReactNode {
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
 
   return (
     <ThemedView style={[styles.container, style]}>
       <Toolbar hidden />
       <ScrollView style={styles.scrollView}>
         <ContentWidth padding="standard">
-          <TouchableOpacity href="/app">
+          <TouchableOpacity onPress={() => navigate({ name: "decks" })}>
             <Image
               style={styles.heroImage}
               source={require("../../assets/images/dex-phones-hero.png")}
@@ -54,7 +54,11 @@ export default function MarketingScreen({
               <Button
                 title={text["marketing_screen.web_button"]}
                 variant="outline"
-                onPress={() => navigate("/app")}
+                onPress={() =>
+                  navigate({
+                    name: "decks",
+                  })
+                }
               />
             </View>
             <ThemedText style={styles.about}>

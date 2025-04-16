@@ -18,7 +18,6 @@ import IconButton, {
   getFloatingButtonVerticalAllowance,
   styles as iconButtonStyles,
 } from "../forms/IconButton";
-import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/ui/Loader";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
 import ContentWidth, { getContentWidth } from "@/components/ui/ContentWidth";
@@ -235,11 +234,6 @@ export default function DeckScreen({
   deckId,
   style,
 }: DeckScreenProps): React.ReactNode {
-  useDeckLastScreen({
-    deckId,
-    screen: "deck",
-  });
-
   const { open, component } = useEditCardModal({
     type: "new-card-in-deck",
     id: deckId,

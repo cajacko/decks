@@ -31,6 +31,7 @@ import { SkeletonProvider } from "@/context/Skeleton";
 import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
+import { NavigationProvider } from "@/context/Navigation";
 
 enableFreeze();
 
@@ -124,22 +125,24 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
   return (
     <PersistGate loading={null} persistor={persistor}>
-      <NavigationThemeProvider value={navigationTheme}>
-        <AuthenticationProvider>
-          <SyncProvider>
-            <SkeletonProvider>
-              <ModalProvider>
-                <DrawerProvider>
-                  <ToolbarProvider>
-                    <Content>{children}</Content>
-                    <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-                  </ToolbarProvider>
-                </DrawerProvider>
-              </ModalProvider>
-            </SkeletonProvider>
-          </SyncProvider>
-        </AuthenticationProvider>
-      </NavigationThemeProvider>
+      <NavigationProvider>
+        <NavigationThemeProvider value={navigationTheme}>
+          <AuthenticationProvider>
+            <SyncProvider>
+              <SkeletonProvider>
+                <ModalProvider>
+                  <DrawerProvider>
+                    <ToolbarProvider>
+                      <Content>{children}</Content>
+                      <StatusBar style={scheme === "dark" ? "light" : "dark"} />
+                    </ToolbarProvider>
+                  </DrawerProvider>
+                </ModalProvider>
+              </SkeletonProvider>
+            </SyncProvider>
+          </AuthenticationProvider>
+        </NavigationThemeProvider>
+      </NavigationProvider>
     </PersistGate>
   );
 }

@@ -11,10 +11,13 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import useEnsureTabletop from "@/hooks/useEnsureTabletop";
 import useFlag from "@/hooks/useFlag";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import {
+  useAppSelector,
+  useAppDispatch,
+  useRequiredAppSelector,
+} from "@/store/hooks";
 import { selectTabletopNeedsResetting } from "@/store/combinedSelectors/tabletops";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { TabletopProvider } from "./Tabletop.context";
@@ -30,6 +33,7 @@ import {
   StackProviderProps,
 } from "@/components/stacks/Stack/Stack.context";
 import { defaultCardSizePreset } from "@/components/cards/connected/CardSpacerSkeleton";
+import { selectDeck } from "@/store/selectors/decks";
 
 function TabletopContent(
   props: Omit<
@@ -111,11 +115,12 @@ export function TabletopSkeleton(props: Pick<TabletopProps, "style">) {
   );
 }
 
-export default function Tabletop({
-  tabletopId,
-  deckId,
-}: TabletopProps): React.ReactNode {
+export default function Tabletop({ deckId }: TabletopProps): React.ReactNode {
   const stackListRef = React.useRef<StackListRef>(null);
+  const tabletopId = useRequiredAppSelector(
+    (state) => selectDeck(state, { deckId })?.defaultTabletopId,
+    selectDeck.name,
+  );
   useEnsureTabletop({ tabletopId });
   const dispatch = useAppDispatch();
   const tabletopNeedsResetting = useAppSelector((state) =>
@@ -145,11 +150,6 @@ export default function Tabletop({
 
     hasTriedToAutoReset.current = true;
   }, [tabletopNeedsResetting, dispatch, tabletopId]);
-
-  useDeckLastScreen({
-    deckId,
-    screen: "play",
-  });
 
   const target = React.useMemo(
     (): Target => ({ id: deckId, type: "deck-defaults" }),
