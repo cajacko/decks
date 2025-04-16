@@ -14,6 +14,7 @@ export const flagMap = {
   SHAKE_TO_SHUFFLE: ["disabled", "enabled"],
 
   // Dev flags
+  GLOBAL_NEAT_STACK_BEHAVIOUR: ["force-neat", "user-choice"],
   /**
    * This causes issues when we navigate. HAving any animations running when the nav transitions
    * packs everything up.

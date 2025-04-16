@@ -4,6 +4,7 @@ import {
   selectDoesTabletopHaveCardInstances,
 } from "../selectors/tabletops";
 import { RootState, Decks, Tabletops } from "../types";
+import { selectFlags } from "../selectors/flags";
 
 type TabletopProps = { tabletopId: Tabletops.Id };
 
@@ -53,7 +54,18 @@ export const selectTabletopNeedsResetting = createCachedSelector(
   },
 )((_, props) => props.tabletopId);
 
-export const selectTabletopSettings = (
-  state: RootState,
-  props: { tabletopId: string },
-): Tabletops.Settings | undefined => selectTabletop(state, props)?.settings;
+export const selectTabletopSettings = createCachedSelector(
+  (state: RootState, props: TabletopProps) =>
+    selectTabletop(state, props)?.settings,
+  (state: RootState) =>
+    selectFlags(state, { keys: ["GLOBAL_NEAT_STACK_BEHAVIOUR"] }),
+  (settings, { GLOBAL_NEAT_STACK_BEHAVIOUR }): Tabletops.Settings => {
+    return {
+      ...settings,
+      preferNeatStacks:
+        GLOBAL_NEAT_STACK_BEHAVIOUR === "user-choice"
+          ? settings?.preferNeatStacks
+          : true,
+    };
+  },
+)((_, props) => props.tabletopId);
