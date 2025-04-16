@@ -36,6 +36,9 @@ export type RenderChildren = (props: {
 
 export interface HoldMenuProps {
   handleLongPress?: () => void;
+  scaleOnTouch?: boolean;
+  toggleMenuOnTap?: boolean;
+  handleTap?: () => void;
   handleDoubleTap?: () => void;
   menuItems: MenuItems | null;
   touchBuffer?: number;
