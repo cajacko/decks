@@ -5,6 +5,8 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
   interpolate,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
@@ -21,6 +23,10 @@ import { useSkeletonAnimation } from "@/context/Skeleton";
 import { useSync } from "@/context/Sync";
 import { TouchableOpacity } from "@/components/ui/Pressables";
 import { useAuthentication } from "@/context/Authentication";
+import useDeckName from "@/hooks/useDeckName";
+// import DeckToolbar from "../decks/DeckToolbar";
+// import TabletopToolbar from "../tabletops/TabletopToolbar";
+const animateHeightDuration = 500;
 
 export interface ToolbarProps {
   title?: string | null;
@@ -53,26 +59,58 @@ export function useToolbarHeight(
   };
 }
 
-export default function Toolbar({
-  title,
-  logoVisible,
-  children,
-  back,
-  sharedToolbarHeight,
-  loading: loadingProp = false,
-}: Omit<ToolbarProps, "hidden"> & {
-  sharedToolbarHeight: SharedValue<number>;
-}) {
-  const { loading: syncing } = useSync();
+export default function Toolbar() {
+  const { height, paddingTop, animatedTopStyle } = useToolbarHeight(null);
+  const sharedToolbarHeight = useSharedValue(height);
+  const shouldAnimateHeight = useFlag("TOOLBAR_HEIGHT_ANIMATION") === "enabled";
+  const hidden = useNavigation().screen.name === "marketing";
 
-  const loading: boolean = loadingProp || syncing;
+  // Happens when insets change e.g. on device rotation etc
+  React.useEffect(() => {
+    if (shouldAnimateHeight) {
+      sharedToolbarHeight.value = withTiming(height, {
+        duration: animateHeightDuration,
+      });
+    } else {
+      sharedToolbarHeight.value = height;
+    }
+  }, [sharedToolbarHeight, height, shouldAnimateHeight]);
+
+  React.useEffect(() => {
+    if (shouldAnimateHeight) {
+      if (hidden) {
+        sharedToolbarHeight.value = withTiming(0, {
+          duration: animateHeightDuration,
+        });
+      } else {
+        sharedToolbarHeight.value = withTiming(height, {
+          duration: animateHeightDuration,
+        });
+      }
+    } else {
+      sharedToolbarHeight.value = height;
+    }
+  }, [hidden, height, sharedToolbarHeight, shouldAnimateHeight]);
+
+  const { loading: syncing } = useSync();
+  const {
+    screen: { name, deckId },
+  } = useNavigation();
+  const back = name !== "decks";
+  const logoVisible = !back;
+
+  let title: string | null = useDeckName(deckId);
+
+  if (!deckId) {
+    title = null;
+  }
+
+  const loading: boolean = syncing;
   const { isLoggedIn } = useAuthentication();
   const { entering, exiting } = useLayoutAnimations();
   const { open } = useDrawer() ?? {};
   const { source, aspectRatio } = useTextLogo();
   const { navigate } = useNavigation();
-  const { height, paddingTop, animatedTopStyle } =
-    useToolbarHeight(sharedToolbarHeight);
   const borderBottomColor = useThemeColor("inputOutline");
   const backgroundColor = useThemeColor("background");
   const primaryColor = useThemeColor("primary");
@@ -182,7 +220,7 @@ export default function Toolbar({
             )}
           </View>
           <View style={styles.rightContainer}>
-            {children}
+            {/* {children} */}
             {open && (
               <>
                 {isLoggedIn ? (
@@ -239,7 +277,6 @@ export const styles = StyleSheet.create({
   container: {
     width: "100%",
     borderBottomWidth: 1,
-    position: "absolute",
     right: 0,
     left: 0,
     zIndex: 2,

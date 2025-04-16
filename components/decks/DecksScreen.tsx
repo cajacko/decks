@@ -14,7 +14,6 @@ import PreBuiltDecks, {
 } from "@/components/decks/PreBuiltDecks";
 import useDeviceSize from "@/hooks/useDeviceSize";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
-import { Toolbar } from "@/context/Toolbar";
 import { selectHasOwnDecks } from "@/store/selectors/decks";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -61,19 +60,16 @@ function DecksScreenContent({
   );
 
   return (
-    <>
-      <Toolbar loading={loading} />
-      <CardConstraintsProvider width={cardWidth}>
-        <ScrollView
-          style={containerStyle}
-          contentContainerStyle={styles.contentContainerStyle}
-        >
-          {myDecks}
-          {preBuiltDecks}
-        </ScrollView>
-        {button}
-      </CardConstraintsProvider>
-    </>
+    <CardConstraintsProvider width={cardWidth}>
+      <ScrollView
+        style={containerStyle}
+        contentContainerStyle={styles.contentContainerStyle}
+      >
+        {myDecks}
+        {preBuiltDecks}
+      </ScrollView>
+      {button}
+    </CardConstraintsProvider>
   );
 }
 

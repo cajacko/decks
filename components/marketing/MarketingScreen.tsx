@@ -14,7 +14,6 @@ import {
   playfaceWebsite,
   charlieJacksonLink,
 } from "@/constants/links";
-import { Toolbar } from "@/context/Toolbar";
 import Link from "@/components/ui/Link";
 import { ScrollView } from "react-native-gesture-handler";
 import { TouchableOpacity } from "@/components/ui/Pressables";
@@ -30,7 +29,6 @@ export default function MarketingScreen({
 
   return (
     <ThemedView style={[styles.container, style]}>
-      <Toolbar hidden />
       <ScrollView style={styles.scrollView}>
         <ContentWidth padding="standard">
           <TouchableOpacity onPress={() => navigate({ name: "decks" })}>

@@ -1,6 +1,5 @@
 import React from "react";
 import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
-import TabletopToolbar from "@/components/tabletops/TabletopToolbar";
 import { TabletopProps } from "@/components/tabletops/Tabletop/Tabletop.types";
 import StackList, {
   StackListRef,
@@ -172,15 +171,6 @@ export default function Tabletop({ deckId }: TabletopProps): React.ReactNode {
         />
         <SettingsDeck deckId={deckId} />
       </DrawerChildren>
-      <TabletopToolbar
-        loading={false}
-        tabletopId={tabletopId}
-        deckId={deckId}
-        beforeUndo={beforeUndo}
-        beforeRedo={beforeRedo}
-        notify={notify}
-      />
-
       <TabletopContent
         stackList={<StackList ref={stackListRef} style={styles.stackList} />}
         notification={

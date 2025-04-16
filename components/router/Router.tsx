@@ -7,7 +7,6 @@ import { DeckScreenSkeleton } from "@/components/decks/DeckScreen";
 import { TabletopSkeleton } from "@/components/tabletops/Tabletop";
 import TextureBackground from "@/components/ui/TextureBackground";
 import Screen from "@/components/ui/Screen";
-import Tabs, { Tab } from "@/components/ui/Tabs";
 import Animated, {
   SharedValue,
   useAnimatedStyle,
@@ -15,10 +14,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useNavigation, ScreenProps } from "@/context/Navigation";
+import MarketingScreen from "../marketing/MarketingScreen";
 
-export interface RouterProps {}
-
-type ScreenKeys = "decks" | "deck" | "play";
+type ScreenKeys = ScreenProps["name"];
 
 function AnimatedScreen(props: {
   children: React.ReactNode;
@@ -61,36 +60,32 @@ function AnimatedScreen(props: {
   return <Animated.View style={style}>{props.children}</Animated.View>;
 }
 
-// type NavState = {
-//   screen: ScreenKeys;
-//   prevScreen: ScreenKeys | null;
-//   deckId: string | null;
-// };
-
-export default function Router(props: RouterProps): React.ReactNode {
+export default function Router(): React.ReactNode {
+  const {
+    screen: { name },
+  } = useNavigation();
   const transitionProgress = useSharedValue(1);
-  // const [navState, setNavState] = React.useState<NavState>({
-  //   screen: "decks",
-  //   prevScreen: null,
-  //   deckId: null,
-  // });
-  const currentScreen = useSharedValue<ScreenKeys>("decks");
-  const prevScreen = useSharedValue<ScreenKeys | null>("decks");
+  const currentScreen = useSharedValue<ScreenKeys>(name);
+  const prevScreen = useSharedValue<ScreenKeys | null>(null);
+  const screenRef = React.useRef<ScreenKeys | null>(null);
 
-  const withOnPress = React.useCallback(
-    (screen: ScreenKeys) => () => {
-      transitionProgress.value = 0;
-      prevScreen.value = currentScreen.value;
-      currentScreen.value = screen;
+  React.useEffect(() => {
+    const _prevScreen = screenRef.current;
+    const _nextScreen = name;
 
-      transitionProgress.value = withTiming(1, { duration: 250 });
-    },
-    [transitionProgress, currentScreen, prevScreen],
-  );
+    // This is init
+    if (!prevScreen) {
+      screenRef.current = _nextScreen;
 
-  const onPressHome = React.useMemo(() => withOnPress("decks"), [withOnPress]);
-  const onPressView = React.useMemo(() => withOnPress("deck"), [withOnPress]);
-  const onPressPlay = React.useMemo(() => withOnPress("play"), [withOnPress]);
+      return;
+    }
+
+    transitionProgress.value = 0;
+    prevScreen.value = _prevScreen;
+    currentScreen.value = _nextScreen;
+
+    transitionProgress.value = withTiming(1, { duration: 250 });
+  }, [name, currentScreen, prevScreen, transitionProgress]);
 
   return (
     <View style={styles.content}>
@@ -120,22 +115,15 @@ export default function Router(props: RouterProps): React.ReactNode {
         >
           <TabletopSkeleton style={styles.container} />
         </AnimatedScreen>
+        <AnimatedScreen
+          transitionProgress={transitionProgress}
+          currentScreen={currentScreen}
+          prevScreen={prevScreen}
+          screen="marketing"
+        >
+          <MarketingScreen style={styles.container} />
+        </AnimatedScreen>
       </Screen>
-      <Tabs style={styles.tabs}>
-        <Tab icon="home" title="Home" isActive={true} onPress={onPressHome} />
-        <Tab
-          icon="remove-red-eye"
-          title="View"
-          isActive={false}
-          onPress={onPressView}
-        />
-        <Tab
-          icon="play-arrow"
-          title="Play"
-          isActive={false}
-          onPress={onPressPlay}
-        />
-      </Tabs>
     </View>
   );
 }

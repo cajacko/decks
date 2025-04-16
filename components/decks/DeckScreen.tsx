@@ -13,7 +13,6 @@ import DeckDetails, {
 } from "@/components/decks/DeckDetails";
 import DeckCard, { DeckCardSkeleton } from "./DeckCard";
 import { useEditCardModal, Open } from "../editCard/EditCardModal";
-import DeckToolbar from "./DeckToolbar";
 import IconButton, {
   getFloatingButtonVerticalAllowance,
   styles as iconButtonStyles,
@@ -122,7 +121,6 @@ function DeckScreenContent<D>(props: {
 
   return (
     <>
-      <DeckToolbar deckId={props.deckId} loading={props.loading} />
       <DrawerChildren>
         {props.deckId && <SettingsDeck deckId={props.deckId} />}
       </DrawerChildren>

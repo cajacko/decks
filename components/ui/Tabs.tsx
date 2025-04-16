@@ -5,7 +5,7 @@ import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ContentWidth from "./ContentWidth";
-import { iconSize, _contentHeight } from "@/context/Toolbar";
+import { iconSize, _contentHeight } from "@/components/ui/Toolbar";
 import { TouchableOpacity } from "./Pressables";
 
 export interface TabsProps {

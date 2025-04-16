@@ -24,7 +24,7 @@ import { useHasRehydrated } from "@/store/hooks";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import { SyncProvider } from "@/context/Sync";
 import { AuthenticationProvider } from "@/context/Authentication";
-import { ToolbarProvider } from "@/context/Toolbar";
+import Toolbar from "@/components/ui/Toolbar";
 import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SkeletonProvider } from "@/context/Skeleton";
@@ -32,6 +32,7 @@ import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
 import { NavigationProvider } from "@/context/Navigation";
+import Router from "../router/Router";
 
 enableFreeze();
 
@@ -71,7 +72,7 @@ function Content({ children }: { children: React.ReactNode }) {
   return (
     <ScreenContentLayoutProvider>
       {component}
-      {children}
+      <Router />
     </ScreenContentLayoutProvider>
   );
 }
@@ -132,10 +133,9 @@ function HasStore({ children }: { children: React.ReactNode }) {
               <SkeletonProvider>
                 <ModalProvider>
                   <DrawerProvider>
-                    <ToolbarProvider>
-                      <Content>{children}</Content>
-                      <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-                    </ToolbarProvider>
+                    <Toolbar />
+                    <Content>{children}</Content>
+                    <StatusBar style={scheme === "dark" ? "light" : "dark"} />
                   </DrawerProvider>
                 </ModalProvider>
               </SkeletonProvider>

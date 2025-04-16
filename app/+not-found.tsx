@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import ThemedView from "@/components/ui/ThemedView";
 import text from "@/constants/text";
-import { Toolbar } from "@/context/Toolbar";
 import { useNavigation } from "@/context/Navigation";
 import Button from "@/components/forms/Button";
 
@@ -11,7 +10,6 @@ export default function NotFoundScreen() {
   const { navigate } = useNavigation();
   return (
     <>
-      <Toolbar />
       <Stack.Screen options={{ title: text["screen.404.title"] }} />
       <ThemedView style={styles.container}>
         <ThemedText type="h3">{text["404.title"]}</ThemedText>
