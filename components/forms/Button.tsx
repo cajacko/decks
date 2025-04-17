@@ -92,7 +92,6 @@ export const styles = StyleSheet.create({
     height,
   },
   buttonContentContainer: {
-    height: height,
     borderRadius: 5,
     flexDirection: "row",
     alignItems: "center",

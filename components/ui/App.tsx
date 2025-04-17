@@ -28,11 +28,11 @@ import Toolbar from "@/components/ui/Toolbar";
 import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SkeletonProvider } from "@/context/Skeleton";
-import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
 import { NavigationProvider } from "@/context/Navigation";
 import Router from "../router/Router";
+import { PerformanceMonitorProvider } from "@/context/PerformanceMonitor";
 
 enableFreeze();
 
@@ -70,10 +70,10 @@ function Content({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <ScreenContentLayoutProvider>
+    <>
       {component}
       <Router />
-    </ScreenContentLayoutProvider>
+    </>
   );
 }
 
@@ -149,13 +149,15 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
 export default function App({ children }: { children: React.ReactNode }) {
   return (
-    <GestureHandlerRootView style={style.flex}>
-      <SafeAreaProvider style={style.flex}>
-        <ReduxProvider store={store}>
-          <HasStore>{children}</HasStore>
-        </ReduxProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <PerformanceMonitorProvider>
+      <GestureHandlerRootView style={style.flex}>
+        <SafeAreaProvider style={style.flex}>
+          <ReduxProvider store={store}>
+            <HasStore>{children}</HasStore>
+          </ReduxProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </PerformanceMonitorProvider>
   );
 }
 

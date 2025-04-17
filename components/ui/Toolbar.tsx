@@ -2,11 +2,8 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import Animated, {
-  SharedValue,
   useAnimatedStyle,
   interpolate,
-  useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
@@ -24,9 +21,6 @@ import { useSync } from "@/context/Sync";
 import { TouchableOpacity } from "@/components/ui/Pressables";
 import { useAuthentication } from "@/context/Authentication";
 import useDeckName from "@/hooks/useDeckName";
-// import DeckToolbar from "../decks/DeckToolbar";
-// import TabletopToolbar from "../tabletops/TabletopToolbar";
-const animateHeightDuration = 500;
 
 export interface ToolbarProps {
   title?: string | null;
@@ -36,23 +30,11 @@ export interface ToolbarProps {
   loading?: boolean;
 }
 
-export function useToolbarHeight(
-  sharedToolbarHeight: SharedValue<number> | null,
-) {
+function useToolbarHeight() {
   const paddingTop = useSafeAreaInsets().top;
   const height = _contentHeight + paddingTop;
 
-  const animatedHeightStyle = useAnimatedStyle(() => ({
-    height: sharedToolbarHeight ? sharedToolbarHeight.value : height,
-  }));
-
-  const animatedTopStyle = useAnimatedStyle(() => ({
-    top: sharedToolbarHeight ? -(height - sharedToolbarHeight.value) : 0,
-  }));
-
   return {
-    animatedTopStyle,
-    animatedHeightStyle,
     paddingTop,
     height,
     contentHeight: _contentHeight,
@@ -60,39 +42,12 @@ export function useToolbarHeight(
 }
 
 export default function Toolbar() {
-  const { height, paddingTop, animatedTopStyle } = useToolbarHeight(null);
-  const sharedToolbarHeight = useSharedValue(height);
-  const shouldAnimateHeight = useFlag("TOOLBAR_HEIGHT_ANIMATION") === "enabled";
+  let { height, paddingTop } = useToolbarHeight();
   const hidden = useNavigation().screen.name === "marketing";
 
-  // Happens when insets change e.g. on device rotation etc
-  React.useEffect(() => {
-    if (shouldAnimateHeight) {
-      sharedToolbarHeight.value = withTiming(height, {
-        duration: animateHeightDuration,
-      });
-    } else {
-      sharedToolbarHeight.value = height;
-    }
-  }, [sharedToolbarHeight, height, shouldAnimateHeight]);
-
-  React.useEffect(() => {
-    if (hidden) {
-      sharedToolbarHeight.value = 0;
-
-      return;
-    }
-
-    if (!shouldAnimateHeight) {
-      sharedToolbarHeight.value = height;
-
-      return;
-    }
-
-    sharedToolbarHeight.value = withTiming(height, {
-      duration: animateHeightDuration,
-    });
-  }, [hidden, height, sharedToolbarHeight, shouldAnimateHeight]);
+  if (hidden) {
+    height = 0;
+  }
 
   const { loading: syncing } = useSync();
   const {
@@ -133,7 +88,6 @@ export default function Toolbar() {
 
   const containerStyle = React.useMemo(
     () => [
-      animatedTopStyle,
       styles.container,
       {
         paddingTop,
@@ -143,7 +97,7 @@ export default function Toolbar() {
         backgroundColor,
       },
     ],
-    [animatedTopStyle, height, borderBottomColor, paddingTop, backgroundColor],
+    [height, borderBottomColor, paddingTop, backgroundColor],
   );
 
   const imageContainerStyle = React.useMemo(
@@ -177,7 +131,7 @@ export default function Toolbar() {
   );
 
   return (
-    <Animated.View style={containerStyle}>
+    <View style={containerStyle}>
       <ContentWidth
         padding="standard"
         style={styles.contentWidth}
@@ -265,7 +219,7 @@ export default function Toolbar() {
           style={loadingProgressStyle}
         />
       )}
-    </Animated.View>
+    </View>
   );
 }
 
@@ -279,6 +233,7 @@ export const styles = StyleSheet.create({
   container: {
     width: "100%",
     borderBottomWidth: 1,
+    top: 0,
     right: 0,
     left: 0,
     zIndex: 2,

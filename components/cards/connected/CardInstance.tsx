@@ -8,6 +8,7 @@ import { useRequiredAppSelector } from "@/store/hooks";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import { Target } from "@/utils/cardTarget";
 import CardSkeleton from "./CardSkeleton";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export interface CardInstanceProps extends Partial<AnimatedCardSidesProps> {
   cardInstanceId: string;
@@ -22,6 +23,10 @@ export function CardInstanceSkeleton({
 export default React.forwardRef<AnimatedCardSidesRef, CardInstanceProps>(
   function CardInstance({ cardInstanceId, ...cardSidesProps }, ref) {
     const { tabletopId } = useTabletopContext();
+
+    usePerformanceMonitor({
+      Component: CardInstance.name,
+    });
 
     const cardInstance = useRequiredAppSelector(
       (state) =>

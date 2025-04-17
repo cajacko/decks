@@ -11,6 +11,7 @@ import { useNavigation } from "@/context/Navigation";
 import MarketingScreen from "../marketing/MarketingScreen";
 import Tabs from "../ui/Tabs";
 import Preload from "./Preload";
+import { ContainerSizeProvider } from "@/context/ContainerSize";
 
 export default React.memo(function Router(): React.ReactNode {
   const {
@@ -22,16 +23,26 @@ export default React.memo(function Router(): React.ReactNode {
 
   return (
     <Screen background={<TextureBackground />}>
-      <Preload
-        visible={name === "decks"}
-        behaviour={
-          Platform.OS === "web" ? "no-preload" : "keep-children-mounted"
-        }
-        style={styles.absolute}
-        renderKey="decks"
-      >
-        <DecksScreen style={styles.container} />
-      </Preload>
+      <ContainerSizeProvider style={styles.container} hideUntilLoaded>
+        <Preload
+          visible={name === "decks"}
+          behaviour={
+            Platform.OS === "web" ? "no-preload" : "keep-children-mounted"
+          }
+          style={styles.absolute}
+          renderKey="decks"
+        >
+          <DecksScreen style={styles.container} />
+        </Preload>
+        <Preload
+          visible={name === "marketing"}
+          behaviour="no-preload"
+          style={styles.absolute}
+          renderKey="marketing"
+        >
+          <MarketingScreen style={styles.container} />
+        </Preload>
+      </ContainerSizeProvider>
       <Preload
         visible={name === "deck" || name === "play"}
         behaviour={
@@ -41,43 +52,35 @@ export default React.memo(function Router(): React.ReactNode {
         renderKey="deckLayout"
       >
         <Tabs>
-          <Preload
-            loader={<DeckScreenSkeleton style={styles.container} />}
-            visible={name === "deck"}
-            behaviour={
-              Platform.OS === "web"
-                ? "no-preload"
-                : "optimise-mount-unmount-with-loader"
-            }
-            style={styles.absolute}
-            renderKey={`deck-${deckId}`}
-          >
-            {deckId && <DeckScreen deckId={deckId} style={styles.container} />}
-          </Preload>
-          <Preload
-            loader={<TabletopSkeleton style={styles.container} />}
-            visible={name === "play"}
-            behaviour={
-              Platform.OS === "web"
-                ? "no-preload"
-                : "optimise-mount-unmount-with-loader"
-            }
-            style={styles.absolute}
-            renderKey={`play-${deckId}`}
-          >
-            {deckId && (
-              <TabletopScreen deckId={deckId} style={styles.container} />
-            )}
-          </Preload>
+          <ContainerSizeProvider style={styles.container} hideUntilLoaded>
+            <Preload
+              loader={<DeckScreenSkeleton style={styles.container} />}
+              visible={name === "deck"}
+              behaviour="no-preload"
+              style={styles.absolute}
+              renderKey={`deck-${deckId}`}
+            >
+              {deckId && (
+                <DeckScreen deckId={deckId} style={styles.container} />
+              )}
+            </Preload>
+            <Preload
+              loader={<TabletopSkeleton style={styles.container} />}
+              visible={name === "play"}
+              behaviour={
+                Platform.OS === "web"
+                  ? "no-preload"
+                  : "optimise-mount-unmount-with-loader"
+              }
+              style={styles.absolute}
+              renderKey={`play-${deckId}`}
+            >
+              {deckId && (
+                <TabletopScreen deckId={deckId} style={styles.container} />
+              )}
+            </Preload>
+          </ContainerSizeProvider>
         </Tabs>
-      </Preload>
-      <Preload
-        visible={name === "marketing"}
-        behaviour="no-preload"
-        style={styles.absolute}
-        renderKey="marketing"
-      >
-        <MarketingScreen style={styles.container} />
       </Preload>
     </Screen>
   );

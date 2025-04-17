@@ -1,17 +1,11 @@
 import React from "react";
-import { Dimensions, ScrollViewProps, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { TabletopProps } from "@/components/tabletops/Tabletop/Tabletop.types";
 import StackList, {
   StackListRef,
   StackListSkeleton,
 } from "@/components/stacks/StackList";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
 import useEnsureTabletop from "@/hooks/useEnsureTabletop";
-import useFlag from "@/hooks/useFlag";
 import {
   useAppSelector,
   useAppDispatch,
@@ -33,6 +27,8 @@ import {
 } from "@/components/stacks/Stack/Stack.context";
 import { defaultCardSizePreset } from "@/components/cards/connected/CardSpacerSkeleton";
 import { selectDeck } from "@/store/selectors/decks";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
+import { useRequiredContainerSize } from "@/context/ContainerSize";
 
 function TabletopContent(
   props: Omit<
@@ -43,54 +39,11 @@ function TabletopContent(
     notification?: React.ReactNode;
   },
 ) {
-  const performanceMode = useFlag("PERFORMANCE_MODE") === "enabled";
-
-  const [size, setSize] = React.useState<{ height: number; width: number }>(
-    Dimensions.get("screen"),
-  );
-
-  // Prevents janky layout reorganising when we get the initial layout
-  const opacity = useSharedValue(0);
-  const hasLayout = React.useRef(false);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-    };
+  usePerformanceMonitor({
+    Component: TabletopContent.name,
   });
 
-  const handleLayout = React.useCallback<Required<ScrollViewProps>["onLayout"]>(
-    (event) => {
-      // Having the fade in here makes doubly sure we're showing the content. We had a bug where it
-      // wasn't showing the content, but this fixed it.
-      if (performanceMode) {
-        opacity.value = 1;
-      } else {
-        opacity.value = withTiming(1, {
-          // We want this really fast as otherwise in native you see lots of see-through bits
-          duration: 200,
-        });
-      }
-
-      // Prevents us updating when the keyboard comes into view, which we don't want. Maybe there's
-      // a better solution for this, that then allows window changes as well?
-      if (hasLayout.current) {
-        // return;
-      }
-
-      hasLayout.current = true;
-
-      const { width, height } = event.nativeEvent.layout;
-
-      setSize({ width, height });
-    },
-    [opacity, performanceMode],
-  );
-
-  const contentStyle = React.useMemo(
-    () => [styles.content, animatedStyle],
-    [animatedStyle],
-  );
+  const size = useRequiredContainerSize();
 
   return (
     <StackProvider
@@ -98,10 +51,8 @@ function TabletopContent(
       availableWidth={size.width}
       sizePreset={defaultCardSizePreset}
     >
-      <Animated.View style={contentStyle} onLayout={handleLayout}>
-        {props.notification}
-        {props.stackList}
-      </Animated.View>
+      {props.notification}
+      {props.stackList}
     </StackProvider>
   );
 }
@@ -117,6 +68,10 @@ export function TabletopSkeleton(props: Pick<TabletopProps, "style">) {
 export default React.memo(function Tabletop({
   deckId,
 }: TabletopProps): React.ReactNode {
+  usePerformanceMonitor({
+    Component: Tabletop.name,
+  });
+
   const stackListRef = React.useRef<StackListRef>(null);
   const tabletopId = useRequiredAppSelector(
     (state) => selectDeck(state, { deckId })?.defaultTabletopId,
@@ -192,11 +147,6 @@ export default React.memo(function Tabletop({
 });
 
 const styles = StyleSheet.create({
-  content: {
-    position: "relative",
-    flex: 1,
-    zIndex: 2,
-  },
   stackList: {
     zIndex: 3,
     position: "relative",

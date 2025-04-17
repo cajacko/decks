@@ -126,11 +126,32 @@ function getCanOnlyFit1Stack({
   return availableWidth / stackWidth < 2;
 }
 
+const memoizedGetStackDimensions = (() => {
+  const cache: Record<string, StackDimensions> = {}; // Use a plain object for caching
+
+  return (props: {
+    availableWidth: number;
+    availableHeight: number;
+    physicalSize: CardPhysicalSize;
+  }): StackDimensions => {
+    const key = JSON.stringify(props);
+
+    if (cache[key]) {
+      return cache[key];
+    }
+
+    const dimensions = getStackDimensionsInternal(props);
+    cache[key] = dimensions;
+
+    return dimensions;
+  };
+})();
+
 // Get dimensions at 100% availableWidth or the max width (whichever is smaller)
 // if the stack height is bigger than availableHeight or max height
 // get the dimensions at 100% availableHeight or max height (whichever is smaller)
 // that should always do it I think
-export function getStackDimensions(props: {
+function getStackDimensionsInternal(props: {
   availableWidth: number;
   availableHeight: number;
   physicalSize: CardPhysicalSize;
@@ -165,6 +186,14 @@ export function getStackDimensions(props: {
       stackWidth: dimensions.stackWidth,
     }),
   };
+}
+
+export function getStackDimensions(props: {
+  availableWidth: number;
+  availableHeight: number;
+  physicalSize: CardPhysicalSize;
+}): StackDimensions {
+  return memoizedGetStackDimensions(props);
 }
 
 export function getToolbarContainerStyle(props: {

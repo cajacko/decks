@@ -10,9 +10,10 @@ import StackListIndicators, {
 } from "@/components/stacks/StackListIndicators";
 import { tabletopUISpacing } from "../Stack/stack.style";
 import { useStackContext } from "@/components/stacks/Stack/Stack.context";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 function StackListContent(
-  props: Pick<StackListProps, "style" | "handleLayout"> & {
+  props: Pick<StackListProps, "style"> & {
     children: React.ReactNode;
     animatedRef?: AnimatedRef<Animated.ScrollView>;
     indicators?: React.ReactNode;
@@ -46,6 +47,10 @@ function StackListContent(
     [dimensions.belowStackHeight, dimensions.aboveStackHeight],
   );
 
+  usePerformanceMonitor({
+    Component: StackListContent.name,
+  });
+
   return (
     <View style={style}>
       <Animated.ScrollView
@@ -56,7 +61,6 @@ function StackListContent(
         snapToAlignment="center"
         snapToInterval={interval}
         decelerationRate="fast"
-        onLayout={props.handleLayout}
         showsHorizontalScrollIndicator={false}
       >
         {props.children}
@@ -78,7 +82,11 @@ export function StackListSkeleton(props: Pick<StackListProps, "style">) {
 }
 
 export default React.forwardRef<StackListRef, StackListProps>(
-  function StackList({ handleLayout, style }, ref): React.ReactNode {
+  function StackList({ style }, ref): React.ReactNode {
+    usePerformanceMonitor({
+      Component: StackList.name,
+    });
+
     const {
       animatedRef,
       stackIds,
@@ -110,7 +118,6 @@ export default React.forwardRef<StackListRef, StackListProps>(
       <StackListContent
         animatedRef={animatedRef}
         style={style}
-        handleLayout={handleLayout}
         indicators={
           indicatorIds &&
           indicatorIds.length > 1 && (

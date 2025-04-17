@@ -22,8 +22,6 @@ export const flagRelationships: FlagRelationships = {
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   SKELETON_ANIMATIONS: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
-  TOOLBAR_HEIGHT_ANIMATION: (value, getFlag) =>
-    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   BACKUP_SYNC: (value, getFlag) =>
     getFlag("DEV_MODE") === true ? value : "disabled",
   AUTO_SYNC: (value, getFlag) =>

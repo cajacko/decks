@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ViewProps } from "react-native";
 import { fixed } from "@/constants/colors";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export interface CardSize {
   height: number;
@@ -27,6 +28,10 @@ export default function CardContainer({
   borderRadius = 0,
   ...viewProps
 }: CardContainerProps): React.ReactNode {
+  usePerformanceMonitor({
+    Component: CardContainer.name,
+  });
+
   const style = React.useMemo(
     () =>
       StyleSheet.flatten([

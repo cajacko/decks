@@ -10,11 +10,16 @@ import AnimatedCard, {
 } from "@/components/cards/ui/AnimatedCard";
 import CardSpacer from "@/components/cards/ui/CardSpacer";
 import Animated from "react-native-reanimated";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
   function AnimatedCardSides({ side, back, front, style, animatedStyle }, ref) {
     const state = useAnimatedCardSides(side, ref);
     const { height, width } = side === "front" ? front : back;
+
+    usePerformanceMonitor({
+      Component: AnimatedCardSides.name,
+    });
 
     const frontStyle = React.useMemo(
       (): AnimatedCardProps["style"] => [

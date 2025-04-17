@@ -2,6 +2,7 @@ import React from "react";
 import CardContainer, { CardContainerProps } from "./CardContainer";
 import Template, { TemplateProps } from "@/components/templates";
 import withUseExternalMemo from "@/hooks/withUseExternalMemo";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 /**
  * Special non card variables the templates can access e.g. the deck name.
@@ -47,6 +48,10 @@ export default function Card({
     [valuesProp, deckValues],
     cardSideCacheKey,
   );
+
+  usePerformanceMonitor({
+    Component: Card.name,
+  });
 
   return (
     <CardContainer {...cardContainerProps}>

@@ -5,6 +5,7 @@ import useConvertStyles from "./useConvertStyles";
 import { replaceVariables, conditional } from "./handlebars";
 import { useTemplateDataItem } from "./TemplateContext";
 import AppError from "@/classes/AppError";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export function MarkupChildren(props: MarkupChildrenProps): React.ReactNode {
   return props.nodes.map((node, i) => (
@@ -18,6 +19,10 @@ export default function MarkupNode({
 }: MarkupNodeProps): React.ReactNode {
   const values = useTemplateDataItem();
   const convertStyles = useConvertStyles({ values, cacheKey });
+
+  usePerformanceMonitor({
+    Component: MarkupNode.name,
+  });
 
   if (
     node.conditional &&

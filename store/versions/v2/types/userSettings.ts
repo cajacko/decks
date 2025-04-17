@@ -20,7 +20,6 @@ export const flagMap = {
    * packs everything up.
    */
   TOOLBAR_LOADING_ANIMATION: ["disabled", "enabled"],
-  TOOLBAR_HEIGHT_ANIMATION: ["enabled", "disabled"],
   BACKUP_SYNC: ["disabled", "enabled"],
   AUTO_SYNC: ["enabled", "disabled"],
   ROTATE_CARDS_BEFORE_FLIP: ["disabled", "enabled"],
@@ -56,6 +55,7 @@ export const flagMap = {
   PURGE_STORE_ON_START: [false, true],
 
   // Debug logs
+  DEBUG_PERFORMANCE: [false, true],
   DEBUG_BOTTOM_DRAWER: [false, true],
   DEBUG_AUTO_SAVE: [false, true],
   DEBUG_EDIT_CARD: [false, true],

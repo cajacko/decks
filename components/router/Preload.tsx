@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native";
 import withDebugLog from "@/utils/withDebugLog";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 const debugLog = withDebugLog(() => false, "Preload");
 
@@ -64,6 +65,11 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
   const renderKeyRef = React.useRef(renderKey);
   renderKeyRef.current = renderKey;
 
+  const { startTime, endTime, trackTime } = usePerformanceMonitor({
+    Component: OptimisedPreloader.name,
+    tags: [renderKeyRef.current],
+  });
+
   // So we can access children in effects without triggering those effects
   const currentChildrenRef = React.useRef(currentChildren);
   currentChildrenRef.current = currentChildren;
@@ -92,12 +98,17 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
 
   // 1. Whenever the renderKey changes, show the loader (is also our init state)
   React.useEffect(() => {
+    startTime(renderKeyRef.current, {
+      note: "Preload 1 - renderKey changed",
+    });
+
     debugLog(
       "1. current children changed, showing loader",
       renderKeyRef.current,
     );
+
     setVisibleComponent("loader");
-  }, [renderKey]);
+  }, [renderKey, startTime]);
 
   // 2. When we have current children and we are showing the loader, mount those current children
   // after a timeout so the views have a chance to render fully and be active
@@ -105,12 +116,19 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
     if (!hasCurrentChildren) return;
     if (visibleComponent === "children") return;
 
+    trackTime({
+      note: "Preload 2 - current children are available, showing them after timeout",
+    });
+
     debugLog(
       "2. current children are available, showing them after timeout",
       renderKeyRef.current,
     );
 
     const timeout = setTimeout(() => {
+      trackTime({
+        note: "Preload 2 - timeout completed",
+      });
       debugLog("2. timeout completed", renderKeyRef.current);
       setRendering([currentChildrenRef.current, renderKeyRef.current]);
     }, renderChildrenTimeout);
@@ -118,11 +136,15 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
     return () => {
       clearTimeout(timeout);
     };
-  }, [hasCurrentChildren, visibleComponent]);
+  }, [hasCurrentChildren, visibleComponent, trackTime]);
 
   // 3. When the renderChildren change wait a bit for them to mount and then show them
   React.useEffect(() => {
     if (!renderChildren) return;
+
+    trackTime({
+      note: "Preload 3 - render children changed, showing them after timeout",
+    });
 
     debugLog(
       "3. render children changed, showing them after timeout",
@@ -132,12 +154,16 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
     const timeout = setTimeout(() => {
       debugLog("3. timeout completed", renderKeyRef.current);
       setVisibleComponent("children");
+
+      endTime(renderKeyRef.current, {
+        note: "Preload 3 - timeout completed",
+      });
     }, showChildrenTimeout);
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [renderChildren]);
+  }, [renderChildren, trackTime, endTime]);
 
   return (
     <>

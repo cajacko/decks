@@ -12,16 +12,16 @@ import MyDecks from "@/components/decks/MyDecks";
 import PreBuiltDecks, {
   PreBuiltDecksSkeleton,
 } from "@/components/decks/PreBuiltDecks";
-import useDeviceSize from "@/hooks/useDeviceSize";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
 import { selectHasOwnDecks } from "@/store/selectors/decks";
 import { ScrollView } from "react-native-gesture-handler";
+import { useRequiredContainerSize } from "@/context/ContainerSize";
 
 const minCardListWidth = 100;
 const maxCardListWidth = 150;
 
 function useCardListWidth(): number {
-  const { width } = useDeviceSize({ listenTo: { width: true, height: false } });
+  const { width } = useRequiredContainerSize();
 
   const idealWidth = width / 3;
 
