@@ -1,132 +1,87 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import DecksScreen, {
-  DecksScreenSkeleton,
-} from "@/components/decks/DecksScreen";
-import { DeckScreenSkeleton } from "@/components/decks/DeckScreen";
-import { TabletopSkeleton } from "@/components/tabletops/Tabletop";
+import { Platform, StyleSheet } from "react-native";
+import DecksScreen from "@/components/decks/DecksScreen";
+import DeckScreen, { DeckScreenSkeleton } from "@/components/decks/DeckScreen";
+import TabletopScreen, {
+  TabletopSkeleton,
+} from "@/components/tabletops/Tabletop";
 import TextureBackground from "@/components/ui/TextureBackground";
 import Screen from "@/components/ui/Screen";
-import Animated, {
-  SharedValue,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
-import { useNavigation, ScreenProps } from "@/context/Navigation";
+import { useNavigation } from "@/context/Navigation";
 import MarketingScreen from "../marketing/MarketingScreen";
+import Tabs from "../ui/Tabs";
+import Preload from "./Preload";
 
-type ScreenKeys = ScreenProps["name"];
-
-function AnimatedScreen(props: {
-  children: React.ReactNode;
-  skeleton?: React.ReactNode;
-  transitionProgress: SharedValue<number>;
-  currentScreen: SharedValue<ScreenKeys>;
-  prevScreen: SharedValue<ScreenKeys | null>;
-  screen: ScreenKeys;
-}): React.ReactNode {
-  const { currentScreen, prevScreen, screen, transitionProgress } = props;
-
-  const visibility = useDerivedValue<number>(() => {
-    if (prevScreen.value !== screen && currentScreen.value !== screen) return 0;
-    if (prevScreen.value === screen && currentScreen.value === screen) return 1;
-
-    if (currentScreen.value === screen) {
-      return transitionProgress.value;
-    }
-
-    return 0;
-    // return 1 - transitionProgress.value;
-  }, [screen]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: visibility.value,
-      transform: [
-        {
-          translateY: visibility.value === 0 ? 100 : 1,
-        },
-      ],
-    };
-  });
-
-  const style = React.useMemo(
-    () => [styles.animated, animatedStyle],
-    [animatedStyle],
-  );
-
-  return <Animated.View style={style}>{props.children}</Animated.View>;
-}
-
-export default function Router(): React.ReactNode {
+export default React.memo(function Router(): React.ReactNode {
   const {
-    screen: { name },
+    screen: { name, deckId: _deckId },
+    preloadDeckId,
   } = useNavigation();
-  const transitionProgress = useSharedValue(1);
-  const currentScreen = useSharedValue<ScreenKeys>(name);
-  const prevScreen = useSharedValue<ScreenKeys | null>(null);
-  const screenRef = React.useRef<ScreenKeys | null>(null);
 
-  React.useEffect(() => {
-    const _prevScreen = screenRef.current;
-    const _nextScreen = name;
-
-    // This is init
-    if (!prevScreen) {
-      screenRef.current = _nextScreen;
-
-      return;
-    }
-
-    transitionProgress.value = 0;
-    prevScreen.value = _prevScreen;
-    currentScreen.value = _nextScreen;
-
-    transitionProgress.value = withTiming(1, { duration: 250 });
-  }, [name, currentScreen, prevScreen, transitionProgress]);
+  const deckId = _deckId ?? preloadDeckId;
 
   return (
-    <View style={styles.content}>
-      <Screen background={<TextureBackground />}>
-        <AnimatedScreen
-          transitionProgress={transitionProgress}
-          currentScreen={currentScreen}
-          prevScreen={prevScreen}
-          screen="decks"
-          skeleton={<DecksScreenSkeleton style={styles.container} />}
-        >
-          <DecksScreen style={styles.container} />
-        </AnimatedScreen>
-        <AnimatedScreen
-          transitionProgress={transitionProgress}
-          currentScreen={currentScreen}
-          prevScreen={prevScreen}
-          screen="deck"
-        >
-          <DeckScreenSkeleton style={styles.container} />
-        </AnimatedScreen>
-        <AnimatedScreen
-          transitionProgress={transitionProgress}
-          currentScreen={currentScreen}
-          prevScreen={prevScreen}
-          screen="play"
-        >
-          <TabletopSkeleton style={styles.container} />
-        </AnimatedScreen>
-        <AnimatedScreen
-          transitionProgress={transitionProgress}
-          currentScreen={currentScreen}
-          prevScreen={prevScreen}
-          screen="marketing"
-        >
-          <MarketingScreen style={styles.container} />
-        </AnimatedScreen>
-      </Screen>
-    </View>
+    <Screen background={<TextureBackground />}>
+      <Preload
+        visible={name === "decks"}
+        behaviour={
+          Platform.OS === "web" ? "no-preload" : "keep-children-mounted"
+        }
+        style={styles.absolute}
+        renderKey="decks"
+      >
+        <DecksScreen style={styles.container} />
+      </Preload>
+      <Preload
+        visible={name === "deck" || name === "play"}
+        behaviour={
+          Platform.OS === "web" ? "no-preload" : "keep-children-mounted"
+        }
+        style={styles.absolute}
+        renderKey="deckLayout"
+      >
+        <Tabs>
+          <Preload
+            loader={<DeckScreenSkeleton style={styles.container} />}
+            visible={name === "deck"}
+            behaviour={
+              Platform.OS === "web"
+                ? "no-preload"
+                : "optimise-mount-unmount-with-loader"
+            }
+            style={styles.absolute}
+            renderKey={`deck-${deckId}`}
+          >
+            {deckId && <DeckScreen deckId={deckId} style={styles.container} />}
+          </Preload>
+          <Preload
+            loader={<TabletopSkeleton style={styles.container} />}
+            visible={name === "play"}
+            behaviour={
+              Platform.OS === "web"
+                ? "no-preload"
+                : "optimise-mount-unmount-with-loader"
+            }
+            style={styles.absolute}
+            renderKey={`play-${deckId}`}
+          >
+            {deckId && (
+              <TabletopScreen deckId={deckId} style={styles.container} />
+            )}
+          </Preload>
+        </Tabs>
+      </Preload>
+      <Preload
+        visible={name === "marketing"}
+        behaviour="no-preload"
+        style={styles.absolute}
+        renderKey="marketing"
+      >
+        <MarketingScreen style={styles.container} />
+      </Preload>
+    </Screen>
   );
-}
+});
 
 const styles = StyleSheet.create({
   tabs: {
@@ -140,7 +95,14 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
-  animated: {
+  hide: {
+    transform: [
+      {
+        translateX: 99999999,
+      },
+    ],
+  },
+  absolute: {
     flex: 1,
     position: "absolute",
     top: 0,

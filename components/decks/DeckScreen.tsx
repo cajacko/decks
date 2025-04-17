@@ -228,7 +228,7 @@ export function DeckScreenSkeleton(props: Omit<DeckScreenProps, "deckId">) {
   );
 }
 
-export default function DeckScreen({
+export default React.memo(function DeckScreen({
   deckId,
   style,
 }: DeckScreenProps): React.ReactNode {
@@ -295,7 +295,7 @@ export default function DeckScreen({
       <AddButton deckId={deckId} open={open} />
     </>
   );
-}
+});
 
 const styles = StyleSheet.create({
   loader: {

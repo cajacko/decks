@@ -77,19 +77,21 @@ export default function Toolbar() {
   }, [sharedToolbarHeight, height, shouldAnimateHeight]);
 
   React.useEffect(() => {
-    if (shouldAnimateHeight) {
-      if (hidden) {
-        sharedToolbarHeight.value = withTiming(0, {
-          duration: animateHeightDuration,
-        });
-      } else {
-        sharedToolbarHeight.value = withTiming(height, {
-          duration: animateHeightDuration,
-        });
-      }
-    } else {
-      sharedToolbarHeight.value = height;
+    if (hidden) {
+      sharedToolbarHeight.value = 0;
+
+      return;
     }
+
+    if (!shouldAnimateHeight) {
+      sharedToolbarHeight.value = height;
+
+      return;
+    }
+
+    sharedToolbarHeight.value = withTiming(height, {
+      duration: animateHeightDuration,
+    });
   }, [hidden, height, sharedToolbarHeight, shouldAnimateHeight]);
 
   const { loading: syncing } = useSync();

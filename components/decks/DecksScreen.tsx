@@ -83,7 +83,9 @@ export function DecksScreenSkeleton(props: DecksScreenProps): React.ReactNode {
   );
 }
 
-export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
+export default React.memo(function DecksScreen(
+  props: DecksScreenProps,
+): React.ReactNode {
   const { navigate } = useNavigation();
   const dispatch = useAppDispatch();
   const hasOwnDecks = useAppSelector(selectHasOwnDecks);
@@ -116,7 +118,7 @@ export default function DecksScreen(props: DecksScreenProps): React.ReactNode {
       }
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   columnWrapper: {

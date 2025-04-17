@@ -114,7 +114,9 @@ export function TabletopSkeleton(props: Pick<TabletopProps, "style">) {
   );
 }
 
-export default function Tabletop({ deckId }: TabletopProps): React.ReactNode {
+export default React.memo(function Tabletop({
+  deckId,
+}: TabletopProps): React.ReactNode {
   const stackListRef = React.useRef<StackListRef>(null);
   const tabletopId = useRequiredAppSelector(
     (state) => selectDeck(state, { deckId })?.defaultTabletopId,
@@ -187,7 +189,7 @@ export default function Tabletop({ deckId }: TabletopProps): React.ReactNode {
       />
     </TabletopProvider>
   );
-}
+});
 
 const styles = StyleSheet.create({
   content: {
