@@ -56,7 +56,11 @@ export default React.memo(function Router(): React.ReactNode {
             <Preload
               loader={<DeckScreenSkeleton style={styles.container} />}
               visible={name === "deck"}
-              behaviour="no-preload"
+              behaviour={
+                Platform.OS === "web"
+                  ? "no-preload"
+                  : "optimise-mount-unmount-with-loader"
+              }
               style={styles.absolute}
               renderKey={`deck-${deckId}`}
             >
