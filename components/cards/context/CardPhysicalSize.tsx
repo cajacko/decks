@@ -3,7 +3,6 @@
  */
 import AppError from "@/classes/AppError";
 import React from "react";
-import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
 import cardDimensions, {
   defaultCardDimensions,
@@ -12,7 +11,7 @@ import cardDimensions, {
 import { useAppSelector } from "@/store/hooks";
 import { selectCardSize } from "@/store/combinedSelectors/cards";
 import { NullBehaviour } from "../types";
-import { useCardTarget } from "@/utils/cardTarget";
+import { useCardTarget, Target, CardTargetProvider } from "@/utils/cardTarget";
 
 export type { CardPhysicalSize };
 
@@ -27,6 +26,7 @@ export interface CardPhysicalSizeProviderProps
   extends UseCardsPhysicalSizeProps {
   nullBehaviour?: NullBehaviour;
   children: React.ReactNode;
+  inheritFromParent?: boolean;
 }
 
 type ContextState = CardPhysicalSize;
@@ -64,7 +64,7 @@ export function useCardsPhysicalSize({
 
   if (!context) {
     new AppError(
-      `${useCardsPhysicalSize.name} (${debugLocation}) must be used within a ${CardPhysicalSizeProvider.name} component or passed a custom size that resolves. Using fallback.`,
+      `${useCardsPhysicalSize.name} (${debugLocation}) must be used within a ${CardTargetProvider.name} or a ${CardPhysicalSizeProvider.name} component or passed a custom size that resolves. Using fallback.`,
     ).log("warn");
 
     return defaultCardDimensions;
@@ -76,10 +76,15 @@ export function useCardsPhysicalSize({
 export function CardPhysicalSizeProvider({
   children,
   nullBehaviour = "log-and-fallback",
+  inheritFromParent = false,
   ...props
 }: CardPhysicalSizeProviderProps) {
   const parentContext = React.useContext(Context);
-  const physicalSize = _useCardsPhysicalSize(props) ?? parentContext;
+  let physicalSize = _useCardsPhysicalSize(props) ?? parentContext;
+
+  if (inheritFromParent && parentContext) {
+    physicalSize = parentContext;
+  }
 
   // Just to not cause our memo to trigger more than it needs to
   const logProps = React.useRef(props);

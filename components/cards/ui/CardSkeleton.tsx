@@ -15,7 +15,7 @@ export interface CardSkeletonProps
   sizePreset?: Cards.Size;
 }
 
-export default function CardSkeleton({
+export default React.memo(function CardSkeleton({
   sizePreset,
   shadow,
   ...cardProps
@@ -74,7 +74,7 @@ export default function CardSkeleton({
       </Skeleton>
     </Card>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
