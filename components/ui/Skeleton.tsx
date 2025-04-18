@@ -36,7 +36,7 @@ export default function Skeleton({
 }: SkeletonProps): React.ReactNode {
   const shouldAnimate = useFlag("SKELETON_ANIMATIONS") === "enabled";
   const showNothing = useFlag("SKELETON_LOADER") === "show-nothing";
-  const { backgroundColorStyle } = useSkeletonAnimation();
+  const { backgroundColorStyle } = useSkeletonAnimation() ?? {};
   const skeletonCardColor = useThemeColor("skeletonCard");
   const backgroundColor = useThemeColor("skeleton");
 

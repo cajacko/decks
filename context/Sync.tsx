@@ -14,6 +14,7 @@ import {
 import useFlag from "@/hooks/useFlag";
 import { useAuthentication } from "./Authentication";
 import withDebugLog from "@/utils/withDebugLog";
+import { useControlGlobalLoading } from "@/context/GlobalLoading";
 
 const debugLog = withDebugLog(() => false, "Sync Context");
 
@@ -73,6 +74,7 @@ export function useSync() {
 
 export function SyncProvider(props: { children: React.ReactNode }) {
   const [loading, setLoading] = React.useState(false);
+  useControlGlobalLoading("toolbar", "sync", loading);
   const [errorState, setError] = React.useState<AppError | undefined>(
     undefined,
   );

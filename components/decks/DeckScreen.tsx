@@ -28,7 +28,7 @@ import text from "@/constants/text";
 import { DrawerChildren } from "@/context/Drawer";
 import SettingsDeck from "@/components/settings/SettingsDeck";
 import { FlatList } from "react-native-gesture-handler";
-import { useRequiredContainerSize } from "@/context/ContainerSize";
+import { useRequiredContainerWidth } from "@/context/ContainerSize";
 
 export interface DeckScreenProps {
   deckId: string;
@@ -66,7 +66,7 @@ function useDeckCardListProps(): {
     flatList: FlatListLayoutProps;
   };
 } {
-  const { width: availableWidth } = useRequiredContainerSize();
+  const availableWidth = useRequiredContainerWidth();
 
   const contentWidth = getContentWidth({
     availableWidth,

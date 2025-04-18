@@ -4,6 +4,8 @@ import ThemedText from "@/components/ui/ThemedText";
 import Animated, {
   useAnimatedStyle,
   interpolate,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
@@ -17,10 +19,10 @@ import ContentWidth from "@/components/ui/ContentWidth";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import useFlag from "@/hooks/useFlag";
 import { useSkeletonAnimation } from "@/context/Skeleton";
-import { useSync } from "@/context/Sync";
 import { TouchableOpacity } from "@/components/ui/Pressables";
 import { useAuthentication } from "@/context/Authentication";
 import useDeckName from "@/hooks/useDeckName";
+import { useIsGlobalLoading } from "@/context/GlobalLoading";
 
 export interface ToolbarProps {
   title?: string | null;
@@ -41,17 +43,21 @@ function useToolbarHeight() {
   };
 }
 
-export default function Toolbar() {
+export default React.memo(function Toolbar(props: {
+  deckId?: string | null;
+  route: "decks" | "deck" | "play";
+}) {
   let { height, paddingTop } = useToolbarHeight();
   const hidden = useNavigation().screen.name === "marketing";
+  const loading = useIsGlobalLoading("toolbar");
 
   if (hidden) {
     height = 0;
   }
 
-  const { loading: syncing } = useSync();
   const {
     screen: { name, deckId },
+    navigate,
   } = useNavigation();
   const back = name !== "decks";
   const logoVisible = !back;
@@ -62,18 +68,25 @@ export default function Toolbar() {
     title = null;
   }
 
-  const loading: boolean = syncing;
   const { isLoggedIn } = useAuthentication();
   const { entering, exiting } = useLayoutAnimations();
   const { open } = useDrawer() ?? {};
   const { source, aspectRatio } = useTextLogo();
-  const { navigate } = useNavigation();
   const borderBottomColor = useThemeColor("inputOutline");
   const backgroundColor = useThemeColor("background");
   const primaryColor = useThemeColor("primary");
-  const { loopAnimation } = useSkeletonAnimation();
+  const { loopAnimation } = useSkeletonAnimation() ?? {};
+  const loadingOpacity = useSharedValue(loading ? 1 : 0);
   const shouldAnimateLoading =
-    useFlag("TOOLBAR_LOADING_ANIMATION") === "enabled" && loading;
+    useFlag("TOOLBAR_LOADING_ANIMATION") === "enabled";
+
+  React.useEffect(() => {
+    if (!shouldAnimateLoading) return;
+
+    loadingOpacity.value = withTiming(loading ? 1 : 0, {
+      duration: 300,
+    });
+  }, [loading, shouldAnimateLoading, loadingOpacity]);
 
   const goBack = React.useMemo(() => {
     if (!back) return undefined;
@@ -113,9 +126,10 @@ export default function Toolbar() {
     const width = 10;
     const midPosition = 50 - width / 2;
 
-    if (!shouldAnimateLoading) return {};
+    if (!shouldAnimateLoading || !loopAnimation) return {};
 
     return {
+      opacity: loadingOpacity.value,
       left: `${interpolate(loopAnimation.value, [0, 0.1, 0.5, 1], [0, 0, midPosition, 100])}%`,
       right: `${interpolate(loopAnimation.value, [0, 0.5, 0.9, 1], [100, midPosition, 0, 0])}%`,
     };
@@ -212,16 +226,10 @@ export default function Toolbar() {
           </View>
         </View>
       </ContentWidth>
-      {shouldAnimateLoading && (
-        <Animated.View
-          entering={entering}
-          exiting={exiting}
-          style={loadingProgressStyle}
-        />
-      )}
+      {shouldAnimateLoading && <Animated.View style={loadingProgressStyle} />}
     </View>
   );
-}
+});
 
 export const _contentHeight = 50;
 const imageHeight = _contentHeight - 10;

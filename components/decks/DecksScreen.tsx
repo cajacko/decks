@@ -15,13 +15,13 @@ import PreBuiltDecks, {
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
 import { selectHasOwnDecks } from "@/store/selectors/decks";
 import { ScrollView } from "react-native-gesture-handler";
-import { useRequiredContainerSize } from "@/context/ContainerSize";
+import { useRequiredContainerWidth } from "@/context/ContainerSize";
 
 const minCardListWidth = 100;
 const maxCardListWidth = 150;
 
 function useCardListWidth(): number {
-  const { width } = useRequiredContainerSize();
+  const width = useRequiredContainerWidth();
 
   const idealWidth = width / 3;
 

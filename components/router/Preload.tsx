@@ -2,6 +2,7 @@ import React from "react";
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native";
 import withDebugLog from "@/utils/withDebugLog";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
+import { useControlGlobalLoading } from "@/context/GlobalLoading";
 
 const debugLog = withDebugLog(() => false, "Preload");
 
@@ -13,13 +14,6 @@ const renderChildrenTimeout = 0;
  * How long to keep showing the loader after the children have been mounted
  */
 const showChildrenTimeout = 0;
-
-/**
- * 1. Decks component/ Deck Layout - which just always mounts the screen but hides/ shows - no skeleton
- * 2. Deck/ play screen - Always has the skeleton mounted, and then loads in the content when available,
- *    showing the skeleton until it's available
- * 3. Marketing screen - no preload, no skeleton
- */
 
 export interface PreloadProps {
   /**
@@ -45,6 +39,9 @@ export interface PreloadProps {
   loader?: React.ReactNode;
   visible?: boolean;
   renderKey: string;
+  onPreloaded?: (
+    props: Pick<PreloadProps, "behaviour" | "visible" | "renderKey">,
+  ) => void;
 }
 
 /**
@@ -54,14 +51,22 @@ export interface PreloadProps {
  * a while. So in these cases where the children change we want to show the skeleton, ensure the
  * view is showing and then switch the children over.
  */
-const OptimisedPreloader = React.memo(function OptimisedPreloader({
-  children: currentChildren,
-  loader,
-  style,
-  visible,
-  hiddenStyle,
-  renderKey,
-}: Omit<PreloadProps, "behaviour"> & { hiddenStyle: StyleProp<ViewStyle> }) {
+const OptimisedPreloader = React.memo(function OptimisedPreloader(
+  props: Omit<PreloadProps, "behaviour"> & {
+    hiddenStyle: StyleProp<ViewStyle>;
+  },
+) {
+  const {
+    children: currentChildren,
+    loader,
+    style,
+    visible,
+    hiddenStyle,
+    renderKey,
+  } = props;
+  const propsRef = React.useRef(props);
+  propsRef.current = props;
+
   const renderKeyRef = React.useRef(renderKey);
   renderKeyRef.current = renderKey;
 
@@ -158,6 +163,12 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
       endTime(renderKeyRef.current, {
         note: "Preload 3 - timeout completed",
       });
+
+      propsRef.current.onPreloaded?.({
+        behaviour: "optimise-mount-unmount-with-loader",
+        visible: propsRef.current.visible,
+        renderKey: propsRef.current.renderKey,
+      });
     }, showChildrenTimeout);
 
     return () => {
@@ -175,16 +186,44 @@ const OptimisedPreloader = React.memo(function OptimisedPreloader({
   );
 });
 
-export default React.memo(function Preload({
-  behaviour,
-  ...props
-}: PreloadProps): React.ReactNode {
-  const { children, style, visible } = props;
+export default React.memo(function Preload(
+  props: PreloadProps,
+): React.ReactNode {
+  const { behaviour, ...optimisedProps } = props;
+  const { children, style, visible, renderKey } = optimisedProps;
+  const propsRef = React.useRef(props);
+  propsRef.current = props;
+  const [loadedRenderKey, setLoadedRenderKey] = React.useState<string | null>(
+    null,
+  );
+  const loading = !loadedRenderKey || loadedRenderKey !== renderKey;
+
+  useControlGlobalLoading("toolbar", renderKey, visible ? loading : false);
 
   const hiddenStyle = React.useMemo(
     () => StyleSheet.flatten([styles.hidden, style]),
     [style],
   );
+
+  const onPreloaded = React.useCallback<
+    NonNullable<PreloadProps["onPreloaded"]>
+  >((params) => {
+    setLoadedRenderKey(params.renderKey);
+
+    propsRef.current.onPreloaded?.(params);
+  }, []);
+
+  React.useEffect(() => {
+    if (propsRef.current.behaviour === "optimise-mount-unmount-with-loader") {
+      return;
+    }
+
+    onPreloaded({
+      behaviour: propsRef.current.behaviour,
+      visible: propsRef.current.visible,
+      renderKey: propsRef.current.renderKey,
+    });
+  }, [onPreloaded]);
 
   if (behaviour === "no-preload") {
     if (!visible) {
@@ -198,7 +237,13 @@ export default React.memo(function Preload({
     return <View style={visible ? style : hiddenStyle}>{children}</View>;
   }
 
-  return <OptimisedPreloader hiddenStyle={hiddenStyle} {...props} />;
+  return (
+    <OptimisedPreloader
+      hiddenStyle={hiddenStyle}
+      {...optimisedProps}
+      onPreloaded={onPreloaded}
+    />
+  );
 });
 
 const styles = StyleSheet.create({

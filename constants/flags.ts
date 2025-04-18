@@ -13,6 +13,8 @@ import * as DevClient from "expo-dev-client";
 // If set, this value will be used
 export const flagOverrides: Partial<UserSettings.FlagMap> = {
   SKELETON_LOADER: "enabled",
+  SKELETON_ANIMATIONS: "enabled",
+  TOOLBAR_LOADING_ANIMATION: "enabled",
 };
 
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
