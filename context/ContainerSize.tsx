@@ -62,43 +62,56 @@ export function useRequiredContainerSize(): Size {
   return { width, height };
 }
 
-export function ContainerSizeProvider({
-  children,
-  style,
-  hideUntilLoaded = false,
-  onLoad: _onLoad,
-}: {
+interface ContainerSizeProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   hideUntilLoaded?: boolean;
-  onLoad?: (size: Size) => void;
-}): React.ReactElement {
-  const [size, setSize] = React.useState<Size>({ width: 0, height: 0 });
+  onLoad?: () => void;
+}
+
+function HideUntilLoad({
+  children,
+  hideUntilLoaded = false,
+  onLoad,
+}: Pick<ContainerSizeProps, "children" | "onLoad" | "hideUntilLoaded">) {
+  const hasSize = useContextSelector(Context, (context) => !!context);
   const hasCalledOnLoad = React.useRef(false);
-  // Ensure's it's only called the once on first load. Passing new instances of onLoad won't
-  // retrigger the effect.
-  const onLoad = React.useRef(_onLoad);
-  onLoad.current = _onLoad;
-
-  const onLayout = React.useCallback((event: LayoutChangeEvent) => {
-    const { width, height } = event.nativeEvent.layout;
-
-    setSize({ width, height });
-  }, []);
+  // // Ensure's it's only called the once on first load. Passing new instances of onLoad won't
+  // // retrigger the effect.
 
   React.useEffect(() => {
-    if (!size) return;
+    if (!hasSize) return;
     if (hasCalledOnLoad.current) return;
 
     hasCalledOnLoad.current = true;
 
-    onLoad.current?.(size);
-  }, [size]);
+    onLoad?.();
+  }, [hasSize, onLoad]);
+
+  if (hideUntilLoaded && !hasSize) return null;
+
+  return children;
+}
+
+export function ContainerSizeProvider({
+  children,
+  style,
+  ...props
+}: ContainerSizeProps): React.ReactElement {
+  const [size, setSize] = React.useState<Size | null>(null);
+
+  const onLayout = React.useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+
+    if (width === 0 || height === 0) return;
+
+    setSize({ width, height });
+  }, []);
 
   return (
     <Context.Provider value={size}>
       <View style={style} onLayout={onLayout}>
-        {hideUntilLoaded && !size ? null : children}
+        <HideUntilLoad {...props}>{children}</HideUntilLoad>
       </View>
     </Context.Provider>
   );
