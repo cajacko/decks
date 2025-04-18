@@ -12,20 +12,20 @@ import { useNavigation } from "@/context/Navigation";
 import { selectCanEditDeck, selectDeck } from "@/store/selectors/decks";
 import deckNameWithFallback from "@/utils/deckNameWithFallback";
 import uuid from "@/utils/uuid";
-import { useDrawer } from "@/context/Drawer";
 import IconSymbol from "../ui/IconSymbol";
 
 const titleProps = { type: "h2" } as const;
 
 export interface SettingsDeckProps extends FieldSetProps {
   deckId: string;
+  closeDrawer: () => void;
 }
 
 export default function SettingsDeck({
   deckId,
+  closeDrawer,
   ...props
 }: SettingsDeckProps): React.ReactNode {
-  const { close: closeDrawer } = useDrawer() ?? {};
   const dispatch = useAppDispatch();
   const { navigate } = useNavigation();
   const deckName = deckNameWithFallback(

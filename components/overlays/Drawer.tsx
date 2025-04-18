@@ -47,9 +47,9 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
             <View style={styles.settings}>
               <FieldSet itemSpacing={30}>
                 {deckId && name === "play" && (
-                  <SettingsTabletop deckId={deckId} />
+                  <SettingsTabletop {...props} deckId={deckId} />
                 )}
-                {deckId && <SettingsDeck deckId={deckId} />}
+                {deckId && <SettingsDeck {...props} deckId={deckId} />}
                 <SettingsApp />
                 {backupSyncEnabled && <SettingsBackupSync />}
                 {devMode && <DevMenu closeDrawer={props.closeDrawer} />}

@@ -34,6 +34,7 @@ export interface SettingsTabletopProps
   extends FieldSetProps,
     UseTabletopHistoryOptions {
   deckId: string;
+  closeDrawer: () => void;
 }
 
 export default function SettingsTabletop({
