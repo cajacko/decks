@@ -25,8 +25,6 @@ import DeckDefaults, {
 } from "@/components/decks/DeckDefaults";
 import ThemedText from "../ui/ThemedText";
 import text from "@/constants/text";
-import { DrawerChildren } from "@/context/Drawer";
-import SettingsDeck from "@/components/settings/SettingsDeck";
 import { FlatList } from "react-native-gesture-handler";
 import { useRequiredContainerWidth } from "@/context/ContainerSize";
 
@@ -120,45 +118,40 @@ function DeckScreenContent<D>(props: {
   );
 
   return (
-    <>
-      <DrawerChildren>
-        {props.deckId && <SettingsDeck deckId={props.deckId} />}
-      </DrawerChildren>
-      <ContentWidth
-        style={containerStyle}
-        contentContainerStyle={styles.container}
-        padding={contentWidthPadding}
-      >
-        <View style={styles.inner}>
-          <CardConstraintsProvider width={cardListProps.cardWidth}>
-            <FlatList<D>
-              {...cardListProps.flatList}
-              data={props.data}
-              style={styles.scroll}
-              contentContainerStyle={styles.contentContainerStyle}
-              showsVerticalScrollIndicator={Platform.OS !== "web"}
-              ListHeaderComponent={
-                <ContentWidth padding="standard">
-                  {props.deckDetails}
-                  {props.showLoader ? (
-                    <View style={styles.loader}>
-                      <Loader />
-                    </View>
-                  ) : (
-                    <>
-                      {props.deckDefaults}
-                      {props.title}
-                    </>
-                  )}
-                </ContentWidth>
-              }
-              renderItem={props.renderItem}
-              keyExtractor={props.keyExtractor}
-            />
-          </CardConstraintsProvider>
-        </View>
-      </ContentWidth>
-    </>
+    <ContentWidth
+      style={containerStyle}
+      contentContainerStyle={styles.container}
+      padding={contentWidthPadding}
+    >
+      <View style={styles.inner}>
+        <CardConstraintsProvider width={cardListProps.cardWidth}>
+          <FlatList<D>
+            {...cardListProps.flatList}
+            data={props.data}
+            style={styles.scroll}
+            contentContainerStyle={styles.contentContainerStyle}
+            showsVerticalScrollIndicator={Platform.OS !== "web"}
+            ListHeaderComponent={
+              <ContentWidth padding="standard">
+                {props.deckDetails}
+                {props.showLoader ? (
+                  <View style={styles.loader}>
+                    <Loader />
+                  </View>
+                ) : (
+                  <>
+                    {props.deckDefaults}
+                    {props.title}
+                  </>
+                )}
+              </ContentWidth>
+            }
+            renderItem={props.renderItem}
+            keyExtractor={props.keyExtractor}
+          />
+        </CardConstraintsProvider>
+      </View>
+    </ContentWidth>
   );
 }
 
