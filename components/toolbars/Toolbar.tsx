@@ -11,7 +11,7 @@ import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import { useDrawer } from "@/context/Drawer";
 import ProfilePic from "@/components/ui/ProfilePic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@/context/Navigation";
+import { useNavigation, appHome } from "@/context/Navigation";
 import Image from "@/components/ui/Image";
 import { useTextLogo } from "@/hooks/useLogo";
 import IconButton from "@/components/forms/IconButton";
@@ -57,8 +57,13 @@ export default React.memo(function Toolbar() {
   const {
     screen: { name, deckId },
     navigate,
-    goBack,
   } = useNavigation();
+  const showLogo = name === appHome;
+
+  const goBack = React.useMemo(
+    () => (showLogo ? null : () => navigate({ name: appHome })),
+    [showLogo, navigate],
+  );
 
   let title: string | null = useDeckName(deckId);
 
@@ -139,7 +144,7 @@ export default React.memo(function Toolbar() {
         contentContainerStyle={styles.contentWidth}
       >
         <View style={styles.content}>
-          {goBack ? (
+          {goBack && (
             <Animated.View entering={entering} exiting={exiting}>
               <IconButton
                 icon="arrow-back"
@@ -150,7 +155,8 @@ export default React.memo(function Toolbar() {
                 vibrate
               />
             </Animated.View>
-          ) : (
+          )}
+          {showLogo && (
             <Animated.View entering={entering} exiting={exiting}>
               <TouchableOpacity
                 onPress={() => navigate({ name: "decks" })}

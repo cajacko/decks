@@ -2,6 +2,7 @@ import { alert } from "@/components/overlays/Alert";
 import React from "react";
 import { BackHandler, Platform } from "react-native";
 import text from "@/constants/text";
+import { isEqual } from "lodash";
 
 export type ScreenProps =
   | {
@@ -44,18 +45,37 @@ export const useNavigation = (): NavigationContext => {
   return context;
 };
 
-const homeScreen = "decks";
+export const appHome = "decks";
 
 export function NavigationProvider(props: {
   children: React.ReactNode;
 }): React.ReactElement {
-  const [screen, setScreen] =
-    React.useState<NavigationContext["screen"]>(initialScreen);
+  const [screen, setScreen] = React.useState<ScreenProps>(initialScreen);
+  const screenRef = React.useRef<ScreenProps>(screen);
+  screenRef.current = screen;
   const [preloadDeckId, setPreloadDeckId] = React.useState<string | null>(null);
-  const isHomeScreen = screen.name === homeScreen;
+  const isAppHomeScreen = screen.name === appHome;
+  /**
+   * The first item in the history is the last screen
+   */
+  const [history, setHistory] = React.useState<ScreenProps[]>([]);
+  const lastScreen: ScreenProps | null = history[0] ?? null;
 
   const navigate = React.useCallback((screen: ScreenProps) => {
+    if (isEqual(screen, screenRef.current)) {
+      return;
+    }
+
+    const currentScreen = screenRef.current;
     setScreen(screen);
+
+    setHistory((prev) => {
+      const newHistory = [...prev];
+
+      newHistory.unshift(currentScreen);
+
+      return newHistory;
+    });
 
     if (screen.name === "deck" || screen.name === "play") {
       setPreloadDeckId(screen.deckId);
@@ -63,12 +83,26 @@ export function NavigationProvider(props: {
   }, []);
 
   const goBack = React.useMemo(() => {
-    if (isHomeScreen) return undefined;
+    if (lastScreen) {
+      return () => {
+        setScreen(lastScreen);
+
+        setHistory((prev) => {
+          const newHistory = [...prev];
+
+          newHistory.shift();
+
+          return newHistory;
+        });
+      };
+    }
+
+    if (isAppHomeScreen) return undefined;
 
     return () => {
-      setScreen({ name: homeScreen });
+      setScreen({ name: appHome });
     };
-  }, [isHomeScreen]);
+  }, [isAppHomeScreen, lastScreen]);
 
   const value = React.useMemo(
     (): NavigationContext => ({
