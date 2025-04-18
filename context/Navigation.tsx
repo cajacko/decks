@@ -1,5 +1,7 @@
+import { alert } from "@/components/overlays/Alert";
 import React from "react";
 import { BackHandler, Platform } from "react-native";
+import text from "@/constants/text";
 
 export type ScreenProps =
   | {
@@ -82,7 +84,29 @@ export function NavigationProvider(props: {
     const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        if (!goBack) return false;
+        if (!goBack) {
+          alert(({ onRequestClose }) => {
+            return {
+              title: text["alert.back.exit.title"],
+              buttons: [
+                {
+                  text: text["general.cancel"],
+                  onPress: onRequestClose,
+                },
+                {
+                  text: text["general.exit"],
+                  style: "destructive",
+                  onPress: () => {
+                    onRequestClose();
+                    BackHandler.exitApp();
+                  },
+                },
+              ],
+            };
+          });
+
+          return true;
+        }
 
         goBack();
 
