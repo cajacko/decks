@@ -4,7 +4,7 @@ import text from "@/constants/text";
 import uuid from "@/utils/uuid";
 import { useAppDispatch } from "@/store/hooks";
 import { copyDeckHelper } from "@/store/actionHelpers/decks";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 
 export interface UseCopyToEditAlert {
   deckId: string;
@@ -12,7 +12,7 @@ export interface UseCopyToEditAlert {
 
 export default function useCopyToEditAlert({ deckId }: UseCopyToEditAlert) {
   const dispatch = useAppDispatch();
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const [showAlert, setShowAlert] = React.useState(false);
 
   const copyDeck = React.useCallback(() => {
@@ -20,7 +20,10 @@ export default function useCopyToEditAlert({ deckId }: UseCopyToEditAlert) {
 
     dispatch(copyDeckHelper({ deckId, newDeckId }));
 
-    navigate(`/deck/${newDeckId}`);
+    navigate({
+      name: "deck",
+      deckId: newDeckId,
+    });
   }, [deckId, dispatch, navigate]);
 
   const open = React.useCallback(() => {

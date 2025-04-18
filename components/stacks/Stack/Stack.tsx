@@ -17,6 +17,8 @@ import StackListItem, {
 import { Target } from "@/utils/cardTarget";
 import StackToolbar from "@/components/stacks/StackToolbar";
 import useGetStackName from "@/hooks/useGetStackName";
+import { useStackContext } from "./Stack.context";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 function StackContent(
   props: Pick<StackProps, "style"> & {
@@ -28,7 +30,11 @@ function StackContent(
     toolbar?: React.ReactNode;
   },
 ) {
-  const dimensions = useTabletopContext();
+  usePerformanceMonitor({
+    Component: StackContent.name,
+  });
+
+  const dimensions = useStackContext();
 
   const innerStyle = React.useMemo(
     () => [
@@ -121,6 +127,10 @@ export function StackSkeleton(
 }
 
 export default function Stack(props: StackProps): React.ReactNode {
+  usePerformanceMonitor({
+    Component: Stack.name,
+  });
+
   const { deckId, tabletopId } = useTabletopContext();
   const stackName = useGetStackName(tabletopId)(props.stackId);
 

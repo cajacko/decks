@@ -9,7 +9,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Href, useRouter } from "expo-router";
+import { ExternalPathString, useRouter } from "expo-router";
 import useVibrate from "@/hooks/useVibrate";
 
 export interface PressableProps
@@ -17,7 +17,7 @@ export interface PressableProps
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
   vibrate?: boolean;
-  href?: Href;
+  href?: ExternalPathString;
 }
 
 export const Pressable = React.forwardRef(function Pressable(

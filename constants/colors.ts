@@ -56,7 +56,7 @@ export const themes = {
     link: colors.yellow,
     background: colors.black,
     skeleton: Color(colors.black).lighten(0.5).rgb().string(),
-    skeletonPulse: Color(colors.black).lighten(0.45).rgb().string(),
+    skeletonPulse: Color(colors.black).lighten(0.4).rgb().string(),
     skeletonCard: Color(colors.black).lighten(0.3).rgb().string(),
     buttonBackground: colors.black,
     buttonText: colors.white,

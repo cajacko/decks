@@ -8,7 +8,7 @@ import FieldSet, {
   titleProps as fieldSetTitleProps,
   useLeftAdornmentSize,
 } from "@/components/forms/FieldSet";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
@@ -30,7 +30,7 @@ export default function DevMenu({
   closeDrawer: () => void;
 }): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const {
     currentlyRunning,
     isChecking,
@@ -201,7 +201,10 @@ export default function DevMenu({
               title={`${deck?.name ?? "N/A"} ${deck?.version ? `(${deck.version})` : ""}`}
               variant="outline"
               onPress={() => {
-                navigate(`/deck/${deckId}`);
+                navigate({
+                  name: "deck",
+                  deckId,
+                });
                 closeDrawer?.();
               }}
               style={{ marginTop: 10 }}

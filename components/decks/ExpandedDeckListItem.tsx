@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/selectors/decks";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import CardSideBySideSkeleton from "@/components/cards/connected/CardSideBySideSkeleton";
@@ -90,7 +90,7 @@ export default function ExpandedDeckListItem(
   props: ExpandedDeckListItemProps,
 ): React.ReactNode {
   const { vibrate } = useVibrate();
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const firstDeckCardId = useAppSelector(
     (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
   );
@@ -104,11 +104,17 @@ export default function ExpandedDeckListItem(
   }, [firstDeckCardId, props.deckId]);
 
   const play = React.useCallback(() => {
-    navigate(`/deck/${props.deckId}/play`);
+    navigate({
+      name: "play",
+      deckId: props.deckId,
+    });
   }, [props.deckId, navigate]);
 
   const view = React.useCallback(() => {
-    navigate(`/deck/${props.deckId}`);
+    navigate({
+      name: "deck",
+      deckId: props.deckId,
+    });
   }, [props.deckId, navigate]);
 
   const onPressCards = React.useCallback(() => {

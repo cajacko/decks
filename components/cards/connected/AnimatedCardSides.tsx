@@ -6,6 +6,7 @@ import UIAnimatedCardSides, {
 import { useCardProps } from "@/components/cards/connected/Card";
 import { AnimatedCardProps } from "@/components/cards/connected/AnimatedCard";
 import { Cards } from "@/store/types";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export { AnimatedCardSidesRef };
 
@@ -22,6 +23,10 @@ export default React.forwardRef<AnimatedCardSidesRef, AnimatedCardSidesProps>(
   ) {
     const front = useCardProps({ ...props, style: cardStyle, side: "front" });
     const back = useCardProps({ ...props, style: cardStyle, side: "back" });
+
+    usePerformanceMonitor({
+      Component: AnimatedCardSides.name,
+    });
 
     return (
       <UIAnimatedCardSides

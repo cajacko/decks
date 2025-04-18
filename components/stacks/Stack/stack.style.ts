@@ -6,7 +6,7 @@ import { stackToolbarHeightAllowance } from "../StackToolbar";
 import { stackListIndicatorsHeight } from "../StackListIndicators";
 import { cardActionSize } from "@/components/forms/CardAction";
 
-export const tabletopUISpacing = 20;
+export const tabletopUISpacing = 10;
 const maxCardHeight = 600;
 
 function getSizesFromWidth(dpWidth: number, physicalSize: CardPhysicalSize) {
@@ -37,8 +37,10 @@ function getExampleStackDimensions(props: {
   availableWidth: number;
   availableHeight: number;
   baseOff: "height" | "width";
+  extraStackHorizontalPadding?: number;
   physicalSize: CardPhysicalSize;
 }): Omit<StackDimensions, "canOnlyFit1Stack"> {
+  const { extraStackHorizontalPadding = 0 } = props;
   // The buttons are the closest things together, so base the space between stacks on them
   const spaceBetweenStacks = Math.round(cardActionSize / 4);
 
@@ -46,7 +48,8 @@ function getExampleStackDimensions(props: {
   // get absolutely positioned around the card/ stack
   // Card actions are half on/ half off the card
   const buttonOverlaySize = Math.round(cardActionSize / 2);
-  const stackHorizontalPadding = buttonOverlaySize;
+  const stackHorizontalPadding =
+    buttonOverlaySize + extraStackHorizontalPadding;
   const stackVerticalPadding = buttonOverlaySize;
 
   const minSpaceAboveStack =
@@ -126,34 +129,74 @@ function getCanOnlyFit1Stack({
   return availableWidth / stackWidth < 2;
 }
 
+const memoizedGetStackDimensions = (() => {
+  const cache: Record<string, StackDimensions> = {}; // Use a plain object for caching
+
+  return (props: {
+    availableWidth: number;
+    availableHeight: number;
+    physicalSize: CardPhysicalSize;
+  }): StackDimensions => {
+    const key = JSON.stringify(props);
+
+    if (cache[key]) {
+      return cache[key];
+    }
+
+    const dimensions = getStackDimensionsInternal(props);
+    cache[key] = dimensions;
+
+    return dimensions;
+  };
+})();
+
 // Get dimensions at 100% availableWidth or the max width (whichever is smaller)
 // if the stack height is bigger than availableHeight or max height
 // get the dimensions at 100% availableHeight or max height (whichever is smaller)
 // that should always do it I think
-export function getStackDimensions(props: {
+function getStackDimensionsInternal(props: {
   availableWidth: number;
   availableHeight: number;
   physicalSize: CardPhysicalSize;
 }): StackDimensions {
-  let dimensions = getExampleStackDimensions({
-    ...props,
-    baseOff: "width",
-  });
+  /**
+   * Keep trying to get a good size at full width, and then fall back to height
+   */
+  function run(
+    extraStackHorizontalPadding: number,
+    i: number,
+  ): StackDimensions | null {
+    const dimensions = getExampleStackDimensions({
+      ...props,
+      extraStackHorizontalPadding,
+      baseOff: "width",
+    });
 
-  if (
-    dimensions.cardHeight <= maxCardHeight &&
-    dimensions.stackContainerHeight <= props.availableHeight
-  ) {
-    return {
-      ...dimensions,
-      canOnlyFit1Stack: getCanOnlyFit1Stack({
-        availableWidth: props.availableWidth,
-        stackWidth: dimensions.stackWidth,
-      }),
-    };
+    if (
+      dimensions.cardHeight <= maxCardHeight &&
+      dimensions.stackContainerHeight <= props.availableHeight
+    ) {
+      return {
+        ...dimensions,
+        canOnlyFit1Stack: getCanOnlyFit1Stack({
+          availableWidth: props.availableWidth,
+          stackWidth: dimensions.stackWidth,
+        }),
+      };
+    }
+
+    if (i > 3) return null;
+
+    return run(extraStackHorizontalPadding + 10, i + 1);
   }
 
-  dimensions = getExampleStackDimensions({
+  const widthDimensions = run(0, 0);
+
+  if (widthDimensions) {
+    return widthDimensions;
+  }
+
+  const dimensions = getExampleStackDimensions({
     ...props,
     baseOff: "height",
   });
@@ -165,6 +208,14 @@ export function getStackDimensions(props: {
       stackWidth: dimensions.stackWidth,
     }),
   };
+}
+
+export function getStackDimensions(props: {
+  availableWidth: number;
+  availableHeight: number;
+  physicalSize: CardPhysicalSize;
+}): StackDimensions {
+  return memoizedGetStackDimensions(props);
 }
 
 export function getToolbarContainerStyle(props: {

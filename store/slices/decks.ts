@@ -88,18 +88,6 @@ export const cardsSlice = createSlice({
   name: SliceName.Decks,
   initialState,
   reducers: {
-    setLastScreen: (
-      state,
-      actions: PayloadAction<{ deckId: Decks.Id; screen: "deck" | "play" }>,
-    ) => {
-      // NOTE: Do not update dateUpdated from this, it's just a minor ux thing not a data thing that
-      // should mess up our date syncing
-      const deck = state.decksById[actions.payload.deckId];
-
-      if (!deck) return;
-
-      deck.lastScreen = actions.payload.screen;
-    },
     setDeckDetails: (
       state,
       actions: PayloadAction<{
@@ -252,7 +240,6 @@ export const cardsSlice = createSlice({
   },
 });
 
-export const { setDeckCardDefaults, setDeckDetails, setLastScreen } =
-  cardsSlice.actions;
+export const { setDeckCardDefaults, setDeckDetails } = cardsSlice.actions;
 
 export default cardsSlice;

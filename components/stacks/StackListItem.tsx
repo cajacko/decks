@@ -8,6 +8,7 @@ import StackTopCard from "@/components/stacks/StackTopCard";
 import useFlag from "@/hooks/useFlag";
 import { StackListRef } from "@/components/stacks/StackList";
 import { SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export interface StackListItemProps {
   cardInstanceId: Tabletops.CardInstanceId;
@@ -41,6 +42,10 @@ export function StackListItemSkeleton({
 export default function StackListItem(
   props: StackListItemProps,
 ): React.ReactNode {
+  usePerformanceMonitor({
+    Component: StackListItem.name,
+  });
+
   const { cardInstanceId, zIndex, isTopCard, cardOffsetPosition } = props;
   const allTouchable = useFlag("STACK_LIST_ITEM_BEHAVIOUR") === "all-touchable";
 

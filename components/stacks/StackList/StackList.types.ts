@@ -1,7 +1,6 @@
-import { ScrollViewProps, StyleProp, ViewStyle } from "react-native";
+import { StyleProp, ViewStyle } from "react-native";
 
 export interface StackListProps {
-  handleLayout?: Required<ScrollViewProps>["onLayout"];
   style?: StyleProp<ViewStyle>;
 }
 
@@ -17,5 +16,4 @@ export interface StackListRef {
   scrollToStart: (options?: ScrollOptions) => Promise<void>;
   scrollToEnd: (options?: ScrollOptions) => Promise<void>;
   onDeleteStack: (stackId: string) => void;
-  // scrollToStack: (stackId: string) => Promise<void>;
 }

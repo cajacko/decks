@@ -10,7 +10,13 @@ export default function useBottomDrawer(
   props: Omit<BottomDrawerProps, "children">,
   ref: React.Ref<BottomDrawerRef>,
 ) {
-  const { height, openOnMount = false, animateIn = false, initHeight } = props;
+  const {
+    height,
+    openOnMount = false,
+    animateIn = false,
+    initHeight,
+    onRequestClose,
+  } = props;
 
   React.useEffect(() => {
     debugLog("mounted");
@@ -37,6 +43,7 @@ export default function useBottomDrawer(
       openOnMount,
       animateIn,
       initHeight,
+      onRequestClose,
     },
     ref,
   );

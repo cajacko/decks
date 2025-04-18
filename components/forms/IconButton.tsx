@@ -54,7 +54,7 @@ export default function IconButton({
   ...props
 }: IconButtonProps): React.ReactNode {
   const { background, text: _text, textDisabled } = useThemeColors();
-  const { backgroundColorStyle } = useSkeletonAnimation();
+  const { backgroundColorStyle } = useSkeletonAnimation() ?? {};
   const iconColor = disabled ? textDisabled : _text;
 
   const { style, contentContainerStyle } = React.useMemo(() => {

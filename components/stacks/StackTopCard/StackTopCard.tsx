@@ -6,6 +6,7 @@ import useMenuItems from "./useMenuItems";
 import EditCardModal from "@/components/editCard/EditCardModal";
 import { Target } from "@/utils/cardTarget";
 import { StyleProp, ViewStyle } from "react-native";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export * from "./types";
 
@@ -26,6 +27,10 @@ export default function StackTopCard({
 
     return styleProp;
   }, [styleProp, state.animatedToBack]);
+
+  usePerformanceMonitor({
+    Component: StackTopCard.name,
+  });
 
   return (
     <>

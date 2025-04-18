@@ -1,5 +1,9 @@
 import React from "react";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import {
+  useAppSelector,
+  useAppDispatch,
+  useRequiredAppSelector,
+} from "@/store/hooks";
 import FieldSet, {
   FieldSetProps,
   useLeftAdornmentSize,
@@ -30,15 +34,18 @@ export interface SettingsTabletopProps
   extends FieldSetProps,
     UseTabletopHistoryOptions {
   deckId: string;
-  tabletopId: string;
+  closeDrawer: () => void;
 }
 
 export default function SettingsTabletop({
   deckId,
-  tabletopId,
   ...props
 }: SettingsTabletopProps): React.ReactNode {
   const dispatch = useAppDispatch();
+  const tabletopId = useRequiredAppSelector(
+    (state) => selectDeck(state, { deckId })?.defaultTabletopId,
+    selectDeck.name,
+  );
   const hideNeatStackOption =
     useFlag("GLOBAL_NEAT_STACK_BEHAVIOUR") === "force-neat";
   const canEdit = useAppSelector((state) =>

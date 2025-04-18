@@ -28,6 +28,7 @@ export interface CardTargetProviderProps {
   target: Target | null;
   children: React.ReactNode;
   inheritIfSame?: boolean;
+  inheritIfNull?: boolean;
 }
 
 type ContextState = {
@@ -70,6 +71,7 @@ export function CardTargetProvider({
   children,
   target,
   inheritIfSame,
+  inheritIfNull,
 }: CardTargetProviderProps) {
   const parentTarget = useCardTarget();
 
@@ -79,6 +81,10 @@ export function CardTargetProvider({
     }),
     [target],
   );
+
+  if (inheritIfNull && target === null) {
+    return children;
+  }
 
   if (inheritIfSame && getIsSameTarget(parentTarget, target)) {
     return children;

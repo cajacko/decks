@@ -1,7 +1,7 @@
 import AppError from "@/classes/AppError";
 import React from "react";
 import {
-  ModalProps,
+  ModalProps as RNModalProps,
   StyleSheet,
   View,
   StyleProp,
@@ -11,7 +11,9 @@ import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
 import uuid from "@/utils/uuid";
 
-export type { ModalProps };
+export type ModalProps = Omit<RNModalProps, "onRequestClose"> & {
+  onRequestClose?: () => void;
+};
 
 type ModalState = {
   id: string;

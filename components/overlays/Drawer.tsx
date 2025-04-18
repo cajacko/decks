@@ -18,10 +18,13 @@ import { playfaceWebsite, dexWebLink } from "@/constants/links";
 import useFlag from "@/hooks/useFlag";
 import { TouchableOpacity } from "@/components/ui/Pressables";
 import { ScrollView } from "react-native-gesture-handler";
+import { useNavigation } from "@/context/Navigation";
+import SettingsDeck from "../settings/SettingsDeck";
+import SettingsTabletop from "../settings/SettingsTabletop";
 
 export interface DrawerProps {
   closeDrawer: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function Drawer(props: DrawerProps): React.ReactNode {
@@ -29,6 +32,9 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
   const updates = useApplyUpdateAlert();
   const devMode = useFlag("DEV_MODE") === true;
   const backupSyncEnabled = useFlag("BACKUP_SYNC") === "enabled";
+  const {
+    screen: { name, deckId },
+  } = useNavigation();
 
   return (
     <ScrollView
@@ -40,7 +46,10 @@ export default function Drawer(props: DrawerProps): React.ReactNode {
           <View style={styles.content}>
             <View style={styles.settings}>
               <FieldSet itemSpacing={30}>
-                {props.children}
+                {deckId && name === "play" && (
+                  <SettingsTabletop {...props} deckId={deckId} />
+                )}
+                {deckId && <SettingsDeck {...props} deckId={deckId} />}
                 <SettingsApp />
                 {backupSyncEnabled && <SettingsBackupSync />}
                 {devMode && <DevMenu closeDrawer={props.closeDrawer} />}

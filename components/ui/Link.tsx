@@ -1,16 +1,21 @@
 import React from "react";
 import ThemedText, { ThemedTextProps } from "./ThemedText";
-import { Link as ERLink, LinkProps as ERLinkProps } from "expo-router";
+import {
+  Link as ERLink,
+  LinkProps as ERLinkProps,
+  ExternalPathString,
+} from "expo-router";
 import useVibrate from "@/hooks/useVibrate";
 
 export interface LinkProps
-  extends Omit<ERLinkProps, "children">,
+  extends Omit<ERLinkProps, "children" | "href">,
     Pick<ThemedTextProps, "type"> {
   text?: string;
   ThemedTextProps?: Partial<ThemedTextProps>;
   vibrate?: boolean;
   onPress?: () => void;
   children?: string;
+  href: ExternalPathString;
 }
 
 export type Href = LinkProps["href"];
