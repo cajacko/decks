@@ -7,8 +7,13 @@ import createCardDataSchemaId from "../utils/createCardDataSchemaId";
 import removeFromArray from "@/utils/immer/removeFromArray";
 import { SetCardData } from "../combinedActions/types";
 import AppError from "@/classes/AppError";
-import { setState, syncState } from "../combinedActions/sync";
 import { mergeMap } from "../utils/mergeData";
+import {
+  setState,
+  syncState,
+  removeDeletedContent,
+} from "../combinedActions/sync";
+import { removeDeletedDataFromMap } from "../utils/removeDeletedData";
 
 const initialState: Decks.State = {
   decksById: {},
@@ -32,13 +37,13 @@ function updateDeckTemplateMapping(
     const map = props.data.templateMapping[side];
     const templateMapping = deck.templates[side].dataTemplateMapping;
 
-    Object.entries(map).forEach(([dataId, templateDataId]) => {
-      if (!templateDataId) return;
+    Object.entries(map).forEach(([templateDataId, dataId]) => {
+      if (!dataId) return;
 
-      if (templateMapping[dataId]?.templateDataId !== templateDataId) {
+      if (templateMapping[templateDataId]?.templateDataId !== templateDataId) {
         hasUpdated = true;
 
-        templateMapping[dataId] = {
+        templateMapping[templateDataId] = {
           dataId,
           templateDataId,
         };
@@ -83,18 +88,6 @@ export const cardsSlice = createSlice({
   name: SliceName.Decks,
   initialState,
   reducers: {
-    setLastScreen: (
-      state,
-      actions: PayloadAction<{ deckId: Decks.Id; screen: "deck" | "play" }>,
-    ) => {
-      // NOTE: Do not update dateUpdated from this, it's just a minor ux thing not a data thing that
-      // should mess up our date syncing
-      const deck = state.decksById[actions.payload.deckId];
-
-      if (!deck) return;
-
-      deck.lastScreen = actions.payload.screen;
-    },
     setDeckDetails: (
       state,
       actions: PayloadAction<{
@@ -233,12 +226,20 @@ export const cardsSlice = createSlice({
       mergeMap(
         state.decksById,
         actions.payload.state[SliceName.Decks].decksById,
+        {
+          removeAllDeletedBefore: actions.payload.removeAllDeletedBefore,
+        },
       );
+    });
+
+    builder.addCase(removeDeletedContent, (state, actions) => {
+      const removeAllDeletedBefore = actions.payload.removeAllDeletedBefore;
+
+      removeDeletedDataFromMap(state.decksById, removeAllDeletedBefore);
     });
   },
 });
 
-export const { setDeckCardDefaults, setDeckDetails, setLastScreen } =
-  cardsSlice.actions;
+export const { setDeckCardDefaults, setDeckDetails } = cardsSlice.actions;
 
 export default cardsSlice;

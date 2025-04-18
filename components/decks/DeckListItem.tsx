@@ -1,8 +1,7 @@
 import React from "react";
-import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectDeckCards, selectDeckLastScreen } from "@/store/selectors/decks";
-import { useRouter } from "expo-router";
+import { selectDeckCards } from "@/store/selectors/decks";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import CardSideBySideSkeleton from "@/components/cards/connected/CardSideBySideSkeleton";
@@ -11,6 +10,8 @@ import uuid from "@/utils/uuid";
 import { createDeckHelper } from "@/store/actionHelpers/decks";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 import useVibrate from "@/hooks/useVibrate";
+import { TouchableScale } from "@/components/ui/Pressables";
+import { useNavigation } from "@/context/Navigation";
 
 export interface DeckListItemProps {
   deckId: string | null;
@@ -33,9 +34,9 @@ function DeckListItemContent({
   return (
     <View style={containerStyle}>
       {onPress ? (
-        <Pressable style={styles.cards} onPress={onPress}>
+        <TouchableScale style={styles.cards} onPress={onPress}>
           {children}
-        </Pressable>
+        </TouchableScale>
       ) : (
         <View style={styles.cards}>{children}</View>
       )}
@@ -55,15 +56,12 @@ export default function DeckListItem(
   props: DeckListItemProps,
 ): React.ReactNode {
   const { vibrate } = useVibrate();
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const dispatch = useAppDispatch();
   const firstDeckCardId = useAppSelector((state) =>
     props.deckId
       ? selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId
       : null,
-  );
-  const lastScreen = useAppSelector((state) =>
-    props.deckId ? selectDeckLastScreen(state, { deckId: props.deckId }) : null,
   );
 
   const target = React.useMemo((): Target => {
@@ -84,17 +82,19 @@ export default function DeckListItem(
 
       dispatch(createDeckHelper({ deckId }));
 
-      navigate(`/deck/${deckId}`);
+      navigate({
+        name: "deck",
+        deckId,
+      });
 
       return;
     }
 
-    navigate(
-      lastScreen === "deck"
-        ? `/deck/${props.deckId}`
-        : `/deck/${props.deckId}/play`,
-    );
-  }, [props.deckId, navigate, lastScreen, dispatch, vibrate]);
+    navigate({
+      name: "play",
+      deckId: props.deckId,
+    });
+  }, [props.deckId, navigate, dispatch, vibrate]);
 
   return (
     <CardTargetProvider target={target}>

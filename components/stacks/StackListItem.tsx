@@ -7,6 +7,8 @@ import CardInstance, {
 import StackTopCard from "@/components/stacks/StackTopCard";
 import useFlag from "@/hooks/useFlag";
 import { StackListRef } from "@/components/stacks/StackList";
+import { SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export interface StackListItemProps {
   cardInstanceId: Tabletops.CardInstanceId;
@@ -16,8 +18,10 @@ export interface StackListItemProps {
   stackId: string;
   leftStackId?: string;
   rightStackId?: string;
-  canMoveToBottom: boolean;
   stackListRef: React.RefObject<StackListRef>;
+  shuffleProgress: SharedValue<number>;
+  index: number;
+  length: number;
 }
 
 function useStyle(zIndex: number) {
@@ -38,10 +42,33 @@ export function StackListItemSkeleton({
 export default function StackListItem(
   props: StackListItemProps,
 ): React.ReactNode {
+  usePerformanceMonitor({
+    Component: StackListItem.name,
+  });
+
   const { cardInstanceId, zIndex, isTopCard, cardOffsetPosition } = props;
   const allTouchable = useFlag("STACK_LIST_ITEM_BEHAVIOUR") === "all-touchable";
 
   const style = useStyle(zIndex);
+
+  // Only 1 item is hidden at any given props.shuffleProgress.value. And this changes linerarly
+  // through the progress from 0-1
+  const animatedStyle = useAnimatedStyle(() => {
+    const hiddenIndex = Math.floor(props.shuffleProgress.value * props.length);
+    let isHidden = props.index === hiddenIndex;
+
+    if (props.shuffleProgress.value === 0) {
+      isHidden = false;
+    }
+
+    return {
+      transform: [
+        {
+          translateY: isHidden ? -9999 : 0,
+        },
+      ],
+    };
+  }, [props.index, props.length]);
 
   // TODO: When we hide the actions, we can render all cardInstances as StackTopCard or
   // rename that component to something like StackCard.
@@ -56,10 +83,10 @@ export default function StackListItem(
         stackId={props.stackId}
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}
-        canMoveToBottom={props.canMoveToBottom}
         offsetPosition={cardOffsetPosition}
         hideActions={!isTopCard}
         stackListRef={props.stackListRef}
+        animatedStyle={animatedStyle}
       />
     );
   }
@@ -70,6 +97,7 @@ export default function StackListItem(
       key={cardInstanceId}
       cardInstanceId={cardInstanceId}
       offsetPosition={cardOffsetPosition}
+      animatedStyle={animatedStyle}
     />
   );
 }

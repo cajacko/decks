@@ -9,6 +9,7 @@ import { BottomDrawerRef } from "./BottomDrawer.types";
 import { autoAnimateConfig, dragHeight } from "./bottomDrawer.style";
 import debugLog from "./debugLog";
 import useFlag from "@/hooks/useFlag";
+import { BackHandler } from "react-native";
 
 /**
  * Set up useImperativeHandle handler for any controls that other components may need regarding the
@@ -23,12 +24,14 @@ export default function useOpenClose(
     openOnMount: boolean;
     animateIn: boolean;
     initHeight: number;
+    onRequestClose?: () => void;
   },
   ref: React.Ref<BottomDrawerRef>,
 ) {
   const canAnimate = useFlag("BOTTOM_DRAWER_ANIMATE") === "enabled";
 
-  const { height, maxAutoHeight, minHeight, hasGotMaxHeight } = props;
+  const { height, maxAutoHeight, minHeight, hasGotMaxHeight, onRequestClose } =
+    props;
 
   const open = React.useCallback((): Promise<void> => {
     debugLog(`set height.value:${Math.round(maxAutoHeight)} (open)`);
@@ -115,6 +118,21 @@ export default function useOpenClose(
     bottom,
     canAnimate,
   ]);
+
+  React.useEffect(() => {
+    if (!onRequestClose) return;
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        onRequestClose();
+
+        return true;
+      },
+    );
+
+    return subscription.remove;
+  }, [onRequestClose]);
 
   return { open, close, bottom };
 }

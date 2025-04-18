@@ -33,6 +33,7 @@ function includedDataToExampleDecks(
     textColor: "textColor",
     backText: "backText",
     backTextSize: "backTextSize",
+    emojiSize: "emojiSize",
   };
 
   includedData.forEach(
@@ -48,6 +49,7 @@ function includedDataToExampleDecks(
         borderColor,
         textColor,
         backTextSize,
+        emojiSize,
         sortOrder: _sortOrder,
         version = null,
       },
@@ -120,6 +122,10 @@ function includedDataToExampleDecks(
                 dataId: dataIds.emoji,
                 templateDataId: frontDataIds.emoji,
               },
+              [frontDataIds.emojiSize]: {
+                dataId: dataIds.emojiSize,
+                templateDataId: frontDataIds.emojiSize,
+              },
               [frontDataIds.color]: {
                 dataId: dataIds.color,
                 templateDataId: frontDataIds.color,
@@ -160,6 +166,16 @@ function includedDataToExampleDecks(
               type: "null",
               value: null,
             },
+          },
+          [dataIds.emojiSize]: {
+            id: dataIds.emojiSize,
+            type: "text",
+            defaultValidatedValue: emojiSize
+              ? {
+                  type: "text",
+                  value: emojiSize,
+                }
+              : undefined,
           },
           [dataIds.description]: {
             id: dataIds.description,

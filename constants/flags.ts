@@ -20,8 +20,6 @@ export const flagRelationships: FlagRelationships = {
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   SKELETON_ANIMATIONS: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
-  TOOLBAR_HEIGHT_ANIMATION: (value, getFlag) =>
-    getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   BACKUP_SYNC: (value, getFlag) =>
     getFlag("DEV_MODE") === true ? value : "disabled",
   AUTO_SYNC: (value, getFlag) =>
@@ -50,8 +48,6 @@ export const flagRelationships: FlagRelationships = {
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   GENERAL_LAYOUT_ANIMATIONS: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
-  SKELETON_LOADER: (value, getFlag) =>
-    getFlag("PERFORMANCE_MODE") === "enabled" ? "enabled" : value,
   NAVIGATION_STACK_ANIMATIONS: (value, getFlag) =>
     getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   SCREEN_ANIMATIONS: (value, getValue) => {
@@ -59,16 +55,7 @@ export const flagRelationships: FlagRelationships = {
       return "disabled";
     }
 
-    switch (value) {
-      case "custom-fade-in-content":
-      case "custom-fade-out-top-background": {
-        return getValue("GENERAL_LAYOUT_ANIMATIONS") === "enabled"
-          ? value
-          : "disabled";
-      }
-      default:
-        return value;
-    }
+    return value;
   },
 };
 

@@ -8,8 +8,7 @@ import FieldSet, {
   titleProps as fieldSetTitleProps,
   useLeftAdornmentSize,
 } from "@/components/forms/FieldSet";
-import { useRouter } from "expo-router";
-import { exampleDeckIds } from "@/utils/builtInTemplateIds";
+import { useNavigation } from "@/context/Navigation";
 import * as DevClient from "expo-dev-client";
 import { useUpdates, reloadAsync } from "expo-updates";
 import Collapsible from "@/components/ui/Collapsible";
@@ -21,7 +20,7 @@ import Field from "@/components/forms/Field";
 import Loader from "@/components/ui/Loader";
 import useIncludedData from "@/hooks/useIncludedData";
 import { useBuiltInStateSelector } from "@/store/hooks";
-import { selectDecksById } from "@/store/selectors/decks";
+import { selectDeckIds, selectDecksById } from "@/store/selectors/decks";
 
 const titleProps = { type: "h2" } as const;
 
@@ -31,7 +30,7 @@ export default function DevMenu({
   closeDrawer: () => void;
 }): React.ReactNode {
   const [purgeStatus, setPurgeStatus] = React.useState<string | null>(null);
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
   const {
     currentlyRunning,
     isChecking,
@@ -47,6 +46,9 @@ export default function DevMenu({
   } = useUpdates();
 
   const decksByDeckId = useBuiltInStateSelector(selectDecksById);
+  const deckIds = useBuiltInStateSelector((state) =>
+    selectDeckIds(state, { sortBy: "sortOrder", direction: "asc" }),
+  );
 
   const purgeStore = React.useCallback(() => {
     setPurgeStatus("Purging...");
@@ -118,7 +120,7 @@ export default function DevMenu({
       {auth.isLoggedIn && (
         <FieldSet title="Sync" collapsible initialCollapsed>
           <Field
-            subLabel={`Last synced: ${sync.loading ? "Syncing..." : (sync.lastSynced ?? "null")}`}
+            subLabel={`Last synced: ${sync.loading ? "Syncing..." : `${sync.lastSynced ?? "null"} (${sync.lastSyncSize})`}`}
             errorMessage={
               auth.error ? text["settings.backup_sync.error"] : undefined
             }
@@ -142,6 +144,16 @@ export default function DevMenu({
             <Button
               title="Push"
               onPress={() => sync.push()}
+              variant="outline"
+            />
+          </Field>
+
+          <Field
+            subLabel={`Last removed deleted content: ${sync.lastRemovedDeletedContent ?? "null"}`}
+          >
+            <Button
+              title="Remove Deleted Content & Push"
+              onPress={() => sync.removeDeletedContentAndPush()}
               variant="outline"
             />
           </Field>
@@ -180,18 +192,25 @@ export default function DevMenu({
         )}
       </FieldSet>
       <FieldSet title="Example Decks" collapsible initialCollapsed>
-        {Object.entries(decksByDeckId).map(([id, deck]) => (
-          <Button
-            key={id}
-            title={`${deck?.name ?? "N/A"} ${deck?.version ? `(${deck.version})` : ""}`}
-            variant="outline"
-            onPress={() => {
-              navigate(`/deck/${exampleDeckIds(id).deckId}`);
-              closeDrawer?.();
-            }}
-            style={{ marginTop: 10 }}
-          />
-        ))}
+        {deckIds.map((deckId) => {
+          const deck = decksByDeckId[deckId];
+
+          return (
+            <Button
+              key={deckId}
+              title={`${deck?.name ?? "N/A"} ${deck?.version ? `(${deck.version})` : ""}`}
+              variant="outline"
+              onPress={() => {
+                navigate({
+                  name: "deck",
+                  deckId,
+                });
+                closeDrawer?.();
+              }}
+              style={{ marginTop: 10 }}
+            />
+          );
+        })}
       </FieldSet>
       <Flags />
       <Collapsible

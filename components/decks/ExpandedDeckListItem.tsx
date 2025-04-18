@@ -1,19 +1,18 @@
 import React from "react";
-import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { StyleSheet, View, ViewStyle } from "react-native";
+import { useAppSelector } from "@/store/hooks";
 import { selectDeck, selectDeckCards } from "@/store/selectors/decks";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import { Target } from "@/utils/cardTarget";
 import CardSideBySide from "@/components/cards/connected/CardSideBySide";
 import CardSideBySideSkeleton from "@/components/cards/connected/CardSideBySideSkeleton";
 import Skeleton from "@/components/ui/Skeleton";
 import ThemedText from "@/components/ui/ThemedText";
 import IconButton, { IconButtonSkeleton } from "@/components/forms/IconButton";
-import { copyDeckHelper } from "@/store/actionHelpers/decks";
-import uuid from "@/utils/uuid";
 import { CardTargetProvider } from "@/components/cards/context/CardTarget";
 import ContentWidth from "@/components/ui/ContentWidth";
 import useVibrate from "@/hooks/useVibrate";
+import { TouchableScale, TouchableOpacity } from "@/components/ui/Pressables";
 
 export interface ExpandedDeckListItemProps {
   deckId: string;
@@ -28,11 +27,13 @@ function ExpandedDeckListItemContent({
   onPress,
   actions,
   text,
+  onPressText,
 }: Pick<ExpandedDeckListItemProps, "style"> & {
   children: React.ReactNode;
   actions: React.ReactNode;
   onPress?: () => void;
   text?: React.ReactNode;
+  onPressText?: () => void;
 }) {
   const containerStyle = React.useMemo(
     () => [styles.container, style],
@@ -42,15 +43,17 @@ function ExpandedDeckListItemContent({
   return (
     <ContentWidth padding="standard" contentContainerStyle={containerStyle}>
       {onPress ? (
-        <Pressable onPress={onPress} style={styles.cards}>
+        <TouchableScale onPress={onPress} style={styles.cards}>
           {children}
-        </Pressable>
+        </TouchableScale>
       ) : (
         <View style={styles.cards}>{children}</View>
       )}
 
       <View style={styles.details}>
-        <View style={styles.text}>{text}</View>
+        <TouchableOpacity onPress={onPressText} style={styles.text}>
+          {text}
+        </TouchableOpacity>
         <View style={styles.actions}>{actions}</View>
       </View>
     </ContentWidth>
@@ -75,7 +78,6 @@ export function ExpandedDeckListItemSkeleton({
         <>
           <IconButtonSkeleton size={iconSize} />
           <IconButtonSkeleton size={iconSize} />
-          <IconButtonSkeleton size={iconSize} />
         </>
       }
     >
@@ -88,8 +90,7 @@ export default function ExpandedDeckListItem(
   props: ExpandedDeckListItemProps,
 ): React.ReactNode {
   const { vibrate } = useVibrate();
-  const { navigate } = useRouter();
-  const dispatch = useAppDispatch();
+  const { navigate } = useNavigation();
   const firstDeckCardId = useAppSelector(
     (state) => selectDeckCards(state, { deckId: props.deckId })?.[0]?.cardId,
   );
@@ -103,20 +104,18 @@ export default function ExpandedDeckListItem(
   }, [firstDeckCardId, props.deckId]);
 
   const play = React.useCallback(() => {
-    navigate(`/deck/${props.deckId}/play`);
+    navigate({
+      name: "play",
+      deckId: props.deckId,
+    });
   }, [props.deckId, navigate]);
 
   const view = React.useCallback(() => {
-    navigate(`/deck/${props.deckId}`);
+    navigate({
+      name: "deck",
+      deckId: props.deckId,
+    });
   }, [props.deckId, navigate]);
-
-  const copyDeck = React.useCallback(() => {
-    const newDeckId = uuid();
-
-    dispatch(copyDeckHelper({ deckId: props.deckId, newDeckId }));
-
-    navigate(`/deck/${newDeckId}`);
-  }, [dispatch, props.deckId, navigate]);
 
   const onPressCards = React.useCallback(() => {
     vibrate?.("ExpandedDeckListItem");
@@ -128,6 +127,7 @@ export default function ExpandedDeckListItem(
       <ExpandedDeckListItemContent
         style={props.style}
         onPress={onPressCards}
+        onPressText={view}
         text={
           <>
             {name && (
@@ -145,13 +145,6 @@ export default function ExpandedDeckListItem(
         actions={
           <>
             <IconButton
-              icon="remove-red-eye"
-              onPress={view}
-              size={iconSize}
-              variant="transparent"
-              vibrate
-            />
-            <IconButton
               icon="play-arrow"
               onPress={play}
               size={iconSize}
@@ -159,9 +152,9 @@ export default function ExpandedDeckListItem(
               vibrate
             />
             <IconButton
-              icon="content-copy"
+              icon="remove-red-eye"
+              onPress={view}
               size={iconSize}
-              onPress={copyDeck}
               variant="transparent"
               vibrate
             />
@@ -197,7 +190,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     marginTop: 20,
   },
 });

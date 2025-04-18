@@ -20,10 +20,15 @@ export interface StackProps {
 export type StackDimensions = {
   stackWidth: number;
   stackHeight: number;
-  buttonSize: number;
   stackHorizontalPadding: number;
   stackVerticalPadding: number;
   spaceBetweenStacks: number;
   scale: Scale;
   canOnlyFit1Stack: boolean;
+  aboveStackHeight: number;
+  belowStackHeight: number;
+  cardHeight: number;
+  cardWidth: number;
+  stackContainerWidth: number;
+  stackContainerHeight: number;
 };

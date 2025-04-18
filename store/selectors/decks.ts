@@ -79,6 +79,11 @@ export const selectDeckIds = createSelector(
   },
 );
 
+export const selectHasOwnDecks = createSelector(
+  selectDeckIds,
+  (deckIds) => deckIds.length > 0,
+);
+
 export const selectDecks = createSelector(
   selectDeckIds,
   selectDecksById,
@@ -101,11 +106,6 @@ export const selectDeckCards = (
   state: RootState,
   props: { deckId: string },
 ): Decks.Card[] | undefined => selectDeck(state, props)?.cards;
-
-export const selectDeckLastScreen = (
-  state: RootState,
-  props: { deckId: string },
-): "deck" | "play" | undefined => selectDeck(state, props)?.lastScreen;
 
 export const selectBuiltInDeckIds = (state: RootState) =>
   selectDeckIds(selectBuiltInState(state));

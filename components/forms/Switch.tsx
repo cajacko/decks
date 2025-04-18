@@ -9,16 +9,24 @@ import text from "@/constants/text";
 import ThemedText from "../ui/ThemedText";
 import { useThemeColors } from "@/hooks/useThemeColor";
 
-export type SwitchProps = RNSwitchProps;
+export interface SwitchProps extends RNSwitchProps {
+  label?: string;
+}
 
-export default function Switch(props: SwitchProps): React.ReactNode {
+export default function Switch({
+  label: labelProp,
+  ...props
+}: SwitchProps): React.ReactNode {
   const colors = useThemeColors();
+  let label = props.value ? text["general.on"] : text["general.off"];
+
+  if (labelProp) {
+    label = labelProp;
+  }
 
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.text}>
-        {props.value ? text["general.on"] : text["general.off"]}
-      </ThemedText>
+      <ThemedText style={styles.text}>{label}</ThemedText>
       <RNSwitch
         trackColor={{
           true: colors.switchTrackTrue,

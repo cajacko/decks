@@ -1,22 +1,21 @@
 import React from "react";
-import {
-  View,
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleProp, ViewStyle, StyleSheet } from "react-native";
 import { useAuthentication } from "@/context/Authentication";
 import Image, { ImageProps } from "@/components/ui/Image";
 import IconSymbol, { IconSymbolName } from "./IconSymbol";
 import AppError from "@/classes/AppError";
-import { useOnPressProps, UseOnPressProps } from "@/components/forms/Button";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import {
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from "@/components/ui/Pressables";
 
-export interface ProfilePicProps extends UseOnPressProps {
+export interface ProfilePicProps
+  extends Pick<TouchableOpacityProps, "onPress"> {
   style?: StyleProp<ViewStyle>;
   size?: number;
   fallbackIcon?: IconSymbolName;
+  loggedOutIcon?: IconSymbolName;
   loadingBehaviour?:
     | "fallback-icon"
     | "nothing"
@@ -24,17 +23,15 @@ export interface ProfilePicProps extends UseOnPressProps {
     | "profile-loading";
 }
 
-const defaultFallbackIcon: IconSymbolName = "face";
+const _fallbackIcon: IconSymbolName = "face";
 
 export default function ProfilePic({
   size = 50,
   style: styleProp,
-  fallbackIcon: fallbackIconProp = defaultFallbackIcon,
   loadingBehaviour = "profile-loading",
   ...props
 }: ProfilePicProps): React.ReactNode {
   const auth = useAuthentication();
-  const onPressProps = useOnPressProps(props);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<AppError | undefined>(undefined);
   const uri = auth.user?.picture;
@@ -44,7 +41,7 @@ export default function ProfilePic({
   let renderFallbackIcon: boolean;
   let renderLoading: boolean;
   let showImage: boolean;
-  let fallbackIcon: IconSymbolName = fallbackIconProp;
+  let fallbackIcon: IconSymbolName = _fallbackIcon;
 
   if (uri) {
     renderImage = true;
@@ -64,7 +61,7 @@ export default function ProfilePic({
         }
         case "profile-icon": {
           renderFallbackIcon = true;
-          fallbackIcon = defaultFallbackIcon;
+          fallbackIcon = _fallbackIcon;
           break;
         }
         case "profile-loading": {
@@ -181,12 +178,12 @@ export default function ProfilePic({
     </>
   );
 
-  if (!onPressProps.onPress && !onPressProps.onPressOut) {
+  if (!props.onPress) {
     return <View style={style}>{children}</View>;
   }
 
   return (
-    <TouchableOpacity {...onPressProps} style={style}>
+    <TouchableOpacity onPress={props.onPress} vibrate style={style}>
       {children}
     </TouchableOpacity>
   );

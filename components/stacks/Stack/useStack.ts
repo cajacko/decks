@@ -1,18 +1,25 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setStackOrder } from "@/store/slices/tabletop";
+import { changeCardState, setStackOrder } from "@/store/slices/tabletop";
 import {
   selectCardInstanceIds,
   selectFirstXCardInstances,
   selectDoesTabletopHaveCardInstances,
+  selectCardInstance,
 } from "@/store/selectors/tabletops";
 import { StackProps } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import seededShuffle, { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
-import { useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
+import {
+  useSharedValue,
+  withTiming,
+  runOnJS,
+  useDerivedValue,
+  interpolate,
+} from "react-native-reanimated";
 import { deleteStack } from "@/store/slices/tabletop";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@/context/Navigation";
 import useFlag from "@/hooks/useFlag";
 import useOffsetPositions from "@/components/cards/ui/AnimatedCard/useOffsetPositions";
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
@@ -21,9 +28,11 @@ import text from "@/constants/text";
 import useShakeEffect from "@/hooks/useShakeEffect";
 import useVibrate from "@/hooks/useVibrate";
 import { dateToDateString } from "@/utils/dates";
+import { useStackContext } from "./Stack.context";
+import { useNotify } from "@/context/Notifications";
 
 export function useStackWidth() {
-  const { stackWidth } = useTabletopContext();
+  const { stackWidth } = useStackContext();
 
   const width = useSharedValue(stackWidth);
 
@@ -53,15 +62,19 @@ export default function useStack({
   const animateShuffle = useFlag("SHUFFLE_ANIMATION") === "enabled";
   const dispatch = useAppDispatch();
   const { tabletopId, deckId } = useTabletopContext();
+  const notify = useNotify();
   const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
-  const rotation = useSharedValue(0);
-  const { navigate } = useRouter();
+  const { navigate } = useNavigation();
+  const shuffleProgress = useSharedValue(0);
   const doesTabletopHaveCards = useAppSelector((state) =>
     selectDoesTabletopHaveCardInstances(state, { tabletopId }),
   );
   const doesTabletopHaveAvailableCards = useAppSelector((state) =>
     selectDoesTabletopHaveAvailableCards(state, { tabletopId }),
+  );
+  const cardCount = useAppSelector(
+    (state) => selectCardInstanceIds(state, { stackId, tabletopId })?.length,
   );
 
   const { getCardOffsetPosition, onUpdateCardList, stackCountLimit } =
@@ -70,7 +83,7 @@ export default function useStack({
       [offsetPositionsCount],
     );
 
-  const cardInstancesIds = useAppSelector((state) =>
+  const _cardInstancesIds = useAppSelector((state) =>
     selectFirstXCardInstances(state, {
       stackId,
       tabletopId,
@@ -92,20 +105,17 @@ export default function useStack({
     vibrate?.("handleShuffle");
 
     if (animateShuffle) {
-      rotation.value = 0;
       const duration = 1200;
 
       promise = new Promise<void>((resolve) => {
-        rotation.value = withTiming(
-          (Math.round(1500 / 360) - 1) * 360,
-          { duration },
-          () => {
-            runOnJS(resolve)();
-          },
-        );
+        shuffleProgress.value = withTiming(1, { duration }, () => {
+          shuffleProgress.value = 0;
+
+          runOnJS(resolve)();
+        });
       });
     } else if (!performanceMode) {
-      const idsToShuffle = allCardInstanceIds ?? cardInstancesIds;
+      const idsToShuffle = allCardInstanceIds ?? _cardInstancesIds;
 
       if (idsToShuffle) {
         const iterations = 4;
@@ -160,11 +170,11 @@ export default function useStack({
     dispatch,
     stackId,
     tabletopId,
-    rotation,
+    shuffleProgress,
     animateShuffle,
     vibrate,
     allCardInstanceIds,
-    cardInstancesIds,
+    _cardInstancesIds,
     performanceMode,
     stackListRef,
   ]);
@@ -172,12 +182,12 @@ export default function useStack({
   const shakeToShuffleActive: boolean =
     isFocussed === true &&
     shakeToShuffle &&
-    !!cardInstancesIds &&
-    cardInstancesIds.length > 1;
+    !!_cardInstancesIds &&
+    _cardInstancesIds.length > 0;
 
   useShakeEffect(shakeToShuffleActive ? handleShuffle : null);
 
-  onUpdateCardList(cardInstancesIds ?? []);
+  onUpdateCardList(_cardInstancesIds ?? []);
 
   const handleDeleteStack = React.useCallback(async () => {
     stackListRef.current?.onDeleteStack?.(stackId);
@@ -247,7 +257,10 @@ export default function useStack({
 
     return {
       action: () => {
-        navigate(`/deck/${deckId}`);
+        navigate({
+          name: "deck",
+          deckId,
+        });
       },
       title: text["stack.actions.edit_deck"],
     };
@@ -263,14 +276,59 @@ export default function useStack({
     navigate,
   ]);
 
+  const firstCardId = _cardInstancesIds?.[0];
+  const firstCardSide = useAppSelector((state) =>
+    firstCardId
+      ? selectCardInstance(state, { cardInstanceId: firstCardId, tabletopId })
+          ?.side
+      : undefined,
+  );
+
+  const handleFlipAll = React.useMemo(() => {
+    if (!firstCardSide) return undefined;
+
+    return () => {
+      notify?.({
+        text:
+          firstCardSide === "front"
+            ? text["stack.notifications.flip_all_down"]
+            : text["stack.notifications.flip_all_up"],
+      });
+
+      dispatch(
+        changeCardState({
+          operation: {
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
+            type:
+              firstCardSide === "front"
+                ? "FLIP_STACK_FACE_DOWN"
+                : "FLIP_STACK_FACE_UP",
+          },
+          date: dateToDateString(new Date()),
+          target: { stackId },
+          tabletopId,
+          side: firstCardSide === "front" ? "back" : "front",
+        }),
+      );
+    };
+  }, [firstCardSide, stackId, tabletopId, dispatch, stackListRef, notify]);
+
+  const rotation = useDerivedValue<number>(() =>
+    interpolate(shuffleProgress.value, [0, 1], [0, 2 * 360]),
+  );
+
   return {
     opacity,
     width,
-    cardInstancesIds: cardInstanceIdsOverride ?? cardInstancesIds,
+    cardInstancesIds: cardInstanceIdsOverride ?? _cardInstancesIds,
     getCardOffsetPosition,
     handleShuffle,
     rotation,
     emptyStackButton,
-    shakeToShuffleActive,
+    handleFlipAll,
+    shuffleProgress,
+    cardCount,
   };
 }

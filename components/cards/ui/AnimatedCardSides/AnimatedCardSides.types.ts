@@ -15,4 +15,5 @@ export interface AnimatedCardSidesProps {
   side: Cards.Side;
   front: AnimatedCardProps;
   back: AnimatedCardProps;
+  animatedStyle?: StyleProp<ViewStyle>;
 }

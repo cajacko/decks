@@ -3,6 +3,7 @@ import { AnimatedCardProps, AnimatedCardRef } from "./AnimatedCard.types";
 import useAnimatedCard from "./useAnimatedCard";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import Card from "@/components/cards/ui/Card";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export default React.forwardRef<AnimatedCardRef, AnimatedCardProps>(
   function AnimatedCard(
@@ -62,7 +63,9 @@ export default React.forwardRef<AnimatedCardRef, AnimatedCardProps>(
       [style, animationStyle],
     );
 
-    // return <View style={{ height: 40, width: 40, backgroundColor: "grey" }} />;
+    usePerformanceMonitor({
+      Component: AnimatedCard.name,
+    });
 
     return (
       <Animated.View style={containerStyle}>

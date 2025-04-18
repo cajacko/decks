@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Pressable, View } from "react-native";
+import { BackHandler, StyleSheet, View } from "react-native";
 import Modal, {
   styles as modalStyles,
   withModal,
@@ -7,6 +7,7 @@ import Modal, {
 import ThemedView from "@/components/ui/ThemedView";
 import ThemedText from "@/components/ui/ThemedText";
 import Button from "@/components/forms/Button";
+import { Pressable } from "@/components/ui/Pressables";
 
 export interface AlertButton {
   text: string;
@@ -26,10 +27,27 @@ export interface AlertProps extends AlertContentProps {
 }
 
 function AlertContent(props: AlertContentProps) {
+  const { onRequestClose } = props;
+
   const modalStyle = React.useMemo(
     () => [modalStyles.content, styles.modalView],
     [],
   );
+
+  React.useEffect(() => {
+    if (!onRequestClose) return;
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        onRequestClose();
+
+        return true;
+      },
+    );
+
+    return subscription.remove;
+  }, [onRequestClose]);
 
   const buttons = React.useMemo(
     () =>

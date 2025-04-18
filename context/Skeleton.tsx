@@ -54,7 +54,7 @@ function useAnimations(animate = true): ContextState {
   const backgroundColorStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       loopAnimation.value,
-      [0, 0.6, 0.8, 1],
+      [0, 0.5, 0.7, 1],
       [backgroundColor, backgroundColor, backgroundColorPulse, backgroundColor],
     ),
   }));
@@ -65,18 +65,16 @@ function useAnimations(animate = true): ContextState {
   };
 }
 
-export const useSkeletonAnimation = (): ContextState => {
+export const useSkeletonAnimation = (): ContextState | null => {
   const context = React.useContext(Context);
 
-  const backupAnimations = useAnimations(!!context);
-
-  return context ?? backupAnimations;
+  return context || null;
 };
 
 export const SkeletonProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { loopAnimation, backgroundColorStyle } = useAnimations();
+  const { loopAnimation, backgroundColorStyle } = useAnimations(true);
 
   const value = React.useMemo<ContextState>(
     () => ({ loopAnimation, backgroundColorStyle }),

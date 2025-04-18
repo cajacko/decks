@@ -24,11 +24,17 @@ import { useHasRehydrated } from "@/store/hooks";
 import useApplyUpdateAlert from "@/hooks/useApplyUpdateAlert";
 import { SyncProvider } from "@/context/Sync";
 import { AuthenticationProvider } from "@/context/Authentication";
-import { ToolbarProvider } from "@/context/Toolbar";
 import useIsSafeAreaContextReady from "@/hooks/useIsSafeAreaContextReady";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SkeletonProvider } from "@/context/Skeleton";
-import { ScreenContentLayoutProvider } from "@/context/ScreenContentLayout";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StyleSheet } from "react-native";
+import { NavigationProvider } from "@/context/Navigation";
+import Router from "../router/Router";
+import { PerformanceMonitorProvider } from "@/context/PerformanceMonitor";
+import { GlobalLoadingProvider } from "@/context/GlobalLoading";
+import { NotificationProvider } from "@/context/Notifications";
+import { StackListRefsProvider } from "@/context/StackListRefs";
 
 enableFreeze();
 
@@ -60,16 +66,22 @@ function useNavigationTheme(): NavigationTheme {
   }, [colorScheme]);
 }
 
-function Content({ children }: { children: React.ReactNode }) {
+function Content({
+  children,
+  onLoad,
+}: {
+  children: React.ReactNode;
+  onLoad?: () => void;
+}) {
   const { component } = useApplyUpdateAlert({
     autoCheck: true,
   });
 
   return (
-    <ScreenContentLayoutProvider>
+    <>
       {component}
-      {children}
-    </ScreenContentLayoutProvider>
+      <Router onLoad={onLoad} />
+    </>
   );
 }
 
@@ -86,9 +98,14 @@ function HasStore({ children }: { children: React.ReactNode }) {
   });
 
   const [isStoreReady, setIsStoreReady] = React.useState(false);
+  const [hasContentLoaded, setHasContentLoaded] = React.useState(false);
   const hasRehydrated = useHasRehydrated();
   const shouldPurgeStoreOnStart = useFlag("PURGE_STORE_ON_START");
   const scheme = useColorScheme();
+
+  const onContentLoad = React.useCallback(() => {
+    setHasContentLoaded(true);
+  }, []);
 
   React.useEffect(() => {
     if (!hasRehydrated) return;
@@ -104,7 +121,8 @@ function HasStore({ children }: { children: React.ReactNode }) {
     setIsStoreReady(true);
   }, [hasRehydrated, shouldPurgeStoreOnStart]);
 
-  const loaded = loadedFonts && isStoreReady && isSafeAreaReady;
+  const loaded =
+    loadedFonts && isStoreReady && isSafeAreaReady && hasContentLoaded;
 
   useEffect(() => {
     initMousePointer();
@@ -122,33 +140,45 @@ function HasStore({ children }: { children: React.ReactNode }) {
 
   return (
     <PersistGate loading={null} persistor={persistor}>
-      <NavigationThemeProvider value={navigationTheme}>
-        <AuthenticationProvider>
-          <SyncProvider>
-            <SkeletonProvider>
-              <ModalProvider>
-                <DrawerProvider>
-                  <ToolbarProvider>
-                    <Content>{children}</Content>
-                    <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-                  </ToolbarProvider>
-                </DrawerProvider>
-              </ModalProvider>
-            </SkeletonProvider>
-          </SyncProvider>
-        </AuthenticationProvider>
-      </NavigationThemeProvider>
+      <GlobalLoadingProvider>
+        <NavigationProvider>
+          <NavigationThemeProvider value={navigationTheme}>
+            <NotificationProvider>
+              <AuthenticationProvider>
+                <SyncProvider>
+                  <SkeletonProvider>
+                    <StackListRefsProvider>
+                      <ModalProvider>
+                        <DrawerProvider>
+                          <Content onLoad={onContentLoad}>{children}</Content>
+                          <StatusBar
+                            style={scheme === "dark" ? "light" : "dark"}
+                          />
+                        </DrawerProvider>
+                      </ModalProvider>
+                    </StackListRefsProvider>
+                  </SkeletonProvider>
+                </SyncProvider>
+              </AuthenticationProvider>
+            </NotificationProvider>
+          </NavigationThemeProvider>
+        </NavigationProvider>
+      </GlobalLoadingProvider>
     </PersistGate>
   );
 }
 
 export default function App({ children }: { children: React.ReactNode }) {
   return (
-    <SafeAreaProvider>
-      <ReduxProvider store={store}>
-        <HasStore>{children}</HasStore>
-      </ReduxProvider>
-    </SafeAreaProvider>
+    <PerformanceMonitorProvider>
+      <GestureHandlerRootView style={style.flex}>
+        <SafeAreaProvider style={style.flex}>
+          <ReduxProvider store={store}>
+            <HasStore>{children}</HasStore>
+          </ReduxProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </PerformanceMonitorProvider>
   );
 }
 
@@ -161,3 +191,9 @@ export function withApp(Component: React.ComponentType) {
     );
   };
 }
+
+const style = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+});

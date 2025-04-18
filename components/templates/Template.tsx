@@ -3,6 +3,7 @@ import { TemplateProps } from "./Template.types";
 import { MarkupChildren } from "./MarkupNode";
 import { TemplateProvider } from "./TemplateContext";
 import uuid from "@/utils/uuid";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 const objectIdMap = new WeakMap<object, string>();
 
@@ -20,6 +21,10 @@ function getCacheKey(objA?: object | null, objB?: object | null): string {
 
 export default React.memo<TemplateProps>(function Template({ values, markup }) {
   const cacheKey = getCacheKey(values, markup);
+
+  usePerformanceMonitor({
+    Component: Template.name,
+  });
 
   return (
     <TemplateProvider values={values ?? null}>

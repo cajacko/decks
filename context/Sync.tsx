@@ -4,10 +4,17 @@ import { AppState } from "react-native";
 import AppError from "@/classes/AppError";
 import { useAppSelector } from "@/store/hooks";
 import { selectSync } from "@/store/slices/sync";
-import { sync, pull, push, remove } from "@/api/dex/sync";
+import {
+  sync,
+  pull,
+  push,
+  remove,
+  removeDeletedContentAndPush,
+} from "@/api/dex/sync";
 import useFlag from "@/hooks/useFlag";
 import { useAuthentication } from "./Authentication";
 import withDebugLog from "@/utils/withDebugLog";
+import { useControlGlobalLoading } from "@/context/GlobalLoading";
 
 const debugLog = withDebugLog(() => false, "Sync Context");
 
@@ -19,6 +26,7 @@ type ContextState = {
   push: () => Promise<void>;
   pull: () => Promise<void>;
   remove: () => Promise<void>;
+  removeDeletedContentAndPush: () => Promise<void>;
 };
 
 const autoSyncMinFrequency = 1000 * 60 * 2;
@@ -28,7 +36,13 @@ const Context = React.createContext<ContextState | undefined>(undefined);
 
 export function useSync() {
   const context = React.useContext(Context);
-  const { lastPulled, lastPushed, lastSynced } = useAppSelector(selectSync);
+  const {
+    lastPulled,
+    lastPushed,
+    lastSynced,
+    lastRemovedDeletedContent,
+    lastSyncSize,
+  } = useAppSelector(selectSync);
 
   if (!context) {
     throw new AppError(
@@ -39,16 +53,28 @@ export function useSync() {
   return React.useMemo(
     () => ({
       ...context,
+      lastSyncSize,
       lastPulled: lastPulled ? new Date(lastPulled) : null,
       lastPushed: lastPushed ? new Date(lastPushed) : null,
       lastSynced: lastSynced ? new Date(lastSynced) : null,
+      lastRemovedDeletedContent: lastRemovedDeletedContent
+        ? new Date(lastRemovedDeletedContent)
+        : null,
     }),
-    [context, lastPulled, lastPushed, lastSynced],
+    [
+      context,
+      lastPulled,
+      lastPushed,
+      lastSynced,
+      lastRemovedDeletedContent,
+      lastSyncSize,
+    ],
   );
 }
 
 export function SyncProvider(props: { children: React.ReactNode }) {
   const [loading, setLoading] = React.useState(false);
+  useControlGlobalLoading("toolbar", "sync", loading);
   const [errorState, setError] = React.useState<AppError | undefined>(
     undefined,
   );
@@ -121,6 +147,10 @@ export function SyncProvider(props: { children: React.ReactNode }) {
       push: withRequest(push, "push"),
       sync: withRequest(sync, "sync"),
       remove: withRequest(remove, "remove"),
+      removeDeletedContentAndPush: withRequest(
+        removeDeletedContentAndPush,
+        "removeDeletedContentAndPush",
+      ),
     }),
     [withRequest],
   );

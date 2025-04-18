@@ -6,20 +6,47 @@ import { StackListProps, StackListRef } from "./StackList.types";
 import useStackList, { useInterval } from "./useStackList";
 import { minStackCount } from "@/utils/minStacks";
 import StackListIndicators from "@/components/stacks/StackListIndicators";
+import { useStackContext } from "@/components/stacks/Stack/Stack.context";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 function StackListContent(
-  props: Pick<StackListProps, "style" | "handleLayout"> & {
+  props: Pick<StackListProps, "style"> & {
     children: React.ReactNode;
     animatedRef?: AnimatedRef<Animated.ScrollView>;
     indicators?: React.ReactNode;
   },
 ) {
   const interval = useInterval();
+  const dimensions = useStackContext();
 
   const style = React.useMemo(
     () => StyleSheet.flatten([styles.container, props.style]),
     [props.style],
   );
+
+  const positionStyles = React.useMemo(
+    () => ({
+      above: StyleSheet.flatten([
+        styles.position,
+        {
+          top: 0,
+          height: dimensions.aboveStackHeight,
+        },
+      ]),
+      below: StyleSheet.flatten([
+        styles.position,
+        {
+          bottom: 0,
+          height: dimensions.belowStackHeight,
+        },
+      ]),
+    }),
+    [dimensions.belowStackHeight, dimensions.aboveStackHeight],
+  );
+
+  usePerformanceMonitor({
+    Component: StackListContent.name,
+  });
 
   return (
     <View style={style}>
@@ -31,12 +58,13 @@ function StackListContent(
         snapToAlignment="center"
         snapToInterval={interval}
         decelerationRate="fast"
-        onLayout={props.handleLayout}
         showsHorizontalScrollIndicator={false}
       >
         {props.children}
       </Animated.ScrollView>
-      {props.indicators}
+      {props.indicators && (
+        <View style={positionStyles.below}>{props.indicators}</View>
+      )}
     </View>
   );
 }
@@ -51,7 +79,11 @@ export function StackListSkeleton(props: Pick<StackListProps, "style">) {
 }
 
 export default React.forwardRef<StackListRef, StackListProps>(
-  function StackList({ handleLayout, style }, ref): React.ReactNode {
+  function StackList({ style }, ref): React.ReactNode {
+    usePerformanceMonitor({
+      Component: StackList.name,
+    });
+
     const {
       animatedRef,
       stackIds,
@@ -59,6 +91,8 @@ export default React.forwardRef<StackListRef, StackListProps>(
       indicatorIds,
       stackListRef,
     } = useStackList(ref);
+
+    const dimensions = useStackContext();
 
     const children = React.useMemo(() => {
       if (!stackIds) return undefined;
@@ -79,16 +113,24 @@ export default React.forwardRef<StackListRef, StackListProps>(
       ));
     }, [stackIds, stackListRef, focussedStackId]);
 
+    const indicatorsStyle = React.useMemo(
+      () =>
+        StyleSheet.flatten([
+          styles.indicatorsContainer,
+          { height: dimensions.belowStackHeight },
+        ]),
+      [dimensions.belowStackHeight],
+    );
+
     return (
       <StackListContent
         animatedRef={animatedRef}
         style={style}
-        handleLayout={handleLayout}
         indicators={
           indicatorIds &&
           indicatorIds.length > 1 && (
             <StackListIndicators
-              style={styles.indicators}
+              style={indicatorsStyle}
               stackIds={indicatorIds}
               focussedStackId={focussedStackId}
             />
@@ -102,19 +144,26 @@ export default React.forwardRef<StackListRef, StackListProps>(
 );
 
 const styles = StyleSheet.create({
+  position: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+  },
   container: {
     flex: 1,
   },
-  indicators: {
-    width: "100%",
+  indicatorsContainer: {
+    zIndex: 1,
     position: "absolute",
-    bottom: 20,
-    zIndex: 2,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    width: "100%",
   },
   scrollView: {
     flexDirection: "row",
     position: "relative",
-    zIndex: 1,
+    zIndex: 2,
   },
   contentContainer: {
     alignItems: "center",

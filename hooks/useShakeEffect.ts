@@ -6,47 +6,116 @@ if (Platform.OS !== "web") {
   DeviceMotion.setUpdateInterval(50); // fast updates for accurate gesture tracking
 }
 
+const ROTATION_THRESHOLD_GAMMA = 350; // degrees per second
+const ROTATION_THRESHOLD_ALPHA = 350; // degrees per second
+const ROTATION_THRESHOLD_BETA = 350; // degrees per second
+const SHAKE_WINDOW_MS = 500;
+const COOLDOWN_MS = 1500;
+
+// For each of these assume the phone is vertical facing you
+// gamma - rotation around a click face
+// alpha - backwards and forwards, so moving from facing you to facing the ceiling
+// beta - Twisting about the middle. So the face is rotating away from you e.g. turning your head
+// side to side
+
 export default function useShakeEffect(callback?: (() => void) | null) {
   const rotationHistory = React.useRef<{
-    left: number | null;
-    right: number | null;
     lastTriggered: number | null;
+    gamma: {
+      positive: number | null;
+      negative: number | null;
+    };
+    alpha: {
+      positive: number | null;
+      negative: number | null;
+    };
+    beta: {
+      positive: number | null;
+      negative: number | null;
+    };
   }>({
-    left: null,
-    right: null,
     lastTriggered: null,
+    gamma: {
+      positive: null,
+      negative: null,
+    },
+    alpha: {
+      positive: null,
+      negative: null,
+    },
+    beta: {
+      positive: null,
+      negative: null,
+    },
   });
 
   React.useEffect(() => {
+    if (Platform.OS === "web") return;
     if (!callback) return;
 
-    const ROTATION_THRESHOLD = 350; // degrees per second
-    const SHAKE_WINDOW_MS = 500;
-    const COOLDOWN_MS = 1500;
+    function getHasDimensionBeenShaken(
+      dimension: "gamma" | "alpha" | "beta",
+      { rotationRate }: DeviceMotionMeasurement,
+      options: {
+        threshold: number;
+        now: number;
+      },
+    ): boolean {
+      const rate = rotationRate?.[dimension];
 
-    const handleMotion = ({ rotationRate }: DeviceMotionMeasurement) => {
-      if (!rotationRate?.gamma) return;
+      // No data or movment
+      if (!rate) return false;
 
-      const now = Date.now();
-      const z = rotationRate.gamma;
+      // Not a fast enough rotation rate to count
+      if (Math.abs(rate) < options.threshold) return false;
 
-      if (Math.abs(z) < ROTATION_THRESHOLD) return;
-
-      if (z > 0) {
-        rotationHistory.current.right = now;
+      // Update the sides. We track both the negative and positive values separately, as we're
+      // looking for a sudden change, not just a fast rotation in one direction
+      if (rate > 0) {
+        rotationHistory.current[dimension].positive = options.now;
       } else {
-        rotationHistory.current.left = now;
+        rotationHistory.current[dimension].negative = options.now;
       }
 
-      if (!rotationHistory.current.left || !rotationHistory.current.right) {
-        return;
+      const positive = rotationHistory.current[dimension].positive;
+      const negative = rotationHistory.current[dimension].negative;
+
+      // We only have one side of the rotation so it can't be a shake
+      if (!positive || !negative) {
+        return false;
       }
 
-      const timeBetweenDirections = Math.abs(
-        rotationHistory.current.left - rotationHistory.current.right,
-      );
+      const timeBetweenDirections = Math.abs(positive - negative);
 
+      // Too long between a fast enough shake in each direction
       if (timeBetweenDirections > SHAKE_WINDOW_MS) {
+        return false;
+      }
+
+      // We have shaked in this direction
+      return true;
+    }
+
+    const handleMotion = (measurement: DeviceMotionMeasurement) => {
+      const now = Date.now();
+
+      const gammaShake = getHasDimensionBeenShaken("gamma", measurement, {
+        threshold: ROTATION_THRESHOLD_GAMMA,
+        now,
+      });
+
+      const alphaShake = getHasDimensionBeenShaken("alpha", measurement, {
+        threshold: ROTATION_THRESHOLD_ALPHA,
+        now,
+      });
+
+      const betaShake = getHasDimensionBeenShaken("beta", measurement, {
+        threshold: ROTATION_THRESHOLD_BETA,
+        now,
+      });
+
+      // No shake between any of the three dimensions
+      if (!gammaShake && !alphaShake && !betaShake) {
         return;
       }
 

@@ -14,6 +14,7 @@ export interface BottomDrawerProps {
   minHeight?: number;
   openOnMount?: boolean;
   animateIn?: boolean;
+  onRequestClose?: () => void;
 }
 
 export interface BottomDrawerRef {

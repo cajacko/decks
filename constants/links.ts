@@ -20,9 +20,10 @@ export const playStoreLink: ExternalPathString =
   "https://www.playface.fun/s/dex-playstore";
 
 export const privacyPolicyLink: ExternalPathString =
-  "https://www.playface.fun/s/f455834a";
+  "https://www.playface.fun/policies";
+
+export const termsLink: ExternalPathString =
+  "https://www.playface.fun/policies";
 
 export const charlieJacksonLink: ExternalPathString =
   "https://www.playface.fun/s/e10f07d8";
-
-export const appHome = Platform.OS === "web" ? "/app" : "/";

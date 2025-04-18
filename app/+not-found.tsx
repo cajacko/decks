@@ -3,20 +3,21 @@ import { StyleSheet } from "react-native";
 import ThemedText from "@/components/ui/ThemedText";
 import ThemedView from "@/components/ui/ThemedView";
 import text from "@/constants/text";
-import { appHome } from "@/constants/links";
-import { Toolbar } from "@/context/Toolbar";
-import Link from "@/components/ui/Link";
+import { useNavigation } from "@/context/Navigation";
+import Button from "@/components/forms/Button";
 
 export default function NotFoundScreen() {
+  const { navigate } = useNavigation();
   return (
     <>
-      <Toolbar />
       <Stack.Screen options={{ title: text["screen.404.title"] }} />
       <ThemedView style={styles.container}>
         <ThemedText type="h3">{text["404.title"]}</ThemedText>
-        <Link href={appHome} style={styles.link}>
-          {text["404.link"]}
-        </Link>
+        <Button
+          onPress={() => navigate({ name: "decks" })}
+          style={styles.link}
+          title={text["404.link"]}
+        />
       </ThemedView>
     </>
   );

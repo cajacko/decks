@@ -1,17 +1,14 @@
 import React from "react";
-import {
-  TouchableOpacity,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-  TouchableOpacityProps,
-} from "react-native";
+import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 import IconSymbol, { IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { useOnPressProps } from "@/components/forms/Button";
 import { useSkeletonAnimation } from "@/context/Skeleton";
 import Animated from "react-native-reanimated";
 import Skeleton from "../ui/Skeleton";
+import {
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from "@/components/ui/Pressables";
 
 export type { IconSymbolName };
 
@@ -23,6 +20,8 @@ export interface IconButtonProps extends TouchableOpacityProps {
   vibrate?: boolean;
   loading?: boolean;
   skeleton?: boolean;
+  disabled?: boolean;
+  iconRotation?: number;
 }
 
 const defaultSize = 80;
@@ -49,28 +48,47 @@ export default function IconButton({
   variant = "filled",
   loading = false,
   skeleton,
+  disabled = false,
+  iconRotation,
+  contentContainerStyle: contentContainerStyleProp,
   ...props
 }: IconButtonProps): React.ReactNode {
-  const { background, text } = useThemeColors();
-  const { backgroundColorStyle } = useSkeletonAnimation();
+  const { background, text: _text, textDisabled } = useThemeColors();
+  const { backgroundColorStyle } = useSkeletonAnimation() ?? {};
+  const iconColor = disabled ? textDisabled : _text;
 
-  const style = React.useMemo(
-    () =>
-      StyleSheet.flatten([
-        variant === "filled" && styles.filled,
-        variant === "filled" && {
+  const { style, contentContainerStyle } = React.useMemo(() => {
+    return {
+      style: StyleSheet.flatten([
+        {
           height: size,
           width: size,
-          borderRadius: size / 2,
-          backgroundColor: background,
-          borderColor: text,
         },
         styleProp,
       ]),
-    [styleProp, size, background, variant, text],
-  );
-
-  const onPressProps = useOnPressProps(props);
+      contentContainerStyle: StyleSheet.flatten([
+        {
+          height: size,
+          width: size,
+        },
+        variant === "filled" && styles.filled,
+        variant === "filled" && {
+          borderRadius: size / 2,
+          backgroundColor: background,
+          borderColor: iconColor,
+        },
+        styles.contentContainer,
+        contentContainerStyleProp,
+      ]),
+    };
+  }, [
+    size,
+    background,
+    variant,
+    iconColor,
+    styleProp,
+    contentContainerStyleProp,
+  ]);
 
   const children = React.useMemo((): React.ReactNode => {
     const iconSize = variant === "filled" ? size * 0.5 : size;
@@ -87,14 +105,35 @@ export default function IconButton({
     }
 
     if (typeof icon === "string") {
-      return <IconSymbol name={icon} color={text} size={iconSize} />;
+      // NOTE: ios doesn't like us rotating the actual icon syymbol
+      return (
+        <IconSymbol
+          name={icon}
+          color={iconColor}
+          size={iconSize}
+          rotation={iconRotation}
+        />
+      );
     }
 
     return icon._children;
-  }, [icon, size, text, variant, skeleton, backgroundColorStyle]);
+  }, [
+    icon,
+    size,
+    iconColor,
+    variant,
+    skeleton,
+    backgroundColorStyle,
+    iconRotation,
+  ]);
 
   return (
-    <TouchableOpacity {...props} {...onPressProps} style={style}>
+    <TouchableOpacity
+      {...props}
+      activeOpacity={disabled ? 1 : props.activeOpacity}
+      style={style}
+      contentContainerStyle={contentContainerStyle}
+    >
       {children}
     </TouchableOpacity>
   );
@@ -109,9 +148,12 @@ export function getFloatingButtonVerticalAllowance({
 }
 
 export const styles = StyleSheet.create({
-  filled: {
+  contentContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  filled: {
     overflow: "hidden",
     borderWidth: 1,
   },

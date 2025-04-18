@@ -12,9 +12,11 @@ export const initialState: RootState = {
     dateFetched: null,
   },
   sync: {
+    lastSyncSize: null,
     lastPulled: null,
     lastPushed: null,
     lastSynced: null,
+    lastRemovedDeletedContent: null,
     lastModifiedImportantChangesLocally: null,
   },
   templates: {

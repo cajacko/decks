@@ -3,9 +3,8 @@ import {
   StyleSheet,
   View,
   ViewStyle,
-  FlatList,
-  FlatListProps,
   Platform,
+  FlatListProps,
 } from "react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectCanEditDeck, selectDeckCards } from "@/store/selectors/decks";
@@ -14,13 +13,10 @@ import DeckDetails, {
 } from "@/components/decks/DeckDetails";
 import DeckCard, { DeckCardSkeleton } from "./DeckCard";
 import { useEditCardModal, Open } from "../editCard/EditCardModal";
-import DeckToolbar from "./DeckToolbar";
 import IconButton, {
   getFloatingButtonVerticalAllowance,
   styles as iconButtonStyles,
 } from "../forms/IconButton";
-import useScreenSkeleton from "@/hooks/useScreenSkeleton";
-import useDeckLastScreen from "@/hooks/useDeckLastScreen";
 import Loader from "@/components/ui/Loader";
 import { CardConstraintsProvider } from "../cards/context/CardSizeConstraints";
 import ContentWidth, { getContentWidth } from "@/components/ui/ContentWidth";
@@ -29,13 +25,12 @@ import DeckDefaults, {
 } from "@/components/decks/DeckDefaults";
 import ThemedText from "../ui/ThemedText";
 import text from "@/constants/text";
-import { DrawerChildren } from "@/context/Drawer";
-import SettingsDeck from "@/components/settings/SettingsDeck";
+import { FlatList } from "react-native-gesture-handler";
+import { useRequiredContainerWidth } from "@/context/ContainerSize";
 
 export interface DeckScreenProps {
   deckId: string;
   style?: ViewStyle;
-  width: number;
 }
 
 type FlatListData = null | {
@@ -63,12 +58,14 @@ type FlatListLayoutProps = Pick<
 
 const contentWidthPadding = undefined;
 
-function useDeckCardListProps(availableWidth: number): {
+function useDeckCardListProps(): {
   cardListProps: {
     cardWidth: number;
     flatList: FlatListLayoutProps;
   };
 } {
+  const availableWidth = useRequiredContainerWidth();
+
   const contentWidth = getContentWidth({
     availableWidth,
     padding: contentWidthPadding,
@@ -102,7 +99,6 @@ function useDeckCardListProps(availableWidth: number): {
 }
 
 function DeckScreenContent<D>(props: {
-  flatListProps: FlatListLayoutProps;
   data: FlatListProps<D>["data"];
   renderItem: NonNullable<FlatListProps<D>["renderItem"]>;
   keyExtractor: NonNullable<FlatListProps<D>["keyExtractor"]>;
@@ -110,137 +106,58 @@ function DeckScreenContent<D>(props: {
   deckDetails: React.ReactNode;
   deckDefaults: React.ReactNode;
   title?: React.ReactNode;
+  deckId?: string;
+  loading?: boolean;
+  style?: ViewStyle;
 }) {
+  const { cardListProps } = useDeckCardListProps();
+
+  const containerStyle = React.useMemo(
+    () => [styles.container, props.style],
+    [props.style],
+  );
+
   return (
-    <FlatList<D>
-      {...props.flatListProps}
-      data={props.data}
-      style={styles.scroll}
-      contentContainerStyle={styles.contentContainerStyle}
-      showsVerticalScrollIndicator={Platform.OS !== "web"}
-      ListHeaderComponent={
-        <ContentWidth padding="standard">
-          {props.deckDetails}
-          {props.showLoader ? (
-            <View style={styles.loader}>
-              <Loader />
-            </View>
-          ) : (
-            <>
-              {props.deckDefaults}
-              {props.title}
-            </>
-          )}
-        </ContentWidth>
-      }
-      renderItem={props.renderItem}
-      keyExtractor={props.keyExtractor}
-    />
+    <ContentWidth
+      style={containerStyle}
+      contentContainerStyle={styles.container}
+      padding={contentWidthPadding}
+    >
+      <View style={styles.inner}>
+        <CardConstraintsProvider width={cardListProps.cardWidth}>
+          <FlatList<D>
+            {...cardListProps.flatList}
+            data={props.data}
+            style={styles.scroll}
+            contentContainerStyle={styles.contentContainerStyle}
+            showsVerticalScrollIndicator={Platform.OS !== "web"}
+            ListHeaderComponent={
+              <ContentWidth padding="standard">
+                {props.deckDetails}
+                {props.showLoader ? (
+                  <View style={styles.loader}>
+                    <Loader />
+                  </View>
+                ) : (
+                  <>
+                    {props.deckDefaults}
+                    {props.title}
+                  </>
+                )}
+              </ContentWidth>
+            }
+            renderItem={props.renderItem}
+            keyExtractor={props.keyExtractor}
+          />
+        </CardConstraintsProvider>
+      </View>
+    </ContentWidth>
   );
 }
 
 type SkeletonData = {
   key: string;
 };
-
-function DeckScreenSkeleton({
-  flatListProps,
-}: {
-  flatListProps: FlatListLayoutProps;
-}) {
-  const numColumns = flatListProps.numColumns ?? 3;
-
-  const data: SkeletonData[] = React.useMemo(
-    () =>
-      Array.from(
-        { length: numColumns * 3 },
-        (_, index): SkeletonData => ({
-          key: `skeleton-${index}`,
-        }),
-      ),
-    [numColumns],
-  );
-
-  const renderItem = React.useCallback<
-    NonNullable<FlatListProps<SkeletonData>["renderItem"]>
-  >(() => <DeckCardSkeleton style={styles.item} />, []);
-
-  const keyExtractor = React.useCallback<
-    NonNullable<FlatListProps<SkeletonData>["keyExtractor"]>
-  >(({ key }) => key, []);
-
-  return (
-    <DeckScreenContent<SkeletonData>
-      flatListProps={flatListProps}
-      data={data}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      showLoader={false}
-      deckDetails={<DeckDetailsSkeleton />}
-      deckDefaults={<DeckDefaultsSkeleton style={styles.deckDefaults} />}
-    />
-  );
-}
-
-function ConnectedDeckScreen({
-  deckId,
-  flatListProps,
-  open,
-}: {
-  deckId: string;
-  flatListProps: FlatListLayoutProps;
-  open: Open;
-}) {
-  const cardsState = useAppSelector((state) =>
-    selectDeckCards(state, { deckId }),
-  );
-
-  const cards = React.useMemo<FlatListData[] | null>(() => {
-    if (!cardsState || cardsState.length === 0) {
-      return [null];
-    }
-
-    return cardsState;
-  }, [cardsState]);
-
-  // Memoized renderItem to prevent unnecessary re-renders
-  const renderItem = React.useCallback<
-    NonNullable<FlatListProps<FlatListData>["renderItem"]>
-  >(
-    ({ item }) => (
-      <DeckCard
-        style={styles.item}
-        id={item?.cardId ?? deckId}
-        type={item ? "card" : "new-card-in-deck"}
-        quantity={item?.quantity}
-        editCard={open}
-        deckId={deckId}
-      />
-    ),
-    [deckId, open],
-  );
-
-  const showLoader = false;
-
-  return (
-    <DeckScreenContent<FlatListData>
-      flatListProps={flatListProps}
-      data={cards}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      showLoader={showLoader}
-      deckDetails={<DeckDetails deckId={deckId} />}
-      deckDefaults={
-        <DeckDefaults style={styles.deckDefaults} deckId={deckId} />
-      }
-      title={
-        <ThemedText style={styles.cardsHeader} type="h2">
-          {text["deck_screen.cards.title"]}
-        </ThemedText>
-      }
-    />
-  );
-}
 
 function AddButton({ deckId, open }: { deckId: string; open: Open }) {
   const canEditDeck = useAppSelector((state) =>
@@ -266,62 +183,112 @@ function AddButton({ deckId, open }: { deckId: string; open: Open }) {
   );
 }
 
-export default function DeckScreen(props: DeckScreenProps): React.ReactNode {
-  const { cardListProps } = useDeckCardListProps(props.width);
-  const skeleton = useScreenSkeleton(DeckScreen.name);
+export function DeckScreenSkeleton(props: Omit<DeckScreenProps, "deckId">) {
+  const { cardListProps } = useDeckCardListProps();
 
-  useDeckLastScreen({
-    deckId: props.deckId,
-    screen: "deck",
-  });
+  const numColumns = cardListProps.flatList.numColumns ?? 3;
 
-  const containerStyle = React.useMemo(
-    () => [styles.container, props.style],
-    [props.style],
+  const data: SkeletonData[] = React.useMemo(
+    () =>
+      Array.from(
+        { length: numColumns * 3 },
+        (_, index): SkeletonData => ({
+          key: `skeleton-${index}`,
+        }),
+      ),
+    [numColumns],
   );
 
+  const renderItem = React.useCallback<
+    NonNullable<FlatListProps<SkeletonData>["renderItem"]>
+  >(() => <DeckCardSkeleton style={styles.item} />, []);
+
+  const keyExtractor = React.useCallback<
+    NonNullable<FlatListProps<SkeletonData>["keyExtractor"]>
+  >(({ key }) => key, []);
+
+  return (
+    <DeckScreenContent<SkeletonData>
+      style={props.style}
+      data={data}
+      renderItem={renderItem}
+      loading
+      keyExtractor={keyExtractor}
+      showLoader={false}
+      deckDetails={<DeckDetailsSkeleton />}
+      deckDefaults={<DeckDefaultsSkeleton style={styles.deckDefaults} />}
+    />
+  );
+}
+
+export default React.memo(function DeckScreen({
+  deckId,
+  style,
+}: DeckScreenProps): React.ReactNode {
   const { open, component } = useEditCardModal({
     type: "new-card-in-deck",
-    id: props.deckId,
+    id: deckId,
   });
 
-  const skeletonContent =
-    skeleton === "show-nothing" ? null : (
-      <DeckScreenSkeleton flatListProps={cardListProps.flatList} />
-    );
+  const cardsState = useAppSelector((state) =>
+    selectDeckCards(state, { deckId }),
+  );
+
+  const { cards, cardCount } = React.useMemo<{
+    cards: FlatListData[];
+    cardCount: number;
+  }>(() => {
+    if (!cardsState || cardsState.length === 0) {
+      return { cards: [null], cardCount: 0 };
+    }
+
+    return { cards: cardsState, cardCount: cardsState.length };
+  }, [cardsState]);
+
+  // Memoized renderItem to prevent unnecessary re-renders
+  const renderItem = React.useCallback<
+    NonNullable<FlatListProps<FlatListData>["renderItem"]>
+  >(
+    ({ item }) => (
+      <DeckCard
+        style={styles.item}
+        id={item?.cardId ?? deckId}
+        type={item ? "card" : "new-card-in-deck"}
+        quantity={item?.quantity}
+        editCard={open}
+        deckId={deckId}
+      />
+    ),
+    [deckId, open],
+  );
+
+  const showLoader = false;
 
   return (
     <>
       {component}
-      <DeckToolbar deckId={props.deckId} loading={!!skeleton} />
-      <DrawerChildren>
-        <SettingsDeck deckId={props.deckId} />
-      </DrawerChildren>
-      <ContentWidth
-        style={containerStyle}
-        contentContainerStyle={styles.container}
-        padding={contentWidthPadding}
-      >
-        <View style={styles.inner}>
-          {cardListProps && (
-            <CardConstraintsProvider width={cardListProps.cardWidth}>
-              {skeleton ? (
-                skeletonContent
-              ) : (
-                <ConnectedDeckScreen
-                  deckId={props.deckId}
-                  open={open}
-                  flatListProps={cardListProps.flatList}
-                />
-              )}
-            </CardConstraintsProvider>
-          )}
-        </View>
-      </ContentWidth>
-      {!skeleton && <AddButton deckId={props.deckId} open={open} />}
+      <DeckScreenContent<FlatListData>
+        style={style}
+        data={cards}
+        loading={false}
+        deckId={deckId}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        showLoader={showLoader}
+        deckDetails={<DeckDetails deckId={deckId} />}
+        deckDefaults={
+          <DeckDefaults style={styles.deckDefaults} deckId={deckId} />
+        }
+        title={
+          <ThemedText style={styles.cardsHeader} type="h2">
+            {text["deck_screen.cards.title"]} ({cardCount})
+          </ThemedText>
+        }
+      />
+      <AddButton deckId={deckId} open={open} />
     </>
   );
-}
+});
 
 const styles = StyleSheet.create({
   loader: {

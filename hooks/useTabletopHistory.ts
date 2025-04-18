@@ -25,21 +25,23 @@ export interface UseTabletopHistoryOptions {
 }
 
 export default function useTabletopHistory(
-  tabletopId: string,
+  tabletopId: string | null,
   options?: UseTabletopHistoryOptions,
 ) {
   const { beforeUndo, beforeRedo } = options || {};
 
   const dispatch = useAppDispatch();
   const hasPast = useAppSelector((state) =>
-    selectTabletopHasPast(state, { tabletopId }),
+    tabletopId ? selectTabletopHasPast(state, { tabletopId }) : false,
   );
 
   const hasFuture = useAppSelector((state) =>
-    selectTabletopHasFuture(state, { tabletopId }),
+    tabletopId ? selectTabletopHasFuture(state, { tabletopId }) : false,
   );
 
   const handleUndo = React.useCallback(() => {
+    if (!tabletopId) return;
+
     const sliceState = store.getState()[SliceName.Tabletops];
     const undoState = getUndoState(sliceState, { tabletopId });
     const currentState = getState(sliceState, { tabletopId });
@@ -52,6 +54,8 @@ export default function useTabletopHistory(
   }, [dispatch, tabletopId, beforeUndo]);
 
   const handleRedo = React.useCallback(() => {
+    if (!tabletopId) return;
+
     const sliceState = store.getState()[SliceName.Tabletops];
     const redoState = getRedoState(sliceState, { tabletopId });
     const currentState = getState(sliceState, { tabletopId });

@@ -11,17 +11,20 @@ import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.con
 import { selectStackIds } from "@/store/selectors/tabletops";
 import { useAppSelector } from "@/store/hooks";
 import { StackListRef, ScrollOptions } from "./StackList.types";
+import { useStackContext } from "@/components/stacks/Stack/Stack.context";
 
 const scrollPromise = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
 export function useInterval() {
-  return useTabletopContext().stackWidth;
+  return useStackContext().stackWidth;
 }
 
 export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
   const animatedRef = useAnimatedRef<Animated.ScrollView>();
+
   const scrollOffset = useScrollViewOffset(animatedRef);
-  const { tabletopId, canOnlyFit1Stack } = useTabletopContext();
+  const { canOnlyFit1Stack } = useStackContext();
+  const { tabletopId } = useTabletopContext();
   const stackIds = useAppSelector((state) =>
     selectStackIds(state, { tabletopId }),
   );

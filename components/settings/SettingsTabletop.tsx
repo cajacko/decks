@@ -1,5 +1,9 @@
 import React from "react";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import {
+  useAppSelector,
+  useAppDispatch,
+  useRequiredAppSelector,
+} from "@/store/hooks";
 import FieldSet, {
   FieldSetProps,
   useLeftAdornmentSize,
@@ -22,6 +26,7 @@ import { setTabletopSetting } from "@/store/slices/tabletop";
 import { selectTabletopSettings } from "@/store/combinedSelectors/tabletops";
 import { dateToDateString } from "@/utils/dates";
 import IconSymbol from "../ui/IconSymbol";
+import useFlag from "@/hooks/useFlag";
 
 const titleProps = { type: "h2" } as const;
 
@@ -29,15 +34,20 @@ export interface SettingsTabletopProps
   extends FieldSetProps,
     UseTabletopHistoryOptions {
   deckId: string;
-  tabletopId: string;
+  closeDrawer: () => void;
 }
 
 export default function SettingsTabletop({
   deckId,
-  tabletopId,
   ...props
 }: SettingsTabletopProps): React.ReactNode {
   const dispatch = useAppDispatch();
+  const tabletopId = useRequiredAppSelector(
+    (state) => selectDeck(state, { deckId })?.defaultTabletopId,
+    selectDeck.name,
+  );
+  const hideNeatStackOption =
+    useFlag("GLOBAL_NEAT_STACK_BEHAVIOUR") === "force-neat";
   const canEdit = useAppSelector((state) =>
     selectCanEditDeck(state, { deckId }),
   );
@@ -66,6 +76,20 @@ export default function SettingsTabletop({
         setTabletopSetting({
           tabletopId,
           key: "preferNeatStacks",
+          value: value,
+          date: dateToDateString(new Date()),
+        }),
+      );
+    },
+    [dispatch, tabletopId],
+  );
+
+  const onChangeHideCardCount = React.useCallback(
+    (value: boolean) => {
+      dispatch(
+        setTabletopSetting({
+          tabletopId,
+          key: "hideCardCount",
           value: value,
           date: dateToDateString(new Date()),
         }),
@@ -160,12 +184,22 @@ export default function SettingsTabletop({
             onPress={resetTabletopModal.open}
             variant="outline"
           />
+          {!hideNeatStackOption && (
+            <SwitchField
+              label={text["settings.neat_stack"]}
+              value={!!settings.preferNeatStacks}
+              onValueChange={onChangeIsNeat}
+              FieldProps={{
+                subLabel: text["settings.neat_stack.helper"],
+              }}
+            />
+          )}
           <SwitchField
-            label={text["settings.neat_stack"]}
-            value={!!settings.preferNeatStacks}
-            onValueChange={onChangeIsNeat}
+            label={text["settings.tabletop.card_count"]}
+            value={!!settings.hideCardCount}
+            onValueChange={onChangeHideCardCount}
             FieldProps={{
-              subLabel: text["settings.neat_stack.helper"],
+              subLabel: text["settings.tabletop.card_count.helper"],
             }}
           />
           {/* Some settings don't make sense if it's a prebuilt deck, specifically things that 

@@ -70,6 +70,10 @@ export default createMigration<V1, V2>({
     const userSettings: V2["userSettings"] = {
       settings: {
         ...props.validState.userSettings,
+        flags: {
+          ...props.validState.userSettings.flags,
+          SCREEN_ANIMATIONS: undefined,
+        },
         dateCreated,
         dateUpdated,
       },
@@ -104,9 +108,11 @@ export default createMigration<V1, V2>({
       userSettings,
       templates,
       sync: {
+        lastSyncSize: null,
         lastSynced: null,
         lastPulled: null,
         lastPushed: null,
+        lastRemovedDeletedContent: null,
         lastModifiedImportantChangesLocally: null,
       },
       includedData: {

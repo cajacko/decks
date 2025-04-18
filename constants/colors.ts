@@ -25,6 +25,7 @@ export const themes = {
   light: {
     primary: colors.blue,
     text: colors.darkBlue,
+    textDisabled: Color(colors.darkBlue).alpha(0.2).rgb().string(),
     link: colors.red,
     background: lightBackground,
     skeleton: Color(lightBackground).darken(0.1).rgb().string(),
@@ -51,10 +52,11 @@ export const themes = {
   dark: {
     primary: colors.yellow,
     text: colors.white,
+    textDisabled: Color(colors.white).alpha(0.5).rgb().string(),
     link: colors.yellow,
     background: colors.black,
     skeleton: Color(colors.black).lighten(0.5).rgb().string(),
-    skeletonPulse: Color(colors.black).lighten(0.45).rgb().string(),
+    skeletonPulse: Color(colors.black).lighten(0.4).rgb().string(),
     skeletonCard: Color(colors.black).lighten(0.3).rgb().string(),
     buttonBackground: colors.black,
     buttonText: colors.white,

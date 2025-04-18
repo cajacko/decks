@@ -3,6 +3,7 @@ import {
   combineReducers,
   StateFromReducersMapObject,
   ActionFromReducersMapObject,
+  Middleware,
 } from "@reduxjs/toolkit";
 import { enablePatches } from "immer";
 import { persistStore, persistReducer } from "redux-persist";
@@ -17,6 +18,7 @@ import userSettingsSlice from "./slices/userSettings";
 import templatesSlice from "./slices/templates";
 import sync from "./slices/sync";
 import includedData from "./slices/includedData";
+import AppError from "@/classes/AppError";
 // import { HistoryTransform } from "./transforms";
 
 enablePatches();
@@ -60,12 +62,31 @@ const persistedReducer = persistReducer(
       sync.name,
       includedData.name,
     ],
+    writeFailHandler: (error) => {
+      AppError.getError(
+        error,
+        "Redux persist encountered an error persisting the store",
+      ).log("error");
+    },
     // Enable to not persist history, currently we're invalidating it during migration instead,
     // which allows us to persist history until we change the state which is nice if it works
     // transforms: [HistoryTransform],
   },
   rootReducer,
 );
+
+// NOTE: Useful for mobile debugging
+const logStoreType = false;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const loggerMiddleware: Middleware = (_) => (next) => (action: any) => {
+  if (logStoreType) {
+    // eslint-disable-next-line no-console
+    console.log(action.type);
+  }
+
+  return next(action);
+};
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -74,7 +95,7 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
       immutableCheck: false,
-    }),
+    }).concat(loggerMiddleware), // Add loggerMiddleware here
 });
 
 export function resetStore() {

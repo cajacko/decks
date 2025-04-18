@@ -1,37 +1,55 @@
 import React from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   StyleProps,
 } from "react-native-reanimated";
 import EmptyStack from "@/components/stacks/EmptyStack";
-import CardAction from "@/components/forms/CardAction";
 import CardSpacer from "@/components/cards/connected/CardSpacer";
 import CardSpacerSkeleton from "@/components/cards/connected/CardSpacerSkeleton";
 import { StackProps } from "./stack.types";
-import styles, { getShuffleStyle } from "./stack.style";
+import styles, { getToolbarContainerStyle } from "./stack.style";
 import useStack, { useStackWidth } from "./useStack";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import StackListItem, {
   StackListItemSkeleton,
 } from "@/components/stacks/StackListItem";
 import { Target } from "@/utils/cardTarget";
+import StackToolbar from "@/components/stacks/StackToolbar";
+import useGetStackName from "@/hooks/useGetStackName";
+import { useStackContext } from "./Stack.context";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 function StackContent(
   props: Pick<StackProps, "style"> & {
     emptyStack?: React.ReactNode;
-    button?: React.ReactNode;
     cards?: React.ReactNode;
     cardSpacer: React.ReactNode;
     containerStyle?: StyleProps;
     innerStyle?: StyleProps;
+    toolbar?: React.ReactNode;
   },
 ) {
-  const dimensions = useTabletopContext();
+  usePerformanceMonitor({
+    Component: StackContent.name,
+  });
+
+  const dimensions = useStackContext();
 
   const innerStyle = React.useMemo(
-    () => [styles.inner, props.innerStyle],
-    [props.innerStyle],
+    () => [
+      styles.inner,
+      {
+        paddingVertical: dimensions.stackVerticalPadding,
+        paddingHorizontal: dimensions.stackHorizontalPadding,
+      },
+      props.innerStyle,
+    ],
+    [
+      props.innerStyle,
+      dimensions.stackVerticalPadding,
+      dimensions.stackHorizontalPadding,
+    ],
   );
 
   const containerStyle = React.useMemo(
@@ -39,29 +57,48 @@ function StackContent(
     [props.style, props.containerStyle],
   );
 
-  const shuffleStyle = React.useMemo(
+  const toolbarContainerStyle = React.useMemo(
     () =>
-      getShuffleStyle({
-        buttonSize: dimensions.buttonSize,
+      getToolbarContainerStyle({
+        stackHorizontalPadding: dimensions.stackHorizontalPadding,
       }),
-    [dimensions.buttonSize],
+    [dimensions.stackHorizontalPadding],
+  );
+
+  const positionStyles = React.useMemo(
+    () => ({
+      above: StyleSheet.flatten([
+        styles.position,
+        {
+          top: 0,
+          height: dimensions.aboveStackHeight,
+        },
+      ]),
+      below: StyleSheet.flatten([
+        styles.position,
+        {
+          bottom: 0,
+          height: dimensions.belowStackHeight,
+        },
+      ]),
+    }),
+    [dimensions.belowStackHeight, dimensions.aboveStackHeight],
   );
 
   return (
     <Animated.View style={containerStyle}>
-      <View style={styles.shuffleContainer} />
+      <View style={positionStyles.above}>
+        <View style={toolbarContainerStyle}>{props.toolbar}</View>
+      </View>
       <Animated.View style={innerStyle}>
-        {props.cards && (
-          <View style={styles.cardInstances}>
-            {props.cardSpacer}
-            {props.cards}
-          </View>
-        )}
-
-        {props.emptyStack}
+        <View style={{ position: "relative" }}>
+          {props.cards && (
+            <View style={styles.cardInstances}>{props.cards}</View>
+          )}
+          {props.emptyStack}
+          {props.cardSpacer}
+        </View>
       </Animated.View>
-
-      <View style={shuffleStyle}>{props.button}</View>
     </Animated.View>
   );
 }
@@ -90,7 +127,12 @@ export function StackSkeleton(
 }
 
 export default function Stack(props: StackProps): React.ReactNode {
-  const { deckId } = useTabletopContext();
+  usePerformanceMonitor({
+    Component: Stack.name,
+  });
+
+  const { deckId, tabletopId } = useTabletopContext();
+  const stackName = useGetStackName(tabletopId)(props.stackId);
 
   const target = React.useMemo(
     (): Target => ({ id: deckId, type: "deck-defaults" }),
@@ -105,7 +147,9 @@ export default function Stack(props: StackProps): React.ReactNode {
     width,
     opacity,
     emptyStackButton,
-    shakeToShuffleActive,
+    handleFlipAll,
+    shuffleProgress,
+    cardCount,
   } = useStack(props);
 
   const innerStyle = useAnimatedStyle(() => ({
@@ -119,9 +163,7 @@ export default function Stack(props: StackProps): React.ReactNode {
 
   function getShouldShowShuffle(): boolean {
     if (!cardInstances) return false;
-    if (cardInstances.length <= 1) return false;
-    if (shakeToShuffleActive) return false;
-    if (props.isFocussed === false) return false;
+    if (cardInstances.length <= 0) return false;
 
     return true;
   }
@@ -136,11 +178,13 @@ export default function Stack(props: StackProps): React.ReactNode {
         isTopCard={i === 0}
         cardOffsetPosition={getCardOffsetPosition(cardInstanceId)}
         zIndex={cardInstancesIds.length - i + 1}
-        canMoveToBottom={cardInstancesIds.length > 1}
         stackId={props.stackId}
         leftStackId={props.leftStackId}
         rightStackId={props.rightStackId}
         stackListRef={props.stackListRef}
+        shuffleProgress={shuffleProgress}
+        index={i}
+        length={cardInstancesIds.length}
       />
     ));
   }, [
@@ -150,6 +194,7 @@ export default function Stack(props: StackProps): React.ReactNode {
     cardInstancesIds,
     getCardOffsetPosition,
     props.stackListRef,
+    shuffleProgress,
   ]);
 
   return (
@@ -166,16 +211,14 @@ export default function Stack(props: StackProps): React.ReactNode {
       cards={cardInstances}
       containerStyle={containerStyle}
       innerStyle={innerStyle}
-      button={
-        getShouldShowShuffle() && (
-          <CardAction
-            icon="shuffle"
-            style={styles.shuffleButton}
-            onPress={handleShuffle}
-            // Vibrate covered by handleShuffle as it gets called programmatically on shake
-            vibrate={false}
-          />
-        )
+      toolbar={
+        <StackToolbar
+          title={stackName}
+          handleShuffle={getShouldShowShuffle() ? handleShuffle : undefined}
+          handleFlipAll={handleFlipAll}
+          cardCount={cardCount}
+          tabletopId={tabletopId}
+        />
       }
     />
   );

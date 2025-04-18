@@ -8,6 +8,7 @@ import {
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
 import MenuItem from "./MenuItem";
+import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
 export const HoldMenuWrapper = GestureHandlerRootView;
 
@@ -73,6 +74,10 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
 
     return childrenProp;
   }, [childrenProp, longPressStyle, state.longPressTransition]);
+
+  usePerformanceMonitor({
+    Component: HoldMenu.name,
+  });
 
   const component = (
     <Animated.View style={containerStyle}>

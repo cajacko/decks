@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  ScrollView,
-  ViewStyle,
-  View,
-  Pressable,
-  Dimensions,
-} from "react-native";
+import { StyleSheet, ViewStyle, View, Dimensions } from "react-native";
 import Animated from "react-native-reanimated";
 import React from "react";
 import BottonDrawer, {
@@ -15,13 +8,13 @@ import BottonDrawer, {
   useMaxHeight,
 } from "@/components/ui/BottomDrawer";
 import EditCardForm from "@/components/editCard/EditCardForm";
-import AnimatedCardSides, {
+import EditingAnimatedCardSides, {
   AnimatedCardSidesRef,
-} from "@/components/cards/connected/AnimatedCardSides";
+} from "@/components/cards/connected/EditingAnimatedCardSides";
 import { EditCardProvider, EditCardProviderProps } from "@/context/EditCard";
 import { Target } from "@/utils/cardTarget";
 import { Cards } from "@/store/types";
-import { TabletopCardSizeProvider } from "@/components/tabletops/Tabletop/Tabletop.context";
+import { StackProvider } from "@/components/stacks/Stack/Stack.context";
 import { selectCanEdit } from "@/store/combinedSelectors/cards";
 import { useAppSelector, useRequiredAppSelector } from "@/store/hooks";
 import ThemedText from "@/components/ui/ThemedText";
@@ -29,6 +22,8 @@ import Button from "@/components/forms/Button";
 import text from "@/constants/text";
 import useCopyToEditAlert from "@/hooks/useCopyToEditAlert";
 import { selectDeckId } from "@/store/combinedSelectors/decks";
+import { ScrollView } from "react-native-gesture-handler";
+import { Pressable } from "@/components/ui/Pressables";
 
 export type EditCardProps = Pick<
   EditCardProviderProps,
@@ -39,6 +34,7 @@ export type EditCardProps = Pick<
   onDelete?: () => void;
   onPressBackground?: () => void;
   backgroundStyle?: ViewStyle;
+  onRequestClose: () => void;
 };
 
 export default function EditCard({
@@ -89,7 +85,7 @@ export default function EditCard({
   }, [_copyDeck, onPressBackground]);
 
   return (
-    <TabletopCardSizeProvider
+    <StackProvider
       availableHeight={containerHeight ?? Dimensions.get("window").height}
       availableWidth={containerWidth ?? Dimensions.get("window").width}
       target={props.target}
@@ -106,7 +102,7 @@ export default function EditCard({
           >
             <View style={styles.scrollContent}>
               <Pressable onPress={onPress}>
-                <AnimatedCardSides
+                <EditingAnimatedCardSides
                   ref={cardSidesRef}
                   target={props.target}
                   side={side}
@@ -123,6 +119,7 @@ export default function EditCard({
             initHeight={height.initHeight}
             animateIn
             openOnMount
+            onRequestClose={props.onRequestClose}
           >
             {canEdit ? (
               <EditCardForm
@@ -147,7 +144,7 @@ export default function EditCard({
           </BottonDrawer>
         </BottomDrawerWrapper>
       </EditCardProvider>
-    </TabletopCardSizeProvider>
+    </StackProvider>
   );
 }
 

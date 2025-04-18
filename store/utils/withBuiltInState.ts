@@ -1,5 +1,6 @@
 import { RootState, SliceName } from "../types";
 import merge from "lodash/merge";
+import cloneDeep from "lodash/cloneDeep";
 import includedData from "@/constants/exampleDecks/includedData";
 import { createSelector } from "@reduxjs/toolkit";
 import { selectIncludedData } from "../slices/includedData";
@@ -28,9 +29,11 @@ let builtInState: RootState = {
     settings: null,
   },
   [SliceName.Sync]: {
+    lastSyncSize: null,
     lastPulled: null,
     lastPushed: null,
     lastSynced: null,
+    lastRemovedDeletedContent: null,
     lastModifiedImportantChangesLocally: null,
   },
   [SliceName.IncludedData]: {
@@ -63,7 +66,7 @@ export const selectBuiltInState = createSelector(
   () => builtInState,
   selectIncludedDataRootState,
   (builtInState, includedData): RootState => {
-    return merge(builtInState, includedData);
+    return cloneDeep(merge(builtInState, includedData));
   },
 );
 

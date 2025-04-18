@@ -12,7 +12,7 @@ import {
   PickerItemProps as RNPickerItemProps,
 } from "@react-native-picker/picker";
 import { useThemeColors } from "@/hooks/useThemeColor";
-import { Platform, StyleSheet, View, ViewStyle, Pressable } from "react-native";
+import { Platform, StyleSheet, View, ViewStyle } from "react-native";
 import { styles as buttonStyles } from "./Button";
 import { useThemedTextStyle } from "../ui/ThemedText";
 import { styles as inputStyles } from "./TextInput";
@@ -20,6 +20,7 @@ import Modal, { styles as modalStyles } from "../overlays/Modal";
 import ThemedView from "../ui/ThemedView";
 import { styles as alertStyles } from "../overlays/Alert";
 import Button from "./Button";
+import { Pressable } from "@/components/ui/Pressables";
 
 export type PickerValue = string | number | boolean | null;
 
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
   },
   container: {
     borderWidth: buttonStyles.outline.borderWidth,
-    borderRadius: buttonStyles.button.borderRadius,
+    borderRadius: buttonStyles.buttonContentContainer.borderRadius,
     overflow: "hidden",
   },
   iosModalContainer: {
