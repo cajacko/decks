@@ -5,10 +5,7 @@ import Animated, { AnimatedRef } from "react-native-reanimated";
 import { StackListProps, StackListRef } from "./StackList.types";
 import useStackList, { useInterval } from "./useStackList";
 import { minStackCount } from "@/utils/minStacks";
-import StackListIndicators, {
-  stackListIndicatorsHeight,
-} from "@/components/stacks/StackListIndicators";
-import { tabletopUISpacing } from "../Stack/stack.style";
+import StackListIndicators from "@/components/stacks/StackListIndicators";
 import { useStackContext } from "@/components/stacks/Stack/Stack.context";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 
@@ -95,6 +92,8 @@ export default React.forwardRef<StackListRef, StackListProps>(
       stackListRef,
     } = useStackList(ref);
 
+    const dimensions = useStackContext();
+
     const children = React.useMemo(() => {
       if (!stackIds) return undefined;
 
@@ -114,6 +113,15 @@ export default React.forwardRef<StackListRef, StackListProps>(
       ));
     }, [stackIds, stackListRef, focussedStackId]);
 
+    const indicatorsStyle = React.useMemo(
+      () =>
+        StyleSheet.flatten([
+          styles.indicatorsContainer,
+          { height: dimensions.belowStackHeight },
+        ]),
+      [dimensions.belowStackHeight],
+    );
+
     return (
       <StackListContent
         animatedRef={animatedRef}
@@ -122,7 +130,7 @@ export default React.forwardRef<StackListRef, StackListProps>(
           indicatorIds &&
           indicatorIds.length > 1 && (
             <StackListIndicators
-              style={styles.indicatorsContainer}
+              style={indicatorsStyle}
               stackIds={indicatorIds}
               focussedStackId={focussedStackId}
             />
@@ -145,18 +153,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   indicatorsContainer: {
-    zIndex: 2,
+    zIndex: 1,
     position: "absolute",
     left: 0,
     right: 0,
-    height: stackListIndicatorsHeight,
-    bottom: tabletopUISpacing,
+    alignItems: "center",
     width: "100%",
   },
   scrollView: {
     flexDirection: "row",
     position: "relative",
-    zIndex: 1,
+    zIndex: 2,
   },
   contentContainer: {
     alignItems: "center",

@@ -19,7 +19,7 @@ export const flagMap = {
    * This causes issues when we navigate. HAving any animations running when the nav transitions
    * packs everything up.
    */
-  TOOLBAR_LOADING_ANIMATION: ["disabled", "enabled"],
+  TOOLBAR_LOADING_ANIMATION: ["enabled", "disabled"],
   BACKUP_SYNC: ["disabled", "enabled"],
   AUTO_SYNC: ["enabled", "disabled"],
   ROTATE_CARDS_BEFORE_FLIP: ["disabled", "enabled"],
@@ -37,13 +37,13 @@ export const flagMap = {
    * Disabled is actually the worst option here as the screens freeze until the entire content has
    * loaded.
    */
-  SKELETON_LOADER: ["show-nothing", "enabled", "disabled"],
+  SKELETON_LOADER: ["enabled", "show-nothing", "disabled"],
   /**
    * This can be a big performance hog if enabled, something about having a tone of animated
    * components rendering of screen causing navigation transitions to seize up. Potentially waiting
    * to enable them might help. But it does seem to block the next navigation transition after that.
    */
-  SKELETON_ANIMATIONS: ["disabled", "enabled"],
+  SKELETON_ANIMATIONS: ["enabled", "disabled"],
   SCREEN_ANIMATIONS: ["disabled", "react-navigation"],
   NAVIGATION_STACK_ANIMATIONS: ["disabled", "slide"],
   // Does not play nicely with reanimated effects. When we navigated to tabletop, then to deck edit

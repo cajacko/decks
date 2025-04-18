@@ -11,11 +11,7 @@ import { Platform } from "react-native";
 import * as DevClient from "expo-dev-client";
 
 // If set, this value will be used
-export const flagOverrides: Partial<UserSettings.FlagMap> = {
-  SKELETON_LOADER: "enabled",
-  SKELETON_ANIMATIONS: "enabled",
-  TOOLBAR_LOADING_ANIMATION: "enabled",
-};
+export const flagOverrides: Partial<UserSettings.FlagMap> = {};
 
 // If some flags depend on others, define that relationship here so it's all in one place. Beware of
 // circular dependencies though
@@ -52,8 +48,6 @@ export const flagRelationships: FlagRelationships = {
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
   GENERAL_LAYOUT_ANIMATIONS: (value, getFlag) =>
     getFlag("PERFORMANCE_MODE") === "enabled" ? "disabled" : value,
-  SKELETON_LOADER: (value, getFlag) =>
-    getFlag("PERFORMANCE_MODE") === "enabled" ? "enabled" : value,
   NAVIGATION_STACK_ANIMATIONS: (value, getFlag) =>
     getFlag("SCREEN_ANIMATIONS") === "react-navigation" ? value : "disabled",
   SCREEN_ANIMATIONS: (value, getValue) => {
