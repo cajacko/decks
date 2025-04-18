@@ -116,7 +116,12 @@ export const GlobalLoadingProvider = React.memo(function GlobalLoadingProvider({
   );
 
   return (
-    <Context.Provider value={{ loading, setLoading: setLoadingState }}>
+    <Context.Provider
+      value={React.useMemo(
+        () => ({ loading, setLoading: setLoadingState }),
+        [loading, setLoadingState],
+      )}
+    >
       {children}
     </Context.Provider>
   );

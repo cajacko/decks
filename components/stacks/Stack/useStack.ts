@@ -29,6 +29,7 @@ import useShakeEffect from "@/hooks/useShakeEffect";
 import useVibrate from "@/hooks/useVibrate";
 import { dateToDateString } from "@/utils/dates";
 import { useStackContext } from "./Stack.context";
+import { useNotify } from "@/context/Notifications";
 
 export function useStackWidth() {
   const { stackWidth } = useStackContext();
@@ -60,7 +61,8 @@ export default function useStack({
   const shakeToShuffle = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
   const animateShuffle = useFlag("SHUFFLE_ANIMATION") === "enabled";
   const dispatch = useAppDispatch();
-  const { tabletopId, deckId, notify } = useTabletopContext();
+  const { tabletopId, deckId } = useTabletopContext();
+  const notify = useNotify();
   const { vibrate } = useVibrate();
   const opacity = useSharedValue(1);
   const { navigate } = useNavigation();
@@ -286,11 +288,12 @@ export default function useStack({
     if (!firstCardSide) return undefined;
 
     return () => {
-      notify?.(
-        firstCardSide === "front"
-          ? text["stack.notifications.flip_all_down"]
-          : text["stack.notifications.flip_all_up"],
-      );
+      notify?.({
+        text:
+          firstCardSide === "front"
+            ? text["stack.notifications.flip_all_down"]
+            : text["stack.notifications.flip_all_up"],
+      });
 
       dispatch(
         changeCardState({

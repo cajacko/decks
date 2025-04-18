@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { TabletopProps } from "@/components/tabletops/Tabletop/Tabletop.types";
 import StackList, {
   StackListRef,
@@ -15,12 +15,6 @@ import { selectTabletopNeedsResetting } from "@/store/combinedSelectors/tabletop
 import { resetTabletopHelper } from "@/store/actionHelpers/tabletop";
 import { TabletopProvider } from "./Tabletop.context";
 import { Target } from "@/utils/cardTarget";
-import { DrawerChildren } from "@/context/Drawer";
-import SettingsTabletop from "@/components/settings/SettingsTabletop";
-import SettingsDeck from "@/components/settings/SettingsDeck";
-import TabletopNotification, {
-  useTabletopNotification,
-} from "../TabletopNotification";
 import {
   StackProvider,
   StackProviderProps,
@@ -29,6 +23,7 @@ import { defaultCardSizePreset } from "@/components/cards/connected/CardSpacerSk
 import { selectDeck } from "@/store/selectors/decks";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
 import { useRequiredContainerSize } from "@/context/ContainerSize";
+import { useSetStackListRef } from "@/context/StackListRefs";
 
 function TabletopContent(
   props: Omit<
@@ -36,7 +31,6 @@ function TabletopContent(
     "availableHeight" | "availableWidth" | "children"
   > & {
     stackList: React.ReactNode;
-    notification?: React.ReactNode;
   },
 ) {
   usePerformanceMonitor({
@@ -51,7 +45,6 @@ function TabletopContent(
       availableWidth={size.width}
       sizePreset={defaultCardSizePreset}
     >
-      {props.notification}
       {props.stackList}
     </StackProvider>
   );
@@ -77,22 +70,12 @@ export default React.memo(function Tabletop({
     (state) => selectDeck(state, { deckId })?.defaultTabletopId,
     selectDeck.name,
   );
+  useSetStackListRef(tabletopId, stackListRef);
   useEnsureTabletop({ tabletopId });
   const dispatch = useAppDispatch();
   const tabletopNeedsResetting = useAppSelector((state) =>
     selectTabletopNeedsResetting(state, { tabletopId }),
   );
-
-  const {
-    beforeUndo,
-    beforeRedo,
-    notification,
-    notify,
-    clear: clearNotification,
-    extendNotification,
-  } = useTabletopNotification({
-    stackListRef,
-  });
 
   const hasTriedToAutoReset = React.useRef(false);
 
@@ -113,34 +96,9 @@ export default React.memo(function Tabletop({
   );
 
   return (
-    <TabletopProvider
-      tabletopId={tabletopId}
-      deckId={deckId}
-      target={target}
-      notify={notify}
-    >
-      <DrawerChildren>
-        <SettingsTabletop
-          tabletopId={tabletopId}
-          deckId={deckId}
-          beforeUndo={beforeUndo}
-          beforeRedo={beforeRedo}
-        />
-        <SettingsDeck deckId={deckId} />
-      </DrawerChildren>
+    <TabletopProvider tabletopId={tabletopId} deckId={deckId} target={target}>
       <TabletopContent
         stackList={<StackList ref={stackListRef} style={styles.stackList} />}
-        notification={
-          notification && (
-            <View style={styles.alertContainer}>
-              <TabletopNotification
-                extendNotification={extendNotification}
-                clear={clearNotification}
-                {...notification}
-              />
-            </View>
-          )
-        }
       />
     </TabletopProvider>
   );

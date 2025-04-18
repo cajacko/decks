@@ -33,6 +33,8 @@ import { NavigationProvider } from "@/context/Navigation";
 import Router from "../router/Router";
 import { PerformanceMonitorProvider } from "@/context/PerformanceMonitor";
 import { GlobalLoadingProvider } from "@/context/GlobalLoading";
+import { NotificationProvider } from "@/context/Notifications";
+import { StackListRefsProvider } from "@/context/StackListRefs";
 
 enableFreeze();
 
@@ -141,18 +143,24 @@ function HasStore({ children }: { children: React.ReactNode }) {
       <GlobalLoadingProvider>
         <NavigationProvider>
           <NavigationThemeProvider value={navigationTheme}>
-            <AuthenticationProvider>
-              <SyncProvider>
-                <SkeletonProvider>
-                  <ModalProvider>
-                    <DrawerProvider>
-                      <Content onLoad={onContentLoad}>{children}</Content>
-                      <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-                    </DrawerProvider>
-                  </ModalProvider>
-                </SkeletonProvider>
-              </SyncProvider>
-            </AuthenticationProvider>
+            <NotificationProvider>
+              <AuthenticationProvider>
+                <SyncProvider>
+                  <SkeletonProvider>
+                    <StackListRefsProvider>
+                      <ModalProvider>
+                        <DrawerProvider>
+                          <Content onLoad={onContentLoad}>{children}</Content>
+                          <StatusBar
+                            style={scheme === "dark" ? "light" : "dark"}
+                          />
+                        </DrawerProvider>
+                      </ModalProvider>
+                    </StackListRefsProvider>
+                  </SkeletonProvider>
+                </SyncProvider>
+              </AuthenticationProvider>
+            </NotificationProvider>
           </NavigationThemeProvider>
         </NavigationProvider>
       </GlobalLoadingProvider>

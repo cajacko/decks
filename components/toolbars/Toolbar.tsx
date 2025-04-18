@@ -23,6 +23,8 @@ import { TouchableOpacity } from "@/components/ui/Pressables";
 import { useAuthentication } from "@/context/Authentication";
 import useDeckName from "@/hooks/useDeckName";
 import { useIsGlobalLoading } from "@/context/GlobalLoading";
+import TabletopToolbar from "./TabletopToolbar";
+import { _contentHeight, styles, iconSize, imageHeight } from "./toolbar.style";
 
 export interface ToolbarProps {
   title?: string | null;
@@ -43,10 +45,7 @@ function useToolbarHeight() {
   };
 }
 
-export default React.memo(function Toolbar(props: {
-  deckId?: string | null;
-  route: "decks" | "deck" | "play";
-}) {
+export default React.memo(function Toolbar() {
   let { height, paddingTop } = useToolbarHeight();
   const hidden = useNavigation().screen.name === "marketing";
   const loading = useIsGlobalLoading("toolbar");
@@ -190,7 +189,7 @@ export default React.memo(function Toolbar(props: {
             )}
           </View>
           <View style={styles.rightContainer}>
-            {/* {children} */}
+            {name === "play" && deckId && <TabletopToolbar deckId={deckId} />}
             {open && (
               <>
                 {isLoggedIn ? (
@@ -229,65 +228,4 @@ export default React.memo(function Toolbar(props: {
       {shouldAnimateLoading && <Animated.View style={loadingProgressStyle} />}
     </View>
   );
-});
-
-export const _contentHeight = 50;
-const imageHeight = _contentHeight - 10;
-
-export const iconSize = _contentHeight - 20;
-export const horizontalPadding = 16;
-
-export const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    borderBottomWidth: 1,
-    top: 0,
-    right: 0,
-    left: 0,
-    zIndex: 2,
-  },
-  contentWidth: {
-    height: _contentHeight,
-  },
-  content: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  imageContainer: {
-    position: "relative",
-  },
-  image: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  title: {
-    textOverflow: "ellipsis",
-  },
-  trimmedContent: {
-    flex: 1,
-    overflow: "hidden",
-  },
-  rightContainer: {
-    alignItems: "center",
-    justifyContent: "flex-end",
-    flexDirection: "row",
-  },
-  settings: {
-    marginLeft: horizontalPadding,
-  },
-  backButton: {
-    marginRight: horizontalPadding,
-  },
-  action: {
-    marginHorizontal: horizontalPadding,
-  },
-  progress: {
-    height: 3,
-    position: "absolute",
-    bottom: -2,
-    zIndex: 500,
-    borderRadius: 3,
-  },
 });
