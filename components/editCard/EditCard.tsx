@@ -34,6 +34,7 @@ export type EditCardProps = Pick<
   onDelete?: () => void;
   onPressBackground?: () => void;
   backgroundStyle?: ViewStyle;
+  onRequestClose: () => void;
 };
 
 export default function EditCard({
@@ -118,6 +119,7 @@ export default function EditCard({
             initHeight={height.initHeight}
             animateIn
             openOnMount
+            onRequestClose={props.onRequestClose}
           >
             {canEdit ? (
               <EditCardForm

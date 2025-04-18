@@ -2,7 +2,7 @@ import React from "react";
 import { Drawer } from "react-native-drawer-layout";
 import DrawerContent from "@/components/overlays/Drawer";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { StyleSheet } from "react-native";
+import { BackHandler, StyleSheet } from "react-native";
 
 type ContextState = {
   isOpen: boolean;
@@ -57,6 +57,21 @@ export function DrawerProvider(props: { children: React.ReactNode }) {
     }),
     [backgroundColor],
   );
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        close();
+
+        return true;
+      },
+    );
+
+    return subscription.remove;
+  }, [isOpen, close]);
 
   return (
     <Context.Provider value={value}>

@@ -6,7 +6,6 @@ import { Cards } from "@/store/types";
 
 export interface EditCardModalProps extends EditCardProps {
   visible?: boolean;
-  onRequestClose?: () => void;
 }
 
 export type Open = (
@@ -92,6 +91,7 @@ export default function EditCardModal({
       <EditCard
         onPressBackground={onRequestClose}
         backgroundStyle={styles.backgroundDark}
+        onRequestClose={onRequestClose}
         {...props}
       />
     </Modal>

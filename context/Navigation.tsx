@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform } from "react-native";
+import { BackHandler, Platform } from "react-native";
 
 export type ScreenProps =
   | {
@@ -23,6 +23,7 @@ export type NavigationContext = {
   screen: ScreenProps;
   preloadDeckId: string | null;
   navigate: (screen: ScreenProps) => void;
+  goBack?: () => void;
 };
 
 const initialScreen: ScreenProps = {
@@ -41,12 +42,15 @@ export const useNavigation = (): NavigationContext => {
   return context;
 };
 
+const homeScreen = "decks";
+
 export function NavigationProvider(props: {
   children: React.ReactNode;
 }): React.ReactElement {
   const [screen, setScreen] =
     React.useState<NavigationContext["screen"]>(initialScreen);
   const [preloadDeckId, setPreloadDeckId] = React.useState<string | null>(null);
+  const isHomeScreen = screen.name === homeScreen;
 
   const navigate = React.useCallback((screen: ScreenProps) => {
     setScreen(screen);
@@ -56,14 +60,38 @@ export function NavigationProvider(props: {
     }
   }, []);
 
+  const goBack = React.useMemo(() => {
+    if (isHomeScreen) return undefined;
+
+    return () => {
+      setScreen({ name: homeScreen });
+    };
+  }, [isHomeScreen]);
+
   const value = React.useMemo(
     (): NavigationContext => ({
       screen,
       preloadDeckId,
       navigate,
+      goBack,
     }),
-    [screen, preloadDeckId, navigate],
+    [screen, preloadDeckId, navigate, goBack],
   );
+
+  React.useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (!goBack) return false;
+
+        goBack();
+
+        return true;
+      },
+    );
+
+    return subscription.remove;
+  }, [goBack]);
 
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }

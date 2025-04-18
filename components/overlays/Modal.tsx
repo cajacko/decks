@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { BackHandler, StyleSheet, View } from "react-native";
 import {
   Modal as ContextModal,
   ModalProps as ContextModalProps,
@@ -56,6 +56,24 @@ export default function Modal({
   children,
   ...props
 }: ModalProps): React.ReactNode {
+  const { onRequestClose, visible } = props;
+
+  React.useEffect(() => {
+    if (!onRequestClose) return;
+    if (!visible) return;
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        onRequestClose();
+
+        return true;
+      },
+    );
+
+    return subscription.remove;
+  }, [onRequestClose, visible]);
+
   return (
     <ContextModal {...defaultModalProps} {...props}>
       <ModalContent>{children}</ModalContent>

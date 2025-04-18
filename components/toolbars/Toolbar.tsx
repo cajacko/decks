@@ -57,9 +57,8 @@ export default React.memo(function Toolbar() {
   const {
     screen: { name, deckId },
     navigate,
+    goBack,
   } = useNavigation();
-  const back = name !== "decks";
-  const logoVisible = !back;
 
   let title: string | null = useDeckName(deckId);
 
@@ -86,17 +85,6 @@ export default React.memo(function Toolbar() {
       duration: 300,
     });
   }, [loading, shouldAnimateLoading, loadingOpacity]);
-
-  const goBack = React.useMemo(() => {
-    if (!back) return undefined;
-
-    return () => {
-      // Adjust for history?
-      navigate({
-        name: "decks",
-      });
-    };
-  }, [back, navigate]);
 
   const containerStyle = React.useMemo(
     () => [
@@ -151,7 +139,7 @@ export default React.memo(function Toolbar() {
         contentContainerStyle={styles.contentWidth}
       >
         <View style={styles.content}>
-          {goBack && (
+          {goBack ? (
             <Animated.View entering={entering} exiting={exiting}>
               <IconButton
                 icon="arrow-back"
@@ -162,8 +150,7 @@ export default React.memo(function Toolbar() {
                 vibrate
               />
             </Animated.View>
-          )}
-          {logoVisible && (
+          ) : (
             <Animated.View entering={entering} exiting={exiting}>
               <TouchableOpacity
                 onPress={() => navigate({ name: "decks" })}
