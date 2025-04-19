@@ -58,7 +58,7 @@ export default function HoldMenu(props: HoldMenuProps): React.ReactNode {
   }));
 
   const longPressStyle = useAnimatedStyle(() => ({
-    opacity: state.longPressTransition.value / 10,
+    opacity: state.longPressTransition.value,
     transform: [{ scale: state.longPressTransition.value }],
   }));
 

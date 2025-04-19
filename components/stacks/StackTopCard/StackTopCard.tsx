@@ -5,12 +5,60 @@ import HoldMenu from "@/components/ui/HoldMenu";
 import useMenuItems from "./useMenuItems";
 import EditCardModal from "@/components/editCard/EditCardModal";
 import { Target } from "@/utils/cardTarget";
-import { StyleProp, ViewStyle } from "react-native";
+import { StyleProp, ViewStyle, StyleSheet } from "react-native";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
+import Animated, {
+  interpolate,
+  SharedValue,
+  useAnimatedStyle,
+  useDerivedValue,
+} from "react-native-reanimated";
+import CardContainer from "@/components/cards/connected/CardContainer";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import Color from "color";
 
 export * from "./types";
 
-export default function StackTopCard({
+const LongPressOverlay = React.memo(function LongPressOverlay({
+  target,
+  longPressSharedValue,
+}: {
+  target: Target;
+  longPressSharedValue: SharedValue<number>;
+}) {
+  const _backgroundColor = useThemeColor("background");
+  const backgroundColor = React.useMemo(
+    () => Color(_backgroundColor).alpha(0.5).rgb().string(),
+    [_backgroundColor],
+  );
+
+  const longPress = useDerivedValue(() =>
+    interpolate(longPressSharedValue.value, [0, 0.5, 1], [0, 0, 1]),
+  );
+
+  const longPressStyle = useAnimatedStyle(() => ({
+    opacity: longPress.value,
+    transform: [{ scale: longPress.value }],
+  }));
+
+  const style = React.useMemo(
+    () => [styles.longPressContainer, longPressStyle],
+    [longPressStyle],
+  );
+
+  const cardContainerStyle = React.useMemo(
+    () => ({ backgroundColor }),
+    [backgroundColor],
+  );
+
+  return (
+    <Animated.View style={style}>
+      <CardContainer target={target} style={cardContainerStyle} />
+    </Animated.View>
+  );
+});
+
+export default React.memo(function StackTopCard({
   style: styleProp,
   hideActions = false,
   ...props
@@ -39,12 +87,21 @@ export default function StackTopCard({
         style={style}
         hideActions={hideActions || state.hideMenuItems}
         handleTap={state.handleTap}
+        handleLongPress={state.handleLongPress}
+        longPressDuration={2000}
       >
-        <CardInstance
-          {...props}
-          ref={state.cardInstanceRef}
-          onAnimationChange={state.setIsAnimating}
-        />
+        {({ longPressSharedValue }) => (
+          <CardInstance
+            {...props}
+            ref={state.cardInstanceRef}
+            onAnimationChange={state.setIsAnimating}
+          >
+            <LongPressOverlay
+              target={target}
+              longPressSharedValue={longPressSharedValue}
+            />
+          </CardInstance>
+        )}
       </HoldMenu>
       <EditCardModal
         visible={state.showEditModal}
@@ -55,4 +112,16 @@ export default function StackTopCard({
       />
     </>
   );
-}
+});
+
+const styles = StyleSheet.create({
+  longPressContainer: {
+    zIndex: 999,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
+  },
+});

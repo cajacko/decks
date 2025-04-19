@@ -48,4 +48,5 @@ export interface HoldMenuProps {
   children?: React.ReactNode | RenderChildren;
   style?: StyleProp<ViewStyle>;
   hideActions?: boolean;
+  longPressDuration?: number;
 }

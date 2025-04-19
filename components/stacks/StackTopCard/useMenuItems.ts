@@ -17,10 +17,8 @@ export default function useMenuItems(props: StackTopCardProps) {
     const bottom: MenuItem = {
       height: cardActionSize,
       width: cardActionSize,
-      component: withHoldMenuItem("edit"),
-      handleAction: () => {
-        setShowEditModal(true);
-      },
+      component: withHoldMenuItem("vertical-align-bottom"),
+      handleAction: () => state.handleMoveToBottom("bottom"),
     };
 
     const top: MenuItem | undefined = {
@@ -52,6 +50,10 @@ export default function useMenuItems(props: StackTopCardProps) {
     };
   }, [state.handleFlipCard, state.handleMoveToBottom]);
 
+  const handleLongPress = React.useCallback(() => {
+    setShowEditModal(true);
+  }, [setShowEditModal]);
+
   return {
     cardId: state.cardId,
     menuItems: state.isAnimating ? null : menuItems,
@@ -61,6 +63,7 @@ export default function useMenuItems(props: StackTopCardProps) {
     closeEditModal,
     side: state.side,
     handleTap: state.isAnimating ? undefined : state.handleFlipCard,
+    handleLongPress: state.isAnimating ? undefined : handleLongPress,
     animatedToBack: state.animatedToBack,
     hideMenuItems: state.isAnimating,
   };

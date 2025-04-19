@@ -18,7 +18,6 @@ const fadeOutDuration = 200;
 const scaleSize = 1.02;
 const scaleDuration = 200;
 const showMenuDelay = 200;
-const longPressDuration = 1000;
 
 export default function useHoldMenu({
   handleLongPress,
@@ -27,6 +26,7 @@ export default function useHoldMenu({
   handleTap,
   toggleMenuOnTap,
   scaleOnTouch,
+  longPressDuration = 1000,
 }: HoldMenuProps) {
   // Flags
   const devIndicator = useFlag("HOLD_MENU_DEV_INDICATOR") === "enabled";
@@ -225,7 +225,7 @@ export default function useHoldMenu({
       .onFinalize(() => {
         longPressTransition.value = 0;
       });
-  }, [onLongPress, longPressTransition]);
+  }, [onLongPress, longPressTransition, longPressDuration]);
 
   // Show the menu on a long press
   const menuLongPress = React.useMemo(() => {
