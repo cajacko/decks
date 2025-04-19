@@ -7,7 +7,7 @@ import {
   selectDoesTabletopHaveCardInstances,
   selectCardInstance,
 } from "@/store/selectors/tabletops";
-import { StackProps } from "./stack.types";
+import { StackProps, StackRef } from "./stack.types";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
 import seededShuffle, { generateSeed } from "@/utils/seededShuffle";
 import { withStackOffsetPositions } from "./stackOffsetPositions";
@@ -30,6 +30,7 @@ import useVibrate from "@/hooks/useVibrate";
 import { dateToDateString } from "@/utils/dates";
 import { useStackContext } from "./Stack.context";
 import { useNotify } from "@/context/Notifications";
+import { useSetActiveStackRef } from "@/context/ActiveStackRefs";
 
 export function useStackWidth() {
   const { stackWidth } = useStackContext();
@@ -43,13 +44,16 @@ export function useStackWidth() {
   return width;
 }
 
-export default function useStack({
-  stackId,
-  stackListRef,
-  canDelete = false,
-  canShowEditDeck = false,
-  isFocussed = false,
-}: StackProps) {
+export default function useStack(
+  {
+    stackId,
+    stackListRef,
+    canDelete = false,
+    canShowEditDeck = false,
+    isFocussed = false,
+  }: StackProps,
+  ref: React.ForwardedRef<StackRef>,
+) {
   // we just want the length and doing it this way to keep a
   // single source of truth for the number of offset positions
   const offsetPositions = useOffsetPositions();
@@ -318,6 +322,17 @@ export default function useStack({
   const rotation = useDerivedValue<number>(() =>
     interpolate(shuffleProgress.value, [0, 1], [0, 2 * 360]),
   );
+
+  const stackRef = React.useMemo(
+    (): StackRef => ({
+      shuffle: handleShuffle,
+    }),
+    [handleShuffle],
+  );
+
+  useSetActiveStackRef(tabletopId, isFocussed ? stackRef : null);
+
+  React.useImperativeHandle(ref, () => stackRef, [stackRef]);
 
   return {
     opacity,

@@ -7,7 +7,7 @@ import Animated, {
 import EmptyStack from "@/components/stacks/EmptyStack";
 import CardSpacer from "@/components/cards/connected/CardSpacer";
 import CardSpacerSkeleton from "@/components/cards/connected/CardSpacerSkeleton";
-import { StackProps } from "./stack.types";
+import { StackProps, StackRef } from "./stack.types";
 import styles, { getToolbarContainerStyle } from "./stack.style";
 import useStack, { useStackWidth } from "./useStack";
 import { useTabletopContext } from "@/components/tabletops/Tabletop/Tabletop.context";
@@ -127,96 +127,98 @@ export function StackSkeleton(
   );
 }
 
-export default function Stack(props: StackProps): React.ReactNode {
-  usePerformanceMonitor({
-    Component: Stack.name,
-  });
+export default React.forwardRef<StackRef, StackProps>(
+  function Stack(props, ref) {
+    usePerformanceMonitor({
+      Component: Stack.name,
+    });
 
-  const { deckId, tabletopId } = useTabletopContext();
-  const stackName = useGetStackName(tabletopId)(props.stackId);
+    const { deckId, tabletopId } = useTabletopContext();
+    const stackName = useGetStackName(tabletopId)(props.stackId);
 
-  const target = React.useMemo(
-    (): Target => ({ id: deckId, type: "deck-defaults" }),
-    [deckId],
-  );
+    const target = React.useMemo(
+      (): Target => ({ id: deckId, type: "deck-defaults" }),
+      [deckId],
+    );
 
-  const {
-    cardInstancesIds,
-    getCardOffsetPosition,
-    handleShuffle,
-    rotation,
-    width,
-    opacity,
-    emptyStackButton,
-    handleFlipAll,
-    shuffleProgress,
-    cardCount,
-  } = useStack(props);
+    const {
+      cardInstancesIds,
+      getCardOffsetPosition,
+      handleShuffle,
+      rotation,
+      width,
+      opacity,
+      emptyStackButton,
+      handleFlipAll,
+      shuffleProgress,
+      cardCount,
+    } = useStack(props, ref);
 
-  const innerStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }));
+    const innerStyle = useAnimatedStyle(() => ({
+      transform: [{ rotate: `${rotation.value}deg` }],
+    }));
 
-  const containerStyle = useAnimatedStyle(() => ({
-    width: width.value,
-    opacity: opacity.value,
-  }));
+    const containerStyle = useAnimatedStyle(() => ({
+      width: width.value,
+      opacity: opacity.value,
+    }));
 
-  function getShouldShowShuffle(): boolean {
-    if (!cardInstances) return false;
-    if (cardInstances.length <= 0) return false;
+    function getShouldShowShuffle(): boolean {
+      if (!cardInstances) return false;
+      if (cardInstances.length <= 0) return false;
 
-    return true;
-  }
+      return true;
+    }
 
-  const cardInstances = React.useMemo(() => {
-    if (!cardInstancesIds || cardInstancesIds.length === 0) return null;
+    const cardInstances = React.useMemo(() => {
+      if (!cardInstancesIds || cardInstancesIds.length === 0) return null;
 
-    return cardInstancesIds.map((cardInstanceId, i) => (
-      <StackListItem
-        key={cardInstanceId}
-        cardInstanceId={cardInstanceId}
-        isTopCard={i === 0}
-        cardOffsetPosition={getCardOffsetPosition(cardInstanceId)}
-        zIndex={cardInstancesIds.length - i + 1}
-        stackId={props.stackId}
-        leftStackId={props.leftStackId}
-        rightStackId={props.rightStackId}
-        stackListRef={props.stackListRef}
-        shuffleProgress={shuffleProgress}
-        index={i}
-        length={cardInstancesIds.length}
-      />
-    ));
-  }, [
-    props.stackId,
-    props.leftStackId,
-    props.rightStackId,
-    cardInstancesIds,
-    getCardOffsetPosition,
-    props.stackListRef,
-    shuffleProgress,
-  ]);
-
-  return (
-    <StackContent
-      style={props.style}
-      emptyStack={
-        <EmptyStack
-          style={styles.empty}
-          buttonTitle={emptyStackButton?.title}
-          buttonAction={emptyStackButton?.action}
+      return cardInstancesIds.map((cardInstanceId, i) => (
+        <StackListItem
+          key={cardInstanceId}
+          cardInstanceId={cardInstanceId}
+          isTopCard={i === 0}
+          cardOffsetPosition={getCardOffsetPosition(cardInstanceId)}
+          zIndex={cardInstancesIds.length - i + 1}
+          stackId={props.stackId}
+          leftStackId={props.leftStackId}
+          rightStackId={props.rightStackId}
+          stackListRef={props.stackListRef}
+          shuffleProgress={shuffleProgress}
+          index={i}
+          length={cardInstancesIds.length}
         />
-      }
-      cardSpacer={<CardSpacer target={target} />}
-      cards={cardInstances}
-      containerStyle={containerStyle}
-      innerStyle={innerStyle}
-      toolbar={
-        <View style={{ width: "100%", alignItems: "center" }}>
-          <Timer initSeconds={60} />
-        </View>
-      }
-    />
-  );
-}
+      ));
+    }, [
+      props.stackId,
+      props.leftStackId,
+      props.rightStackId,
+      cardInstancesIds,
+      getCardOffsetPosition,
+      props.stackListRef,
+      shuffleProgress,
+    ]);
+
+    return (
+      <StackContent
+        style={props.style}
+        emptyStack={
+          <EmptyStack
+            style={styles.empty}
+            buttonTitle={emptyStackButton?.title}
+            buttonAction={emptyStackButton?.action}
+          />
+        }
+        cardSpacer={<CardSpacer target={target} />}
+        cards={cardInstances}
+        containerStyle={containerStyle}
+        innerStyle={innerStyle}
+        toolbar={
+          <View style={{ width: "100%", alignItems: "center" }}>
+            <Timer initSeconds={60} />
+          </View>
+        }
+      />
+    );
+  },
+);

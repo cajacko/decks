@@ -35,6 +35,7 @@ import { PerformanceMonitorProvider } from "@/context/PerformanceMonitor";
 import { GlobalLoadingProvider } from "@/context/GlobalLoading";
 import { NotificationProvider } from "@/context/Notifications";
 import { StackListRefsProvider } from "@/context/StackListRefs";
+import { ActiveStackRefsProvider } from "@/context/ActiveStackRefs";
 
 enableFreeze();
 
@@ -148,14 +149,16 @@ function HasStore({ children }: { children: React.ReactNode }) {
                 <SyncProvider>
                   <SkeletonProvider>
                     <StackListRefsProvider>
-                      <ModalProvider>
-                        <DrawerProvider>
-                          <Content onLoad={onContentLoad}>{children}</Content>
-                          <StatusBar
-                            style={scheme === "dark" ? "light" : "dark"}
-                          />
-                        </DrawerProvider>
-                      </ModalProvider>
+                      <ActiveStackRefsProvider>
+                        <ModalProvider>
+                          <DrawerProvider>
+                            <Content onLoad={onContentLoad}>{children}</Content>
+                            <StatusBar
+                              style={scheme === "dark" ? "light" : "dark"}
+                            />
+                          </DrawerProvider>
+                        </ModalProvider>
+                      </ActiveStackRefsProvider>
                     </StackListRefsProvider>
                   </SkeletonProvider>
                 </SyncProvider>

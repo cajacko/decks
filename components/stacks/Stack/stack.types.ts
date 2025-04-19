@@ -32,3 +32,7 @@ export type StackDimensions = {
   stackContainerWidth: number;
   stackContainerHeight: number;
 };
+
+export interface StackRef {
+  shuffle: () => Promise<void>;
+}

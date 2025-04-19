@@ -5,17 +5,15 @@ import useTabletopHistory, {
 } from "@/hooks/useTabletopHistory";
 import Animated from "react-native-reanimated";
 import useLayoutAnimations from "@/hooks/useLayoutAnimations";
-import useFlag from "@/hooks/useFlag";
-import { setUserFlag } from "@/store/slices/userSettings";
-import { dateToDateString } from "@/utils/dates";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { useNotify } from "@/context/Notifications";
-import { Platform } from "react-native";
 import text from "@/constants/text";
 import { selectDeck } from "@/store/selectors/decks";
 import { Tabletops, RequiredOperations } from "@/store/types";
 import { useGetStackListRef } from "@/context/StackListRefs";
 import { styles, iconSize } from "./toolbar.style";
+import { useActiveStackRef } from "@/context/ActiveStackRefs";
+import { useDrawer } from "@/context/Drawer";
 
 export interface TabletopToolbarProps extends UseTabletopHistoryOptions {
   deckId: string;
@@ -51,6 +49,7 @@ export default function TabletopToolbar({
   deckId,
 }: TabletopToolbarProps): React.ReactNode {
   const notify = useNotify();
+  const { open } = useDrawer();
   const tabletopId = useAppSelector(
     (state) => selectDeck(state, { deckId })?.defaultTabletopId,
   );
@@ -113,40 +112,21 @@ export default function TabletopToolbar({
     beforeUndo,
   });
   const { entering, exiting } = useLayoutAnimations();
-  const shakeToShuffleOn = useFlag("SHAKE_TO_SHUFFLE") === "enabled";
-  const dispatch = useAppDispatch();
-
-  const toggleShakeToShuffle = React.useCallback(() => {
-    notify?.({
-      text: shakeToShuffleOn
-        ? text["tabletop.notification.shuffle_disabled"]
-        : text["tabletop.notification.shuffle_enabled"],
-    });
-
-    dispatch(
-      setUserFlag({
-        key: "SHAKE_TO_SHUFFLE",
-        value: shakeToShuffleOn ? "disabled" : "enabled",
-        date: dateToDateString(new Date()),
-      }),
-    );
-  }, [dispatch, shakeToShuffleOn, notify]);
+  const { shuffle } = useActiveStackRef(tabletopId ?? null) ?? {};
 
   return (
     <>
-      {Platform.OS !== "web" && (
-        <Animated.View entering={entering} exiting={exiting}>
-          <IconButton
-            icon="vibration"
-            size={iconSize}
-            variant="transparent"
-            style={styles.action}
-            vibrate
-            onPress={toggleShakeToShuffle}
-            disabled={!shakeToShuffleOn}
-          />
-        </Animated.View>
-      )}
+      <Animated.View entering={entering} exiting={exiting}>
+        <IconButton
+          icon="shuffle"
+          size={iconSize}
+          variant="transparent"
+          style={styles.action}
+          vibrate
+          onPress={shuffle ?? open}
+          disabled={!shuffle}
+        />
+      </Animated.View>
       <Animated.View entering={entering} exiting={exiting}>
         <IconButton
           icon="undo"
