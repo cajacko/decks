@@ -52,10 +52,6 @@ export default function useMenuItems(props: StackTopCardProps) {
     };
   }, [state.handleFlipCard, state.handleMoveToBottom]);
 
-  const handleDoubleTap = React.useCallback(() => {
-    setShowEditModal(true);
-  }, [setShowEditModal]);
-
   return {
     cardId: state.cardId,
     menuItems: state.isAnimating ? null : menuItems,
@@ -64,7 +60,6 @@ export default function useMenuItems(props: StackTopCardProps) {
     showEditModal,
     closeEditModal,
     side: state.side,
-    handleDoubleTap: state.isAnimating ? undefined : handleDoubleTap,
     handleTap: state.isAnimating ? undefined : state.handleFlipCard,
     animatedToBack: state.animatedToBack,
     hideMenuItems: state.isAnimating,

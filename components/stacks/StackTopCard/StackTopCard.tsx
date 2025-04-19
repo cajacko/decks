@@ -36,7 +36,6 @@ export default function StackTopCard({
     <>
       <HoldMenu
         menuItems={state.menuItems}
-        handleDoubleTap={state.handleDoubleTap}
         style={style}
         hideActions={hideActions || state.hideMenuItems}
         handleTap={state.handleTap}

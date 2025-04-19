@@ -23,7 +23,6 @@ const longPressDuration = 1000;
 export default function useHoldMenu({
   handleLongPress,
   menuItems,
-  handleDoubleTap,
   hideActions,
   handleTap,
   toggleMenuOnTap,
@@ -88,17 +87,6 @@ export default function useHoldMenu({
     [handleLongPress, throttledVibrate],
   );
 
-  const onDoubleTap = React.useMemo(
-    () =>
-      handleDoubleTap
-        ? () => {
-            throttledVibrate("handleDoubleTap");
-            handleDoubleTap();
-          }
-        : undefined,
-    [handleDoubleTap, throttledVibrate],
-  );
-
   const onTap = React.useCallback(() => {
     if (handleTap || toggleMenuOnTap) {
       throttledVibrate("tap");
@@ -107,10 +95,11 @@ export default function useHoldMenu({
     handleTap?.();
   }, [throttledVibrate, handleTap, toggleMenuOnTap]);
 
-  const onTouch = React.useCallback(
-    () => throttledVibrate("touch", 150),
-    [throttledVibrate],
-  );
+  const onTouch = React.useCallback(() => {
+    if (scaleOnTouch) {
+      throttledVibrate("touch", 150);
+    }
+  }, [throttledVibrate, scaleOnTouch]);
 
   const onHighlight = React.useCallback(
     (activeDirection: string) =>
@@ -146,23 +135,6 @@ export default function useHoldMenu({
     [toggleMenuOnTap, menuOpacity, onTap],
   );
 
-  const doubleTap = React.useMemo(
-    () =>
-      Gesture.Tap()
-        .enabled(!!onDoubleTap)
-        .maxDuration(maxTimeoutForTap)
-        .numberOfTaps(2)
-        .maxDistance(10000)
-        .shouldCancelWhenOutside(false)
-        .onEnd(() => {
-          if (!onDoubleTap) return;
-
-          runOnJS(onDoubleTap)();
-        }),
-
-    [onDoubleTap],
-  );
-
   // Scale the card up when touching
   const touching = React.useMemo(() => {
     return Gesture.LongPress()
@@ -173,10 +145,10 @@ export default function useHoldMenu({
       .onStart(() => {
         isTouching.value = true;
 
+        runOnJS(onTouch)();
+
         if (scaleOnTouch) {
           scaleUpFinished.value = false;
-
-          runOnJS(onTouch)();
 
           scale.value = withTiming(
             scaleSize,
@@ -225,7 +197,7 @@ export default function useHoldMenu({
             duration: fadeInDuration,
           });
         })
-        .onEnd((event) => {
+        .onEnd(() => {
           menuOpacity.value = withTiming(0, {
             duration: fadeOutDuration,
           });
@@ -381,11 +353,11 @@ export default function useHoldMenu({
       touching,
       longPress,
       Gesture.Race(
-        Gesture.Exclusive(doubleTap, tap),
+        tap,
         Gesture.Race(hover, Gesture.Simultaneous(menuLongPress, pan)),
       ),
     );
-  }, [tap, menuLongPress, pan, hover, touching, longPress, doubleTap]);
+  }, [tap, menuLongPress, pan, hover, touching, longPress]);
 
   const menuTaps = React.useMemo(
     () => ({

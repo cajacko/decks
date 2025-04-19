@@ -39,7 +39,10 @@ export interface HoldMenuProps {
   scaleOnTouch?: boolean;
   toggleMenuOnTap?: boolean;
   handleTap?: () => void;
-  handleDoubleTap?: () => void;
+  /**
+   * Removing double tap as it blocks other interactions as we have to wait to see if this happens
+   */
+  // handleDoubleTap?: () => void;
   menuItems: MenuItems | null;
   touchBuffer?: number;
   children?: React.ReactNode | RenderChildren;
