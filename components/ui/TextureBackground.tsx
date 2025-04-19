@@ -3,6 +3,7 @@ import { View, ViewStyle, StyleSheet } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import uuid from "@/utils/uuid";
 import { useThemeColors } from "@/hooks/useThemeColor";
+import useFlag from "@/hooks/useFlag";
 
 export interface TextureBackgroundProps {
   style?: ViewStyle;
@@ -15,41 +16,55 @@ export default function TextureBackground({
 }: TextureBackgroundProps): React.ReactNode {
   const id = React.useRef(uuid()).current;
   const colors = useThemeColors();
+  const mainBackgroundColor = colors.textureBackgroundFallback;
+  const useGradients = useFlag("GRADIENTS") === "enabled";
+
+  const backgroundStyle = React.useMemo(
+    () => [
+      styles.background,
+      !useGradients && {
+        backgroundColor: mainBackgroundColor,
+      },
+    ],
+    [mainBackgroundColor, useGradients],
+  );
 
   return (
     <View style={React.useMemo(() => [styles.container, style], [style])}>
       {children && <View style={styles.content}>{children}</View>}
-      <View style={styles.background}>
-        <Svg height="100%" width="100%">
-          <Defs>
-            <RadialGradient
-              id={id}
-              cx="50%"
-              cy="50%"
-              rx="50%"
-              ry="50%"
-              fx="50%"
-              fy="50%"
-            >
-              <Stop
-                offset="0%"
-                stopColor={colors.textureBackgroundStop1}
-                stopOpacity="1"
-              />
-              <Stop
-                offset="70%"
-                stopColor={colors.textureBackgroundStop2}
-                stopOpacity="1"
-              />
-              <Stop
-                offset="100%"
-                stopColor={colors.textureBackgroundStop3}
-                stopOpacity="1"
-              />
-            </RadialGradient>
-          </Defs>
-          <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
-        </Svg>
+      <View style={backgroundStyle}>
+        {useGradients && (
+          <Svg height="100%" width="100%">
+            <Defs>
+              <RadialGradient
+                id={id}
+                cx="50%"
+                cy="50%"
+                rx="50%"
+                ry="50%"
+                fx="50%"
+                fy="50%"
+              >
+                <Stop
+                  offset="0%"
+                  stopColor={colors.textureBackgroundStop1}
+                  stopOpacity="1"
+                />
+                <Stop
+                  offset="70%"
+                  stopColor={colors.textureBackgroundStop2}
+                  stopOpacity="1"
+                />
+                <Stop
+                  offset="100%"
+                  stopColor={colors.textureBackgroundStop3}
+                  stopOpacity="1"
+                />
+              </RadialGradient>
+            </Defs>
+            <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
+          </Svg>
+        )}
       </View>
     </View>
   );

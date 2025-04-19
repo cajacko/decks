@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, ViewProps } from "react-native";
 import { fixed } from "@/constants/colors";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
+import useFlag from "@/hooks/useFlag";
 
 export interface CardSize {
   height: number;
@@ -32,6 +33,8 @@ export default function CardContainer({
     Component: CardContainer.name,
   });
 
+  const useShadows = useFlag("SHADOWS") === "enabled";
+
   const style = React.useMemo(
     () =>
       StyleSheet.flatten([
@@ -41,13 +44,22 @@ export default function CardContainer({
           width,
           borderRadius,
           backgroundColor: backgroundColor ?? "transparent",
-          boxShadow: shadow
-            ? `${shadow.x}px ${shadow.y}px ${shadow.blur}px ${fixed.shadow}`
-            : undefined,
+          boxShadow:
+            shadow && useShadows
+              ? `${shadow.x}px ${shadow.y}px ${shadow.blur}px ${fixed.shadow}`
+              : undefined,
         },
         styleProp,
       ]),
-    [styleProp, backgroundColor, borderRadius, height, width, shadow],
+    [
+      styleProp,
+      backgroundColor,
+      borderRadius,
+      height,
+      width,
+      shadow,
+      useShadows,
+    ],
   );
 
   return (

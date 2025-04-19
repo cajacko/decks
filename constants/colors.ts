@@ -41,6 +41,9 @@ export const themes = {
     switchTrackTrue: colors.darkBlue,
     switchTrackFalse: dragBarPassiveLight,
     switchThumb: lightBackground,
+    textureBackgroundFallback: Color(textureBackground.stop1)
+      .lighten(0.2)
+      .hex(),
     textureBackgroundStop1: Color(textureBackground.stop1).lighten(0.2).hex(),
     textureBackgroundStop2: Color(textureBackground.stop2).lighten(0.6).hex(),
     textureBackgroundStop3: Color(textureBackground.stop3).lighten(0.7).hex(),
@@ -68,6 +71,7 @@ export const themes = {
     switchTrackTrue: colors.yellow,
     switchTrackFalse: dragBarPassiveDark,
     switchThumb: colors.white,
+    textureBackgroundFallback: Color(textureBackground.stop2).darken(0.6).hex(),
     textureBackgroundStop1: Color(textureBackground.stop1).darken(0.2).hex(),
     textureBackgroundStop2: Color(textureBackground.stop2).darken(0.6).hex(),
     textureBackgroundStop3: Color(textureBackground.stop3).darken(0.7).hex(),
