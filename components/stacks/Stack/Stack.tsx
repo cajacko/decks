@@ -214,7 +214,7 @@ export default function Stack(props: StackProps): React.ReactNode {
       innerStyle={innerStyle}
       toolbar={
         <View style={{ width: "100%", alignItems: "center" }}>
-          <Timer initSeconds={10} />
+          <Timer initSeconds={60} />
         </View>
       }
     />
