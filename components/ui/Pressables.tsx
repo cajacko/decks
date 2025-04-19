@@ -13,9 +13,10 @@ import { ExternalPathString, useRouter } from "expo-router";
 import useVibrate from "@/hooks/useVibrate";
 
 export interface PressableProps
-  extends Omit<RNGPressableProps, "style" | "onPress"> {
+  extends Omit<RNGPressableProps, "style" | "onPress" | "onLongPress"> {
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
+  onLongPress?: () => void;
   vibrate?: boolean;
   href?: ExternalPathString;
 }
@@ -24,6 +25,7 @@ export const Pressable = React.forwardRef(function Pressable(
   {
     style: styleProp,
     onPress: onPressProp,
+    onLongPress: onLongPressProp,
     vibrate: shouldVibrate = false,
     href,
     ...props
@@ -38,19 +40,42 @@ export const Pressable = React.forwardRef(function Pressable(
     [styleProp],
   );
 
-  const onPress = React.useCallback(() => {
-    if (shouldVibrate) {
-      vibrate?.("Pressable");
-    }
+  const onPress = React.useMemo(() => {
+    if (!onPressProp && !href) return undefined;
 
-    onPressProp?.();
+    return () => {
+      if (shouldVibrate) {
+        vibrate?.("Pressable");
+      }
 
-    if (href) {
-      navigate(href);
-    }
+      onPressProp?.();
+
+      if (href) {
+        navigate(href);
+      }
+    };
   }, [onPressProp, vibrate, shouldVibrate, href, navigate]);
 
-  return <RNGPressable {...props} onPress={onPress} style={style} />;
+  const onLongPress = React.useMemo(() => {
+    if (!onLongPressProp) return undefined;
+
+    return () => {
+      if (shouldVibrate) {
+        vibrate?.("Pressable");
+      }
+
+      onLongPressProp?.();
+    };
+  }, [onLongPressProp, vibrate, shouldVibrate]);
+
+  return (
+    <RNGPressable
+      {...props}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={style}
+    />
+  );
 });
 
 export interface TouchableOpacityProps extends PressableProps {

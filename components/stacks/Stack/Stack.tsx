@@ -212,7 +212,11 @@ export default function Stack(props: StackProps): React.ReactNode {
       cards={cardInstances}
       containerStyle={containerStyle}
       innerStyle={innerStyle}
-      toolbar={<Timer />}
+      toolbar={
+        <View style={{ width: "100%", alignItems: "center" }}>
+          <Timer initSeconds={10} />
+        </View>
+      }
     />
   );
 }

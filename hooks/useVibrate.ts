@@ -14,8 +14,11 @@ export default function useVibrate() {
       options?: {
         delay?: number;
         throttle?: number;
+        impactStyle?: "light" | "heavy";
       },
     ) => {
+      const impactStyle = options?.impactStyle ?? "light";
+
       if (vibrateTimeout.current) {
         clearTimeout(vibrateTimeout.current);
         vibrateTimeout.current = null;
@@ -32,7 +35,33 @@ export default function useVibrate() {
           return;
         }
 
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        switch (impactStyle) {
+          case "heavy": {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+            setTimeout(() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }, 100);
+
+            setTimeout(() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }, 200);
+
+            setTimeout(() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+            }, 300);
+
+            setTimeout(() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+            }, 400);
+            break;
+          }
+          case "light":
+          default:
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            break;
+        }
+
         lastVibrated.current = now;
       }
 

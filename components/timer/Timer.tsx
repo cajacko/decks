@@ -1,64 +1,118 @@
 import React from "react";
-import ThemedView from "@/components/ui/ThemedView";
-import { TouchableScale } from "@/components/ui/Pressables";
+import {
+  TouchableScale,
+  TouchableScaleProps,
+} from "@/components/ui/Pressables";
 import SimpleCountdown from "@/components/timer/SimpleCountdown";
-import { TimerRef, InternalTimerRef } from "@/components/timer/Timer.types";
+import {
+  TimerRef,
+  InternalTimerRef,
+  TimerProps as _TimerProps,
+} from "@/components/timer/Timer.types";
+import useVibrate from "@/hooks/useVibrate";
 
-export interface TimerProps {
-  children?: React.ReactNode;
+export function useAlertVibration() {
+  const { vibrate } = useVibrate();
+
+  const vibrateAlert = React.useCallback(() => {
+    vibrate?.("Timer", { impactStyle: "heavy" });
+
+    setTimeout(() => {
+      vibrate?.("Timer", { impactStyle: "heavy" });
+    }, 1000);
+
+    setTimeout(() => {
+      vibrate?.("Timer", { impactStyle: "heavy" });
+    }, 2000);
+  }, [vibrate]);
+
+  return {
+    vibrateAlert,
+  };
 }
 
-export default React.forwardRef<TimerRef, TimerProps>(
-  function Timer(props, timerRef) {
-    const internalTimerRef = React.useRef<InternalTimerRef>(null);
+export interface TimerProps
+  extends Pick<TouchableScaleProps, "style" | "contentContainerStyle">,
+    _TimerProps {}
 
-    const start = React.useCallback<TimerRef["start"]>(() => {
-      internalTimerRef.current?.reset();
-      internalTimerRef.current?.resume();
-    }, []);
+export default React.forwardRef<TimerRef, TimerProps>(function Timer(
+  { contentContainerStyle, style, onFinished: _onFinished, ...props },
+  timerRef,
+) {
+  const { vibrateAlert } = useAlertVibration();
+  const internalTimerRef = React.useRef<InternalTimerRef>(null);
 
-    const stop = React.useCallback<TimerRef["stop"]>(() => {
-      internalTimerRef.current?.pause();
-      internalTimerRef.current?.reset();
-      internalTimerRef.current?.setState("ready");
-    }, []);
+  const onFinishedTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-    const toggle = React.useCallback<TimerRef["toggle"]>(() => {
-      switch (internalTimerRef.current?.getState()) {
-        case "started":
-          internalTimerRef.current?.pause();
-          break;
-        case "paused":
-          internalTimerRef.current?.resume();
-          break;
-        case "finished":
-          start();
-          break;
-        case "ready":
-          start();
-          break;
-      }
+  const start = React.useCallback<TimerRef["start"]>(() => {
+    if (onFinishedTimeout.current) clearTimeout(onFinishedTimeout.current);
 
-      return internalTimerRef.current?.getState() ?? "ready";
-    }, [start]);
+    internalTimerRef.current?.reset({ animateProgressAnimation: false });
+    internalTimerRef.current?.resume();
+  }, []);
 
-    React.useImperativeHandle(timerRef, () => ({
-      reset: () => internalTimerRef.current?.reset(),
-      pause: () => internalTimerRef.current?.pause(),
-      resume: () => internalTimerRef.current?.resume(),
-      getState: () => internalTimerRef.current?.getState() ?? "ready",
-      setState: (state) => internalTimerRef.current?.setState(state),
-      stop,
-      start,
-      toggle,
-    }));
+  const stop = React.useCallback<TimerRef["stop"]>(() => {
+    if (onFinishedTimeout.current) clearTimeout(onFinishedTimeout.current);
 
-    return (
-      <TouchableScale onPress={toggle} onLongPress={stop}>
-        <ThemedView>
-          <SimpleCountdown ref={internalTimerRef} />
-        </ThemedView>
-      </TouchableScale>
-    );
-  },
-);
+    internalTimerRef.current?.pause();
+    internalTimerRef.current?.reset({ animateProgressAnimation: false });
+    internalTimerRef.current?.setState("ready");
+  }, []);
+
+  const toggle = React.useCallback<TimerRef["toggle"]>(() => {
+    if (onFinishedTimeout.current) clearTimeout(onFinishedTimeout.current);
+
+    switch (internalTimerRef.current?.getState()) {
+      case "started":
+        internalTimerRef.current?.pause();
+        break;
+      case "paused":
+        internalTimerRef.current?.resume();
+        break;
+      case "finished":
+        start();
+        break;
+      case "ready":
+        start();
+        break;
+    }
+
+    return internalTimerRef.current?.getState() ?? "ready";
+  }, [start]);
+
+  React.useImperativeHandle(timerRef, () => ({
+    reset: () => internalTimerRef.current?.reset(),
+    pause: () => internalTimerRef.current?.pause(),
+    resume: () => internalTimerRef.current?.resume(),
+    getState: () => internalTimerRef.current?.getState() ?? "ready",
+    setState: (state) => internalTimerRef.current?.setState(state),
+    stop,
+    start,
+    toggle,
+  }));
+
+  const onFinished = React.useCallback(() => {
+    vibrateAlert();
+    _onFinished?.();
+
+    onFinishedTimeout.current = setTimeout(() => {
+      internalTimerRef.current?.reset({ animateProgressAnimation: true });
+    }, 5000);
+  }, [vibrateAlert, _onFinished]);
+
+  return (
+    <TouchableScale
+      onPress={toggle}
+      onLongPress={stop}
+      style={style}
+      vibrate
+      contentContainerStyle={contentContainerStyle}
+    >
+      <SimpleCountdown
+        ref={internalTimerRef}
+        onFinished={onFinished}
+        {...props}
+      />
+    </TouchableScale>
+  );
+});

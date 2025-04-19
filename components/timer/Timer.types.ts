@@ -1,5 +1,10 @@
 export type TimerState = "started" | "paused" | "finished" | "ready";
 
+export type TimerProps<P extends object = {}> = P & {
+  onFinished?: () => void;
+  initSeconds?: number;
+};
+
 /**
  * We can do everything given these methods
  */
@@ -7,7 +12,7 @@ export interface InternalTimerRef {
   /**
    * Just sets the seconds to the init value, does not affect the countdown
    */
-  reset: () => void;
+  reset: (options?: { animateProgressAnimation?: boolean }) => void;
   pause: () => void;
   resume: () => void;
   getState: () => TimerState;

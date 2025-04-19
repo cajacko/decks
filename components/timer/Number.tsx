@@ -8,5 +8,5 @@ export interface NumberProps {
 }
 
 export default function Number({ number }: NumberProps): React.ReactNode {
-  return <ThemedText>{number}</ThemedText>;
+  return <ThemedText type="h2">{number}</ThemedText>;
 }
