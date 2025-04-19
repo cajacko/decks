@@ -21,6 +21,7 @@ import Loader from "@/components/ui/Loader";
 import useIncludedData from "@/hooks/useIncludedData";
 import { useBuiltInStateSelector } from "@/store/hooks";
 import { selectDeckIds, selectDecksById } from "@/store/selectors/decks";
+import { commitMsg } from "@/constants/commitSha.json";
 
 const titleProps = { type: "h2" } as const;
 
@@ -218,7 +219,7 @@ export default function DevMenu({
       </FieldSet>
       <Flags />
       <Collapsible
-        title="Updates Info"
+        title="Updates/ Version Info"
         collapsible
         initialCollapsed
         titleProps={fieldSetTitleProps}
@@ -226,6 +227,7 @@ export default function DevMenu({
         <ThemedText>
           {JSON.stringify(
             {
+              commitMsg,
               currentlyRunning: currentlyRunning.updateId,
               isChecking,
               isDownloading,
