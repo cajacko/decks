@@ -63,9 +63,35 @@ export default function useOpenClose(
     });
   }, [height, minHeight, canAnimate]);
 
+  const toggleOpen = React.useCallback(async (): Promise<void> => {
+    let moveTo: "top" | "bottom";
+
+    const distanceToTop = height.value - minHeight;
+    const distanceToBottom = maxAutoHeight - height.value;
+
+    if (height.value >= maxAutoHeight) {
+      moveTo = "bottom";
+    } else if (distanceToTop < distanceToBottom) {
+      moveTo = "top";
+    } else {
+      moveTo = "bottom";
+    }
+
+    const newHeight = moveTo === "top" ? maxAutoHeight : minHeight;
+
+    if (!canAnimate) {
+      height.value = newHeight;
+
+      return;
+    }
+
+    height.value = withSpring(newHeight, autoAnimateConfig);
+  }, [canAnimate, height, maxAutoHeight, minHeight]);
+
   React.useImperativeHandle(ref, () => ({
     open,
     close,
+    toggleOpen,
   }));
 
   const haveCheckedInitAnimations = React.useRef(false);
@@ -134,5 +160,5 @@ export default function useOpenClose(
     return subscription.remove;
   }, [onRequestClose]);
 
-  return { open, close, bottom };
+  return { open, close, bottom, toggleOpen };
 }

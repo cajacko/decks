@@ -43,6 +43,7 @@ export default function EditCard({
   backgroundStyle: backgroundStyleProp,
   ...props
 }: EditCardProps) {
+  const { onRequestClose } = props;
   const deckId = useRequiredAppSelector(
     (state) => selectDeckId(state, props.target),
     selectDeckId.name,
@@ -57,8 +58,12 @@ export default function EditCard({
   const bottomDrawer = React.useRef<BottomDrawerRef>(null);
 
   const onPress = React.useCallback(() => {
-    bottomDrawer.current?.open();
-  }, []);
+    if (canEdit) {
+      bottomDrawer.current?.toggleOpen();
+    } else {
+      onRequestClose();
+    }
+  }, [canEdit, onRequestClose]);
 
   const [side, setSide] = React.useState<Cards.Side>(initialSide ?? "front");
   const cardSidesRef = React.useRef<AnimatedCardSidesRef>(null);
@@ -101,7 +106,7 @@ export default function EditCard({
             horizontal={false}
           >
             <View style={styles.scrollContent}>
-              <Pressable onPress={onPress}>
+              <Pressable onPress={onPress} vibrate>
                 <EditingAnimatedCardSides
                   ref={cardSidesRef}
                   target={props.target}

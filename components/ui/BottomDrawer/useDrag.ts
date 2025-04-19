@@ -5,9 +5,9 @@ import {
   SharedValue,
   useSharedValue,
   useDerivedValue,
+  runOnJS,
 } from "react-native-reanimated";
 import { Gesture } from "react-native-gesture-handler";
-import { autoAnimateConfig } from "./bottomDrawer.style";
 import useFlag from "@/hooks/useFlag";
 
 // NOTE: Debug logs don't work inside the pan events, even with runOnJs
@@ -16,14 +16,13 @@ export default function useDrag(props: {
   maxHeight: number;
   maxAutoHeight: number;
   minHeight: number;
+  toggleOpen: () => Promise<void>;
 }) {
-  const canAnimate = useFlag("BOTTOM_DRAWER_ANIMATE") === "enabled";
   const canDrag = useFlag("BOTTOM_DRAWER_DRAG") === "enabled";
 
-  const { height } = props;
+  const { height, toggleOpen } = props;
 
   const maxHeight = useSharedValue<number>(props.maxHeight);
-  const maxAutoHeight = useSharedValue<number>(props.maxAutoHeight);
   const minHeight = useSharedValue<number>(props.minHeight);
   const isPanning = useSharedValue<boolean>(false);
   const isHolding = useSharedValue<boolean>(false);
@@ -36,16 +35,8 @@ export default function useDrag(props: {
   // Keep our shared values in sync with the props
   React.useEffect(() => {
     maxHeight.value = props.maxHeight;
-    maxAutoHeight.value = props.maxAutoHeight;
     minHeight.value = props.minHeight;
-  }, [
-    props.maxHeight,
-    props.maxAutoHeight,
-    props.minHeight,
-    maxHeight,
-    maxAutoHeight,
-    minHeight,
-  ]);
+  }, [props.maxHeight, props.minHeight, maxHeight, minHeight]);
 
   const holding = React.useMemo(
     () =>
@@ -76,31 +67,9 @@ export default function useDrag(props: {
   const tap = React.useMemo(
     () =>
       Gesture.Tap().onEnd(() => {
-        let moveTo: "top" | "bottom";
-
-        const distanceToTop = height.value - minHeight.value;
-        const distanceToBottom = maxAutoHeight.value - height.value;
-
-        if (height.value >= maxAutoHeight.value) {
-          moveTo = "bottom";
-        } else if (distanceToTop < distanceToBottom) {
-          moveTo = "top";
-        } else {
-          moveTo = "bottom";
-        }
-
-        const newHeight =
-          moveTo === "top" ? maxAutoHeight.value : minHeight.value;
-
-        if (!canAnimate) {
-          height.value = newHeight;
-
-          return;
-        }
-
-        height.value = withSpring(newHeight, autoAnimateConfig);
+        runOnJS(toggleOpen)();
       }),
-    [canAnimate, height, maxAutoHeight, minHeight],
+    [toggleOpen],
   );
 
   const panStartHeight = useSharedValue(0);

@@ -34,7 +34,7 @@ export default function useBottomDrawer(
     hasGotMaxHeight,
   } = useHeightConstraints(props);
 
-  const { bottom } = useOpenClose(
+  const { bottom, toggleOpen } = useOpenClose(
     {
       height,
       maxAutoHeight,
@@ -53,6 +53,7 @@ export default function useBottomDrawer(
     maxAutoHeight,
     maxHeight,
     minHeight,
+    toggleOpen,
   });
 
   const animatedStyles = useAnimatedStyles({ height, pressed, bottom });
