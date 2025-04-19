@@ -51,6 +51,10 @@ export default function DevMenu({
   );
 
   const purgeStore = React.useCallback(() => {
+    navigate({
+      name: "decks",
+    });
+
     setPurgeStatus("Purging...");
 
     persistor
@@ -69,7 +73,7 @@ export default function DevMenu({
           setPurgeStatus(null);
         }, 1000);
       });
-  }, []);
+  }, [navigate]);
 
   const isDevClient = DevClient.isDevelopmentBuild();
   const iconSize = useLeftAdornmentSize({ titleProps });

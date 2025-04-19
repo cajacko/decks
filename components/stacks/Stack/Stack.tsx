@@ -19,6 +19,7 @@ import StackToolbar from "@/components/stacks/StackToolbar";
 import useGetStackName from "@/hooks/useGetStackName";
 import { useStackContext } from "./Stack.context";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
+import Timer from "@/components/timer/Timer";
 
 function StackContent(
   props: Pick<StackProps, "style"> & {
@@ -211,15 +212,7 @@ export default function Stack(props: StackProps): React.ReactNode {
       cards={cardInstances}
       containerStyle={containerStyle}
       innerStyle={innerStyle}
-      toolbar={
-        <StackToolbar
-          title={stackName}
-          handleShuffle={getShouldShowShuffle() ? handleShuffle : undefined}
-          handleFlipAll={handleFlipAll}
-          cardCount={cardCount}
-          tabletopId={tabletopId}
-        />
-      }
+      toolbar={<Timer />}
     />
   );
 }
