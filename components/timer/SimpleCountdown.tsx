@@ -16,7 +16,9 @@ import useTimer, { UseTimerProps } from "@/components/timer/useTimer";
 import useAlertVibration from "@/components/timer/useAlertVibration";
 import Numbers from "@/components/timer/Numbers";
 
-export type SimpleCountdownProps = UseTimerProps;
+export interface SimpleCountdownProps extends UseTimerProps {
+  hideProgress?: boolean;
+}
 
 function useSimpleCountdown(props: SimpleCountdownProps) {
   const { vibrateAlert } = useAlertVibration();
@@ -24,6 +26,7 @@ function useSimpleCountdown(props: SimpleCountdownProps) {
   const iconSize = useSharedValue(1);
   const numbersSize = useSharedValue(0);
   const pauseFlash = useSharedValue(0);
+  const [isPaused, setIsPaused] = React.useState(false);
 
   const resetTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -42,12 +45,14 @@ function useSimpleCountdown(props: SimpleCountdownProps) {
     },
     onChangeState: (state) => {
       if (state === "paused") {
+        setIsPaused(true);
         pauseFlash.value = withRepeat(
           withTiming(1, { duration: 500 }),
           -1,
           true,
         );
       } else {
+        setIsPaused(false);
         pauseFlash.value = 0;
       }
     },
@@ -74,6 +79,7 @@ function useSimpleCountdown(props: SimpleCountdownProps) {
     iconSize,
     stop,
     toggle,
+    isPaused,
   };
 }
 
@@ -89,6 +95,7 @@ export default React.memo<SimpleCountdownProps>(
       stop,
       toggle,
       pulse,
+      isPaused,
     } = useSimpleCountdown(props);
 
     const primaryColor = useThemeColor("primary");
@@ -139,21 +146,22 @@ export default React.memo<SimpleCountdownProps>(
         <Animated.View style={style}>
           <View style={styles.content}>
             <Animated.View style={iconContainerStyle}>
-              <IconSymbol name="timer" color={primaryColor} size={30} />
+              <IconSymbol name={isPaused ? "pause" : "timer"} size={30} />
             </Animated.View>
             <Animated.View style={numbersContainerStyle}>
               <Numbers initSeconds={props.initSeconds} countdown={countdown} />
             </Animated.View>
           </View>
-
-          <TimerCircle
-            countdown={countdown}
-            size={size}
-            strokeWidth={4}
-            startProgress={startProgress}
-            endProgress={endProgress}
-            progressColor={textColor}
-          />
+          {!props.hideProgress && (
+            <TimerCircle
+              countdown={countdown}
+              size={size}
+              strokeWidth={4}
+              startProgress={startProgress}
+              endProgress={endProgress}
+              progressColor={textColor}
+            />
+          )}
         </Animated.View>
       </TouchableScale>
     );

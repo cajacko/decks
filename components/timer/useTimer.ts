@@ -25,6 +25,7 @@ interface UseTimerMethods {
 
 export interface UseTimerProps {
   initSeconds: number;
+  doNotPulse?: boolean;
   onFinished?: (reset: () => void) => void;
   onResume?: () => void;
   onPause?: () => void;
@@ -54,26 +55,64 @@ export default function useTimer({
   onStart,
   onStop,
   onToggle,
+  doNotPulse = false,
 }: UseTimerProps): UseTimerReturn {
   const state = useSharedValue<TimerState>("ready");
   const initSeconds = useSharedValue(initSecondsProp);
   const countdown = useSharedValue(initSecondsProp);
   const seconds = useDerivedValue(() => Math.ceil(countdown.value));
   const { vibrate } = useVibrate();
-  const pulse = useSharedValue(0);
+  const pulseAnimation = useSharedValue(0);
 
-  const onSecond = React.useCallback((second: number) => {
-    if (second <= 0) return;
-    if (second > 3) return;
+  const pulseInterval = React.useRef<NodeJS.Timeout | null>(null);
 
-    const duration = 150;
+  const pulse = React.useCallback(
+    (loop?: boolean) => {
+      if (doNotPulse) return;
 
-    pulse.value = withTiming(1, { duration, easing: Easing.linear }, () => {
-      pulse.value = withTiming(0, { duration, easing: Easing.linear });
-    });
+      function run() {
+        vibrate?.("useTimer = on second");
 
-    vibrate?.("useTimer = on second");
-  }, []);
+        const duration = 150;
+
+        pulseAnimation.value = withTiming(
+          1,
+          { duration, easing: Easing.linear },
+          () => {
+            pulseAnimation.value = withTiming(0, {
+              duration,
+              easing: Easing.linear,
+            });
+          },
+        );
+      }
+
+      run();
+
+      if (loop) {
+        if (pulseInterval.current) {
+          clearTimeout(pulseInterval.current);
+
+          pulseInterval.current = null;
+        }
+
+        pulseInterval.current = setInterval(() => {
+          run();
+        }, 1000);
+      }
+    },
+    [doNotPulse, vibrate],
+  );
+
+  const onSecond = React.useCallback(
+    (second: number) => {
+      if (second <= 0) return;
+      if (second > 3) return;
+
+      pulse();
+    },
+    [doNotPulse],
+  );
 
   useDerivedValue(() => {
     runOnJS(onSecond)(seconds.value);
@@ -87,6 +126,11 @@ export default function useTimer({
     state.value = "ready";
     initSeconds.value = initSecondsProp;
     countdown.value = initSecondsProp;
+
+    if (pulseInterval.current) {
+      clearTimeout(pulseInterval.current);
+      pulseInterval.current = null;
+    }
 
     onChangeState?.("ready");
     onReset?.();
@@ -118,6 +162,8 @@ export default function useTimer({
         if (!finished) return;
 
         state.value = "finished";
+
+        runOnJS(pulse)(true);
 
         if (onChangeState) {
           runOnJS(onChangeState)("finished");
@@ -175,6 +221,6 @@ export default function useTimer({
     toggle,
     stop,
     start,
-    pulse,
+    pulse: pulseAnimation,
   };
 }
