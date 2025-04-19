@@ -215,48 +215,51 @@ export default function useDispatchActions({
     stackListRef,
   ]);
 
-  const handleMoveToBottom = React.useCallback(async () => {
-    if (cardInstanceRef.current && animateCardMovement) {
-      try {
-        await cardInstanceRef.current.animateOut({
-          direction: "top",
-          animateOpacity: false,
-          animateBack: animateSendToBack
-            ? async () => {
-                setAnimatedToBack(cardInstanceId);
-              }
-            : undefined,
-        });
-      } catch {}
+  const handleMoveToBottom = React.useCallback(
+    async (direction: "top" | "left" | "right" | "bottom" = "top") => {
+      if (cardInstanceRef.current && animateCardMovement) {
+        try {
+          await cardInstanceRef.current.animateOut({
+            direction,
+            animateOpacity: false,
+            animateBack: animateSendToBack
+              ? async () => {
+                  setAnimatedToBack(cardInstanceId);
+                }
+              : undefined,
+          });
+        } catch {}
 
-      setAnimatedToBack(null);
-    }
+        setAnimatedToBack(null);
+      }
 
-    dispatch(
-      moveCard({
-        tabletopId,
-        moveTarget: { cardInstanceId },
-        method: MoveCardInstanceMethod.bottomNoChange,
-        toTarget: { stackId: stackId },
-        date: dateToDateString(new Date()),
-        operation: {
-          type: "MOVE_CARD_TO_BOTTOM",
-          payload: {
-            scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+      dispatch(
+        moveCard({
+          tabletopId,
+          moveTarget: { cardInstanceId },
+          method: MoveCardInstanceMethod.bottomNoChange,
+          toTarget: { stackId: stackId },
+          date: dateToDateString(new Date()),
+          operation: {
+            type: "MOVE_CARD_TO_BOTTOM",
+            payload: {
+              scrollOffset: stackListRef?.current?.getScrollOffset() ?? null,
+            },
           },
-        },
-      }),
-    );
-  }, [
-    animateSendToBack,
-    dispatch,
-    cardInstanceId,
-    stackId,
-    cardInstanceRef,
-    tabletopId,
-    animateCardMovement,
-    stackListRef,
-  ]);
+        }),
+      );
+    },
+    [
+      animateSendToBack,
+      dispatch,
+      cardInstanceId,
+      stackId,
+      cardInstanceRef,
+      tabletopId,
+      animateCardMovement,
+      stackListRef,
+    ],
+  );
 
   return {
     deckId,

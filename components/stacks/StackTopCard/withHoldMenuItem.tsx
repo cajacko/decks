@@ -2,10 +2,7 @@ import { MenuItemComponentProps } from "@/components/ui/HoldMenu";
 import { IconSymbolName } from "@/components/ui/IconSymbol";
 import CardAction from "@/components/forms/CardAction";
 
-export default function withHoldMenuItem(
-  icon: IconSymbolName,
-  action?: () => void,
-) {
+export default function withHoldMenuItem(icon: IconSymbolName) {
   return function HoldMenuItem({
     isHighlighted,
   }: MenuItemComponentProps): React.ReactNode {

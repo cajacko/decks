@@ -17,34 +17,31 @@ export default function useMenuItems(props: StackTopCardProps) {
     const bottom: MenuItem = {
       height: cardActionSize,
       width: cardActionSize,
-      component: withHoldMenuItem("edit", state.handleFlipCard),
+      component: withHoldMenuItem("edit"),
       handleAction: () => {
         setShowEditModal(true);
       },
     };
 
-    const top: MenuItem | undefined = state.handleMoveToBottom && {
+    const top: MenuItem | undefined = {
       height: cardActionSize,
       width: cardActionSize,
-      component: withHoldMenuItem(
-        "vertical-align-top",
-        state.handleMoveToBottom,
-      ),
-      handleAction: state.handleMoveToBottom,
+      component: withHoldMenuItem("vertical-align-top"),
+      handleAction: () => state.handleMoveToBottom("top"),
     };
 
     const right: MenuItem = {
       height: cardActionSize,
       width: cardActionSize,
-      component: withHoldMenuItem("chevron-right", state.moveRight.top),
-      handleAction: state.moveRight.top,
+      component: withHoldMenuItem("chevron-right"),
+      handleAction: () => state.handleMoveToBottom("right"),
     };
 
     const left: MenuItem = {
       height: cardActionSize,
       width: cardActionSize,
-      component: withHoldMenuItem("chevron-left", state.moveLeft.top),
-      handleAction: state.moveLeft.top,
+      component: withHoldMenuItem("chevron-left"),
+      handleAction: () => state.handleMoveToBottom("left"),
     };
 
     return {
@@ -53,12 +50,7 @@ export default function useMenuItems(props: StackTopCardProps) {
       right,
       left,
     };
-  }, [
-    state.handleFlipCard,
-    state.handleMoveToBottom,
-    state.moveRight,
-    state.moveLeft,
-  ]);
+  }, [state.handleFlipCard, state.handleMoveToBottom]);
 
   const handleDoubleTap = React.useCallback(() => {
     setShowEditModal(true);

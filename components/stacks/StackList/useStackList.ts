@@ -25,8 +25,12 @@ export default function useStackList(ref: React.ForwardedRef<StackListRef>) {
   const scrollOffset = useScrollViewOffset(animatedRef);
   const { canOnlyFit1Stack } = useStackContext();
   const { tabletopId } = useTabletopContext();
-  const stackIds = useAppSelector((state) =>
+  const _stackIds = useAppSelector((state) =>
     selectStackIds(state, { tabletopId }),
+  );
+  const stackIds = React.useMemo(
+    () => (_stackIds ? [_stackIds[0]] : null),
+    [_stackIds],
   );
   const [focussedStackId, setFocussedStackId] = React.useState<string | null>(
     null,
