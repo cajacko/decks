@@ -19,7 +19,7 @@ import StackToolbar from "@/components/stacks/StackToolbar";
 import useGetStackName from "@/hooks/useGetStackName";
 import { useStackContext } from "./Stack.context";
 import { usePerformanceMonitor } from "@/context/PerformanceMonitor";
-import Timer from "@/components/timer/Timer";
+import Timer from "@/components/timer/SimpleCountdown";
 
 function StackContent(
   props: Pick<StackProps, "style"> & {

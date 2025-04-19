@@ -5,12 +5,15 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
   useDerivedValue,
+  interpolateColor,
 } from "react-native-reanimated";
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { fixed } from "@/constants/colors";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function TimerCircle({
+  countdown,
   startProgress: startProgressProp,
   endProgress,
   size,
@@ -18,7 +21,9 @@ export default function TimerCircle({
   progressColor,
   trackColor = "transparent",
   style: styleProp,
+  transitionColorsFrom = 3,
 }: {
+  countdown: SharedValue<number>;
   startProgress?: SharedValue<number>;
   endProgress: SharedValue<number>;
   size: number;
@@ -26,6 +31,7 @@ export default function TimerCircle({
   progressColor: string;
   trackColor?: string;
   style?: StyleProp<ViewStyle>;
+  transitionColorsFrom?: number;
 }) {
   const startProgress = useDerivedValue(() =>
     startProgressProp ? startProgressProp.value : 0,
@@ -34,6 +40,11 @@ export default function TimerCircle({
   const circumference = 2 * Math.PI * radius;
 
   const animatedProps = useAnimatedProps(() => ({
+    stroke: interpolateColor(
+      countdown.value,
+      [1, transitionColorsFrom, transitionColorsFrom + 1],
+      [fixed.red, fixed.yellow, progressColor],
+    ),
     strokeDashoffset:
       circumference * (1 - endProgress.value - startProgress.value),
   }));
@@ -78,7 +89,6 @@ export default function TimerCircle({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={progressColor}
           strokeWidth={strokeWidth}
           strokeDasharray={`${circumference}, ${circumference}`}
           strokeLinecap="round"

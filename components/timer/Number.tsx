@@ -1,12 +1,17 @@
-import ThemedText from "@/components/ui/ThemedText";
+import ThemedText, { ThemedTextProps } from "@/components/ui/ThemedText";
 import React from "react";
-import { StyleProp, ViewStyle } from "react-native";
 
-export interface NumberProps {
+export interface NumberProps extends Pick<ThemedTextProps, "style"> {
   number: number;
-  style?: StyleProp<ViewStyle>;
 }
 
-export default function Number({ number }: NumberProps): React.ReactNode {
-  return <ThemedText type="h2">{number}</ThemedText>;
+export default function Number({
+  number,
+  style,
+}: NumberProps): React.ReactNode {
+  return (
+    <ThemedText type="h2" style={style}>
+      {number}
+    </ThemedText>
+  );
 }

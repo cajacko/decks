@@ -83,6 +83,8 @@ export type ThemeObjectKey = keyof ThemeObject;
 export type ThemeObjectValue<K extends ThemeObjectKey> = ThemeObject[K];
 
 export const fixed = {
+  red: colors.red,
+  yellow: colors.yellow,
   shadow: Color(colors.black).alpha(0.5).rgb().string(),
   cardPresets: {
     black: colors.black,

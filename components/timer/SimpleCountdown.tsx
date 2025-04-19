@@ -1,192 +1,96 @@
 import React from "react";
-import Number from "@/components/timer/Number";
 import { StyleSheet, View } from "react-native";
-import {
-  InternalTimerRef,
-  TimerState,
-  TimerProps,
-} from "@/components/timer/Timer.types";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import IconSymbol from "@/components/ui/IconSymbol";
 import Animated, {
-  Easing,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withTiming,
-  cancelAnimation,
   withSpring,
 } from "react-native-reanimated";
 import TimerCircle from "@/components/timer/TimerCircle";
+import { TouchableScale } from "@/components/ui/Pressables";
+import useTimer, { UseTimerProps } from "@/components/timer/useTimer";
+import useAlertVibration from "@/components/timer/useAlertVibration";
+import Numbers from "@/components/timer/Numbers";
 
-export type SimpleCountdownProps = TimerProps<{
-  initSeconds?: number;
-}>;
+export type SimpleCountdownProps = UseTimerProps;
 
-function useSimpleCountdown(
-  { initSeconds = 60, onFinished }: SimpleCountdownProps,
-  ref: React.ForwardedRef<InternalTimerRef>,
-) {
-  const [timerState, setTimerState] = React.useState<TimerState>("ready");
-  const [seconds, setSeconds] = React.useState(initSeconds);
+function useSimpleCountdown(props: SimpleCountdownProps) {
+  const { vibrateAlert } = useAlertVibration();
   const startProgress = useSharedValue(0);
-  const endProgress = useSharedValue(0);
   const iconSize = useSharedValue(1);
   const numbersSize = useSharedValue(0);
+  const pauseFlash = useSharedValue(0);
 
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null); // Ref to store the interval
+  const resetTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-  // useImperativeHandle doesn't update with new prop/ state changes so to access the latest we
-  // need to grab from refs
-  const _state = {
-    initSeconds,
-    timerState,
-    seconds,
-    onFinished,
-  };
-  const stateRef = React.useRef(_state);
-  stateRef.current = _state;
-
-  const resume = React.useCallback<InternalTimerRef["resume"]>(() => {
-    if (intervalRef.current) return; // Prevent multiple intervals
-
-    setTimerState("started");
-
-    startProgress.value = 0;
-    numbersSize.value = withSpring(1);
-    iconSize.value = withTiming(0, {
-      duration: 500,
-    });
-
-    endProgress.value = withTiming(1, {
-      duration: stateRef.current.seconds * 1000,
-      easing: Easing.linear,
-    });
-
-    intervalRef.current = setInterval(() => {
-      setSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-
-          return 0;
-        }
-
-        return prev - 1;
+  const { countdown, percentageProgress, toggle, stop, pulse } = useTimer({
+    ...props,
+    onResume: () => {
+      startProgress.value = 0;
+      numbersSize.value = withSpring(1);
+      iconSize.value = withTiming(0, {
+        duration: 500,
       });
-    }, 1000);
-  }, [endProgress, startProgress, numbersSize, iconSize]);
-
-  const isZeroSeconds = seconds === 0;
-
-  React.useEffect(() => {
-    if (!isZeroSeconds) return;
-
-    setTimerState("finished");
-    stateRef.current.onFinished?.();
-
-    endProgress.value = withTiming(1, {
-      duration: 200,
-      easing: Easing.linear,
-    });
-  }, [isZeroSeconds, endProgress]);
-
-  const pause = React.useCallback<InternalTimerRef["pause"]>(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    numbersSize.value = withSpring(0);
-    iconSize.value = withSpring(1);
-    cancelAnimation(endProgress);
-    setTimerState("paused");
-  }, [endProgress, numbersSize, iconSize]);
-
-  const reset = React.useCallback<InternalTimerRef["reset"]>(
-    ({ animateProgressAnimation = false } = {}) => {
-      setSeconds(stateRef.current.initSeconds);
-
+    },
+    onPause: () => {
       numbersSize.value = withSpring(0);
       iconSize.value = withSpring(1);
-
-      if (!animateProgressAnimation) {
-        startProgress.value = 0;
-        endProgress.value = 0;
-
-        return;
-      }
-
-      startProgress.value = withTiming(
-        1,
-        {
-          duration: 500,
-          easing: Easing.linear,
-        },
-        () => {
-          startProgress.value = 0;
-          endProgress.value = 0;
-        },
-      );
     },
-    [endProgress, startProgress, numbersSize, iconSize],
-  );
+    onChangeState: (state) => {
+      if (state === "paused") {
+        pauseFlash.value = withRepeat(
+          withTiming(1, { duration: 500 }),
+          -1,
+          true,
+        );
+      } else {
+        pauseFlash.value = 0;
+      }
+    },
+    onFinished: (reset) => {
+      vibrateAlert();
 
-  const getState = React.useCallback<InternalTimerRef["getState"]>(() => {
-    return stateRef.current.timerState;
-  }, []);
-
-  React.useImperativeHandle(ref, () => ({
-    reset,
-    pause,
-    resume,
-    getState,
-    setState: setTimerState,
-  }));
-
-  /**
-   * Given the seconds this will return the digits in the correct order to display.
-   */
-  const numbers = React.useMemo((): number[] => {
-    const digits = String(seconds).split("");
-
-    return digits.map((digit) => parseInt(digit, 10));
-  }, [seconds]);
-
-  const pauseFlash = useSharedValue(0);
-  const isPaused = timerState === "paused";
-
-  React.useEffect(() => {
-    if (isPaused) {
-      pauseFlash.value = withRepeat(withTiming(1, { duration: 500 }), -1, true);
-    } else {
-      pauseFlash.value = 0;
-    }
-  }, [isPaused, pauseFlash]);
+      resetTimeout.current = setTimeout(() => {
+        reset();
+      }, 3000);
+    },
+    onReset: () => {
+      numbersSize.value = withSpring(0);
+      iconSize.value = withSpring(1);
+    },
+  });
 
   return {
-    numbers,
-    timerState,
+    pulse,
+    countdown,
     pauseFlash,
-    endProgress,
+    endProgress: percentageProgress,
     startProgress,
     numbersSize,
     iconSize,
+    stop,
+    toggle,
   };
 }
 
-export default React.forwardRef<InternalTimerRef, SimpleCountdownProps>(
-  function SimpleCountdown(props, ref): React.ReactNode {
+export default React.memo<SimpleCountdownProps>(
+  function SimpleCountdown(props): React.ReactNode {
     const {
-      numbers,
       pauseFlash,
-      timerState,
+      countdown,
       endProgress,
       startProgress,
       numbersSize,
       iconSize,
-    } = useSimpleCountdown(props, ref);
+      stop,
+      toggle,
+      pulse,
+    } = useSimpleCountdown(props);
+
     const primaryColor = useThemeColor("primary");
     const textColor = useThemeColor("text");
 
@@ -196,6 +100,11 @@ export default React.forwardRef<InternalTimerRef, SimpleCountdownProps>(
         [0, 0.2, 0.8, 1],
         [1, 1, 0.2, 0.2],
       ),
+      transform: [
+        {
+          scale: interpolate(pulse.value, [0, 1], [1, 1.1]),
+        },
+      ],
     }));
 
     const animatedIconStyle = useAnimatedStyle(() => ({
@@ -226,30 +135,27 @@ export default React.forwardRef<InternalTimerRef, SimpleCountdownProps>(
     );
 
     return (
-      <Animated.View style={style}>
-        <View style={styles.content}>
-          <Animated.View style={iconContainerStyle}>
-            <IconSymbol
-              name={timerState === "paused" ? "pause" : "timer"}
-              color={primaryColor}
-              size={30}
-            />
-          </Animated.View>
-          <Animated.View style={numbersContainerStyle}>
-            {numbers.map((number, i) => (
-              <Number key={i} number={number} />
-            ))}
-          </Animated.View>
-        </View>
+      <TouchableScale onPress={toggle} onLongPress={stop} vibrate>
+        <Animated.View style={style}>
+          <View style={styles.content}>
+            <Animated.View style={iconContainerStyle}>
+              <IconSymbol name="timer" color={primaryColor} size={30} />
+            </Animated.View>
+            <Animated.View style={numbersContainerStyle}>
+              <Numbers initSeconds={props.initSeconds} countdown={countdown} />
+            </Animated.View>
+          </View>
 
-        <TimerCircle
-          size={size}
-          strokeWidth={4}
-          startProgress={startProgress}
-          endProgress={endProgress}
-          progressColor={textColor}
-        />
-      </Animated.View>
+          <TimerCircle
+            countdown={countdown}
+            size={size}
+            strokeWidth={4}
+            startProgress={startProgress}
+            endProgress={endProgress}
+            progressColor={textColor}
+          />
+        </Animated.View>
+      </TouchableScale>
     );
   },
 );
@@ -264,7 +170,7 @@ const styles = StyleSheet.create({
     position: "relative",
     height: size,
     width: size,
-    overflow: "hidden",
+    // overflow: "hidden",
   },
   content: {
     position: "absolute",
